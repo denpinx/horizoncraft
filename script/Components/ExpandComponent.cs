@@ -1,0 +1,14 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using MemoryPack;
+
+namespace horizoncraft.script.Components
+{
+    [MemoryPackable]
+    public partial class ExpandComponent : TickComponent
+    {
+        public string BlockName = "";
+    }
+}
