@@ -14,7 +14,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             name = "森林";
             weight = 3;
             GetHigh = (noise, x, z) => ((int)(noise.GetNoise2D(x * Chunk.Size, z) * 64)) - new Random(HashCode.Combine(x, z)).Next(8);
-            GeneratorStrcut = (noise, random, structs, gx, gy, z) =>
+            GeneratorStruct = (noise, random, structs, gx, gy, z) =>
             {
                 if (random.Next(7) != 1) return;
                 BlockStruct blockStrcut = new BlockStruct();

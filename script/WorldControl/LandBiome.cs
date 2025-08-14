@@ -11,6 +11,6 @@ namespace horizoncraft.script.WorldControl
         public Func<FastNoiseLite, int, int, int> GetHigh;
         public Action<FastNoiseLite,Chunk, int[,], Random, int, int, int, int, int> GeneratorTerrain;
         //噪音，随机生成器，globalX,globalY,z
-        public Action<FastNoiseLite, Random, List<BlockStruct>, int, int, int> GeneratorStrcut;
+        public Action<FastNoiseLite, Random, List<BlockStruct>, int, int, int> GeneratorStruct;
     }
 }

@@ -60,7 +60,7 @@ namespace horizoncraft.script.WorldControl
             BiomeType biomeType = BiomeManage.CheckRange(highmap, x, y);
             if (biomeType == BiomeType.LandBiome)
             {
-                if (landbiome.GeneratorStrcut == null) return structs;
+                if (landbiome.GeneratorStruct == null) return structs;
                 for (int i = 0; i < Chunk.Size; i++)
                 {
                     int gx = x * Chunk.Size + i;
@@ -68,7 +68,7 @@ namespace horizoncraft.script.WorldControl
                     int hy = highmap[i, z] - y * Chunk.Size;
                     if (hy >= 0 && hy < Chunk.Size)
                     {
-                        landbiome.GeneratorStrcut(fastNoiseLite, random, structs, gx, gy, z);
+                        landbiome.GeneratorStruct(fastNoiseLite, random, structs, gx, gy, z);
                     }
                 }
                 return structs;

@@ -23,7 +23,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                 if (num == -3) chunk[x, y, z] = Materials.Valueof("snow").Blockdata();
                 if (num <= -4) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
             };
-            GeneratorStrcut = (noise, random, structs, gx, gy, z) =>
+            GeneratorStruct = (noise, random, structs, gx, gy, z) =>
             {
                 if (random.Next(14) != 1) return;
                 BlockStruct blockStrcut = new BlockStruct();
