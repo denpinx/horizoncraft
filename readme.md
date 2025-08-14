@@ -92,71 +92,37 @@
     {
         ...
         //在尾部添加
-        Register(new Biome
-        {
-            //地下名称
-            name = "我的地形",
-            //生成权重
-            weight = 1,
-            //地形基本高度,x为区块坐标，相同输入，相同输出，在多个区块之间的高度插值生成地形,实现可控地形高度
-            GetHigh = (noise, x, z) => -Math.Abs((int)(noise.GetNoise2D(x * Chunk.Size, z) * 8) - new Random(HashCode.Combine(x, z)).Next(4)),
-            //生成地形,如果不想写，可以直接复用,遍历区块所有方块
-            GeneratorTerrain = (chunk, highMap, blockStrcut)=>{
-                for (int z = 0; z < 2; z++)
+            Register(new Biome
+            {
+                name = "我的地形",
+                //生成权重
+                weight = 2,
+                //生成区块的高度,会由生成器插值生成高度图,所以这里不用考虑X轴和Y轴连续性
+                GetHigh = (noise, x, z) => (int)(noise.GetNoise2D(x * Chunk.Size, z) * 8),
+                //生成地形,x,y,z是外部循环,gx,gy是全局x,y坐标
+                GeneratorTerrain = (chunk, highMap, blockStrcut, random, x, y, z, gx, gy) =>
                 {
-                    Random random = new Random(chunk.X * 3 + chunk.Y * 7 + z * 11);
-                    for (int x = 0; x < Chunk.Size; x++)
-                        for (int y = 0; y < Chunk.Size; y++)
-                        {
-                            //特别注意,这个函数内只能用 chunk[x, y, z] 去设置方块，请勿用 chunk[x+K, y+J, z]等等,这样就不符合区块的生成守则了
-                            //每个区块只能生成自己区块内的方块，不能跨区块生成
+                    //这里的num,是当前坐标与地平线highmap的差值,以下计算皆在Chunk范围内,不会越界
+                    int num = highMap[x, z] - gy;
+                    if (num == 0) chunk[x, y, z] = Materials.Valueof("grass").Blockdata();
+                    if (num == -1) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
+                    if (num == -2) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
+                    if (num == -3) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
+                    if (num <= -4) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
+                },
+                //生成建筑结构
+                //用来交给生成器判断有没有建筑结构跨区块命中了某个区块
+                GeneratorStrcut = (noise, random, strcuts, gx, gy, z) =>
+                {
+                    //控制生成概率
+                    if (random.Next(14) != 1) return;
+                    BlockStrcut blockStrcut = new BlockStrcut();
+                    SetBlockWork sbw = blockStrcut.work;
+                    //具体结构的生成
+                    ..
 
-                            int gx = chunk.X * Chunk.Size + x;
-                            int gy = chunk.Y * Chunk.Size + y;
-                            int num = highMap[x, z] - gy;//和当前的插值
-                            if (gy > 0 && highMap[x, z] > 0)//小于海平面填充水，生成沙子覆盖
-                            {
-                                //这里开始自定义
-                                if (num > 0) chunk[x, y, z] = Materials.Valueof("water").Blockdata();
-                                if (num == 0) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                                if (num == -1) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                                if (num == -2) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                                if (num == -3)
-                                {
-                                    if (random.Next(2) == 1) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                                    else chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
-                                 }
-                            }
-                            else//高于海平面，生成草方块和泥土
-                            {
-                                //这里开始自定义
-                                if (num == 1)
-                                {
-                                    if (random.Next(2) == 1) chunk[x, y, z] = Materials.Valueof("bush").Blockdata();
-                                }
-                                if (num == 0) chunk[x, y, z] = Materials.Valueof("grass").Blockdata();
-                                if (num == -1) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
-                                if (num == -2) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
-                                if (num == -3) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
-                                if (num <= -4) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
-                            }
 
-                            //
-                            (BlockMeta, int) data = WorldGenerator.GetStructData(blockStrcut, gx, gy, z);
-                            if (data.Item1 != null)
-                            {
-                                chunk[x, y, z] = data.Item1.Blockdata();
-                                chunk[x, y, z].STATE = data.Item2;
-                            }
-                        }
+                    strcuts.Add(blockStrcut);
                 }
-            },
-            //生成建筑结构表,也可以复用,注意,这里只是生成结构表，并不是真的生成结构
-            GeneratorStrcut =  (noise, x, y, z)=>{
-                List<BlockStrcut> strcuts = new List<BlockStrcut>();
-                int[,] highmap = WorldGenerator.GetHighMap(x);
-                //你的结构生成判断写在这,其他区块生成时会调用这个来判断当前结构是否命中了某个方块
-                return strcuts;
-            }
-        });
+            });
     }

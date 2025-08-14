@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.WorldControl.work;
@@ -68,7 +69,20 @@ namespace horizoncraft.script.WorldControl
             Biome biome = BiomeManage.GetBiome(x);
             if (biome.GeneratorStrcut != null)
             {
-                return BiomeManage.GetBiome(x).GeneratorStrcut(fastNoiseLite, x, y, z);
+                int[,] highmap = WorldGenerator.GetHighMap(x);
+                Random random = new Random(x * 3 + y * 7 + z * 11);
+                List<BlockStrcut> blockStrcuts = new();
+                for (int i = 0; i < Chunk.Size; i++)
+                {
+                    int gx = x * Chunk.Size + i;
+                    int gy = highmap[i, z] - 1;
+                    int hy = highmap[i, z] - y * Chunk.Size;
+                    if (hy >= 0 && hy < Chunk.Size)
+                    {
+                        biome.GeneratorStrcut(fastNoiseLite, random, blockStrcuts,gx, gy, z);
+                    }
+                }
+                return blockStrcuts;
             }
             else
             {
@@ -105,7 +119,25 @@ namespace horizoncraft.script.WorldControl
             chunk.spawn = true;
             var biome = BiomeManage.GetBiome(chunk.X);
             chunk.BiomeType = biome.name;
-            biome.GeneratorTerrain(chunk, GetHighMap(chunk.X), GetAllStructs(chunk.X, chunk.Y));
+            int[,] highmap = GetHighMap(chunk.X);
+            List<BlockStrcut> strcuts = GetAllStructs(chunk.X, chunk.Y);
+            for (int z = 0; z < Chunk.SizeZ; z++)
+            {
+                Random random = new Random(chunk.X * 3 + chunk.Y * 7 + z * 11);
+                for (int x = 0; x < Chunk.Size; x++)
+                    for (int y = 0; y < Chunk.Size; y++)
+                    {
+                        int gx = chunk.X * Chunk.Size + x;
+                        int gy = chunk.Y * Chunk.Size + y;
+                        biome.GeneratorTerrain(chunk, highmap, strcuts, random, x, y, z, gx, gy);
+                        (BlockMeta, int) data = WorldGenerator.GetStructData(strcuts, gx, gy, z);
+                        if (data.Item1 != null)
+                        {
+                            chunk[x, y, z] = data.Item1.Blockdata();
+                            chunk[x, y, z].STATE = data.Item2;
+                        }
+                    }
+            }
             chunk.update = true;
         }
     }
