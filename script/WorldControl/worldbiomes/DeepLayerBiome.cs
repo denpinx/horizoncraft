@@ -15,9 +15,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             weight = 100;
             GeneratorTerrain = (Chunk, highmap, noise, x, y, z, gx, gy) =>
             {
-                if (noise > 0.3f && z == 1) Chunk[x, y, z] = Materials.Valueof("air").Blockdata();
-                else
-                    Chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
+                Chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
             };
         }
     }

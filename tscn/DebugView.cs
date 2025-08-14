@@ -32,11 +32,11 @@ public partial class DebugView : Node2D
         }
 
         DrawPolyline(new Vector2[]{
-            new Vector2(0,0),//左上角
-            new Vector2(0,16*Chunk.Size),//左下
-            new Vector2(16*Chunk.Size,16*Chunk.Size),//右下
-            new Vector2(16*Chunk.Size,0),//右
-            new Vector2(0,0)//右
+            new Vector2(0,0),
+            new Vector2(0,16*Chunk.Size),
+            new Vector2(16*Chunk.Size,16*Chunk.Size),
+            new Vector2(16*Chunk.Size,0),
+            new Vector2(0,0)
         }, color,4
         );
         

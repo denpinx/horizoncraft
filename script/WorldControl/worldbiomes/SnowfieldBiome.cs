@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Godot;
 using horizoncraft.script.WorldControl.work;
 
 namespace horizoncraft.script.WorldControl.worldbiomes
@@ -13,7 +14,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             name = "雪地";
             weight = 2;
             GetHigh = (noise, x, z) => (int)(noise.GetNoise2D(x * Chunk.Size, z) * 8);
-            GeneratorTerrain = (chunk, highMap, random, x, y, z, gx, gy) =>
+            GeneratorTerrain = (Noise,chunk, highMap, random, x, y, z, gx, gy) =>
             {
                 int num = highMap[x, z] - gy;
                 if (num == 0) chunk[x, y, z] = Materials.Valueof("snow").Blockdata();

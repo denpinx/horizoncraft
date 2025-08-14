@@ -131,13 +131,15 @@ namespace horizoncraft.script.WorldControl
                         {
                             int gx = chunk.X * Chunk.Size + x;
                             int gy = chunk.Y * Chunk.Size + y;
-                            landbiome.GeneratorTerrain(chunk, highmap, random, x, y, z, gx, gy);
+                            landbiome.GeneratorTerrain(fastNoiseLite, chunk, highmap, random, x, y, z, gx, gy);
                             (BlockMeta, int) data = WorldGenerator.GetStructData(structs, gx, gy, z);
                             if (data.Item1 != null)
                             {
                                 chunk[x, y, z] = data.Item1.Blockdata();
                                 chunk[x, y, z].STATE = data.Item2;
                             }
+
+                            if (gy > highmap[x, z] && fastNoiseLite.GetNoise2D(gx, gy) > 0.3f && z == 1) chunk[x, y, z] = Materials.Valueof("air").Blockdata();
                         }
                 }
             }
@@ -161,10 +163,11 @@ namespace horizoncraft.script.WorldControl
                             int gx = chunk.X * Chunk.Size + x;
                             int gy = chunk.Y * Chunk.Size + y;
                             biome.GeneratorTerrain(chunk, highmap, fastNoiseLite.GetNoise2D(gx, gy), x, y, z, gx, gy);
+
+                            if (gy > highmap[x, z] && fastNoiseLite.GetNoise2D(gx, gy) > 0.3f && z == 1) chunk[x, y, z] = Materials.Valueof("air").Blockdata();
                         }
                 }
             }
-
 
             stopwatch.Stop();
             chunk.SpawnCostTime = (int)stopwatch.ElapsedMilliseconds;

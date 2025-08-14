@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.Features;
+using horizoncraft.script.Share;
 using horizoncraft.script.WorldControl.work;
 using MemoryPack;
 using Microsoft.Data.Sqlite;
@@ -16,8 +17,13 @@ namespace horizoncraft.script.WorldControl
 {
     public partial class ChunkManageSql : BaseManage
     {
+        public enum WorldMode
+        {
+            Preview, Single, Multiplayer_Client, Multiplayer_Server
+        }
         public event Action<ChunkManageSql, Chunk> OnChunkLoaded;
         public event Action<ChunkManageSql, Chunk> OnChunkUnLoading;
+        public WorldMode worldMode = WorldMode.Single;
         public long time;
         public long tick_use_time;
         public int LoadHorizon = 3;
@@ -28,71 +34,82 @@ namespace horizoncraft.script.WorldControl
         public ConcurrentDictionary<Vector2I, Chunk> UnloadingQuee = new();
         // 待加载区块以及加载后处理工作
         public ConcurrentDictionary<Vector2I, WorkBase> LoadingQuee = new();
+        public List<PlayerData> playerdatas = new List<PlayerData>();
         public bool Lock = false;
         public World world;
         SqliteConnection sqliteConnection;
-        FastNoiseLite fastNoiseLite = new FastNoiseLite();
         public ChunkManageSql(World world) : base("ChunkManageSql")
         {
             this.world = world;
             Horizoncraft.AddManage(this);
             world.timer.Timeout += PreTick;
             world.player.OnMoveToChunk += OnPlayerMoveChunk;
-            try
+
+            playerdatas.Add(world.player.playerData);
+            if (worldMode == WorldMode.Single || worldMode == WorldMode.Multiplayer_Server)
             {
-                if (!DirAccess.DirExistsAbsolute($"save"))
+                try
                 {
-                    Error err = DirAccess.MakeDirAbsolute($"save");
-                    if (err != Error.Ok)
-                        GD.PrintErr($"创建 save 文件夹失败，错误码: {err}");
+                    if (!DirAccess.DirExistsAbsolute($"save"))
+                    {
+                        Error err = DirAccess.MakeDirAbsolute($"save");
+                        if (err != Error.Ok)
+                            GD.PrintErr($"创建 save 文件夹失败，错误码: {err}");
+                    }
+                    if (!DirAccess.DirExistsAbsolute($"save/{World.world_name}"))
+                    {
+                        Error err = DirAccess.MakeDirAbsolute($"save/{World.world_name}");
+                        if (err != Error.Ok)
+                            GD.PrintErr($"创建 save{World.world_name} 文件夹失败，错误码: {err}");
+                    }
+                    sqliteConnection = new SqliteConnection(
+                        $"Data Source=save/{World.world_name}/data.db"
+                    );
+                    sqliteConnection.Open();
+                    CheckAndCreateTable();
                 }
-                if (!DirAccess.DirExistsAbsolute($"save/{World.world_name}"))
+                catch (SqliteException ex)
                 {
-                    Error err = DirAccess.MakeDirAbsolute($"save/{World.world_name}");
-                    if (err != Error.Ok)
-                        GD.PrintErr($"创建 save{World.world_name} 文件夹失败，错误码: {err}");
+                    GD.PrintErr(ex.Message);
                 }
-                sqliteConnection = new SqliteConnection(
-                    $"Data Source=save/{World.world_name}/data.db"
-                );
-                sqliteConnection.Open();
-                CheckAndCreateTable();
+
+                if (worldMode == WorldMode.Multiplayer_Server)
+                {
+                    //开启rpc服务器
+                }
             }
-            catch (SqliteException ex)
+            else if(worldMode == WorldMode.Multiplayer_Client)
             {
-                GD.PrintErr(ex.Message);
+                //链接服务器
             }
         }
-
         public void OnPlayerMoveChunk()
         {
             LoadingQuee.Clear();
-            Vector2I CenterCoord = world.player.playerData.ChunkCoord;
-            for (int X = CenterCoord.X - LoadHorizon; X <= CenterCoord.X + LoadHorizon; X++)
+            for (int i = 0; i < playerdatas.Count; i++)
             {
-                for (int Y = CenterCoord.Y - LoadHorizon; Y <= CenterCoord.Y + LoadHorizon; Y++)
+                Vector2I CenterCoord = playerdatas[i].ChunkCoord;
+                for (int X = CenterCoord.X - LoadHorizon; X <= CenterCoord.X + LoadHorizon; X++)
                 {
-                    Vector2I coord = new Vector2I(X, Y);
-                    if (!LoadedChunks.ContainsKey(coord) && !LoadingQuee.ContainsKey(coord))
+                    for (int Y = CenterCoord.Y - LoadHorizon; Y <= CenterCoord.Y + LoadHorizon; Y++)
                     {
+                        Vector2I coord = new Vector2I(X, Y);
                         LoadingQuee.TryAdd(coord, new WorkBase());
-                        GD.Print("加载区块：" + coord);
                     }
                 }
             }
+
             foreach (Vector2I coord in LoadedChunks.Keys)
             {
-                Chunk chunk = LoadedChunks[coord];
-                //Vector2I Horizon = chunk.coord - world.player.playerData.ChunkCoord;
-                if (
-                    chunk.coord.X < CenterCoord.X - LoadHorizon
-                    || chunk.coord.X > CenterCoord.X + LoadHorizon
-                    || chunk.coord.Y < CenterCoord.Y - LoadHorizon
-                    || chunk.coord.Y > CenterCoord.Y + LoadHorizon
-                )
+                if (!LoadingQuee.ContainsKey(coord))
                 {
+                    Chunk chunk = LoadedChunks[coord];
                     UnloadingQuee[coord] = chunk;
                     LoadedChunks.TryRemove(coord, out _);
+                }
+                else
+                {
+                    LoadingQuee.TryRemove(coord, out _);
                 }
             }
         }
@@ -119,7 +136,8 @@ namespace horizoncraft.script.WorldControl
                 }
             }
 
-            // 记录需要移除的键
+
+
             var keysToRemove = new List<Vector2I>();
             foreach (Vector2I coord in world.VisibleChunks.Keys)
             {
@@ -139,7 +157,6 @@ namespace horizoncraft.script.WorldControl
                 }
             }
 
-            // 移除不可见的区块
             foreach (var key in keysToRemove)
             {
                 world.VisibleChunks.Remove(key, out _);
@@ -150,7 +167,6 @@ namespace horizoncraft.script.WorldControl
                 Lock = true;
                 int max = UnloadingQuee.Count;
                 int count = 0;
-                //Vector2I coord = UnloadingQuee.Keys.Last();
                 Chunk chunk = UnloadingQuee[coord];
                 Chunk outchunk;
                 if (UnloadingQuee.TryRemove(coord, out outchunk))
@@ -174,7 +190,6 @@ namespace horizoncraft.script.WorldControl
             foreach (Vector2I coord in LoadingQuee.Keys)
             {
                 int max = LoadingQuee.Count;
-                //Vector2I coord = LoadingQuee.Keys;
                 WorkBase work = LoadingQuee[coord];
                 LoadingQuee.TryRemove(coord, out _);
                 Task.Run(() =>
@@ -188,24 +203,34 @@ namespace horizoncraft.script.WorldControl
                             work.Execute(chunk);
                         if (!chunk.spawn)
                             GeneratorChunk(chunk);
+
+                        OnChunkLoaded?.Invoke(this, chunk);
                     }
                     else
                     {
-                        chunk = new(coord.X, coord.Y);
-                        LoadedChunks[coord] = chunk;
-                        if (work.Type != "NONE")
-                            work.Execute(chunk);
-                        GeneratorChunk(chunk);
+                        if (worldMode == WorldMode.Single || worldMode == WorldMode.Multiplayer_Server)
+                        {
+                            chunk = new(coord.X, coord.Y);
+                            LoadedChunks[coord] = chunk;
+                            if (work.Type != "NONE")
+                                work.Execute(chunk);
+                            GeneratorChunk(chunk);
+                            OnChunkLoaded?.Invoke(this, chunk);
+                        }
                     }
-                    OnChunkLoaded?.Invoke(this, chunk);
+
                 });
             }
 
-            foreach (Vector2I coord in LoadedChunks.Keys)
+            if (worldMode == WorldMode.Single || worldMode == WorldMode.Multiplayer_Server)
             {
-                Chunk chunk = LoadedChunks[coord];
-                chunk.Tick(this);
+                foreach (Vector2I coord in LoadedChunks.Keys)
+                {
+                    Chunk chunk = LoadedChunks[coord];
+                    chunk.Tick(this);
+                }
             }
+
 
             stopwatch.Stop();
             tick_use_time = stopwatch.ElapsedMilliseconds;
@@ -213,6 +238,8 @@ namespace horizoncraft.script.WorldControl
 
         bool CheckKeyValueExists(int x, int y)
         {
+            if (worldMode == WorldMode.Preview || worldMode == WorldMode.Multiplayer_Client) return false;
+
             string query = "SELECT COUNT(*) FROM World WHERE x = @x AND y = @y";
             using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
             {
@@ -266,33 +293,22 @@ namespace horizoncraft.script.WorldControl
         }
         public void UpdateData(Chunk chunk)
         {
+            if (worldMode == WorldMode.Preview || worldMode == WorldMode.Multiplayer_Client) return;
             UpdateByteData(chunk.coord.X, chunk.coord.Y, MemoryPackSerializer.Serialize<Chunk>(chunk));
         }
         public void InsertData(Chunk chunk)
         {
+            if (worldMode == WorldMode.Preview || worldMode == WorldMode.Multiplayer_Client) return;
             InsertNewByteValue(chunk.coord.X, chunk.coord.Y, MemoryPackSerializer.Serialize<Chunk>(chunk));
         }
         public Chunk GetChunkData(int x, int y)
         {
+            if (worldMode == WorldMode.Preview) return null;
+            if (worldMode == WorldMode.Multiplayer_Client) return null;
+
             byte[] bytes = GetByeData(x, y);
             Chunk chunk = MemoryPackSerializer.Deserialize<Chunk>(bytes);
             return chunk;
-        }
-
-        /// <summary>
-        /// 根据区块坐标和本地坐标设置区块中的方块元数据。
-        /// </summary>
-        /// <param name="chunk">区块</param>
-        /// <param name="coord">本地坐标</param>
-        /// <param name="meta">方块类型</param>
-        /// <param name="replaceAir">是否替换空气</param>
-        public void SetBlock(Chunk chunk, Vector3I coord, BlockMeta meta, bool replaceAir = false,int state=0)
-        {
-            Vector2I LocalCoord = new Vector2I(coord.X, coord.Y);
-            Vector2I globalCoord = chunk.coord * Chunk.Size + LocalCoord;
-            SetBlock(new(globalCoord.X, globalCoord.Y, coord.Z), meta, replaceAir,state);
-
-            //GD.Print("SetBlock", globalCoord, ",", chunk.coord);
         }
 
         /// <summary>
@@ -303,6 +319,8 @@ namespace horizoncraft.script.WorldControl
         /// <param name="replaceAir">是否替换空气</param>
         public void SetBlock(Vector3I coord, BlockMeta meta, bool replaceAir = false, int state = 0)
         {
+            if (worldMode == WorldMode.Preview || worldMode == WorldMode.Multiplayer_Client) return;
+
             Vector2I ChunkCoord = World.MathFloor(coord, Chunk.Size);
             Vector2I LocalCoord = World.Remainder(coord, Chunk.Size);
             if (LoadedChunks.ContainsKey(ChunkCoord))
@@ -381,6 +399,9 @@ namespace horizoncraft.script.WorldControl
         }
         public void Save()
         {
+            if (worldMode == WorldMode.Preview) return;
+            if (worldMode == WorldMode.Multiplayer_Client) return;
+
             foreach (Vector2I coord in LoadedChunks.Keys)
             {
                 Chunk chunk = LoadedChunks[coord];

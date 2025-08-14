@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
@@ -45,10 +47,17 @@ namespace horizoncraft.script.WorldControl
         }
         private void UpdateByteData(int x, int y, byte[] bytes)
         {
+            using var output = new MemoryStream();
+            using (var gzip = new GZipStream(output, CompressionMode.Compress, leaveOpen: true))
+            {
+                gzip.Write(bytes, 0, bytes.Length);
+            }
+            ;
+
             string query = "UPDATE World SET byte = @Byte WHERE x = @KeyX AND y = @KeyY";
             using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
             {
-                command.Parameters.AddWithValue("@Byte", bytes);
+                command.Parameters.AddWithValue("@Byte", output.ToArray());
                 command.Parameters.AddWithValue("@KeyX", x);
                 command.Parameters.AddWithValue("@KeyY", y);
                 command.ExecuteNonQuery();
@@ -57,10 +66,16 @@ namespace horizoncraft.script.WorldControl
 
         private void InsertNewByteValue(int x, int y, byte[] bytes)
         {
+            using var output = new MemoryStream();
+            using (var gzip = new GZipStream(output, CompressionMode.Compress, leaveOpen: true))
+            {
+                gzip.Write(bytes, 0, bytes.Length);
+            }
+            ;
             string query = "INSERT INTO World (x, y, byte) VALUES (@KeyX, @KeyY, @Byte)";
             using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
             {
-                command.Parameters.AddWithValue("@Byte", bytes);
+                command.Parameters.AddWithValue("@Byte", output.ToArray());
                 command.Parameters.AddWithValue("@KeyX", x);
                 command.Parameters.AddWithValue("@KeyY", y);
                 command.ExecuteNonQuery();
@@ -75,7 +90,11 @@ namespace horizoncraft.script.WorldControl
                 command.Parameters.AddWithValue("@KeyX", x);
                 command.Parameters.AddWithValue("@KeyY", y);
                 var result = command.ExecuteScalar() as byte[];
-                return result;
+                using var input = new MemoryStream(result);
+                using var gzip = new GZipStream(input, CompressionMode.Decompress);
+                using var output = new MemoryStream();
+                gzip.CopyTo(output);
+                return output.ToArray();
             }
         }
     }

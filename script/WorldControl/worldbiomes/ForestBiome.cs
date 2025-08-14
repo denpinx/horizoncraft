@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Godot;
 using horizoncraft.script.WorldControl.work;
 
 namespace horizoncraft.script.WorldControl.worldbiomes
@@ -38,7 +39,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                     }
                 structs.Add(blockStrcut);
             };
-            GeneratorTerrain = (chunk, highMap, random, x, y, z, gx, gy) =>
+            GeneratorTerrain = (Noise,chunk, highMap, random, x, y, z, gx, gy) =>
             {
                 int num = highMap[x, z] - gy;//和当前的插值
                 if (gy > 0 && highMap[x, z] > 0)//地下
