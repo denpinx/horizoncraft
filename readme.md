@@ -86,43 +86,144 @@
 ### 3.暂时不支持自定义[EntityData](script/Entity/Entitydata.cs)
 ###
 
-# 注册生物群系
-### 1.打开[群系管理类](script/WorldControl/BiomeManage.cs),调用 'RegBiome(Biome biome)' 方法注册新的生物群系,并配置好权重
-    static BiomeManage()
+# 生物群系
+|生物群系类型|继承|描述|
+|----|----|----|
+|BaseBiome|无|生物群系基类
+|LandBiome|BaseBiome|地表群系
+|Biome|BaseBiome|二维群系
+
+LandBiome生成基于X轴计算,Biome是在LandBiome的基础上再计算的结果,两则不会冲突
+
+## 注册生物群系
+### 1.在 'script\WorldControl\worldbiomes' 中创建一个名为 XXXBiome.cs的文件
+创建地下群系:
+    public class MyDeepBiome : Biome
     {
-        ...
-        //在尾部添加
-            Register(new Biome
+        public MyDeepBiome()
+        {
+            //群系名
+            name = "我的地下群系";
+            //群系类型,决定当前群戏属于天空群戏还是地下群系
+            biomeType = BiomeType.Deep;
+            //权重,越大生成概率越高
+            weight = 1;
+
+
+            //外循环驱动
+            //Chunk 区块
+            //highmap 一维高度图,在地下群系和天空群系一般没什么用
+            //noise [-1,1]的噪音值
+            //x,y,z 方块局部坐标
+            //gx,gy 方块全局坐标
+            GeneratorTerrain = (Chunk, highmap, noise, x, y, z, gx, gy) =>
             {
-                name = "我的地形",
-                //生成权重
-                weight = 2,
-                //生成区块的高度,会由生成器插值生成高度图,所以这里不用考虑X轴和Y轴连续性
-                GetHigh = (noise, x, z) => (int)(noise.GetNoise2D(x * Chunk.Size, z) * 8),
-                //生成地形,x,y,z是外部循环,gx,gy是全局x,y坐标
-                GeneratorTerrain = (chunk, highMap, blockStrcut, random, x, y, z, gx, gy) =>
+                if (noise > 0.3f && z == 1) Chunk[x, y, z] = Materials.Valueof("air").Blockdata();
+                else
+                    Chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
+            };
+            
+            //二维群系的结构生成和一维不同，这里没有外部循环在区块内随机生成就行,将结果添加到struct中
+            //fastnoiselite 噪音函数
+            //rand 随机数生成器
+            //structs 存储结构集合
+            GeneratorStrcut = (fastnoiselite,rand,structs,gx,gy)=>{
+                BlockStruct blockStrcut = new BlockStruct();//结构集合
+                SetBlockWork sbw = blockStrcut.work;        //单个结构方块集合
+                //
+                sbw.ExclList.Add(
+                    new(
+                        //全局坐标
+                        new(x,y,0),
+                        //方块类型
+                        Materials.Valueof("oak_log"),
+                        //方块状态 
+                        1
+                        ));
+                //返回结果
+                structs.add(blockStrcut)
+            };
+        }
+    }
+创建地表群系
+    public class MyLandBiome : LandBiome
+    {
+        public MyLandBiome()
+        {
+            name = "我的地表群系";
+            weight = 3;
+            //计算当前区块的高度,不用连续，只要相同输入能给出固定输出就行,之后会交给生成器和周边区块插值
+            GetHigh = (noise, x, z) => ((int)(noise.GetNoise2D(x * Chunk.Size, z) * 64)) - new Random(HashCode.Combine(x, z)).Next(8);
+            //外循环驱动
+            //fastnoiselite 噪音函数
+            //random 随机数生成器
+            //structs 存储结构集合
+            //gx,gy,z当前全局坐标
+            GeneratorStrcut = (fastnoiselite, random, structs, gx, gy, z) =>
+            {
+                //控制生成概率,这里一定要用这个random对象生成，确保每个区块生成的结构多次调用能够有相同的结果
+                if (random.Next(7) != 1) return;
+                BlockStruct blockStrcut = new BlockStruct();
+                SetBlockWork sbw = blockStrcut.work;
+                //在这个坐标系中，-y是向上，+y是向下
+                //这里是判断在海平面以上才生成结构 
+                if (gy < 0)
+                    for (int h = 0; h < 5 + random.Next(4); h++)
+                    {
+                        sbw.ExclList.Add(new(new(gx, gy - h, z), Materials.Valueof("oak_log"), 0));
+                        //随机分支
+                        if (random.Next(4) == 1)
+                        {
+                            sbw.ExclList.Add(new(new(gx - 1, gy - h, z), Materials.Valueof("oak_log"), 1));
+                            sbw.ExclList.Add(new(new(gx - 1, gy - h - 1, z), Materials.Valueof("oak_leaves"), 1));
+                            sbw.ExclList.Add(new(new(gx - 2, gy - h, z), Materials.Valueof("oak_leaves"), 1));
+                        }
+                        if (random.Next(4) == 2)
+                        {
+                            sbw.ExclList.Add(new(new(gx + 1, gy - h, z), Materials.Valueof("oak_log"), 1));
+                            sbw.ExclList.Add(new(new(gx + 1, gy - h - 1, z), Materials.Valueof("oak_leaves"), 1));
+                            sbw.ExclList.Add(new(new(gx + 2, gy - h, z), Materials.Valueof("oak_leaves"), 1));
+                        }
+                    }
+                structs.Add(blockStrcut);
+            };
+            //外循环驱动
+            GeneratorTerrain = (chunk, highMap, random, x, y, z, gx, gy) =>
+            {
+                //这里的num是指当前方块与高度图的差距
+                int num = highMap[x, z] - gy;
+                if (gy > 0 && highMap[x, z] > 0)//地下
                 {
-                    //这里的num,是当前坐标与地平线highmap的差值,以下计算皆在Chunk范围内,不会越界
-                    int num = highMap[x, z] - gy;
+                    if (num > 0) chunk[x, y, z] = Materials.Valueof("water").Blockdata();
+                    if (num == 0) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
+                    if (num == -1) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
+                    if (num == -2) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
+                    if (num == -3)
+                    {
+                        if (random.Next(2) == 1) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
+                        else chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
+                    }
+                }
+                else//地上
+                {
+                    if (num == 1)
+                    {
+                        if (random.Next(2) == 1) chunk[x, y, z] = Materials.Valueof("bush").Blockdata();
+                    }
                     if (num == 0) chunk[x, y, z] = Materials.Valueof("grass").Blockdata();
                     if (num == -1) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
                     if (num == -2) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
                     if (num == -3) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
                     if (num <= -4) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
-                },
-                //生成建筑结构
-                //用来交给生成器判断有没有建筑结构跨区块命中了某个区块
-                GeneratorStrcut = (noise, random, strcuts, gx, gy, z) =>
-                {
-                    //控制生成概率
-                    if (random.Next(14) != 1) return;
-                    BlockStrcut blockStrcut = new BlockStrcut();
-                    SetBlockWork sbw = blockStrcut.work;
-                    //具体结构的生成
-                    ..
-
-
-                    strcuts.Add(blockStrcut);
                 }
-            });
+                if (num <= -4) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
+            };
+        }
+    }
+### 2.打开[群系管理类](script/WorldControl/BiomeManage.cs),调用 'RegBiome(Biome biome)' 方法注册新的生物群系,并配置好权重
+    static BiomeManage()
+    {
+        ...
+        //在尾部添加
+        Register(new MyBiome());
     }

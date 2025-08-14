@@ -75,9 +75,11 @@ namespace horizoncraft.script.WorldControl
             }
             else
             {
+                int gx = x * Chunk.Size;
+                int gy = y * Chunk.Size;
                 Biome biome = BiomeManage.GetDeepBiome(x, y);
-                if (biome.GeneratorStrcut == null) return structs;
-                biome.GeneratorStrcut(fastNoiseLite, random, structs);
+                if (biome.GeneratorStruct == null) return structs;
+                biome.GeneratorStruct(fastNoiseLite, random, structs, gx, gy);
             }
             return new();
 
