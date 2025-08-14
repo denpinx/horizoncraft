@@ -15,7 +15,6 @@ namespace horizoncraft.script.WorldControl
     [MemoryPackable]
     public partial class Chunk
     {
-        public int spawncount = 0;
         public int X;
         public int Y;
         public static int SizeZ = 2;

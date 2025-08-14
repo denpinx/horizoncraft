@@ -5,159 +5,171 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.WorldControl.work;
-using horizoncraft.script.WorldControl.Work;
+using horizoncraft.script.WorldControl.worldbiomes;
 using MemoryPack.Compression;
 
 namespace horizoncraft.script.WorldControl
 {
     public class BiomeManage
     {
-        public static FastNoiseLite biome_noise = new FastNoiseLite();
-        public static List<Biome> biomes = new List<Biome>();
-        public static int MaxWeight = 0;
-        public static void Register(Biome biome)
+        public enum BiomeType
         {
-            biome.weight = (int)(biome.weight + biomes.Count * 1.25 * biome.weight);
-            biome.Left_weight = MaxWeight;
-            biome.Right_weight = MaxWeight + biome.weight;
-            MaxWeight += biome.weight;
-            biomes.Add(biome);
+            LandBiome, Sky, Deep
+        }
+        public static FastNoiseLite biome_noise = new FastNoiseLite();
+
+        public static List<LandBiome> landbiomes = new List<LandBiome>();
+        public static List<Biome> deep_biomes = new List<Biome>();
+        public static List<Biome> sky_biomes = new List<Biome>();
+        public static float LandMaxWeight = 0;
+        public static float DeepMaxWeight = 0;
+        public static float SkyMaxWeight = 0;
+        public static void Register(BaseBiome basebiome)
+        {
+            if (basebiome is LandBiome landBiome)
+            {
+                landbiomes.Add(landBiome);
+                LandMaxWeight += basebiome.weight;
+            }
+            else
+            if (basebiome is Biome biome)
+            {
+                if (biome.biomeType == BiomeType.Deep)
+                {
+                    DeepMaxWeight += basebiome.weight;
+                    deep_biomes.Add(biome);
+                }
+                else
+                {
+                    SkyMaxWeight += basebiome.weight;
+                    sky_biomes.Add(biome);
+                }
+
+            }
         }
 
 
         // 平滑计算当前X轴的生物群系类型
-        // 但是这里的biome_noise.GetNoise1D(x) ，这个值越接近1，越难生成，导致分布并不是按照MaxWeight来分布的
-        public static Biome Valueof(string name)
+        public static LandBiome Valueof(string name)
         {
-            for (int i = 0; i < biomes.Count; i++)
-                if (biomes[i].name == name) return biomes[i];
+            for (int i = 0; i < landbiomes.Count; i++)
+                if (landbiomes[i].name == name) return landbiomes[i];
             return null;
         }
-        public static Biome GetBiome(int x)
+        public static void ReSetWeight()
         {
-            var num = (int)(biome_noise.GetNoise1D(x) * MaxWeight);
-            num = Mathf.Abs(num);
-            for (int i = 0; i < biomes.Count; i++)
+            //将权重连续分布到-1到1
+            float half = -LandMaxWeight / 2;
+            for (int i = 0; i < landbiomes.Count; i++)
             {
-                if (num >= biomes[i].Left_weight && num < biomes[i].Right_weight)
+                landbiomes[i].weight_range.X = half;
+                landbiomes[i].weight_range.Y = half + landbiomes[i].weight;
+                half += landbiomes[i].weight;
+                GD.Print($"群系名称：{landbiomes[i].name} 权重:{landbiomes[i].weight}，{landbiomes[i].weight_range.X},{landbiomes[i].weight_range.Y}");
+            }
+
+            half = -DeepMaxWeight / 2;
+            for (int i = 0; i < deep_biomes.Count; i++)
+            {
+                deep_biomes[i].weight_range.X = half;
+                deep_biomes[i].weight_range.Y = half + deep_biomes[i].weight;
+                half += deep_biomes[i].weight;
+                GD.Print($"群系名称：{deep_biomes[i].name} 权重:{deep_biomes[i].weight}，{deep_biomes[i].weight_range.X},{deep_biomes[i].weight_range.Y}");
+            }
+
+            half = -SkyMaxWeight / 2;
+            for (int i = 0; i < sky_biomes.Count; i++)
+            {
+                sky_biomes[i].weight_range.X = half;
+                sky_biomes[i].weight_range.Y = half + sky_biomes[i].weight;
+                half += sky_biomes[i].weight;
+                GD.Print($"群系名称：{sky_biomes[i].name} 权重:{sky_biomes[i].weight}，{sky_biomes[i].weight_range.X},{sky_biomes[i].weight_range.Y}");
+            }
+        }
+        //检查生物群系属于地表群系还是二维群系
+        public static BiomeType CheckRange(int[,] HighMap, int x, int y)
+        {
+            int gx = Chunk.Size * x;
+            int gy = Chunk.Size * y;
+            int IsDeep = 0;
+            int IsSky = 0;
+            for (int z = 0; z < Chunk.SizeZ; z++)
+                for (int i = 0; i < Chunk.Size; i++)
                 {
-                    return biomes[i];
+                    if (HighMap[i, z] >= gy - Chunk.Size && HighMap[i, z] < gy + Chunk.Size)
+                    {
+                        return BiomeType.LandBiome;
+                    }
+                    else
+                    if (HighMap[i, z] > gy + Chunk.Size)
+                    {
+                        IsSky++;
+                    }
+                    if (HighMap[i, z] < gy - Chunk.Size)
+                    {
+                        IsDeep++;
+                    }
+                }
+
+            if (IsDeep == Chunk.Size * Chunk.SizeZ) return BiomeType.Deep;
+            if (IsSky == Chunk.Size * Chunk.SizeZ) return BiomeType.Sky;
+            return BiomeType.LandBiome;
+        }
+        //地表群系
+        public static LandBiome GetLandBiome(int x)
+        {
+            var num = biome_noise.GetNoise1D(x) * (LandMaxWeight / 2);
+            for (int i = 0; i < landbiomes.Count; i++)
+            {
+                if (num >= landbiomes[i].weight_range.X && num < landbiomes[i].weight_range.Y)
+                {
+                    return landbiomes[i];
                 }
             }
             return null;
         }
-        static BiomeManage()
+        public static Biome GetDeepBiome(int x, int y)
+        {
+            var num = biome_noise.GetNoise2D(x, y) * (DeepMaxWeight / 2);
+            for (int i = 0; i < deep_biomes.Count; i++)
+            {
+                if (num >= deep_biomes[i].weight_range.X && num < deep_biomes[i].weight_range.Y)
+                {
+                    return deep_biomes[i];
+                }
+            }
+            return null;
+        }
+        public static Biome GetSkyBiome(int x, int y)
+        {
+            var num = biome_noise.GetNoise2D(x, y) * (SkyMaxWeight / 2);
+            for (int i = 0; i < sky_biomes.Count; i++)
+            {
+                if (num >= sky_biomes[i].weight_range.X && num < sky_biomes[i].weight_range.Y)
+                {
+                    return sky_biomes[i];
+                }
+            }
+            return null;
+        }
+        public static void RegBiomes()
         {
             //森林
-            Register(new Biome
-            {
-                name = "森林",
-                weight = 3,
-                GetHigh = (noise, x, z) => ((int)(noise.GetNoise2D(x * Chunk.Size, z) * 64)) - new Random(HashCode.Combine(x, z)).Next(8),
-                GeneratorTerrain = (chunk, highMap, blockStrcut, random, x, y, z, gx, gy) =>
-                {
-                    int num = highMap[x, z] - gy;//和当前的插值
-                    if (gy > 0 && highMap[x, z] > 0)//地下
-                    {
-                        if (num > 0) chunk[x, y, z] = Materials.Valueof("water").Blockdata();
-                        if (num == 0) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                        if (num == -1) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                        if (num == -2) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                        if (num == -3)
-                        {
-                            if (random.Next(2) == 1) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                            else chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
-                        }
-                    }
-                    else//地上
-                    {
-                        if (num == 1)
-                        {
-                            if (random.Next(2) == 1) chunk[x, y, z] = Materials.Valueof("bush").Blockdata();
-                        }
-                        if (num == 0) chunk[x, y, z] = Materials.Valueof("grass").Blockdata();
-                        if (num == -1) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
-                        if (num == -2) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
-                        if (num == -3) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
-                        if (num <= -4) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
-                    }
-                    if (num <= -4) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
-                },
-                GeneratorStrcut = (noise, random, strcuts, gx, gy, z) =>
-                {
-                    if (random.Next(7) != 1) return;
-                    BlockStrcut blockStrcut = new BlockStrcut();
-                    SetBlockWork sbw = blockStrcut.work;
-                    if (gy < 0)
-                        for (int h = 0; h < 5 + random.Next(4); h++)
-                        {
-                            sbw.ExclList.Add(new(new(gx, gy - h, z), Materials.Valueof("oak_log"), 0));
-                            //随机分支
-                            if (random.Next(4) == 1)
-                            {
-                                sbw.ExclList.Add(new(new(gx - 1, gy - h, z), Materials.Valueof("oak_log"), 1));
-                                sbw.ExclList.Add(new(new(gx - 1, gy - h - 1, z), Materials.Valueof("oak_leaves"), 1));
-                                sbw.ExclList.Add(new(new(gx - 2, gy - h, z), Materials.Valueof("oak_leaves"), 1));
-                            }
-                            if (random.Next(4) == 2)
-                            {
-                                sbw.ExclList.Add(new(new(gx + 1, gy - h, z), Materials.Valueof("oak_log"), 1));
-                                sbw.ExclList.Add(new(new(gx + 1, gy - h - 1, z), Materials.Valueof("oak_leaves"), 1));
-                                sbw.ExclList.Add(new(new(gx + 2, gy - h, z), Materials.Valueof("oak_leaves"), 1));
-                            }
-                        }
-                    strcuts.Add(blockStrcut);
-                }
-            });
+            Register(new ForestBiome());
             //平原
-            Register(new Biome
-            {
-                name = "平原",
-                weight = 1,
-                GetHigh = (noise, x, z) => -Math.Abs((int)(noise.GetNoise2D(x * Chunk.Size, z) * 8) - new Random(HashCode.Combine(x, z)).Next(4)),
-                GeneratorTerrain = Valueof("森林").GeneratorTerrain,
-            });
+            Register(new PlainBiome());
             //雪地
-            Register(new Biome
-            {
-                name = "雪地",
-                weight = 2,
-                GetHigh = (noise, x, z) => (int)(noise.GetNoise2D(x * Chunk.Size, z) * 8),
-                GeneratorTerrain = (chunk, highMap, blockStrcut, random, x, y, z, gx, gy) =>
-                {
-                    int num = highMap[x, z] - gy;
-                    if (num == 0) chunk[x, y, z] = Materials.Valueof("snow").Blockdata();
-                    if (num == -1) chunk[x, y, z] = Materials.Valueof("snow").Blockdata();
-                    if (num == -2) chunk[x, y, z] = Materials.Valueof("snow").Blockdata();
-                    if (num == -3) chunk[x, y, z] = Materials.Valueof("snow").Blockdata();
-                    if (num <= -4) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
-                },
-                GeneratorStrcut = (noise, random, strcuts, gx, gy, z) =>
-                {
-                    if (random.Next(14) != 1) return;
-                    BlockStrcut blockStrcut = new BlockStrcut();
-                    SetBlockWork sbw = blockStrcut.work;
-                    if (gy < 0)
-                        for (int h = 0; h < 8 + random.Next(6); h++)
-                        {
-                            sbw.ExclList.Add(new(new(gx, gy - h, z), Materials.Valueof("oak_log"), 0));
-                            //随机分支
-                            if (random.Next(4) == 1)
-                            {
-                                sbw.ExclList.Add(new(new(gx - 1, gy - h, z), Materials.Valueof("oak_log"), 1));
-                                sbw.ExclList.Add(new(new(gx - 1, gy - h - 1, z), Materials.Valueof("oak_leaves"), 1));
-                                sbw.ExclList.Add(new(new(gx - 2, gy - h, z), Materials.Valueof("oak_leaves"), 1));
-                            }
-                            if (random.Next(4) == 2)
-                            {
-                                sbw.ExclList.Add(new(new(gx + 1, gy - h, z), Materials.Valueof("oak_log"), 1));
-                                sbw.ExclList.Add(new(new(gx + 1, gy - h - 1, z), Materials.Valueof("oak_leaves"), 1));
-                                sbw.ExclList.Add(new(new(gx + 2, gy - h, z), Materials.Valueof("oak_leaves"), 1));
-                            }
-                        }
-                    strcuts.Add(blockStrcut);
-                }
-            });
+            Register(new SnowfieldBiome());
+            //地下通用群系
+            Register(new DeepLayerBiome());
+            //天空通用群系
+            Register(new SkyLayerBiome());
+        }
+
+        static BiomeManage()
+        {
+            RegBiomes();
+            ReSetWeight();
         }
     }
 }

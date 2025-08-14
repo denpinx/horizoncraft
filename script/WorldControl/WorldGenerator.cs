@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script.WorldControl.work;
-using horizoncraft.script.WorldControl.Work;
+using static horizoncraft.script.WorldControl.BiomeManage;
 
 namespace horizoncraft.script.WorldControl
 {
     public class WorldGenerator
     {
+        public static Stopwatch stopwatch = new Stopwatch();
         public static FastNoiseLite fastNoiseLite = new FastNoiseLite();
         static WorldGenerator()
         {
@@ -37,10 +38,10 @@ namespace horizoncraft.script.WorldControl
             for (int z = 0; z < 2; z++)
             {
                 // 获取相邻区块的关键高度点（确保控制点覆盖当前区块）
-                float p0 = BiomeManage.GetBiome(x - 1).GetHigh(fastNoiseLite, x - 1, z);
-                float p1 = BiomeManage.GetBiome(x).GetHigh(fastNoiseLite, x, z);
-                float p2 = BiomeManage.GetBiome(x + 1).GetHigh(fastNoiseLite, x + 1, z);
-                float p3 = BiomeManage.GetBiome(x + 2).GetHigh(fastNoiseLite, x + 2, z);
+                float p0 = BiomeManage.GetLandBiome(x - 1).GetHigh(fastNoiseLite, x - 1, z);
+                float p1 = BiomeManage.GetLandBiome(x).GetHigh(fastNoiseLite, x, z);
+                float p2 = BiomeManage.GetLandBiome(x + 1).GetHigh(fastNoiseLite, x + 1, z);
+                float p3 = BiomeManage.GetLandBiome(x + 2).GetHigh(fastNoiseLite, x + 2, z);
                 for (int i = 0; i < Chunk.Size; i++)
                 {
                     float t = (float)i / (float)(Chunk.Size - 1);
@@ -49,29 +50,17 @@ namespace horizoncraft.script.WorldControl
             }
             return highmap;
         }
-
-        //获取一维高度图
-        //y是占位的，防止输错
-        //z是层次0 和 1层
-        //每个区块32*32*2个方块
-        // public static int[,] GetHighMap(int x)
-        // {
-        //     int[,] highmap = new int[Chunk.Size, 2];
-        //     for (int z = 0; z < 2; z++)
-        //         for (int i = 0; i < Chunk.Size; i++)
-        //             highmap[i, z] = (int)(fastNoiseLite.GetNoise2D(x * Chunk.Size + i, z) * 32);
-        //     return highmap;
-        // }
-
         //获取这个区块的结构体
-        public static List<BlockStrcut> GetStructs(int x, int y, int z)
+        public static List<BlockStruct> GetStructs(int x, int y, int z)
         {
-            Biome biome = BiomeManage.GetBiome(x);
-            if (biome.GeneratorStrcut != null)
+            LandBiome landbiome = BiomeManage.GetLandBiome(x);
+            int[,] highmap = WorldGenerator.GetHighMap(x);
+            Random random = new Random(x * 3 + y * 7 + z * 11);
+            List<BlockStruct> structs = new();
+            BiomeType biomeType = BiomeManage.CheckRange(highmap, x, y);
+            if (biomeType == BiomeType.LandBiome)
             {
-                int[,] highmap = WorldGenerator.GetHighMap(x);
-                Random random = new Random(x * 3 + y * 7 + z * 11);
-                List<BlockStrcut> blockStrcuts = new();
+                if (landbiome.GeneratorStrcut == null) return structs;
                 for (int i = 0; i < Chunk.Size; i++)
                 {
                     int gx = x * Chunk.Size + i;
@@ -79,32 +68,36 @@ namespace horizoncraft.script.WorldControl
                     int hy = highmap[i, z] - y * Chunk.Size;
                     if (hy >= 0 && hy < Chunk.Size)
                     {
-                        biome.GeneratorStrcut(fastNoiseLite, random, blockStrcuts,gx, gy, z);
+                        landbiome.GeneratorStrcut(fastNoiseLite, random, structs, gx, gy, z);
                     }
                 }
-                return blockStrcuts;
+                return structs;
             }
             else
             {
-                return new();
+                Biome biome = BiomeManage.GetDeepBiome(x, y);
+                if (biome.GeneratorStrcut == null) return structs;
+                biome.GeneratorStrcut(fastNoiseLite, random, structs);
             }
+            return new();
+
         }
-        public static List<BlockStrcut> GetAllStructs(int x, int y)
+        public static List<BlockStruct> GetAllStructs(int x, int y)
         {
-            List<BlockStrcut> blockStrcuts = new();
+            List<BlockStruct> structs = new();
             for (int k = 0; k <= 1; k++)
                 for (int i = x - 1; i <= x + 1; i++)
                     for (int j = y - 1; j <= y + 1; j++)
                     {
-                        blockStrcuts.AddRange(GetStructs(i, j, k));
+                        structs.AddRange(GetStructs(i, j, k));
                     }
-            return blockStrcuts;
+            return structs;
         }
-        public static (BlockMeta, int) GetStructData(List<BlockStrcut> blockStrcuts, int x, int y, int z)
+        public static (BlockMeta, int) GetStructData(List<BlockStruct> structs, int x, int y, int z)
         {
-            for (int i = 0; i < blockStrcuts.Count; i++)
+            for (int i = 0; i < structs.Count; i++)
             {
-                (BlockMeta, int) data = blockStrcuts[i].GetBlocMeta(x, y, z);
+                (BlockMeta, int) data = structs[i].GetBlocMeta(x, y, z);
                 if (data.Item1 != null) return data;
             }
             return (null, 0);
@@ -114,30 +107,65 @@ namespace horizoncraft.script.WorldControl
         //区块只生成一次，之后加载不会再重新生成，花点时间可以理解.
         //旧算法每次设置方块都需要遍历所有的区块才能命中，以及还要等待区块异步加载的延迟，现在直接100%命中
         //当前运行速度50chunk+/s
+        //去除stopwatch的误差，单区块平均生成耗时小于1ms
         public static void Generator(Chunk chunk)
         {
+            stopwatch.Restart();
             chunk.spawn = true;
-            var biome = BiomeManage.GetBiome(chunk.X);
-            chunk.BiomeType = biome.name;
+            var landbiome = BiomeManage.GetLandBiome(chunk.X);
             int[,] highmap = GetHighMap(chunk.X);
-            List<BlockStrcut> strcuts = GetAllStructs(chunk.X, chunk.Y);
-            for (int z = 0; z < Chunk.SizeZ; z++)
+            List<BlockStruct> structs = GetAllStructs(chunk.X, chunk.Y);
+            //地表生物群系
+
+            BiomeType biomeType = BiomeManage.CheckRange(highmap, chunk.X, chunk.Y);
+            if (biomeType == BiomeType.LandBiome)
             {
-                Random random = new Random(chunk.X * 3 + chunk.Y * 7 + z * 11);
-                for (int x = 0; x < Chunk.Size; x++)
-                    for (int y = 0; y < Chunk.Size; y++)
-                    {
-                        int gx = chunk.X * Chunk.Size + x;
-                        int gy = chunk.Y * Chunk.Size + y;
-                        biome.GeneratorTerrain(chunk, highmap, strcuts, random, x, y, z, gx, gy);
-                        (BlockMeta, int) data = WorldGenerator.GetStructData(strcuts, gx, gy, z);
-                        if (data.Item1 != null)
+                chunk.BiomeType = landbiome.name;
+                for (int z = 0; z < Chunk.SizeZ; z++)
+                {
+                    Random random = new Random(chunk.X * 3 + chunk.Y * 7 + z * 11);
+                    for (int x = 0; x < Chunk.Size; x++)
+                        for (int y = 0; y < Chunk.Size; y++)
                         {
-                            chunk[x, y, z] = data.Item1.Blockdata();
-                            chunk[x, y, z].STATE = data.Item2;
+                            int gx = chunk.X * Chunk.Size + x;
+                            int gy = chunk.Y * Chunk.Size + y;
+                            landbiome.GeneratorTerrain(chunk, highmap, random, x, y, z, gx, gy);
+                            (BlockMeta, int) data = WorldGenerator.GetStructData(structs, gx, gy, z);
+                            if (data.Item1 != null)
+                            {
+                                chunk[x, y, z] = data.Item1.Blockdata();
+                                chunk[x, y, z].STATE = data.Item2;
+                            }
                         }
-                    }
+                }
             }
+            else
+            {
+                Biome biome;
+                if (biomeType == BiomeType.Deep)
+                {
+                    biome = BiomeManage.GetDeepBiome(chunk.X, chunk.Y);
+                }
+                else
+                {
+                    biome = BiomeManage.GetSkyBiome(chunk.X, chunk.Y);
+                }
+                chunk.BiomeType = biome.name;
+                for (int z = 0; z < Chunk.SizeZ; z++)
+                {
+                    for (int x = 0; x < Chunk.Size; x++)
+                        for (int y = 0; y < Chunk.Size; y++)
+                        {
+                            int gx = chunk.X * Chunk.Size + x;
+                            int gy = chunk.Y * Chunk.Size + y;
+                            biome.GeneratorTerrain(chunk, highmap, fastNoiseLite.GetNoise2D(gx, gy), x, y, z, gx, gy);
+                        }
+                }
+            }
+
+
+            stopwatch.Stop();
+            chunk.SpawnCostTime = (int)stopwatch.ElapsedMilliseconds;
             chunk.update = true;
         }
     }

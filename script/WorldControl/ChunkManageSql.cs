@@ -187,7 +187,7 @@ namespace horizoncraft.script.WorldControl
                         if (work.Type != "NONE")
                             work.Execute(chunk);
                         if (!chunk.spawn)
-                            SpawnChunk(chunk);
+                            GeneratorChunk(chunk);
                     }
                     else
                     {
@@ -195,7 +195,7 @@ namespace horizoncraft.script.WorldControl
                         LoadedChunks[coord] = chunk;
                         if (work.Type != "NONE")
                             work.Execute(chunk);
-                        SpawnChunk(chunk);
+                        GeneratorChunk(chunk);
                     }
                     OnChunkLoaded?.Invoke(this, chunk);
                 });
@@ -375,114 +375,9 @@ namespace horizoncraft.script.WorldControl
                 return null;
             }
         }
-        public void SpawnChunk(Chunk chunk)
+        public void GeneratorChunk(Chunk chunk)
         {
             WorldGenerator.Generator(chunk);
-            return;
-            //
-            chunk.spawn = true;
-            chunk.spawncount++;
-            Random random = new Random(chunk.coord.X * Chunk.Size);
-            for (int Z = 0; Z < Chunk.SizeZ; Z++)
-            {
-                for (int X = 0; X < Chunk.Size; X++)
-                {
-                    int globalX = chunk.coord.X * Chunk.Size + X;
-                    int NoiseY =
-                        64
-                        + (int)(fastNoiseLite.GetNoise2D(chunk.coord.X * Chunk.Size + X, Z) * 16);
-                    int localY = World.Remainder(NoiseY, Chunk.Size);
-                    int ChunkY = World.MathFloor(NoiseY, Chunk.Size);
-                    for (int Y = 0; Y < Chunk.Size; Y++)
-                    {
-                        int globalY = (chunk.coord.Y * Chunk.Size + Y);
-                        int ry = NoiseY - globalY;
-                        if (ry == 0)
-                        {
-                            if (random.Next(2) == 1)
-                            {
-                                SetBlock(new(globalX, globalY, Z), Materials.Valueof("bush"));
-                            }
-                            else if (random.Next(4) == 1)
-                            {
-                                int h = 5 + random.Next(8);
-                                for (int log_h = 0; log_h < h; log_h++)
-                                {
-                                    SetBlock(
-                                        new(globalX, globalY - log_h, Z),
-                                        Materials.Valueof("oak_log")
-                                    );
-                                    if (log_h > 4)
-                                    {
-                                        int angle = random.Next(4);
-                                        if (angle == 0)
-                                        {
-                                            SetBlock(
-                                                new(globalX - 1, globalY - log_h, Z),
-                                                Materials.Valueof("oak_log"),
-                                                true,
-                                                1
-                                            );
-                                            SetBlock(
-
-                                                new(globalX - 2, globalY - log_h, Z),
-                                                Materials.Valueof("oak_leaves"),
-                                                true,
-                                                1
-                                            );
-                                            SetBlock(
-                                                new(globalX - 1, globalY - log_h - 1, Z),
-                                                Materials.Valueof("oak_leaves"),
-                                                true,
-                                                1
-                                            );
-                                        }
-                                        angle = random.Next(4);
-                                        if (angle == 1)
-                                        {
-                                            SetBlock(
-
-                                                new(globalX + 1, globalY - log_h, Z),
-                                                Materials.Valueof("oak_log"),
-                                                true,
-                                                1
-                                            );
-                                            SetBlock(
-
-                                                new(globalX + 2, globalY - log_h, Z),
-                                                Materials.Valueof("oak_leaves"),
-                                                true,
-                                                1
-                                            );
-                                            SetBlock(
-
-                                                new(globalX + 1, globalY - log_h - 1, Z),
-                                                Materials.Valueof("oak_leaves"),
-                                                true,
-                                                1
-                                            );
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        // if (ry == -1) SetBlock(chunk, new(X, Y, Z), Materials.Valueof("grass"));
-                        // if (ry == -2) SetBlock(chunk, new(X, Y, Z), Materials.Valueof("dirt"));
-                        // if (ry == -3) SetBlock(chunk, new(X, Y, Z), Materials.Valueof("dirt"));
-                        // if (ry == -4) SetBlock(chunk, new(X, Y, Z), Materials.Valueof("dirt"));
-                        // if (ry == -5) SetBlock(chunk, new(X, Y, Z), Materials.Valueof("dirt"));
-                        // if (ry < -5) SetBlock(chunk, new(X, Y, Z), Materials.Valueof("stone"));
-                        if (ry == -1) SetBlock(new(globalX, globalY, Z), Materials.Valueof("grass"));
-                        if (ry == -2) SetBlock(new(globalX, globalY, Z), Materials.Valueof("dirt"));
-                        if (ry == -3) SetBlock(new(globalX, globalY, Z), Materials.Valueof("dirt"));
-                        if (ry == -4) SetBlock(new(globalX, globalY, Z), Materials.Valueof("dirt"));
-                        if (ry == -5) SetBlock(new(globalX, globalY, Z), Materials.Valueof("dirt"));
-                        if (ry < -5) SetBlock(new(globalX, globalY, Z), Materials.Valueof("stone"));
-
-                    }
-                }
-            }
-            chunk.update = true;
         }
         public void Save()
         {

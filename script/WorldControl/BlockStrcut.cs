@@ -3,7 +3,7 @@ using horizoncraft.script.WorldControl.work;
 
 namespace horizoncraft.script.WorldControl
 {
-    public class BlockStrcut
+    public class BlockStruct
     {
         public SetBlockWork work = new SetBlockWork();
         public (BlockMeta, int) GetBlocMeta(int X, int Y, int Z)
