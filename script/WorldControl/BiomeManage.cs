@@ -152,7 +152,7 @@ namespace horizoncraft.script.WorldControl
             }
             return null;
         }
-        public static void RegBiomes()
+        static void RegBiomes()
         {
             //森林
             Register(new ForestBiome());

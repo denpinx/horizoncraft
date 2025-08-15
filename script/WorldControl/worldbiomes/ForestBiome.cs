@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
+using horizoncraft.script.WorldControl.Context;
 using horizoncraft.script.WorldControl.work;
 
 namespace horizoncraft.script.WorldControl.worldbiomes
@@ -13,61 +14,100 @@ namespace horizoncraft.script.WorldControl.worldbiomes
         {
             name = "森林";
             weight = 3;
-            GetHigh = (noise, x, z) => ((int)(noise.GetNoise2D(x * Chunk.Size, z) * 64)) - new Random(HashCode.Combine(x, z)).Next(8);
-            GeneratorStruct = (noise, random, structs, gx, gy, z) =>
-            {
-                if (random.Next(7) != 1) return;
-                BlockStruct blockStrcut = new BlockStruct();
-                SetBlockWork sbw = blockStrcut.work;
-                if (gy < 0)
-                    for (int h = 0; h < 5 + random.Next(4); h++)
-                    {
-                        sbw.ExclList.Add(new(new(gx, gy - h, z), Materials.Valueof("oak_log"), 0));
-                        //随机分支
-                        if (random.Next(4) == 1)
-                        {
-                            sbw.ExclList.Add(new(new(gx - 1, gy - h, z), Materials.Valueof("oak_log"), 1));
-                            sbw.ExclList.Add(new(new(gx - 1, gy - h - 1, z), Materials.Valueof("oak_leaves"), 1));
-                            sbw.ExclList.Add(new(new(gx - 2, gy - h, z), Materials.Valueof("oak_leaves"), 1));
-                        }
-                        if (random.Next(4) == 2)
-                        {
-                            sbw.ExclList.Add(new(new(gx + 1, gy - h, z), Materials.Valueof("oak_log"), 1));
-                            sbw.ExclList.Add(new(new(gx + 1, gy - h - 1, z), Materials.Valueof("oak_leaves"), 1));
-                            sbw.ExclList.Add(new(new(gx + 2, gy - h, z), Materials.Valueof("oak_leaves"), 1));
-                        }
-                    }
-                structs.Add(blockStrcut);
-            };
-            GeneratorTerrain = (Noise,chunk, highMap, random, x, y, z, gx, gy) =>
-            {
-                int num = highMap[x, z] - gy;//和当前的插值
-                if (gy > 0 && highMap[x, z] > 0)//地下
+        }
+
+        public override int GetHigh(FastNoiseLite noise, int x, int z)
+        {
+            return ((int)(noise.GetNoise2D(x * Chunk.Size, z) * 64)) - new Random(HashCode.Combine(x, z)).Next(8);
+        }
+
+        public override void GeneratorStruct(LandBiomeStructContext lbsc)
+        {
+            if (lbsc.Random.Next(7) != 1) return;
+            BlockStruct blockStrcut = new BlockStruct();
+            if (lbsc.GlobalY < 0)
+                for (int h = 0; h < 5 + lbsc.Random.Next(4); h++)
                 {
-                    if (num > 0) chunk[x, y, z] = Materials.Valueof("water").Blockdata();
-                    if (num == 0) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                    if (num == -1) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                    if (num == -2) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                    if (num == -3)
+                    blockStrcut.AddBlock(lbsc.GlobalX, lbsc.GlobalY - h, lbsc.GloablZ, Materials.Valueof("oak_log"), 0);
+                    //随机分支
+                    if (lbsc.Random.Next(4) == 1)
                     {
-                        if (random.Next(2) == 1) chunk[x, y, z] = Materials.Valueof("sand").Blockdata();
-                        else chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
+                        blockStrcut.AddBlock(lbsc.GlobalX - 1, lbsc.GlobalY - h, lbsc.GloablZ,
+                            Materials.Valueof("oak_log"), 1);
+                        blockStrcut.AddBlock(lbsc.GlobalX - 1, lbsc.GlobalY - h - 1, lbsc.GloablZ,
+                            Materials.Valueof("oak_leaves"), 0);
+                        blockStrcut.AddBlock(lbsc.GlobalX - 2, lbsc.GlobalY - h, lbsc.GloablZ,
+                            Materials.Valueof("oak_leaves"), 0);
+                    }
+
+                    if (lbsc.Random.Next(4) == 2)
+                    {
+                        blockStrcut.AddBlock(lbsc.GlobalX + 1, lbsc.GlobalY - h, lbsc.GloablZ,
+                            Materials.Valueof("oak_log"), 1);
+                        blockStrcut.AddBlock(lbsc.GlobalX + 1, lbsc.GlobalY - h - 1, lbsc.GloablZ,
+                            Materials.Valueof("oak_leaves"), 0);
+                        blockStrcut.AddBlock(lbsc.GlobalX + 2, lbsc.GlobalY - h, lbsc.GloablZ,
+                            Materials.Valueof("oak_leaves"), 0);
                     }
                 }
-                else//地上
+
+            lbsc.BlockStructs.Add(blockStrcut);
+        }
+
+        public override void GeneratorTerrain(BiomeTerrainContext context)
+        {
+            int num = context.HighMap[context.LocalX, context.LocalY] - context.GlobalY; //和当前的插值
+            if (context.GlobalY > 0 && context.HighMap[context.LocalX, context.GloablZ] > 0) //地下
+            {
+                switch (num)
                 {
-                    if (num == 1)
-                    {
-                        if (random.Next(2) == 1) chunk[x, y, z] = Materials.Valueof("bush").Blockdata();
-                    }
-                    if (num == 0) chunk[x, y, z] = Materials.Valueof("grass").Blockdata();
-                    if (num == -1) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
-                    if (num == -2) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
-                    if (num == -3) chunk[x, y, z] = Materials.Valueof("dirt").Blockdata();
-                    if (num <= -4) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
+                    case > 0:
+                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("water").Blockdata();
+                        break;
+                    case 0:
+                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("sand").Blockdata();
+                        break;
+                    case -1:
+                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("sand").Blockdata();
+                        break;
+                    case -2:
+                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("sand").Blockdata();
+                        break;
+                    case -3:
+                        if (context.Random.Next(2) == 1)
+                            context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("sand").Blockdata();
+                        else context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("stone").Blockdata();
+                        break;
+                    case < -4:
+                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("stone").Blockdata();
+                        break;
                 }
-                if (num <= -4) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
-            };
+            }
+            else //地上
+            {
+                switch (num)
+                {
+                    case 1:
+                        if (context.Random.Next(2) == 1)
+                            context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("bush").Blockdata();
+                        break;
+                    case 0:
+                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("grass").Blockdata();
+                        break;
+                    case -1:
+                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("dirt").Blockdata();
+                        break;
+                    case -2:
+                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("dirt").Blockdata();
+                        break;
+                    case -3:
+                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("dirt").Blockdata();
+                        break;
+                    case < -4:
+                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("stone").Blockdata();
+                        break;
+                }
+            }
         }
     }
 }

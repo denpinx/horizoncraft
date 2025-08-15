@@ -34,7 +34,11 @@ namespace horizoncraft.script.WorldControl
         public Blockdata this[int x, int y, int z]
         {
             get { return data[x, y, z]; }
-            set { data[x, y, z] = value; }
+            set
+            {
+                update = true;
+                data[x, y, z] = value;
+            }
         }
 
         [MemoryPackConstructor]
@@ -58,6 +62,7 @@ namespace horizoncraft.script.WorldControl
         }
         public void Tick(ChunkManageSql chunkManage)
         {
+            int state = 0;
             for (int Z = 0; Z < Chunk.SizeZ; Z++)
             {
                 for (int X = 0; X < Chunk.Size; X++)
@@ -66,6 +71,7 @@ namespace horizoncraft.script.WorldControl
                     {
                         if (data[X, Y, Z].components.Count != 0)
                         {
+                            state = data[X, Y, Z].STATE;
                             BlockTickEvent blockTickEvnet = new()
                             {
                                 World = chunkManage.world,
@@ -79,6 +85,7 @@ namespace horizoncraft.script.WorldControl
                                 ),
                                 LocalPos = new Godot.Vector3I(X, Y, Z),
                             };
+                            if (state != data[X, Y, Z].STATE) update = true;
                             ComponentManager.ExecuteComponents(blockTickEvnet, data[X, Y, Z]);
                         }
                         else
@@ -86,8 +93,6 @@ namespace horizoncraft.script.WorldControl
                             if (data[X, Y, Z].BlockMeta.Components.Count != 0)
                             {
                                 data[X, Y, Z].SetMeta(data[X, Y, Z].BlockMeta);
-                                Godot.GD.Print(data[X, Y, Z].BlockMeta.NAME);
-                                Godot.GD.Print(data[X, Y, Z].components.Count);
                             }
                         }
                     }

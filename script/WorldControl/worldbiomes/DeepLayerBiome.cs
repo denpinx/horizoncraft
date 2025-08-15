@@ -13,10 +13,10 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             name = "深层";
             biomeType = BiomeType.Deep;
             weight = 100;
-            GeneratorTerrain = (Chunk, highmap, noise, x, y, z, gx, gy) =>
-            {
-                Chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
-            };
+        }
+        public override void GeneratorTerrain(BiomeTerrainContext btc)
+        {
+            btc.Chunk[btc.LocalX, btc.LocalY, btc.GloablZ] = Materials.Valueof("stone").Blockdata();
         }
     }
 }

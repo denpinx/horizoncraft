@@ -31,7 +31,7 @@ namespace horizoncraft.script
         public long tick_use_time = 0;
         public SqliteConnection connection;
         public ChunkManageSql chunkManage;
-        PackedScene PSTilemapLayerChunk;
+        public PackedScene PSTilemapLayerChunk;
         public List<TileMapLayerChunk> tileMapLayerChunks = new();
         public System.Collections.Generic.Dictionary<Vector2I, Chunk> VisibleChunks = new();
         //Node
@@ -114,7 +114,7 @@ namespace horizoncraft.script
 
         public override void _Process(double delta) { }
 
-        private void CilentTick()
+        public void CilentTick()
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();

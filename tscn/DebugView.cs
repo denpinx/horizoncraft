@@ -5,7 +5,7 @@ public partial class DebugView : Node2D
 {
     public Chunk chunk;
     Font font = new SystemFont();
-    public static bool DEBUG = true;
+    public static bool DEBUG = false;
     public override void _Draw()
     {
         if (!DEBUG) return;

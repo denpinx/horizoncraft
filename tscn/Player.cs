@@ -20,7 +20,8 @@ public partial class Player : CharacterBody2D
     public World world;
     public const float Speed = 300.0f;
     public const float JumpVelocity = -200.0f;
-
+    public bool InputAble = true;
+    public bool MoreInfo = false;
     [Export]
     public int mode = 0;
 
@@ -36,6 +37,7 @@ public partial class Player : CharacterBody2D
 
     public override void _Input(InputEvent @event)
     {
+        if (!InputAble) return;
         Vector2I Mousecoord = new(
             (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
@@ -117,41 +119,29 @@ public partial class Player : CharacterBody2D
         {
             playerData.ChunkCoord = ChunkCoord;
         }
-        Label_DEBUG_Left.Text = "";
-        StringBuilder Text = new StringBuilder();
-        Text.AppendLine($"全局坐标：{playerData.Coord.X},{playerData.Coord.Y}");
-        Text.AppendLine($"区块坐标：{playerData.ChunkCoord.X},{playerData.ChunkCoord.Y}");
-        Text.AppendLine($"加载区块：{world.chunkManage.LoadedChunks.Count}");
-        Text.AppendLine($"正在加载：{world.chunkManage.LoadingQuee.Count}");
-        Text.AppendLine($"TileMap: {world.tileMapLayerChunks.Count}");
-        Text.AppendLine($"显示区块: {world.VisibleChunks.Count}");
-        Text.AppendLine($"鼠标位置: {Mcoord.X},{Mcoord.Y} ");
-        Text.AppendLine($"鼠标所在: {MCcoord.X},{MCcoord.Y} ");
-        Text.AppendLine($"World.Tick耗时: {world.tick_use_time}MS");
-        Text.AppendLine($"ChunkManage.Tick耗时: {world.chunkManage.tick_use_time}MS");
-        Text.AppendLine($"时间: {world.chunkManage.time}");
-        foreach (Func<string> func in GetInformation)
-            Text.AppendLine(func());
-        Label_DEBUG_Left.Text = Text.ToString();
-
-
-        string str = "[已加载区块]\n";
-        // for (int i = 0; i < world.tileMapLayerChunks.Count; i++)
-        // {
-        //     TileMapLayerChunk chunk = world.tileMapLayerChunks[i];
-        //     if(chunk!=null)
-        //     str += $"[{chunk.chunk.coord.X},{chunk.chunk.coord.Y}] {chunk}\n";
-        // }
-        foreach (var key in world.VisibleChunks.Keys)
+        if (MoreInfo)
         {
-            var chunk = world.VisibleChunks[key];
-            if (chunk != null)
-                str += $"[{chunk.coord.X},{chunk.coord.Y}]\n";
+            Label_DEBUG_Left.Text = "";
+            StringBuilder Text = new StringBuilder();
+            Text.AppendLine($"全局坐标：{playerData.Coord.X},{playerData.Coord.Y}");
+            Text.AppendLine($"区块坐标：{playerData.ChunkCoord.X},{playerData.ChunkCoord.Y}");
+            Text.AppendLine($"加载区块：{world.chunkManage.LoadedChunks.Count}");
+            Text.AppendLine($"正在加载：{world.chunkManage.LoadingQuee.Count}");
+            Text.AppendLine($"TileMap: {world.tileMapLayerChunks.Count}");
+            Text.AppendLine($"显示区块: {world.VisibleChunks.Count}");
+            Text.AppendLine($"鼠标位置: {Mcoord.X},{Mcoord.Y} ");
+            Text.AppendLine($"鼠标所在: {MCcoord.X},{MCcoord.Y} ");
+            Text.AppendLine($"World.Tick耗时: {world.tick_use_time}MS");
+            Text.AppendLine($"ChunkManage.Tick耗时: {world.chunkManage.tick_use_time}MS");
+            Text.AppendLine($"时间: {world.chunkManage.time}");
+            foreach (Func<string> func in GetInformation)
+                Text.AppendLine(func());
+            Label_DEBUG_Left.Text = Text.ToString();
         }
-        Label_DEBUG_Right.Text = str;
+
 
         //防止加载地形的时候卡墙里
-        if (!world.chunkManage.LoadedChunks.ContainsKey(ChunkCoord))
+        if (world==null||!world.chunkManage.LoadedChunks.ContainsKey(ChunkCoord))
         {
             Stop = true;
         }
@@ -160,8 +150,7 @@ public partial class Player : CharacterBody2D
             if (mode == 0)
                 Stop = false;
         }
-
-        if (mode == 0)
+        if (mode == 0 && InputAble)
         {
             Vector2 velocity = Velocity;
             if (!IsOnFloor() && (!fly || !Stop))
@@ -184,7 +173,7 @@ public partial class Player : CharacterBody2D
             Velocity = velocity;
             MoveAndSlide();
         }
-        if (mode == 1)
+        if (mode == 1 && InputAble)
         {
             if (Input.IsActionPressed("zoom_1"))
                 camera2d.Zoom = new(2, 2);
@@ -212,10 +201,16 @@ public partial class Player : CharacterBody2D
             }
         }
 
-        if (Input.IsActionJustPressed("F1"))
+        if (Input.IsActionJustPressed("F1") && InputAble)
             mode = mode == 0 ? 1 : 0;
-        if (Input.IsActionJustPressed("F2"))
+        if (Input.IsActionJustPressed("F2") && InputAble)
             DebugView.DEBUG = !DebugView.DEBUG;
+        if (Input.IsActionJustPressed("F3") && InputAble)
+        {
+            MoreInfo = !MoreInfo;
+            Label_DEBUG_Left.Visible = MoreInfo;
+            Label_DEBUG_Right.Visible = MoreInfo;
+        }
     }
 
     public override void _Ready()
@@ -230,11 +225,13 @@ public partial class Player : CharacterBody2D
 
     public override void _ExitTree()
     {
+
         Save();
     }
 
     public void Load()
     {
+        if (ChunkManageSql.worldMode == ChunkManageSql.WorldMode.Preview || ChunkManageSql.worldMode == ChunkManageSql.WorldMode.Multiplayer_Client) return;
         if (!FileAccess.FileExists($"save/{World.world_name}/player.json"))
         {
             if (!DirAccess.DirExistsAbsolute($"save"))
@@ -281,6 +278,7 @@ public partial class Player : CharacterBody2D
 
     public void Save()
     {
+        if (ChunkManageSql.worldMode == ChunkManageSql.WorldMode.Preview || ChunkManageSql.worldMode == ChunkManageSql.WorldMode.Multiplayer_Client) return;
         FileAccess file = FileAccess.Open(
             $"save/{World.world_name}/player.json",
             FileAccess.ModeFlags.Write

@@ -23,7 +23,7 @@ namespace horizoncraft.script.WorldControl
         }
         public event Action<ChunkManageSql, Chunk> OnChunkLoaded;
         public event Action<ChunkManageSql, Chunk> OnChunkUnLoading;
-        public WorldMode worldMode = WorldMode.Single;
+        public static WorldMode worldMode = WorldMode.Preview;
         public long time;
         public long tick_use_time;
         public int LoadHorizon = 3;
@@ -38,8 +38,9 @@ namespace horizoncraft.script.WorldControl
         public bool Lock = false;
         public World world;
         SqliteConnection sqliteConnection;
-        public ChunkManageSql(World world) : base("ChunkManageSql")
+        public ChunkManageSql(World world, WorldMode worldMode = WorldMode.Single) : base("ChunkManageSql")
         {
+            ChunkManageSql.worldMode = worldMode;
             this.world = world;
             Horizoncraft.AddManage(this);
             world.timer.Timeout += PreTick;
@@ -78,7 +79,7 @@ namespace horizoncraft.script.WorldControl
                     //开启rpc服务器
                 }
             }
-            else if(worldMode == WorldMode.Multiplayer_Client)
+            else if (worldMode == WorldMode.Multiplayer_Client)
             {
                 //链接服务器
             }
@@ -161,68 +162,75 @@ namespace horizoncraft.script.WorldControl
             {
                 world.VisibleChunks.Remove(key, out _);
             }
-
-            foreach (Vector2I coord in UnloadingQuee.Keys)
+            //保存区块
+            if (ChunkManageSql.worldMode == WorldMode.Single || ChunkManageSql.worldMode == WorldMode.Multiplayer_Server)
             {
-                Lock = true;
-                int max = UnloadingQuee.Count;
-                int count = 0;
-                Chunk chunk = UnloadingQuee[coord];
-                Chunk outchunk;
-                if (UnloadingQuee.TryRemove(coord, out outchunk))
+                foreach (Vector2I coord in UnloadingQuee.Keys)
                 {
-                    OnChunkUnLoading?.Invoke(this, chunk);
+                    Lock = true;
+                    int max = UnloadingQuee.Count;
+                    int count = 0;
+                    Chunk chunk = UnloadingQuee[coord];
+                    Chunk outchunk;
+                    if (UnloadingQuee.TryRemove(coord, out outchunk))
+                    {
+                        OnChunkUnLoading?.Invoke(this, chunk);
+                        Task.Run(() =>
+                        {
+                            if (CheckKeyValueExists(coord.X, coord.Y))
+                            {
+                                UpdateData(chunk);
+                            }
+                            else
+                            {
+                                InsertData(chunk);
+                            }
+                        });
+                        Lock = false;
+                    }
+                }
+            }
+            if (worldMode == WorldMode.Single || worldMode == WorldMode.Multiplayer_Server || worldMode == WorldMode.Preview)
+            {
+                //创建与获取区块
+                foreach (Vector2I coord in LoadingQuee.Keys)
+                {
+                    int max = LoadingQuee.Count;
+                    WorkBase work = LoadingQuee[coord];
+                    LoadingQuee.TryRemove(coord, out _);
                     Task.Run(() =>
                     {
-                        GD.Print("保存", count++, "/", max);
+                        Chunk chunk;
                         if (CheckKeyValueExists(coord.X, coord.Y))
                         {
-                            UpdateData(chunk);
+                            chunk = GetChunkData(coord.X, coord.Y);
+                            LoadedChunks[coord] = chunk;
+                            if (work.Type != "NONE")
+                                work.Execute(chunk);
+                            if (!chunk.spawn)
+                                GeneratorChunk(chunk);
+
+                            OnChunkLoaded?.Invoke(this, chunk);
                         }
                         else
                         {
-                            InsertData(chunk);
-                        }
-                    });
-                    Lock = false;
-                }
-            }
-            foreach (Vector2I coord in LoadingQuee.Keys)
-            {
-                int max = LoadingQuee.Count;
-                WorkBase work = LoadingQuee[coord];
-                LoadingQuee.TryRemove(coord, out _);
-                Task.Run(() =>
-                {
-                    Chunk chunk;
-                    if (CheckKeyValueExists(coord.X, coord.Y))
-                    {
-                        chunk = GetChunkData(coord.X, coord.Y);
-                        LoadedChunks[coord] = chunk;
-                        if (work.Type != "NONE")
-                            work.Execute(chunk);
-                        if (!chunk.spawn)
-                            GeneratorChunk(chunk);
+                            //生成区块
 
-                        OnChunkLoaded?.Invoke(this, chunk);
-                    }
-                    else
-                    {
-                        if (worldMode == WorldMode.Single || worldMode == WorldMode.Multiplayer_Server)
-                        {
                             chunk = new(coord.X, coord.Y);
                             LoadedChunks[coord] = chunk;
                             if (work.Type != "NONE")
                                 work.Execute(chunk);
                             GeneratorChunk(chunk);
                             OnChunkLoaded?.Invoke(this, chunk);
-                        }
-                    }
 
-                });
+                        }
+
+                    });
+                }
             }
 
-            if (worldMode == WorldMode.Single || worldMode == WorldMode.Multiplayer_Server)
+
+            if (worldMode == WorldMode.Single || worldMode == WorldMode.Multiplayer_Server || worldMode == WorldMode.Preview)
             {
                 foreach (Vector2I coord in LoadedChunks.Keys)
                 {
@@ -303,7 +311,12 @@ namespace horizoncraft.script.WorldControl
         }
         public Chunk GetChunkData(int x, int y)
         {
-            if (worldMode == WorldMode.Preview) return null;
+            if (worldMode == WorldMode.Preview)
+            {
+                var c = new Chunk(x, y);
+                GeneratorChunk(c);
+                return c;
+            }
             if (worldMode == WorldMode.Multiplayer_Client) return null;
 
             byte[] bytes = GetByeData(x, y);

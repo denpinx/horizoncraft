@@ -14,10 +14,6 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             name = "天空";
             biomeType = BiomeType.Sky;
             weight = 100;
-            GeneratorTerrain = (Chunk,highmap, noise, x, y, z,gx,gy) =>
-            {
-
-            };
         }
 
     }
