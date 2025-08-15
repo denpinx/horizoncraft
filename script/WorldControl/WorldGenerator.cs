@@ -15,6 +15,7 @@ namespace horizoncraft.script.WorldControl
     {
         private static readonly Stopwatch StopWatch = new Stopwatch();
         private static readonly FastNoiseLite FastNoiseLite = new FastNoiseLite();
+
         public static float CatmullRom(float p0, float p1, float p2, float p3, float t)
         {
             const float tension = 0.5f; // 0.5 为标准 Catmull-Rom
@@ -81,11 +82,10 @@ namespace horizoncraft.script.WorldControl
 
                 if (structs.Count > 0)
                     return structs;
-                else return null;
             }
             else if (biomeType == BiomeType.Deep)
             {
-                var landBiomeStructContext = new BiomeStructContext()
+                var biomeStructContext = new BiomeStructContext()
                 {
                     FastNoiseLite = FastNoiseLite,
                     BlockStructs = structs,
@@ -94,10 +94,9 @@ namespace horizoncraft.script.WorldControl
                     GlobalY = y * Chunk.Size
                 };
                 Biome biome = BiomeManage.GetDeepBiome(x, y);
-                biome.GeneratorStruct(landBiomeStructContext);
+                biome.GeneratorStruct(biomeStructContext);
                 if (structs.Count > 0)
                     return structs;
-                else return null;
             }
             else if (biomeType == BiomeType.Sky)
             {
@@ -113,7 +112,6 @@ namespace horizoncraft.script.WorldControl
                 biome.GeneratorStruct(landBiomeStructContext);
                 if (structs.Count > 0)
                     return structs;
-                else return null;
             }
 
             return null;
@@ -137,7 +135,7 @@ namespace horizoncraft.script.WorldControl
         {
             for (int i = 0; i < structs.Count; i++)
             {
-                (BlockMeta, int) data = structs[i].GetBlocMeta(x, y, z);
+                (BlockMeta, int) data = structs[i].GetBlockMeta(x, y, z);
                 if (data.Item1 != null) return data;
             }
 
@@ -150,6 +148,13 @@ namespace horizoncraft.script.WorldControl
         //旧算法每次设置方块都需要遍历所有的区块才能命中，以及还要等待区块异步加载的延迟，现在直接100%命中
         //当前运行速度50chunk+/s
         //去除stopwatch的误差，单区块平均生成耗时小于1ms
+        
+        /*
+            单线程生成 1000 区块耗时12669 ms
+            平均耗时12 ms
+            多线程生成 1000 区块耗时2528 ms
+            平均耗时2 ms
+         */
         public static void Generator(Chunk chunk)
         {
             StopWatch.Restart();
@@ -171,6 +176,7 @@ namespace horizoncraft.script.WorldControl
                 for (int z = 0; z < Chunk.SizeZ; z++)
                 {
                     Random random = new Random(chunk.X * 3 + chunk.Y * 7 + z * 11);
+                    biomeTerrainContext.Random = random;
                     for (int x = 0; x < Chunk.Size; x++)
                     for (int y = 0; y < Chunk.Size; y++)
                     {
@@ -185,10 +191,10 @@ namespace horizoncraft.script.WorldControl
 
                         landbiome.GeneratorTerrain(biomeTerrainContext);
 
-                        if (gy >= highmap[x, z] && FastNoiseLite.GetNoise2D(gx, gy) > 0.3f && z == 1)
+                        if (gy >= highmap[x, z] && biomeTerrainContext.Noise > 0.2f && z == 1)
                             chunk[x, y, z] = Materials.Valueof("air").Blockdata();
 
-                        (BlockMeta, int) data = GetStructData(structs, gx, gy, z);
+                        var data = GetStructData(structs, gx, gy, z);
                         if (data.Item1 != null)
                         {
                             chunk[x, y, z] = data.Item1.Blockdata();
@@ -218,6 +224,7 @@ namespace horizoncraft.script.WorldControl
                 };
                 for (int z = 0; z < Chunk.SizeZ; z++)
                 {
+                    biomeTerrainContext.Random = new Random(chunk.X * 3 + chunk.Y * 7 + z * 11);
                     for (int x = 0; x < Chunk.Size; x++)
                     for (int y = 0; y < Chunk.Size; y++)
                     {
@@ -231,7 +238,7 @@ namespace horizoncraft.script.WorldControl
                         biomeTerrainContext.Noise = FastNoiseLite.GetNoise2D(gx, gy);
                         if (gy > highmap[x, z] && FastNoiseLite.GetNoise2D(gx, gy) > 0.3f && z == 1)
                             chunk[x, y, z] = Materials.Valueof("air").Blockdata();
-                        else chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
+                        else if (biomeType == BiomeType.Deep) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
 
                         biome.GeneratorTerrain(biomeTerrainContext);
 

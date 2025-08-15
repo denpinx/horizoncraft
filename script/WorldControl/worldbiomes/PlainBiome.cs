@@ -23,7 +23,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
 
         public override void GeneratorTerrain(BiomeTerrainContext context)
         {
-            int num = context.HighMap[context.LocalX, context.LocalY] - context.GlobalY; //和当前的插值
+            int num = context.HighMap[context.LocalX, context.GloablZ] - context.GlobalY; //和当前的插值
             if (context.GlobalY > 0 && context.HighMap[context.LocalX, context.GloablZ] > 0) //地下
             {
                 switch (num)
@@ -45,7 +45,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                             context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("sand").Blockdata();
                         else context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("stone").Blockdata();
                         break;
-                    case < -4:
+                    case <= -4:
                         context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("stone").Blockdata();
                         break;
                 }
@@ -70,7 +70,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                     case -3:
                         context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("dirt").Blockdata();
                         break;
-                    case < -4:
+                    case <= -4:
                         context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("stone").Blockdata();
                         break;
                 }

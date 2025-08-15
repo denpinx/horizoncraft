@@ -10,7 +10,8 @@ namespace horizoncraft.script.WorldControl
         private Vector2I min = new(0, 0);
         private Vector2I max = new(0, 0);
         public List<BlockStructItem> blockStructItems = new List<BlockStructItem>();
-        public void AddBlock(int x, int y, int z, BlockMeta blockMeta, int state)
+
+        public void AddBlock(int x, int y, int z, BlockMeta blockMeta, int state = 0)
         {
             if (blockStructItems.Count == 0)
             {
@@ -20,10 +21,11 @@ namespace horizoncraft.script.WorldControl
             else
             {
                 if (x > max.X) max.X = x;
-                else min.X = x;
+                if (x < min.X) min.X = x;
                 if (y > max.Y) max.Y = y;
-                else min.Y = y;
+                if (y < min.Y) min.Y = y;
             }
+
             blockStructItems.Add(new()
             {
                 Coord = new Vector3I(x, y, z),
@@ -31,7 +33,8 @@ namespace horizoncraft.script.WorldControl
                 State = state
             });
         }
-        public (BlockMeta, int) GetBlocMeta(int X, int Y, int Z)
+
+        public (BlockMeta, int) GetBlockMeta(int X, int Y, int Z)
         {
             if (X < min.X || X > max.X || Y < min.Y || Y > max.Y) return (null, 0);
             foreach (BlockStructItem bsi in blockStructItems)
