@@ -5,10 +5,11 @@ using Godot;
 using Godot.Collections;
 using horizoncraft.script.WorldControl;
 using HorizonCraft.script.WorldControl.Service;
+using horizoncraft.script.WorldControl.Tool;
 using MemoryPack;
 
 namespace horizoncraft.script;
-
+//客户端RPC函数
 public partial class World
 {
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
@@ -19,7 +20,7 @@ public partial class World
         if (WorldService is IWorldService iws && iws.GetPlayer(name, out playerData))
         {
             playerData.PeerId = peerid;
-            var bytes = WorldManage.PlayerToByte(playerData);
+            var bytes = playerData.ToByte();
             RpcId(peerid, "RecivePlayer", bytes);
             GD.Print($"[成功获取,即将返回]{name}");
         }

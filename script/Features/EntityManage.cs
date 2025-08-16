@@ -12,9 +12,9 @@ using HorizonCraft.script.WorldControl.Service;
 
 namespace horizoncraft.script.Features
 {
-    public class EntityManage : IBaseManage
+    public class EntityManage
     {
-        public static bool Enable = false; 
+        public static bool Enable = false;
         static WorldBase _worldManage;
         public static ConcurrentBag<Node2D> waitEntitys = new();
         public static List<Node2D> entitys = new();
@@ -25,6 +25,14 @@ namespace horizoncraft.script.Features
 
         public static void Init(WorldBase world)
         {
+            if (Enable)
+            {
+                waitEntitys.Clear();
+                entitys.Clear();
+                _worldManage.OnChunkLoaded = null;
+                _worldManage.OnChunkUnLoading = null;
+            }
+
             Enable = true;
             _worldManage = world;
             _worldManage.OnChunkLoaded += OnWorldLoaded;

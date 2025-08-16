@@ -15,10 +15,6 @@ run/main_scene="res://tscn/world.tscn"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
-[autoload]
-
-Server="*res://tscn/Server.tscn"
-
 [dotnet]
 
 project/assembly_name="HorizonCraft"

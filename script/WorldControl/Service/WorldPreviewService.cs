@@ -15,7 +15,7 @@ namespace HorizonCraft.script.WorldControl.Service;
 /// 预览模式
 /// 只创建区块并预览效果，不保存和加载任何数据
 /// </summary>
-public class WorldPreviewService : WorldBase, IWorldService, IBaseManage, IWorldTickable
+public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
 {
     public bool Init()
     {
@@ -29,7 +29,6 @@ public class WorldPreviewService : WorldBase, IWorldService, IBaseManage, IWorld
 
     public void ProcessChunkUnloadQueue()
     {
-        
     }
 
     public void UpdateLoadChunkCoords()

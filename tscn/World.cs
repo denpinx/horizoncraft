@@ -25,8 +25,15 @@ namespace horizoncraft.script
     public partial class World : Node2D
     {
         //
+        public enum WorldMode
+        {
+            Preview, //预览模式,仅生成世界,不保存,不加载
+            Single, //单人模式,拥有全部内容
+            MultiplayerClient, //联机客户端模式,不生成世界,不保存，不加载
+            MultiplayerHost //联机服主机模式,拥有全部内容
+        }
 
-        public static WorldManage.WorldMode WorldMode = WorldManage.WorldMode.Single;
+        public static WorldMode worldMode = WorldMode.Single;
 
         //
         public PackedScene Player_ps;
@@ -121,7 +128,7 @@ namespace horizoncraft.script
             timer.Timeout += CilentTick;
             player.world = this;
 
-            if (WorldMode == WorldManage.WorldMode.Single)
+            if (worldMode == WorldMode.Single)
             {
                 WorldSingleService wsw = new WorldSingleService();
                 WorldService = wsw;
@@ -133,7 +140,7 @@ namespace horizoncraft.script
                 player.MoreInfo = true;
             }
 
-            if (WorldMode == WorldManage.WorldMode.MultiplayerHost)
+            if (worldMode == WorldMode.MultiplayerHost)
             {
                 WorldHostService whs = new WorldHostService();
                 WorldService = whs;
@@ -142,7 +149,7 @@ namespace horizoncraft.script
                 whs.UpdateLoadChunkCoords();
             }
 
-            if (WorldMode == WorldManage.WorldMode.MultiplayerClient)
+            if (worldMode == WorldMode.MultiplayerClient)
             {
                 WorldClientService wcs = new WorldClientService();
                 WorldService = wcs;
@@ -151,7 +158,7 @@ namespace horizoncraft.script
                 wcs.UpdateLoadChunkCoords();
             }
 
-            if (WorldMode == WorldManage.WorldMode.Preview)
+            if (worldMode == WorldMode.Preview)
             {
                 WorldPreviewService wps = new WorldPreviewService();
                 WorldService = wps;
@@ -204,7 +211,7 @@ namespace horizoncraft.script
                 {
                     player.playerData.player = player;
                     player.Position = player.playerData.Position;
-                    if (WorldManage.worldMode == WorldManage.WorldMode.Preview)
+                    if (worldMode == WorldMode.Preview)
                     {
                         player.Visible = false;
                         player.Visible = false;
@@ -240,7 +247,6 @@ namespace horizoncraft.script
                             Tween tween = GetTree().CreateTween();
                             tween.TweenProperty(PlayerNodes[Kvp.Key], "position", Kvp.Value.Position, 0.05f);
                         }
-                            
                     }
                 }
         }

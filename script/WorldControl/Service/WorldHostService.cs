@@ -20,7 +20,7 @@ using Microsoft.Data.Sqlite;
 /// 多人游戏，主机模式
 /// 拥有全部功能
 /// </summary>
-public class WorldHostService : WorldBase, IWorldService, IBaseManage, IWorldHostService, IWorldTickable
+public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWorldTickable
 {
     private const int Port = 9999;
     private const int MaxPlayer = 16;

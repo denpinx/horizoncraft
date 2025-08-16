@@ -7,7 +7,7 @@ using horizoncraft.script.WorldControl.Tool;
 
 namespace HorizonCraft.script.WorldControl.Service;
 
-public class WorldClientService : WorldBase, IWorldService, IBaseManage, IWorldTickable
+public class WorldClientService : WorldBase, IWorldService, IWorldTickable
 {
     private const int Port = 9999;
 
@@ -108,17 +108,21 @@ public class WorldClientService : WorldBase, IWorldService, IBaseManage, IWorldT
     public void SavePlayer(PlayerData playerData)
     {
         if (!Connect) return;
+        if (playerData == null)
+        {
+            GD.PrintErr("playerData is null");
+            return;
+        }
         world.RpcId(1, "UpdataPlayer", playerData.Name, playerData.ToByte());
     }
 
     public void SaveChunk(Chunk chunk)
     {
-        if (!Connect) return;
+        
     }
 
     public void Save()
     {
-        if (!Connect) return;
     }
     public void Tick()
     {

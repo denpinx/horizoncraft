@@ -10,7 +10,7 @@ public partial class MainMenu : World
 
     public override void _Ready()
     {
-        WorldMode = WorldManage.WorldMode.Preview;
+        worldMode = WorldMode.Preview;
         base._Ready();
         
         ButtonSingle = GetNode<Button>("CanvasLayer2/Button_Single");
@@ -20,17 +20,17 @@ public partial class MainMenu : World
 
         ButtonSingle.Pressed += () =>
         {
-            WorldMode = WorldManage.WorldMode.Single;
+            worldMode = WorldMode.Single;
             GetTree().ChangeSceneToFile("res://tscn/world.tscn");
         };
         ButtonHost.Pressed += () =>
         {
-            WorldMode = WorldManage.WorldMode.MultiplayerHost;
+            worldMode = WorldMode.MultiplayerHost;
             GetTree().ChangeSceneToFile("res://tscn/world.tscn");
         };
         ButtonConnect.Pressed += () =>
         {
-            WorldMode = WorldManage.WorldMode.MultiplayerClient;
+            worldMode = WorldMode.MultiplayerClient;
             GetTree().ChangeSceneToFile("res://tscn/world.tscn");
         };
         TextEdit.TextChanged += () => { Player.LocalName = TextEdit.Text; };

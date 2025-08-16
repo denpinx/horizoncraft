@@ -16,7 +16,7 @@ namespace HorizonCraft.script.WorldControl.Service;
 /// 单机模式
 /// 拥有全部服务器功能
 /// </summary>
-public class WorldSingleService : WorldBase, IWorldService, IBaseManage, IWorldTickable
+public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
 {
     public SqliteConnection sqliteConnection;
 
