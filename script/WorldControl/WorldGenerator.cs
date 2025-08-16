@@ -184,7 +184,7 @@ namespace horizoncraft.script.WorldControl
                         int gy = chunk.Y * Chunk.Size + y;
                         biomeTerrainContext.LocalX = x;
                         biomeTerrainContext.LocalY = y;
-                        biomeTerrainContext.GloablZ = z;
+                        biomeTerrainContext.GlobalZ = z;
                         biomeTerrainContext.GlobalX = gx;
                         biomeTerrainContext.GlobalY = gy;
                         biomeTerrainContext.Noise = FastNoiseLite.GetNoise2D(gx, gy);
@@ -232,7 +232,7 @@ namespace horizoncraft.script.WorldControl
                         int gy = chunk.Y * Chunk.Size + y;
                         biomeTerrainContext.LocalX = x;
                         biomeTerrainContext.LocalY = y;
-                        biomeTerrainContext.GloablZ = z;
+                        biomeTerrainContext.GlobalZ = z;
                         biomeTerrainContext.GlobalX = gx;
                         biomeTerrainContext.GlobalY = gy;
                         biomeTerrainContext.Noise = FastNoiseLite.GetNoise2D(gx, gy);

@@ -23,27 +23,27 @@ namespace horizoncraft.script.WorldControl.worldbiomes
 
         public override void GeneratorTerrain(BiomeTerrainContext context)
         {
-            int num = context.HighMap[context.LocalX, context.GloablZ] - context.GlobalY;
+            int num = context.HighMap[context.LocalX, context.GlobalZ] - context.GlobalY;
             switch (num)
             {
                 case 0:
-                    context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                    context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                         Materials.Valueof("snow").Blockdata();
                     break;
                 case -1:
-                    context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                    context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                         Materials.Valueof("snow").Blockdata();
                     break;
                 case -2:
-                    context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                    context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                         Materials.Valueof("snow").Blockdata();
                     break;
                 case -3:
-                    context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                    context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                         Materials.Valueof("snow").Blockdata();
                     break;
                 case <= -4:
-                    context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                    context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                         Materials.Valueof("stone").Blockdata();
                     break;
             }

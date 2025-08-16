@@ -15,7 +15,7 @@ namespace horizoncraft.script.WorldControl
         public int LocalY;
         public int GlobalX;
         public int GlobalY;
-        public int GloablZ;
+        public int GlobalZ;
 
     }
 }

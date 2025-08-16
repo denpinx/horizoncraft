@@ -16,7 +16,9 @@
 |合成功能|配合物品系统,已经有思路了|
 
 # 多人相关
-目前没有任何性能优化,仅作测试功能
+
+性能瓶颈在区块数据的分发，同一个区块会在一Tick内被序列化多次。
+接下来打算在分发前先序列化所有要同步的区块。
 
 |类名|继承与接口|描述|
 |----|----|----|
@@ -24,6 +26,20 @@
 |WorldClientService|WorldBase, IWorldService, IWorldTickable|联机客户端,没有任何存储功能|
 |WorldSingleService|WorldBase, IWorldService, IWorldTickable|单机,拥有除联机外全部功能|
 |WorldPreviewService|WorldBase, IWorldService, IWorldTickable|预览模式,没有任何存储功能|
+|WorldBase|objcet|存储世界的基本信息,如已加载的区块,待加载的区块,玩家等等|
+|IWorldService|Interface|通过接口强制要求每个子类实现所有方法,以免遗漏|
+|IWorldHostService|Interface|网络同步接口,要求必须实现里面的所有方法|
+|IWorldTickable|Interface|Tick接口|
+
+性能分析
+
+|优化方向|进度|描述|
+|----|----|----|
+|不同步整个区块,只同步改变的,或则减少同步频率|20%|目前是直接根据脏标记直接同步整个区块,虽然一个区块压缩后才500字节,还是得考虑有没有更好的办法|
+|减少同步次数|0%|目前是每tick同步所有玩家的所有信息,只做了视距筛选,玩家之间只同步视距内的玩家，但是还不够，主要是区块同步太频繁了。
+
+
+
 
 # 已实现组件类
 
@@ -184,30 +200,30 @@ w
 
         public override void GeneratorTerrain(BiomeTerrainContext context)
         {
-            int num = context.HighMap[context.LocalX, context.GloablZ] - context.GlobalY; //和当前的插值
-            if (context.GlobalY > 0 && context.HighMap[context.LocalX, context.GloablZ] > 0) //地下
+            int num = context.HighMap[context.LocalX, context.GlobalZ] - context.GlobalY; //和当前的插值
+            if (context.GlobalY > 0 && context.HighMap[context.LocalX, context.GlobalZ] > 0) //地下
             {
                 switch (num)
                 {
                     case > 0:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("water").Blockdata();
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("water").Blockdata();
                         break;
                     case 0:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("sand").Blockdata();
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("sand").Blockdata();
                         break;
                     case -1:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("sand").Blockdata();
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("sand").Blockdata();
                         break;
                     case -2:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("sand").Blockdata();
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("sand").Blockdata();
                         break;
                     case -3:
                         if (context.Random.Next(2) == 1)
-                            context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("sand").Blockdata();
-                        else context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("stone").Blockdata();
+                            context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("sand").Blockdata();
+                        else context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("stone").Blockdata();
                         break;
                     case <= -4:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("stone").Blockdata();
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("stone").Blockdata();
                         break;
                 }
             }
@@ -217,22 +233,22 @@ w
                 {
                     case 1:
                         if (context.Random.Next(2) == 1)
-                            context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("bush").Blockdata();
+                            context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("bush").Blockdata();
                         break;
                     case 0:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("grass").Blockdata();
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("grass").Blockdata();
                         break;
                     case -1:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("dirt").Blockdata();
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("dirt").Blockdata();
                         break;
                     case -2:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("dirt").Blockdata();
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("dirt").Blockdata();
                         break;
                     case -3:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("dirt").Blockdata();
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("dirt").Blockdata();
                         break;
                     case <= -4:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] = Materials.Valueof("stone").Blockdata();
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] = Materials.Valueof("stone").Blockdata();
                         break;
                 }
             }

@@ -55,37 +55,37 @@ namespace horizoncraft.script.WorldControl.worldbiomes
 
         public override void GeneratorTerrain(BiomeTerrainContext context)
         {
-            int num = context.HighMap[context.LocalX, context.GloablZ] - context.GlobalY;
-            if (context.GlobalY > 0 && context.HighMap[context.LocalX, context.GloablZ] > 0) //地下
+            int num = context.HighMap[context.LocalX, context.GlobalZ] - context.GlobalY;
+            if (context.GlobalY > 0 && context.HighMap[context.LocalX, context.GlobalZ] > 0) //地下
             {
                 switch (num)
                 {
                     case > 0:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                             Materials.Valueof("water").Blockdata();
                         break;
                     case 0:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                             Materials.Valueof("sand").Blockdata();
                         break;
                     case -1:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                             Materials.Valueof("sand").Blockdata();
                         break;
                     case -2:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                             Materials.Valueof("sand").Blockdata();
                         break;
                     case -3:
                         if (context.Random.Next(2) == 1)
-                            context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                            context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                                 Materials.Valueof("sand").Blockdata();
                         else
-                            context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                            context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                                 Materials.Valueof("stone").Blockdata();
                         break;
                     case <= -4:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                             Materials.Valueof("stone").Blockdata();
                         break;
                 }
@@ -96,27 +96,27 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                 {
                     case 1:
                         if (context.Random.Next(2) == 1)
-                            context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                            context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                                 Materials.Valueof("bush").Blockdata();
                         break;
                     case 0:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                             Materials.Valueof("grass").Blockdata();
                         break;
                     case -1:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                             Materials.Valueof("dirt").Blockdata();
                         break;
                     case -2:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                             Materials.Valueof("dirt").Blockdata();
                         break;
                     case -3:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                             Materials.Valueof("dirt").Blockdata();
                         break;
                     case <= -4:
-                        context.Chunk[context.LocalX, context.LocalY, context.GloablZ] =
+                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
                             Materials.Valueof("stone").Blockdata();
                         break;
                 }
