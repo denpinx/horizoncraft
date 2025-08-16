@@ -5,36 +5,44 @@ using System;
 
 public partial class MainMenu : World
 {
+    private Button ButtonSingle, ButtonHost, ButtonConnect;
+    private TextEdit TextEdit;
+
     public override void _Ready()
     {
-        _ = Materials.blockmetas;
-        PSTilemapLayerChunk = GD.Load<PackedScene>("res://tscn/TileMapLayerChunk.tscn");
-        subViewport = GetNode<SubViewport>("CanvasLayer/SubViewport");
-        textureRect = GetNode<TextureRect>("CanvasLayer/TextureRect");
+        WorldMode = WorldManage.WorldMode.Preview;
+        base._Ready();
+        
+        ButtonSingle = GetNode<Button>("CanvasLayer2/Button_Single");
+        ButtonHost = GetNode<Button>("CanvasLayer2/Button_Host");
+        ButtonConnect = GetNode<Button>("CanvasLayer2/Button_Connect");
+        TextEdit = GetNode<TextEdit>("CanvasLayer2/TextEdit");
 
-        world_name = "preview_world";
-        player = GetNode<Player>("Player");
-        player.Visible = false;
-        timer = GetNode<Timer>("Timer_Tick");
-        textureRect.Texture = subViewport.GetTexture();
-
-        timer.Timeout += CilentTick;
-
-        player.world = this;
-        player.InputAble = false;
-        player.MoreInfo = false;
-
-        chunkManage = new ChunkManageSql(this, ChunkManageSql.WorldMode.Preview);
-        chunkManage.LoadHorizon = 2;
-        chunkManage.TileMapHorizon = 2;
-    chunkManage.OnPlayerMoveChunk();
+        ButtonSingle.Pressed += () =>
+        {
+            WorldMode = WorldManage.WorldMode.Single;
+            GetTree().ChangeSceneToFile("res://tscn/world.tscn");
+        };
+        ButtonHost.Pressed += () =>
+        {
+            WorldMode = WorldManage.WorldMode.MultiplayerHost;
+            GetTree().ChangeSceneToFile("res://tscn/world.tscn");
+        };
+        ButtonConnect.Pressed += () =>
+        {
+            WorldMode = WorldManage.WorldMode.MultiplayerClient;
+            GetTree().ChangeSceneToFile("res://tscn/world.tscn");
+        };
+        TextEdit.TextChanged += () => { Player.LocalName = TextEdit.Text; };
+        Player.LocalName = "玩家" + new Random().Next();
     }
 
     public override void _PhysicsProcess(double delta)
     {
+        player.Visible = false;
+        player.Inputable = false;
         base._PhysicsProcess(delta);
         player.Position += Vector2.Left * 2;
+        if(TextEdit!=null)TextEdit.PlaceholderText = Player.LocalName;
     }
-
-
 }

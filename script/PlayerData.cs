@@ -5,41 +5,35 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
+using horizoncraft.script.WorldControl;
+using MemoryPack;
 using Vector2 = Godot.Vector2;
 
-namespace horizoncraft.script.Share
+namespace horizoncraft.script
 {
-    public class PlayerData
+    [MemoryPackable]
+    public partial class PlayerData
     {
-        public Player player;
-        public Vector2I Coord;
-        public Vector2I ChunkCoord;
+        public int PeerId;
         public String Name;
+        public Vector2 Position;
+
+        [MemoryPackIgnore] public Player player;
+
+        [MemoryPackIgnore]
+        public Vector2I Coord
+        {
+            get { return World.MathFloor(new Vector2I((int)Position.X, (int)Position.Y), 16); }
+        }
+
+        [MemoryPackIgnore]
+        public Vector2I ChunkCoord
+        {
+            get { return World.MathFloor(new Vector2I((int)Position.X, (int)Position.Y), Chunk.Size * 16); }
+        }
+
         public PlayerData()
         {
-        }
-        public Dictionary GetDictionary()
-        {
-            return new Dictionary()
-            {
-                {"Position.x",player.Position.X},
-                {"Position.y",player.Position.Y},
-                { "Coord.x",Coord.X},
-                { "Coord.y",Coord.Y},
-                {"ChunkCoord.x",ChunkCoord.X},
-                {"ChunkCoord.y",ChunkCoord.Y},
-            };
-        }
-        public void ParseDictionary(Dictionary dict)
-        {
-            this.Coord.X = (int)dict["Coord.x"];
-            this.Coord.Y = (int)dict["Coord.y"];
-            this.ChunkCoord.X = (int)dict["ChunkCoord.x"];
-            this.ChunkCoord.Y = (int)dict["ChunkCoord.y"];
-            Vector2 vector2 = new Godot.Vector2();
-            vector2.X = (float)dict["Position.x"];
-            vector2.Y = (float)dict["Position.y"];
-            player.Position = vector2;
         }
     }
 }

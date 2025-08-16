@@ -8,3 +8,58 @@ script = ExtResource("2_lvpjg")
 
 [node name="Player" parent="." index="0"]
 position = Vector2(0, 0)
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="." index="4"]
+
+[node name="Button_Single" type="Button" parent="CanvasLayer2" index="0"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "单人游戏"
+
+[node name="Button_Host" type="Button" parent="CanvasLayer2" index="1"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -36.0
+offset_top = 16.0
+offset_right = 36.0
+offset_bottom = 47.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "创建主机"
+
+[node name="Button_Connect" type="Button" parent="CanvasLayer2" index="2"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -36.0
+offset_top = 47.0
+offset_right = 36.0
+offset_bottom = 78.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "加入游戏"
+
+[node name="TextEdit" type="TextEdit" parent="CanvasLayer2" index="3"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -176.0
+offset_top = 8.0
+offset_right = -11.0
+offset_bottom = 47.0
+grow_horizontal = 0
+placeholder_text = "玩家名"

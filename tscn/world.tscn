@@ -8,7 +8,7 @@
 script = ExtResource("1_oo2r5")
 
 [node name="Player" parent="." instance=ExtResource("2_hb80g")]
-position = Vector2(821, 348)
+position = Vector2(603, 327)
 
 [node name="Timer_Tick" type="Timer" parent="."]
 wait_time = 0.05
@@ -22,6 +22,7 @@ shadow_color = Color(0, 0, 0, 0.282353)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = -1
+visible = false
 
 [node name="SubViewport" type="SubViewport" parent="CanvasLayer"]
 size = Vector2i(1920, 1080)

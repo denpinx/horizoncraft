@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.Components;
 using horizoncraft.script.WorldControl;
+using HorizonCraft.script.WorldControl.Service;
 
 namespace horizoncraft.script.Events
 {
@@ -13,7 +14,7 @@ namespace horizoncraft.script.Events
     {
         public Player Player;
         public World World;
-        public ChunkManageSql ChunkManageSql;
+        public WorldBase WorldService;
         public Chunk Chunk;
     }
 }

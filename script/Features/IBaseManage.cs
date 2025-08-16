@@ -6,10 +6,11 @@ using HorizonCraft.script.WorldControl.Service;
 
 namespace horizoncraft.script.Features
 {
-    public class ManageAttribute
+    public interface IBaseManage
     {
-        public List<String> Prerequisites;
-        public String Name;
-        public Func<EntityManage> GetManage;
+        public virtual WorldBase GetWorldBase()
+        {
+            return null;
+        }
     }
 }

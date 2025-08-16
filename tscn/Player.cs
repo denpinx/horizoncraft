@@ -8,43 +8,45 @@ using horizoncraft.script;
 using horizoncraft.script.Components;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Features;
-using horizoncraft.script.Share;
 using horizoncraft.script.WorldControl;
+using horizoncraft.script.WorldControl.Service;
+using HorizonCraft.script.WorldControl.Service;
 
 public partial class Player : CharacterBody2D
 {
+    public static string LocalName = "Player";
     public static List<Func<string>> GetInformation = new List<Func<string>>();
+
     //
     public Action OnMoveToChunk;
-    public PlayerData playerData = new PlayerData();
+    public PlayerData playerData;
     public World world;
     public const float Speed = 300.0f;
     public const float JumpVelocity = -200.0f;
-    public bool InputAble = true;
+    public bool Inputable = true;
     public bool MoreInfo = false;
-    [Export]
-    public int mode = 0;
+    [Export] public int mode = 0;
 
-    [Export]
-    public bool fly = true;
+    [Export] public bool fly = true;
     public bool Stop = false;
     Camera2D camera2d;
     Timer Timer_Tick;
     Label Label_DEBUG_Left;
     Label Label_DEBUG_Right;
+    Label Label_PlayerName;
 
     public bool LastFramIsLeft = false;
 
     public override void _Input(InputEvent @event)
     {
-        if (!InputAble) return;
+        if (!Inputable) return;
         Vector2I Mousecoord = new(
             (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
         );
         if (Input.IsActionPressed("breakblock"))
         {
-            Blockdata blockdata = world.chunkManage.GetBlock(new(Mousecoord.X, Mousecoord.Y, 1));
+            Blockdata blockdata = world.WorldService.GetBlock(new(Mousecoord.X, Mousecoord.Y, 1));
             if (blockdata?.components.Count > 0)
             {
                 GD.Print($"点击方块名：{blockdata.BlockMeta.NAME}");
@@ -60,6 +62,7 @@ public partial class Player : CharacterBody2D
                             GD.PrintErr(blockdata.components[i].GetType());
                             GD.PrintErr(blockdata.components[i].Name);
                         }
+
                         if (blockdata.components[i] is FluidComponent fc)
                         {
                             GD.Print($"流体名:{fc.Name},是否流动：{fc.mobility}");
@@ -71,6 +74,7 @@ public partial class Player : CharacterBody2D
                     }
                 }
             }
+
             if (LastFramIsLeft)
             {
                 // world.chunkManage.SetBlock(
@@ -90,7 +94,7 @@ public partial class Player : CharacterBody2D
 
         if (Input.IsActionPressed("placeblock"))
         {
-            world.chunkManage.SetBlock(
+            world.WorldService.SetBlock(
                 new(Mousecoord.X, Mousecoord.Y, 1),
                 Materials.Valueof("air")
             );
@@ -99,49 +103,69 @@ public partial class Player : CharacterBody2D
 
     public override void _PhysicsProcess(double delta)
     {
+        if (playerData == null) return;
         Vector2I Mcoord = World.MathFloor((Vector2I)GetGlobalMousePosition(), 16);
         Vector2I MCcoord = World.MathFloor(Mcoord, Chunk.Size);
-        playerData.Coord = new Vector2I(
-            (int)Mathf.Floor(Position.X / 16),
-            (int)Mathf.Floor(Position.Y / 16)
-        );
         Vector2I ChunkCoord = new Vector2I(
             (int)Mathf.Floor(Position.X / (16 * Chunk.Size)),
             (int)Mathf.Floor(Position.Y / (16 * Chunk.Size))
         );
         if (ChunkCoord != playerData.ChunkCoord)
         {
-            playerData.ChunkCoord = ChunkCoord;
             if (OnMoveToChunk != null)
                 OnMoveToChunk.Invoke();
         }
-        else
+
+        //更新自身数据
+        playerData.Position = Position;
+
+
+        Label_PlayerName.Text = playerData.Name;
+
+        if (world.WorldService is WorldHostService whs && world.WorldService is WorldBase _worldBase_)
         {
-            playerData.ChunkCoord = ChunkCoord;
+            _worldBase_.Players[playerData.Name].Position = playerData.Position;
         }
-        if (MoreInfo)
+
+
+        if (MoreInfo && Inputable && world.WorldService is WorldBase worldBase)
         {
             Label_DEBUG_Left.Text = "";
             StringBuilder Text = new StringBuilder();
-            Text.AppendLine($"全局坐标：{playerData.Coord.X},{playerData.Coord.Y}");
+            Text.AppendLine($"全局A坐标：{playerData.Coord.X},{playerData.Coord.Y}");
             Text.AppendLine($"区块坐标：{playerData.ChunkCoord.X},{playerData.ChunkCoord.Y}");
-            Text.AppendLine($"加载区块：{world.chunkManage.LoadedChunks.Count}");
-            Text.AppendLine($"正在加载：{world.chunkManage.LoadingQuee.Count}");
+            Text.AppendLine($"加载区块：{world.WorldService.LoadedChunks.Count}");
+            Text.AppendLine($"正在加载：{world.WorldService.LoadingChunkQuee.Count}");
             Text.AppendLine($"TileMap: {world.tileMapLayerChunks.Count}");
             Text.AppendLine($"显示区块: {world.VisibleChunks.Count}");
             Text.AppendLine($"鼠标位置: {Mcoord.X},{Mcoord.Y} ");
-            Text.AppendLine($"鼠标所在: {MCcoord.X},{MCcoord.Y} ");
+            Text.AppendLine($"当前方块坐标: {MCcoord.X},{MCcoord.Y} ");
             Text.AppendLine($"World.Tick耗时: {world.tick_use_time}MS");
-            Text.AppendLine($"ChunkManage.Tick耗时: {world.chunkManage.tick_use_time}MS");
-            Text.AppendLine($"时间: {world.chunkManage.time}");
+            Text.AppendLine($"ChunkManage.Tick耗时: {world.WorldService.TickConsuming}MS");
+            Text.AppendLine($"时间: {world.WorldService.TickTimes}");
+            Text.AppendLine($"在线玩家: {worldBase.Players.Count}");
+            Text.AppendLine($"加载玩家实体: {world.PlayerNodes.Count}");
             foreach (Func<string> func in GetInformation)
                 Text.AppendLine(func());
             Label_DEBUG_Left.Text = Text.ToString();
+            StringBuilder right = new StringBuilder();
+            foreach (var sets in worldBase.Players)
+            {
+                right.AppendLine(
+                    $"在线玩家[{sets.Key}] 坐标:[{sets.Value.ChunkCoord.X},{sets.Value.ChunkCoord.Y}],id{sets.Value.PeerId}");
+            }
+
+            foreach (var sets in world.WorldService.LoadingPlayers)
+            {
+                right.AppendLine($"待加载信息:玩家[{sets}]");
+            }
+
+            Label_DEBUG_Right.Text = right.ToString();
         }
 
 
         //防止加载地形的时候卡墙里
-        if (world==null||!world.chunkManage.LoadedChunks.ContainsKey(ChunkCoord))
+        if (world == null || !world.WorldService.LoadedChunks.ContainsKey(ChunkCoord))
         {
             Stop = true;
         }
@@ -150,17 +174,20 @@ public partial class Player : CharacterBody2D
             if (mode == 0)
                 Stop = false;
         }
-        if (mode == 0 && InputAble)
+
+        if (mode == 0 && Inputable)
         {
             Vector2 velocity = Velocity;
             if (!IsOnFloor() && (!fly || !Stop))
             {
                 velocity += GetGravity() * (float)delta;
             }
+
             if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
             {
                 velocity.Y = JumpVelocity;
             }
+
             Vector2 direction = Input.GetVector("move_left", "move_right", "move_up", "move_down");
             if (direction != Vector2.Zero)
             {
@@ -170,10 +197,12 @@ public partial class Player : CharacterBody2D
             {
                 velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
             }
+
             Velocity = velocity;
             MoveAndSlide();
         }
-        if (mode == 1 && InputAble)
+
+        if (mode == 1 && Inputable)
         {
             if (Input.IsActionPressed("zoom_1"))
                 camera2d.Zoom = new(2, 2);
@@ -190,22 +219,21 @@ public partial class Player : CharacterBody2D
             if (Input.IsActionJustPressed("TEST_1"))
             {
                 //生成生物
-                EntityManage entityManage = Horizoncraft.getManage<EntityManage>("EntityManage");
-                if (entityManage != null)
+                if (EntityManage.Enable)
                 {
                     EntityMeta entityMeta = Materials.GetEntityMeta("item_entity");
                     EntityNode entity = entityMeta.GetEntityNode();
                     entity.Data.position = new(GetGlobalMousePosition().X, GetGlobalMousePosition().Y);
-                    entityManage.waitEntitys.Add(entity);
+                    EntityManage.waitEntitys.Add(entity);
                 }
             }
         }
 
-        if (Input.IsActionJustPressed("F1") && InputAble)
+        if (Input.IsActionJustPressed("F1") && Inputable)
             mode = mode == 0 ? 1 : 0;
-        if (Input.IsActionJustPressed("F2") && InputAble)
+        if (Input.IsActionJustPressed("F2") && Inputable)
             DebugView.DEBUG = !DebugView.DEBUG;
-        if (Input.IsActionJustPressed("F3") && InputAble)
+        if (Input.IsActionJustPressed("F3") && Inputable)
         {
             MoreInfo = !MoreInfo;
             Label_DEBUG_Left.Visible = MoreInfo;
@@ -218,72 +246,9 @@ public partial class Player : CharacterBody2D
         camera2d = GetNode<Camera2D>("Camera2D");
         Label_DEBUG_Left = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Left");
         Label_DEBUG_Right = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Right");
+        Label_PlayerName = GetNode<Label>("Label_PlayerName");
         Timer_Tick = GetNode<Timer>("Timer_Tick");
-        playerData.player = this;
-        Load();
-    }
-
-    public override void _ExitTree()
-    {
-
-        Save();
-    }
-
-    public void Load()
-    {
-        if (ChunkManageSql.worldMode == ChunkManageSql.WorldMode.Preview || ChunkManageSql.worldMode == ChunkManageSql.WorldMode.Multiplayer_Client) return;
-        if (!FileAccess.FileExists($"save/{World.world_name}/player.json"))
-        {
-            if (!DirAccess.DirExistsAbsolute($"save"))
-            {
-                Error err = DirAccess.MakeDirAbsolute($"save");
-                if (err != Error.Ok)
-                {
-                    GD.PrintErr($"创建 save 文件夹失败，错误码: {err}");
-                }
-            }
-            if (!DirAccess.DirExistsAbsolute($"save/{World.world_name}"))
-            {
-                Error err = DirAccess.MakeDirAbsolute($"save/{World.world_name}");
-                if (err != Error.Ok)
-                {
-                    GD.PrintErr($"创建 save{World.world_name} 文件夹失败，错误码: {err}");
-                }
-            }
-            return;
-        }
-        else
-        {
-            FileAccess file = FileAccess.Open(
-                $"save/{World.world_name}/player.json",
-                FileAccess.ModeFlags.Read
-            );
-
-            string json = file.GetAsText();
-            Dictionary dict = (Dictionary)Json.ParseString(json);
-            playerData.ParseDictionary(dict);
-
-            file.Close();
-            if (playerData == null)
-            {
-                playerData = new();
-            }
-            else
-            {
-                Position = playerData.Coord * 16;
-            }
-
-        }
-    }
-
-    public void Save()
-    {
-        if (ChunkManageSql.worldMode == ChunkManageSql.WorldMode.Preview || ChunkManageSql.worldMode == ChunkManageSql.WorldMode.Multiplayer_Client) return;
-        FileAccess file = FileAccess.Open(
-            $"save/{World.world_name}/player.json",
-            FileAccess.ModeFlags.Write
-        );
-        file.StoreString(Json.Stringify(playerData.GetDictionary()));
-        file.Close();
+        if (playerData != null)
+            playerData.player = this;
     }
 }

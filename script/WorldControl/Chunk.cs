@@ -10,6 +10,8 @@ using horizoncraft.script.Events;
 using Array = Godot.Collections.Array;
 using MemoryPack;
 using horizoncraft.script.Components;
+using HorizonCraft.script.WorldControl.Service;
+
 namespace horizoncraft.script.WorldControl
 {
     [MemoryPackable]
@@ -19,11 +21,22 @@ namespace horizoncraft.script.WorldControl
         public int Y;
         public static int SizeZ = 2;
         public static int Size = 24;
-        public bool update = true;
         public bool spawn = false;
         public string BiomeType = "";
+
+        [MemoryPackIgnore] public bool update = true;
+
         [MemoryPackIgnore]
-        public Godot.Vector2I coord { get { return new(X, Y); } set { X = value.X; Y = value.Y; } }
+        public Godot.Vector2I coord
+        {
+            get { return new(X, Y); }
+            set
+            {
+                X = value.X;
+                Y = value.Y;
+            }
+        }
+
         //加载完区块后释放到世界中，卸载区块时再从世界中捕获
         public List<Entitydata> entities = new();
         public Blockdata[,,] data = new Blockdata[Size, Size, SizeZ];
@@ -44,8 +57,8 @@ namespace horizoncraft.script.WorldControl
         [MemoryPackConstructor]
         public Chunk()
         {
-
         }
+
         public Chunk(int x, int y)
         {
             coord = new Godot.Vector2I(x, y);
@@ -60,7 +73,8 @@ namespace horizoncraft.script.WorldControl
                 }
             }
         }
-        public void Tick(ChunkManageSql chunkManage)
+
+        public void Tick(WorldBase WorldService, World world)
         {
             int state = 0;
             for (int Z = 0; Z < Chunk.SizeZ; Z++)
@@ -74,8 +88,8 @@ namespace horizoncraft.script.WorldControl
                             state = data[X, Y, Z].STATE;
                             BlockTickEvent blockTickEvnet = new()
                             {
-                                World = chunkManage.world,
-                                ChunkManageSql = chunkManage,
+                                World = world,
+                                WorldService = WorldService,
                                 Chunk = this,
                                 Blockdata = data[X, Y, Z],
                                 GloablPos = new Godot.Vector3I(
