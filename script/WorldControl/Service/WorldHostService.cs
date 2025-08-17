@@ -97,9 +97,9 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         {
             //SavePlayer(player.Value);
             Vector2I CenterCoord = player.Value.ChunkCoord;
-            for (int X = CenterCoord.X - LoadHorizon; X <= CenterCoord.X + LoadHorizon; X++)
+            for (int X = CenterCoord.X - TileMapHorizon; X <= CenterCoord.X + TileMapHorizon; X++)
             {
-                for (int Y = CenterCoord.Y - LoadHorizon; Y <= CenterCoord.Y + LoadHorizon; Y++)
+                for (int Y = CenterCoord.Y - TileMapHorizon; Y <= CenterCoord.Y + TileMapHorizon; Y++)
                 {
                     Vector2I coord = new Vector2I(X, Y);
                     LoadChunkQueue[coord] = new WorkBase();
@@ -250,8 +250,8 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     PlayerData pd2 = Ts.Value;
 
                     if (
-                        Math.Abs((pd1.ChunkCoord.X - pd2.ChunkCoord.X)) <= LoadHorizon &&
-                        Math.Abs((pd1.ChunkCoord.Y - pd2.ChunkCoord.Y)) <= LoadHorizon
+                        Math.Abs((pd1.ChunkCoord.X - pd2.ChunkCoord.X)) <= TileMapHorizon &&
+                        Math.Abs((pd1.ChunkCoord.Y - pd2.ChunkCoord.Y)) <= TileMapHorizon
                     )
                     {
                         if (pd1.Name != Player.Profile.Name)
@@ -308,8 +308,8 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                         PlayerData pd1 = playerset.Value;
                         //按距离同步
                         if (
-                            Math.Abs(chunk.X - pd1.ChunkCoord.X) <= LoadHorizon &&
-                            Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= LoadHorizon
+                            Math.Abs(chunk.X - pd1.ChunkCoord.X) <= TileMapHorizon &&
+                            Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= TileMapHorizon
                         )
                         {
                             if (pd1.Name != Player.Profile.Name)
