@@ -117,14 +117,15 @@ public partial class Player : CharacterBody2D
         }
 
         //更新自身数据
-        playerData.Position = Position;
+        playerData.Position = new System.Numerics.Vector2(Position.X, Position.Y);
 
 
         Label_PlayerName.Text = playerData.Name;
 
         if (world.WorldService is WorldHostService whs && world.WorldService is WorldBase _worldBase_)
         {
-            _worldBase_.Players[playerData.Name].Position = playerData.Position;
+            if (_worldBase_.Players.ContainsKey(playerData.Name))
+                _worldBase_.Players[playerData.Name].Position = playerData.Position;
         }
 
 
@@ -134,17 +135,27 @@ public partial class Player : CharacterBody2D
             StringBuilder Text = new StringBuilder();
             Text.AppendLine($"全局A坐标：{playerData.Coord.X},{playerData.Coord.Y}");
             Text.AppendLine($"区块坐标：{playerData.ChunkCoord.X},{playerData.ChunkCoord.Y}");
-            Text.AppendLine($"加载区块：{world.WorldService.LoadedChunks.Count}");
-            Text.AppendLine($"正在加载：{world.WorldService.LoadingChunkQuee.Count}");
+            Text.AppendLine($"加载区块：{world.WorldService.Chunks.Count}");
+            Text.AppendLine($"正在加载：{world.WorldService.LoadChunkQueue.Count}");
             Text.AppendLine($"TileMap: {world.tileMapLayerChunks.Count}");
             Text.AppendLine($"显示区块: {world.VisibleChunks.Count}");
             Text.AppendLine($"鼠标位置: {Mcoord.X},{Mcoord.Y} ");
             Text.AppendLine($"当前方块坐标: {MCcoord.X},{MCcoord.Y} ");
             Text.AppendLine($"World.Tick耗时: {world.tick_use_time}MS");
             Text.AppendLine($"ChunkManage.Tick耗时: {world.WorldService.TickConsuming}MS");
+
+
+            if (world.WorldService is WorldHostService hostserver)
+            {
+                Text.AppendLine($"区块同步耗时: {hostserver.SyncChunkTime.X} max: {hostserver.SyncChunkTime.Y}");
+                Text.AppendLine($"玩家同步耗时: {hostserver.SyncPlayerTime.X} max: {hostserver.SyncPlayerTime.Y}");
+            }
+
+
             Text.AppendLine($"时间: {world.WorldService.TickTimes}");
             Text.AppendLine($"在线玩家: {worldBase.Players.Count}");
             Text.AppendLine($"加载玩家实体: {world.PlayerNodes.Count}");
+
             foreach (Func<string> func in GetInformation)
                 Text.AppendLine(func());
             Label_DEBUG_Left.Text = Text.ToString();
@@ -165,7 +176,7 @@ public partial class Player : CharacterBody2D
 
 
         //防止加载地形的时候卡墙里
-        if (world == null || !world.WorldService.LoadedChunks.ContainsKey(ChunkCoord))
+        if (world == null || !world.WorldService.Chunks.ContainsKey(ChunkCoord))
         {
             Stop = true;
         }

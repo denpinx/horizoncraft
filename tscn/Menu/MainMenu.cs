@@ -5,7 +5,7 @@ using System;
 
 public partial class MainMenu : World
 {
-    private Button ButtonSingle, ButtonHost, ButtonConnect;
+    private TextureButton ButtonSingle, ButtonHost, ButtonConnect;
     private TextEdit TextEdit;
 
     public override void _Ready()
@@ -13,9 +13,9 @@ public partial class MainMenu : World
         worldMode = WorldMode.Preview;
         base._Ready();
         
-        ButtonSingle = GetNode<Button>("CanvasLayer2/Button_Single");
-        ButtonHost = GetNode<Button>("CanvasLayer2/Button_Host");
-        ButtonConnect = GetNode<Button>("CanvasLayer2/Button_Connect");
+        ButtonSingle = GetNode<TextureButton>("CanvasLayer2/Button_Single");
+        ButtonHost = GetNode<TextureButton>("CanvasLayer2/Button_Host");
+        ButtonConnect = GetNode<TextureButton>("CanvasLayer2/Button_Connect");
         TextEdit = GetNode<TextEdit>("CanvasLayer2/TextEdit");
 
         ButtonSingle.Pressed += () =>
@@ -42,7 +42,7 @@ public partial class MainMenu : World
         player.Visible = false;
         player.Inputable = false;
         base._PhysicsProcess(delta);
-        player.Position += Vector2.Left * 2;
+        player.Position += Vector2.Left * 1;
         if(TextEdit!=null)TextEdit.PlaceholderText = Player.LocalName;
     }
 }

@@ -18,6 +18,7 @@ namespace horizoncraft.script
         public List<BlockTileSet> blockTileDatas = new();
         public string Tiletype = "tile";
         public string NAME;
+        public int SourceID;
         public int ID;
         public bool COLLIDE = true;
         public bool CUBE = true;

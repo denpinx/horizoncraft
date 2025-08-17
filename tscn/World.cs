@@ -57,9 +57,9 @@ namespace horizoncraft.script
         //Node
         public Player player;
         public Timer timer;
-        public SubViewport subViewport;
         public TextureRect textureRect;
 
+        public ColorRect colorRect;
         public double RequeueFreeze = 0;
 
         public bool HasTileMap(Vector2I coord)
@@ -97,7 +97,7 @@ namespace horizoncraft.script
             {
                 if (tileMapLayerChunks[i].chunk.coord == chunk.coord)
                 {
-                    chunk.update = true;
+                    chunk.update_tilemap = true;
                     tileMapLayerChunks[i].chunk = chunk;
                     return;
                 }
@@ -120,11 +120,8 @@ namespace horizoncraft.script
             PSTilemapLayerChunk = GD.Load<PackedScene>("res://tscn/TileMapLayerChunk.tscn");
             player = GetNode<Player>("Player");
             timer = GetNode<Timer>("Timer_Tick");
-            subViewport = GetNode<SubViewport>("CanvasLayer/SubViewport");
-            textureRect = GetNode<TextureRect>("CanvasLayer/TextureRect");
-
-            textureRect.Texture = subViewport.GetTexture();
-
+            textureRect = GetNode<TextureRect>("CanvasLayer_Back/TextureRect_Sky");
+            colorRect = GetNode<ColorRect>("CanvasLayer/ColorRect_Top");
             timer.Timeout += CilentTick;
             player.world = this;
 
@@ -181,6 +178,12 @@ namespace horizoncraft.script
 
         public override void _Process(double delta)
         {
+            if (WorldService != null && WorldService is WorldBase wb && colorRect != null)
+            {
+                var t = (float)(wb.TickTimes % wb.DayTimeMax) / wb.DayTimeMax;
+                colorRect.Color = GetEnvironmentColorV2(t);
+            }
+
             if (RequeueFreeze > 0) RequeueFreeze -= delta;
             if (player.playerData == null)
             {
@@ -190,7 +193,7 @@ namespace horizoncraft.script
                     if (whs.GetPlayer(Player.LocalName, out pd))
                     {
                         player.playerData = pd;
-                        player.Position = pd.Position;
+                        player.Position = pd.Position_v2;
                         GD.Print("[服务端]初始化玩家成功");
                     }
                 }
@@ -210,7 +213,7 @@ namespace horizoncraft.script
                          player.playerData != null)
                 {
                     player.playerData.player = player;
-                    player.Position = player.playerData.Position;
+                    player.Position = new(player.playerData.Position.X, player.playerData.Position.Y);
                     if (worldMode == WorldMode.Preview)
                     {
                         player.Visible = false;
@@ -245,7 +248,7 @@ namespace horizoncraft.script
                         {
                             //PlayerNodes[Kvp.Key].Position = Kvp.Value.Position;
                             Tween tween = GetTree().CreateTween();
-                            tween.TweenProperty(PlayerNodes[Kvp.Key], "position", Kvp.Value.Position, 0.05f);
+                            tween.TweenProperty(PlayerNodes[Kvp.Key], "position", Kvp.Value.Position_v2, 0.05f);
                         }
                     }
                 }
@@ -309,6 +312,37 @@ namespace horizoncraft.script
 
             sw.Stop();
             tick_use_time = sw.ElapsedMilliseconds;
+        }
+
+
+        public Color GetEnvironmentColor(float t)
+        {
+            var hour = (int)(t * 24f);
+            switch (hour)
+            {
+                case > 20 or < 5:
+                    return Color.Color8(0, 0, 0, 222);
+                case >= 5 and < 8:
+                    return Color.Color8(0, 0, 0, (byte)(222 * (1f - (t - (5f / 24f)) / (3f / 24f))));
+                case >= 8 and <= 17:
+                    return Color.Color8(0, 0, 0, 0);
+                case > 17 and <= 20:
+                    return Color.Color8(0, 0, 0, (byte)(222 * (((17f / 24f) / (3f / 24f))-t)));
+                default:
+                    return Color.Color8(0, 0, 0, 0);
+            }
+        }
+        public Color GetEnvironmentColorV2(float t)
+        {
+            float hour = t * 24f; // 使用浮点数精确比较
+            if (hour < 5f || hour >= 20f) // 夜晚: [20:00-24:00) + [00:00-05:00)
+                return Color.Color8(0, 0, 0, 200);
+            else if (hour >= 5f && hour < 8f) // 日出: [05:00-08:00)
+                return Color.Color8(0, 0, 0, (byte)(200 * (1f - (hour - 5f) / 3f)));
+            else if (hour >= 8f && hour < 17f) // 白天: [08:00-17:00)
+                return Color.Color8(0, 0, 0, 0);
+            else // 日落: [17:00-20:00)
+                return Color.Color8(0, 0, 0, (byte)(200 * ((hour - 17f) / 3f)));
         }
 
         public static Vector2I MathFloor(Vector3I V3I, int chunkSize)

@@ -39,7 +39,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
     public void UpdateLoadChunkCoords()
     {
         if (world == null) return;
-        LoadingChunkQuee.Clear();
+        LoadChunkQueue.Clear();
 
         if (world.player.playerData != null) SavePlayer(world.player.playerData);
         else return;
@@ -49,34 +49,34 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
             for (int Y = CenterCoord.Y - LoadHorizon; Y <= CenterCoord.Y + LoadHorizon; Y++)
             {
                 Vector2I coord = new Vector2I(X, Y);
-                LoadingChunkQuee[coord] = new WorkBase();
+                LoadChunkQueue[coord] = new WorkBase();
             }
         }
 
 
-        foreach (Vector2I coord in LoadedChunks.Keys)
+        foreach (Vector2I coord in Chunks.Keys)
         {
-            if (!LoadingChunkQuee.ContainsKey(coord))
+            if (!LoadChunkQueue.ContainsKey(coord))
             {
-                Chunk chunk = LoadedChunks[coord];
-                UnloadingQuee[coord] = chunk;
-                LoadedChunks.TryRemove(coord, out _);
+                Chunk chunk = Chunks[coord];
+                OffloadChunkQueue[coord] = chunk;
+                Chunks.TryRemove(coord, out _);
             }
             else
             {
-                LoadingChunkQuee.TryRemove(coord, out _);
+                LoadChunkQueue.TryRemove(coord, out _);
             }
         }
     }
 
     public void ProcessChunkUnloadQueue()
     {
-        if (UnloadingQuee.IsEmpty) return;
+        if (OffloadChunkQueue.IsEmpty) return;
 
         Interlocked.CompareExchange(ref ProcessUnloadChunkTask,
             Task.Run(() =>
             {
-                while (UnloadingQuee.TryRemove(UnloadingQuee.Keys.FirstOrDefault(), out var chunk))
+                while (OffloadChunkQueue.TryRemove(OffloadChunkQueue.Keys.FirstOrDefault(), out var chunk))
                 {
                     SaveChunk(chunk);
                 }
@@ -86,19 +86,18 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
     public void ProcessChunkLoadQueue()
     {
         if (world == null) return;
-        if (LoadingChunkQuee.IsEmpty) return;
+        if (LoadChunkQueue.IsEmpty) return;
 
         Interlocked.CompareExchange(ref ProcessLoadingChunkTask, Task.Run((() =>
         {
-            var coord = LoadingChunkQuee.Keys.FirstOrDefault();
-            while (LoadingChunkQuee.TryRemove(coord, out WorkBase work))
+            var coord = LoadChunkQueue.Keys.FirstOrDefault();
+            while (LoadChunkQueue.TryRemove(coord, out WorkBase work))
             {
                 Chunk chunk;
                 if (sqliteConnection.CheckChunkExists(coord.X, coord.Y))
                 {
-                    var bytes = sqliteConnection.GetChunkByteData(coord.X, coord.Y);
-                    chunk = MemoryPackSerializer.Deserialize<Chunk>(bytes);
-                    LoadedChunks[coord] = chunk;
+                    chunk = sqliteConnection.GetChunkByteData(coord.X, coord.Y);
+                    Chunks[coord] = chunk;
                     if (work.Type != "NONE")
                         work.Execute(chunk);
                     if (!chunk.spawn)
@@ -113,14 +112,14 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
                 {
                     //生成区块
                     chunk = new(coord.X, coord.Y);
-                    LoadedChunks[coord] = chunk;
+                    Chunks[coord] = chunk;
                     if (work.Type != "NONE")
                         work.Execute(chunk);
                     WorldGenerator.Generator(chunk);
                     OnChunkLoaded?.Invoke(this, chunk);
                 }
 
-                coord = LoadingChunkQuee.Keys.FirstOrDefault();
+                coord = LoadChunkQueue.Keys.FirstOrDefault();
             }
         })), null);
     }
@@ -152,8 +151,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
 
         if (sqliteConnection.CheckPlayerExists(Player.LocalName))
         {
-            var bytes = sqliteConnection.GetPlayerByteData(Player.LocalName);
-            PlayerData player = MemoryPackSerializer.Deserialize<PlayerData>(bytes);
+            PlayerData player = sqliteConnection.GetPlayerByteData(Player.LocalName);
             player.Name = Player.LocalName;
             Players[player.Name] = player;
             GD.Print($"[{TickTimes}] 加载玩家数据:({Player.LocalName})");
@@ -177,27 +175,25 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
     public void SavePlayer(PlayerData playerData)
     {
         if (world == null) return;
-        var bytes = playerData.ToByte();
         if (sqliteConnection.CheckPlayerExists(playerData.Name))
-            sqliteConnection.UpdatePlayerByteData(playerData.Name, bytes);
+            sqliteConnection.UpdatePlayerByteData(playerData.Name, playerData);
         else
-            sqliteConnection.InsertPlayerByteValue(playerData.Name, bytes);
+            sqliteConnection.InsertPlayerByteValue(playerData.Name, playerData);
     }
 
     public void SaveChunk(Chunk chunk)
     {
         if (world == null) return;
-        var bytes = chunk.ToByte();
         if (sqliteConnection.CheckChunkExists(chunk.X, chunk.Y))
-            sqliteConnection.UpdateChunkByteData(chunk.X, chunk.Y, bytes);
+            sqliteConnection.UpdateChunkByteData(chunk.X, chunk.Y, chunk);
         else
-            sqliteConnection.InsertChunkByteValue(chunk.X, chunk.Y, bytes);
+            sqliteConnection.InsertChunkByteValue(chunk.X, chunk.Y, chunk);
     }
 
     public void Save()
     {
         if (world == null) return;
-        foreach (var chunkset in LoadedChunks)
+        foreach (var chunkset in Chunks)
             SaveChunk(chunkset.Value);
 
         foreach (var playerset in Players)
@@ -215,9 +211,9 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
 
         ProcessChunkUnloadQueue();
 
-        foreach (Vector2I coord in LoadedChunks.Keys)
+        foreach (Vector2I coord in Chunks.Keys)
         {
-            Chunk chunk = LoadedChunks[coord];
+            Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
         }
 

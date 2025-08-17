@@ -7,6 +7,9 @@ public interface IWorldHostService
 {
     ///<summary>同步玩家</summary>
     public void SyncPlayers();
+
     ///<summary>同步区块</summary>
     public void SyncChunks();
+
+    public void OnPlayerJoin(long peer_id);
 }

@@ -32,7 +32,7 @@ public static class SqliteTool
                 $"Data Source=save/{World.world_name}/data.db"
             );
             sqliteConnection.Open();
-            
+
             sqliteConnection.InitTable_World();
             sqliteConnection.InitTable_Player();
             return sqliteConnection;
@@ -45,13 +45,9 @@ public static class SqliteTool
         return null;
     }
 
-    public static void UpdateChunkByteData(this SqliteConnection sqliteConnection, int x, int y, byte[] bytes)
+    public static void UpdateChunkByteData(this SqliteConnection sqliteConnection, int x, int y, Chunk chunk)
     {
-        // using var output = new MemoryStream();
-        // using (var gzip = new GZipStream(output, CompressionMode.Compress, leaveOpen: true))
-        // {
-        //     gzip.Write(bytes, 0, bytes.Length);
-        // }
+        var bytes = Chunk.ToBytes(chunk);
 
         string query = "UPDATE World SET byte = @Byte WHERE x = @KeyX AND y = @KeyY";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
@@ -63,15 +59,9 @@ public static class SqliteTool
         }
     }
 
-    public static void InsertChunkByteValue(this SqliteConnection sqliteConnection, int x, int y, byte[] bytes)
+    public static void InsertChunkByteValue(this SqliteConnection sqliteConnection, int x, int y, Chunk chunk)
     {
-        // using var output = new MemoryStream();
-        // using (var gzip = new GZipStream(output, CompressionMode.Compress, leaveOpen: true))
-        // {
-        //     gzip.Write(bytes, 0, bytes.Length);
-        // }
-        //
-        // ;
+        var bytes = Chunk.ToBytes(chunk);
         string query = "INSERT INTO World (x, y, byte) VALUES (@KeyX, @KeyY, @Byte)";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
         {
@@ -82,7 +72,7 @@ public static class SqliteTool
         }
     }
 
-    public static byte[] GetChunkByteData(this SqliteConnection sqliteConnection, int x, int y)
+    public static Chunk GetChunkByteData(this SqliteConnection sqliteConnection, int x, int y)
     {
         string query = "SELECT byte FROM World WHERE x = @KeyX AND y = @KeyY";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
@@ -90,11 +80,7 @@ public static class SqliteTool
             command.Parameters.AddWithValue("@KeyX", x);
             command.Parameters.AddWithValue("@KeyY", y);
             var result = command.ExecuteScalar() as byte[];
-            using var input = new MemoryStream(result);
-            using var gzip = new GZipStream(input, CompressionMode.Decompress);
-            using var output = new MemoryStream();
-            gzip.CopyTo(output);
-            return output.ToArray();
+            return Chunk.FromBytes(result);
         }
     }
 
@@ -121,8 +107,9 @@ public static class SqliteTool
         }
     }
 
-    public static void UpdatePlayerByteData(this SqliteConnection sqliteConnection, string name, byte[] bytes)
+    public static void UpdatePlayerByteData(this SqliteConnection sqliteConnection, string name, PlayerData playerData)
     {
+        var bytes = PlayerData.ToBytes(playerData);
         //GD.Print($"[{time}] UpdatePlayerByteData(name:{name})");
         // using var output = new MemoryStream();
         // using (var gzip = new GZipStream(output, CompressionMode.Compress, leaveOpen: true))
@@ -139,13 +126,9 @@ public static class SqliteTool
         }
     }
 
-    public static void InsertPlayerByteValue(this SqliteConnection sqliteConnection, string name, byte[] bytes)
+    public static void InsertPlayerByteValue(this SqliteConnection sqliteConnection, string name, PlayerData playerData)
     {
-        // using var output = new MemoryStream();
-        // using (var gzip = new GZipStream(output, CompressionMode.Compress, leaveOpen: true))
-        // {
-        //     gzip.Write(bytes, 0, bytes.Length);
-        // }
+        var bytes = PlayerData.ToBytes(playerData);
 
         string query = "INSERT INTO Player (name,byte) VALUES (@Name, @Byte)";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
@@ -156,18 +139,14 @@ public static class SqliteTool
         }
     }
 
-    public static byte[] GetPlayerByteData(this SqliteConnection sqliteConnection, string name)
+    public static PlayerData GetPlayerByteData(this SqliteConnection sqliteConnection, string name)
     {
         string query = "SELECT byte FROM Player WHERE name = @Name";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
         {
             command.Parameters.AddWithValue("@Name", name);
             var result = command.ExecuteScalar() as byte[];
-            using var input = new MemoryStream(result);
-            using var gzip = new GZipStream(input, CompressionMode.Decompress);
-            using var output = new MemoryStream();
-            gzip.CopyTo(output);
-            return output.ToArray();
+            return PlayerData.FromBytes(result);
         }
     }
 

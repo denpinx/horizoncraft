@@ -19,8 +19,8 @@ namespace horizoncraft.script.WorldControl
         public int ID;
         public int STATE = 0;
 
-        [MemoryPackIgnore]
-        private BlockMeta _blockMeta;
+        [MemoryPackIgnore] private BlockMeta _blockMeta;
+
         [MemoryPackIgnore]
         public BlockMeta BlockMeta
         {
@@ -31,22 +31,34 @@ namespace horizoncraft.script.WorldControl
                     // o(1)
                     _blockMeta = Materials.Valueof(ID);
                 }
+
                 return _blockMeta;
             }
             set { _blockMeta = value; }
         }
+
         public T GetComponent<T>(string name) where T : Component
         {
             for (int i = 0; i < components.Count; i++)
-                if (components[i].Name == name) return (T)components[i];
+                if (components[i].Name == name)
+                    return (T)components[i];
             return null;
         }
+
         public Blockdata(BlockMeta meta)
         {
             SetMeta(meta);
         }
+
         [MemoryPackConstructor]
-        public Blockdata() { }
+        public Blockdata()
+        {
+        }
+
+        public void SetMeta(string name)
+        {
+            SetMeta(Materials.Valueof(name));
+        }
 
         public void SetMeta(BlockMeta meta)
         {
@@ -56,11 +68,13 @@ namespace horizoncraft.script.WorldControl
             foreach (Func<Component> cmp in meta.Components)
                 components.Add(cmp.Invoke());
         }
+
         public bool IsMeta(String ID)
         {
             BlockMeta = Materials.Valueof(this.ID);
             return BlockMeta.ID == Materials.Valueof(ID).ID;
         }
+
         public int GetTileId()
         {
             BlockMeta = Materials.Valueof(this.ID);

@@ -1,66 +1,66 @@
 {
-    "dirt": {
-        "components": {
-            "ExpandComponent": {
-                "Name": "BlockSpread",
-                "BlockName": "grass",
-                "Max": 20
-            }
-        }
-    },
-    "grass": {
-        "components": {
-            "ExpandComponent": {
-                "Name": "BlockCover",
-                "BlockName": "dirt",
-                "Max": 20
-            }
-        }
-    },
-    "stone": {},
-    "bush": {
-        "collide": false,
-        "cube": false,
-        "components": {
-            "TickComponent": {
-                "Name": "BottomCheck",
-                "Max": 20
-            }
-        }
-    },
-    "oak_log": {
-        "state": {
-            "normal": {
-                "texture": "oak_log"
-            },
-            "horizontal": {
-                "texture": "oak_log_horizontal"
-            }
-        }
-    },
-    "oak_leaves": {},
-    "snow": {},
-    "iceblock": {},
-    "water": {
-        "collide": false,
-        "cube": false,
-        "tiletype": "atlas",
-        "components": {
-            "FluidComponent": {
-                "Name": "FluidComponent",
-                "BlockName": "water",
-                "Max": 5
-            }
-        }
-    },
-    "sand": {
-        "components": {
-            "PhysicsComponent": {
-                "Name": "PhysicsComponent",
-                "BlockName": "sand",
-                "Max": 5,
-                "Current": 0
-            }
-        }
+  "dirt": {
+    "components": {
+      "ExpandComponent": {
+        "Name": "BlockSpread",
+        "BlockName": "grass",
+        "Max": 20
+      }
     }
+  },
+  "grass": {
+    "components": {
+      "ExpandComponent": {
+        "Name": "BlockCover",
+        "BlockName": "dirt",
+        "Max": 20
+      }
+    }
+  },
+  "stone": {},
+  "bush": {
+    "collide": false,
+    "cube": false,
+    "components": {
+      "TickComponent": {
+        "Name": "BottomCheck",
+        "Max": 20
+      }
+    }
+  },
+  "oak_log": {
+    "state": {
+      "normal": {
+        "texture": "oak_log"
+      },
+      "horizontal": {
+        "texture": "oak_log_horizontal"
+      }
+    }
+  },
+  "oak_leaves": {},
+  "snow": {},
+  "iceblock": {},
+  "water": {
+    "collide": false,
+    "cube": false,
+    "tiletype": "atlas",
+    "components": {
+      "FluidComponent": {
+        "Name": "FluidComponent",
+        "BlockName": "water",
+        "Max": 5
+      }
+    }
+  },
+  "sand": {
+    "components": {
+      "PhysicsComponent": {
+        "Name": "PhysicsComponent",
+        "BlockName": "sand",
+        "Max": 5,
+        "Current": 0
+      }
+    }
+  }
 }

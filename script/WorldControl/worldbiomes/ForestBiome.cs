@@ -50,6 +50,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                             Materials.Valueof("oak_leaves"), 0);
                     }
                 }
+
             lbsc.BlockStructs.Add(blockStrcut);
         }
 
@@ -61,32 +62,25 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                 switch (num)
                 {
                     case > 0:
-                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                            Materials.Valueof("water").Blockdata();
+                        context.Blockdata.SetMeta("water");
                         break;
                     case 0:
-                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                            Materials.Valueof("sand").Blockdata();
+                        context.Blockdata.SetMeta("sand");
                         break;
                     case -1:
-                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                            Materials.Valueof("sand").Blockdata();
+                        context.Blockdata.SetMeta("sand");
                         break;
                     case -2:
-                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                            Materials.Valueof("sand").Blockdata();
+                        context.Blockdata.SetMeta("sand");
                         break;
                     case -3:
                         if (context.Random.Next(2) == 1)
-                            context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                                Materials.Valueof("sand").Blockdata();
+                            context.Blockdata.SetMeta("sand");
                         else
-                            context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                                Materials.Valueof("stone").Blockdata();
+                            context.Blockdata.SetMeta("stone");
                         break;
                     case <= -4:
-                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                            Materials.Valueof("stone").Blockdata();
+                        context.Blockdata.SetMeta("stone");
                         break;
                 }
             }
@@ -96,28 +90,22 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                 {
                     case 1:
                         if (context.Random.Next(2) == 1)
-                            context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                                Materials.Valueof("bush").Blockdata();
+                            context.Blockdata.SetMeta("bush");
                         break;
                     case 0:
-                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                            Materials.Valueof("grass").Blockdata();
+                        context.Blockdata.SetMeta("grass");
                         break;
                     case -1:
-                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                            Materials.Valueof("dirt").Blockdata();
+                        context.Blockdata.SetMeta("dirt");
                         break;
                     case -2:
-                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                            Materials.Valueof("dirt").Blockdata();
+                        context.Blockdata.SetMeta("dirt");
                         break;
                     case -3:
-                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                            Materials.Valueof("dirt").Blockdata();
+                        context.Blockdata.SetMeta("dirt");
                         break;
                     case <= -4:
-                        context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                            Materials.Valueof("stone").Blockdata();
+                        context.Blockdata.SetMeta("stone");
                         break;
                 }
             }

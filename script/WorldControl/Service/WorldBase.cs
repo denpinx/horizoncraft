@@ -20,6 +20,7 @@ public class WorldBase
     //
     public bool Connect = false;
     public bool ServerOn = false;
+    public long DayTimeMax = 20 * 60;
     public long TickTimes;
     public long TickConsuming;
     public int LoadHorizon = 3;
@@ -29,7 +30,7 @@ public class WorldBase
     /// <summary>
     /// 已加载区块
     /// </summary>
-    public ConcurrentDictionary<Vector2I, Chunk> LoadedChunks = new();
+    public ConcurrentDictionary<Vector2I, Chunk> Chunks = new();
 
     /// <summary>
     /// 已加载玩家
@@ -39,7 +40,7 @@ public class WorldBase
     /// <summary>
     /// 待卸载区块
     /// </summary>
-    public ConcurrentDictionary<Vector2I, Chunk> UnloadingQuee = new();
+    public ConcurrentDictionary<Vector2I, Chunk> OffloadChunkQueue = new();
 
     /// <summary>
     /// 待加载玩家
@@ -49,7 +50,7 @@ public class WorldBase
     /// <summary>
     /// 待加载区块
     /// </summary>
-    public ConcurrentDictionary<Vector2I, WorkBase> LoadingChunkQuee = new();
+    public ConcurrentDictionary<Vector2I, WorkBase> LoadChunkQueue = new();
 
     public bool Lock = false;
     public World world;
@@ -62,9 +63,9 @@ public class WorldBase
     {
         Vector2I ChunkCoord = World.MathFloor(coord, Chunk.Size);
         Vector2I LocalCoord = World.Remainder(coord, Chunk.Size);
-        if (LoadedChunks.ContainsKey(ChunkCoord))
+        if (Chunks.ContainsKey(ChunkCoord))
         {
-            Chunk chunk = LoadedChunks[ChunkCoord];
+            Chunk chunk = Chunks[ChunkCoord];
             if (replaceAir)
             {
                 if (chunk[LocalCoord.X, LocalCoord.Y, coord.Z].IsMeta("air"))
@@ -81,9 +82,9 @@ public class WorldBase
         }
         else
         {
-            if (LoadingChunkQuee.ContainsKey(ChunkCoord))
+            if (LoadChunkQueue.ContainsKey(ChunkCoord))
             {
-                if (LoadingChunkQuee[ChunkCoord].Type == "NONE")
+                if (LoadChunkQueue[ChunkCoord].Type == "NONE")
                 {
                     SetBlockWork sbw = new SetBlockWork()
                     {
@@ -91,11 +92,11 @@ public class WorldBase
                         ExclList = new List<(Vector3I, BlockMeta, int)>(),
                     };
                     sbw.ExclList.Add((new Vector3I(LocalCoord.X, LocalCoord.Y, coord.Z), meta, state));
-                    LoadingChunkQuee[ChunkCoord] = sbw;
+                    LoadChunkQueue[ChunkCoord] = sbw;
                 }
                 else
                 {
-                    SetBlockWork stw = (SetBlockWork)LoadingChunkQuee[ChunkCoord];
+                    SetBlockWork stw = (SetBlockWork)LoadChunkQueue[ChunkCoord];
                     stw.ExclList.Add((new Vector3I(LocalCoord.X, LocalCoord.Y, coord.Z), meta, state));
                 }
             }
@@ -107,7 +108,7 @@ public class WorldBase
                     ExclList = new List<(Vector3I, BlockMeta, int)>(),
                 };
                 sbw.ExclList.Add((new Vector3I(LocalCoord.X, LocalCoord.Y, coord.Z), meta, state));
-                LoadingChunkQuee[ChunkCoord] = sbw;
+                LoadChunkQueue[ChunkCoord] = sbw;
             }
         }
     }
@@ -116,9 +117,9 @@ public class WorldBase
     {
         Vector2I ChunkCoord = World.MathFloor(coord, Chunk.Size);
         Vector2I LocalCoord = World.Remainder(coord, Chunk.Size);
-        if (LoadedChunks.ContainsKey(ChunkCoord))
+        if (Chunks.ContainsKey(ChunkCoord))
         {
-            Chunk chunk = LoadedChunks[ChunkCoord];
+            Chunk chunk = Chunks[ChunkCoord];
             return chunk[LocalCoord.X, LocalCoord.Y, coord.Z];
         }
         else
@@ -141,9 +142,9 @@ public class WorldBase
                 )
                 {
                     Vector2I coord = new Vector2I(X, Y);
-                    if (LoadedChunks.ContainsKey(coord))
+                    if (Chunks.ContainsKey(coord))
                     {
-                        world.VisibleChunks[coord] = LoadedChunks[coord];
+                        world.VisibleChunks[coord] = Chunks[coord];
                     }
                 }
             }
@@ -162,7 +163,7 @@ public class WorldBase
             if (
                 Horizon.X > TileMapHorizon
                 || Horizon.Y > TileMapHorizon
-                || !LoadedChunks.ContainsKey(coord)
+                || !Chunks.ContainsKey(coord)
             )
             {
                 keysToRemove.Add(coord);

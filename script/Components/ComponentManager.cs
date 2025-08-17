@@ -1,36 +1,43 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-
 using horizoncraft.script.Events;
 using horizoncraft.script.WorldControl;
 
 namespace horizoncraft.script.Components
 {
     using System;
+
     //Link & Execut,ECS
     public class ComponentManager
     {
         private static readonly Random _Random = new Random();
         static Dictionary<string, ComponentAndSystem> CMPSets = new();
+
         public static void ExecuteComponents(WorldEvent worldEvent, Blockdata blockdata)
         {
+            int start_id = blockdata.ID;
+            int start_state = blockdata.STATE;
             for (int i = 0; i < blockdata.components.Count; i++)
             {
-                Component item = blockdata.components[i];
-                if (item == null)
+                Component component = blockdata.components[i];
+                if (component == null)
                 {
                     GD.PrintErr("item is null");
                 }
                 else
                 {
-                    if (item.Name == null) GD.PrintErr($"{item.GetType()} name is null");
+                    if (component.Name == null) GD.PrintErr($"{component.GetType()} name is null");
                 }
-                if (CMPSets.ContainsKey(item.Name))
-                    CMPSets[item.Name].system.Execute(worldEvent, item);
-            }
 
+                if (CMPSets.ContainsKey(component.Name))
+                    CMPSets[component.Name].system.Execute(worldEvent, component);
+                //方块类型和状态已经被组件给修改了，防止其他组件异常执行，直接跳过之后的组件
+                if (blockdata.ID != start_id || blockdata.STATE != start_state)
+                    return;
+            }
         }
+
         public static void Register<T>(String key, Func<Component> func, T System) where T : IComponentSystem
         {
             CMPSets.Add(key, new ComponentAndSystem()
@@ -48,8 +55,7 @@ namespace horizoncraft.script.Components
                 {
                     var ec = cmp as ExpandComponent;
                     if (e.CheckIsCube(e.TopBlock)) e.Blockdata.SetMeta(Materials.Valueof(ec.BlockName));
-                }
-            ,
+                },
             });
             Register("BlockSpread", () => new ExpandComponent(), new TickSystem()
             {
@@ -62,6 +68,7 @@ namespace horizoncraft.script.Components
                     {
                         e.Blockdata.SetMeta(meta);
                     }
+
                     if (e.CheckMeta(e.RightBlock, meta) && _Random.Next(0, 5) < 1)
                     {
                         e.Blockdata.SetMeta(meta);
@@ -73,8 +80,7 @@ namespace horizoncraft.script.Components
                 Tick = (BlockTickEvent e, TickComponent cmp) =>
                 {
                     if (!e.CheckIsCube(e.BottomBlock)) e.Blockdata.SetMeta(Materials.Valueof("air"));
-                }
-,
+                },
             });
 
             Register("FluidComponent", () => new FluidComponent(), new TickSystem()
@@ -95,6 +101,7 @@ namespace horizoncraft.script.Components
                                 return true;
                             }
                         }
+
                         if (e.CheckMeta(target, Materials.Valueof("air")))
                         {
                             target.SetMeta(blockMeta);
@@ -102,12 +109,15 @@ namespace horizoncraft.script.Components
                             target.STATE = e.Blockdata.STATE + 1;
                             return true;
                         }
+
                         return false;
                     }
+
                     if (e.CheckMeta(e.TopBlock, blockMeta))
                     {
                         e.Blockdata.STATE = 0;
                     }
+
                     if (e.CheckMeta(e.BottomBlock, Materials.Valueof("air")))
                     {
                         e.BottomBlock.SetMeta(blockMeta);
@@ -119,7 +129,6 @@ namespace horizoncraft.script.Components
                         MoveFluid(e.LeftBlock);
                         MoveFluid(e.RightBlock);
                     }
-
                 },
             });
             //沙子模拟

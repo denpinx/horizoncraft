@@ -1,59 +1,44 @@
-[gd_scene load_steps=3 format=3 uid="uid://b387xrf6eof4w"]
+[gd_scene load_steps=9 format=3 uid="uid://b387xrf6eof4w"]
 
 [ext_resource type="PackedScene" uid="uid://bem5bibh4ch2d" path="res://tscn/world.tscn" id="1_n4w62"]
 [ext_resource type="Script" uid="uid://er56e2mbajku" path="res://tscn/Menu/MainMenu.cs" id="2_lvpjg"]
+[ext_resource type="Texture2D" uid="uid://baf6hjwqh4psh" path="res://texture/button.png" id="3_t0cg7"]
+[ext_resource type="Shader" uid="uid://bu2dhuwhrsatn" path="res://tscn/Menu/MainMenu.gdshader" id="3_wwbxd"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8lkrk"]
+shader = ExtResource("3_wwbxd")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wwbxd"]
+atlas = ExtResource("3_t0cg7")
+region = Rect2(0, 0, 128, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8lkrk"]
+atlas = ExtResource("3_t0cg7")
+region = Rect2(0, 64, 128, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yxxv2"]
+atlas = ExtResource("3_t0cg7")
+region = Rect2(0, 32, 128, 32)
 
 [node name="World" instance=ExtResource("1_n4w62")]
 script = ExtResource("2_lvpjg")
+metadata/_edit_vertical_guides_ = [512.0, 640.0]
+metadata/_edit_horizontal_guides_ = [340.0, 372.0, 332.0, 380.0]
 
 [node name="Player" parent="." index="0"]
 position = Vector2(0, 0)
 
 [node name="CanvasLayer2" type="CanvasLayer" parent="." index="4"]
 
-[node name="Button_Single" type="Button" parent="CanvasLayer2" index="0"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -4.0
-offset_top = -4.0
-offset_right = 4.0
-offset_bottom = 4.0
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer2" index="0"]
+material = SubResource("ShaderMaterial_8lkrk")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-text = "单人游戏"
 
-[node name="Button_Host" type="Button" parent="CanvasLayer2" index="1"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -36.0
-offset_top = 16.0
-offset_right = 36.0
-offset_bottom = 47.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "创建主机"
-
-[node name="Button_Connect" type="Button" parent="CanvasLayer2" index="2"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -36.0
-offset_top = 47.0
-offset_right = 36.0
-offset_bottom = 78.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "加入游戏"
-
-[node name="TextEdit" type="TextEdit" parent="CanvasLayer2" index="3"]
+[node name="TextEdit" type="TextEdit" parent="CanvasLayer2" index="1"]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -63,3 +48,93 @@ offset_right = -11.0
 offset_bottom = 47.0
 grow_horizontal = 0
 placeholder_text = "玩家名"
+
+[node name="Button_Single" type="TextureButton" parent="CanvasLayer2" index="2"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = -24.0
+offset_right = 64.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = SubResource("AtlasTexture_wwbxd")
+texture_pressed = SubResource("AtlasTexture_8lkrk")
+texture_hover = SubResource("AtlasTexture_yxxv2")
+
+[node name="Label" type="Label" parent="CanvasLayer2/Button_Single" index="0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "单人游戏"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_lock_ = true
+
+[node name="Button_Host" type="TextureButton" parent="CanvasLayer2" index="3"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = 16.0
+offset_right = 64.0
+offset_bottom = 48.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = SubResource("AtlasTexture_wwbxd")
+texture_pressed = SubResource("AtlasTexture_8lkrk")
+texture_hover = SubResource("AtlasTexture_yxxv2")
+
+[node name="Label" type="Label" parent="CanvasLayer2/Button_Host" index="0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "创建多人游戏"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_lock_ = true
+
+[node name="Button_Connect" type="TextureButton" parent="CanvasLayer2" index="4"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -64.0
+offset_top = 56.0
+offset_right = 64.0
+offset_bottom = 88.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_normal = SubResource("AtlasTexture_wwbxd")
+texture_pressed = SubResource("AtlasTexture_8lkrk")
+texture_hover = SubResource("AtlasTexture_yxxv2")
+
+[node name="Label" type="Label" parent="CanvasLayer2/Button_Connect" index="0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "加入多人游戏"
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_lock_ = true

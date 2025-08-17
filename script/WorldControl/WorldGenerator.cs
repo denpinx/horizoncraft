@@ -148,7 +148,7 @@ namespace horizoncraft.script.WorldControl
         //旧算法每次设置方块都需要遍历所有的区块才能命中，以及还要等待区块异步加载的延迟，现在直接100%命中
         //当前运行速度50chunk+/s
         //去除stopwatch的误差，单区块平均生成耗时小于1ms
-        
+
         /*
             单线程生成 1000 区块耗时12669 ms
             平均耗时12 ms
@@ -188,7 +188,7 @@ namespace horizoncraft.script.WorldControl
                         biomeTerrainContext.GlobalX = gx;
                         biomeTerrainContext.GlobalY = gy;
                         biomeTerrainContext.Noise = FastNoiseLite.GetNoise2D(gx, gy);
-
+                        biomeTerrainContext.Blockdata = chunk[x, y, z];
                         landbiome.GeneratorTerrain(biomeTerrainContext);
 
                         if (gy >= highmap[x, z] && biomeTerrainContext.Noise > 0.2f && z == 1)
@@ -236,6 +236,7 @@ namespace horizoncraft.script.WorldControl
                         biomeTerrainContext.GlobalX = gx;
                         biomeTerrainContext.GlobalY = gy;
                         biomeTerrainContext.Noise = FastNoiseLite.GetNoise2D(gx, gy);
+                        biomeTerrainContext.Blockdata = chunk[x, y, z];
                         if (gy > highmap[x, z] && FastNoiseLite.GetNoise2D(gx, gy) > 0.3f && z == 1)
                             chunk[x, y, z] = Materials.Valueof("air").Blockdata();
                         else if (biomeType == BiomeType.Deep) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
@@ -254,7 +255,7 @@ namespace horizoncraft.script.WorldControl
 
             StopWatch.Stop();
             chunk.SpawnCostTime = (int)StopWatch.ElapsedMilliseconds;
-            chunk.update = true;
+            chunk.update_tilemap = true;
         }
     }
 }

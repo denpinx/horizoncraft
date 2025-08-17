@@ -1,6 +1,7 @@
 using System.IO;
 using System.IO.Compression;
 using Godot;
+using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using HorizonCraft.script.WorldControl.Service;
 using MemoryPack;
@@ -12,12 +13,22 @@ public partial class World
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void ReciveChunk(byte[] data)
     {
-        using var input = new MemoryStream(data);
-        using var gzip = new GZipStream(input, CompressionMode.Decompress);
-        using var output = new MemoryStream();
-        gzip.CopyTo(output);
-        Chunk chunk = MemoryPackSerializer.Deserialize<Chunk>(output.ToArray());
-        WorldService.LoadedChunks[new(chunk.X, chunk.Y)] = chunk;
+        Chunk chunk = Chunk.FromBytes(data);
+        WorldService.Chunks[new(chunk.X, chunk.Y)] = chunk;
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void ReciveChunkPack(byte[] data)
+    {
+        PlayerSyncChunks sync = PlayerSyncChunks.FromBytes(data);
+        for (int i = 0; i < sync.Chunks.Count; i++)
+            WorldService.Chunks[sync.Chunks[i].coord] = sync.Chunks[i];
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void ReciveWorldTime(int time)
+    {
+        this.WorldService.TickTimes = tick_use_time;
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
@@ -25,28 +36,18 @@ public partial class World
     {
         if (WorldService is WorldBase worldBase)
         {
-            using var input = new MemoryStream(data);
-            using var gzip = new GZipStream(input, CompressionMode.Decompress);
-            using var output = new MemoryStream();
-            gzip.CopyTo(output);
-
-            PlayerData playerData = MemoryPackSerializer.Deserialize<PlayerData>(output.ToArray());
+            PlayerData playerData = PlayerData.FromBytes(data);
             if (playerData.Name == Player.LocalName)
             {
                 player.playerData = playerData;
                 player.playerData.player = player;
                 if (WorldService is WorldClientService wcs)
                 {
-                    player.Position = playerData.Position;
+                    player.Position = playerData.Position_v2;
                 }
-            }
-            else
-            {
-                
             }
 
             worldBase.Players[playerData.Name] = playerData;
-            GD.Print($"[{worldBase.TickTimes}] RecivePlayer() Done");
         }
     }
 }

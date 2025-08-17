@@ -9,6 +9,7 @@ using horizoncraft.script.WorldControl.Tool;
 using MemoryPack;
 
 namespace horizoncraft.script;
+
 //客户端RPC函数
 public partial class World
 {
@@ -20,7 +21,7 @@ public partial class World
         if (WorldService is IWorldService iws && iws.GetPlayer(name, out playerData))
         {
             playerData.PeerId = peerid;
-            var bytes = playerData.ToByte();
+            var bytes = PlayerData.ToBytes(playerData);
             RpcId(peerid, "RecivePlayer", bytes);
             GD.Print($"[成功获取,即将返回]{name}");
         }
@@ -37,12 +38,7 @@ public partial class World
         ;
         if (WorldService is { } worldBase)
         {
-            using var input = new MemoryStream(bytes);
-            using var gzip = new GZipStream(input, CompressionMode.Decompress);
-            using var output = new MemoryStream();
-            gzip.CopyTo(output);
-            //
-            PlayerData playerData = MemoryPackSerializer.Deserialize<PlayerData>(output.ToArray());
+            PlayerData playerData = PlayerData.FromBytes(bytes);
             worldBase.Players[name] = playerData;
         }
     }

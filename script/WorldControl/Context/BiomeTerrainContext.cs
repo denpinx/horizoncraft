@@ -16,6 +16,6 @@ namespace horizoncraft.script.WorldControl
         public int GlobalX;
         public int GlobalY;
         public int GlobalZ;
-
+        public Blockdata Blockdata;
     }
 }

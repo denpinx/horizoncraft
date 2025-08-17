@@ -27,24 +27,19 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             switch (num)
             {
                 case 0:
-                    context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                        Materials.Valueof("snow").Blockdata();
+                    context.Blockdata.SetMeta("snow");
                     break;
                 case -1:
-                    context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                        Materials.Valueof("snow").Blockdata();
+                    context.Blockdata.SetMeta("snow");
                     break;
                 case -2:
-                    context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                        Materials.Valueof("snow").Blockdata();
+                    context.Blockdata.SetMeta("snow");
                     break;
                 case -3:
-                    context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                        Materials.Valueof("snow").Blockdata();
+                    context.Blockdata.SetMeta("snow");
                     break;
                 case <= -4:
-                    context.Chunk[context.LocalX, context.LocalY, context.GlobalZ] =
-                        Materials.Valueof("stone").Blockdata();
+                    context.Blockdata.SetMeta("stone");
                     break;
             }
         }

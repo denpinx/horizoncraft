@@ -1,4 +1,5 @@
 using System.Threading;
+using horizoncraft.script.Net;
 using HorizonCraft.script.WorldControl.Service;
 using horizoncraft.script.WorldControl.Tool;
 
@@ -22,19 +23,31 @@ using Microsoft.Data.Sqlite;
 /// </summary>
 public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWorldTickable
 {
+    //配置
     private const int Port = 9999;
     private const int MaxPlayer = 16;
 
+    //性能监视
+    //x:当前值,y:历史最大值
+    public Vector2 SyncChunkTime = new Vector2();
+    public Vector2 SyncPlayerTime = new Vector2();
+
+
     public SqliteConnection sqliteConnection;
 
+    //线程管理,确保服务端后处理都在线程内完成，不阻塞主线程
     private Task ProcessUnloadChunkTask;
     private Task ProcessLoadingChunkTask;
+    private Task SyncChunkTask;
+
+    //其他异步相关的处理结果
+    private ConcurrentQueue<(int, byte[])> PlayerSyncChunksCollection = new();
 
     public WorldHostService()
     {
     }
 
-    public virtual bool Init()
+    public bool Init()
     {
         if (world == null) return false;
         EntityManage.Init(this);
@@ -56,7 +69,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                 }
             }
         };
-        world.Multiplayer.PeerConnected += (id) => { GD.Print($"[{TickTimes}] 玩家连接"); };
+        world.Multiplayer.PeerConnected += OnPlayerJoin;
         var peer = new ENetMultiplayerPeer();
         peer.CreateServer(Port, MaxPlayer);
         world.Multiplayer.MultiplayerPeer = peer;
@@ -67,47 +80,47 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
 
     public void ProcessChunkUnloadQueue()
     {
-        if (UnloadingQuee.IsEmpty) return;
+        if (OffloadChunkQueue.IsEmpty) return;
 
         Interlocked.CompareExchange(ref ProcessUnloadChunkTask,
             Task.Run(() =>
             {
-                while (UnloadingQuee.TryRemove(UnloadingQuee.Keys.FirstOrDefault(), out var chunk))
+                while (OffloadChunkQueue.TryRemove(OffloadChunkQueue.Keys.FirstOrDefault(), out var chunk))
                 {
                     SaveChunk(chunk);
                 }
             }), null);
     }
 
-    public virtual void UpdateLoadChunkCoords()
+    public void UpdateLoadChunkCoords()
     {
         if (!ServerOn) return;
-        LoadingChunkQuee.Clear();
+        LoadChunkQueue.Clear();
         foreach (var player in Players)
         {
-            SavePlayer(player.Value);
+            //SavePlayer(player.Value);
             Vector2I CenterCoord = player.Value.ChunkCoord;
             for (int X = CenterCoord.X - LoadHorizon; X <= CenterCoord.X + LoadHorizon; X++)
             {
                 for (int Y = CenterCoord.Y - LoadHorizon; Y <= CenterCoord.Y + LoadHorizon; Y++)
                 {
                     Vector2I coord = new Vector2I(X, Y);
-                    LoadingChunkQuee[coord] = new WorkBase();
+                    LoadChunkQueue[coord] = new WorkBase();
                 }
             }
         }
 
-        foreach (Vector2I coord in LoadedChunks.Keys)
+        foreach (Vector2I coord in Chunks.Keys)
         {
-            if (!LoadingChunkQuee.ContainsKey(coord))
+            if (!LoadChunkQueue.ContainsKey(coord))
             {
-                Chunk chunk = LoadedChunks[coord];
-                UnloadingQuee[coord] = chunk;
-                LoadedChunks.TryRemove(coord, out _);
+                Chunk chunk = Chunks[coord];
+                OffloadChunkQueue[coord] = chunk;
+                Chunks.TryRemove(coord, out _);
             }
             else
             {
-                LoadingChunkQuee.TryRemove(coord, out _);
+                LoadChunkQueue.TryRemove(coord, out _);
             }
         }
     }
@@ -115,19 +128,18 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
     public void ProcessChunkLoadQueue()
     {
         if (world == null) return;
-        if (LoadingChunkQuee.IsEmpty) return;
+        if (LoadChunkQueue.IsEmpty) return;
 
         Interlocked.CompareExchange(ref ProcessLoadingChunkTask, Task.Run((() =>
         {
-            var coord = LoadingChunkQuee.Keys.FirstOrDefault();
-            while (LoadingChunkQuee.TryRemove(coord, out WorkBase work))
+            var coord = LoadChunkQueue.Keys.FirstOrDefault();
+            while (LoadChunkQueue.TryRemove(coord, out WorkBase work))
             {
                 Chunk chunk;
                 if (sqliteConnection.CheckChunkExists(coord.X, coord.Y))
                 {
-                    var bytes = sqliteConnection.GetChunkByteData(coord.X, coord.Y);
-                    chunk = MemoryPackSerializer.Deserialize<Chunk>(bytes);
-                    LoadedChunks[coord] = chunk;
+                    chunk = sqliteConnection.GetChunkByteData(coord.X, coord.Y);
+                    Chunks[coord] = chunk;
                     if (work.Type != "NONE")
                         work.Execute(chunk);
                     if (!chunk.spawn)
@@ -142,19 +154,19 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                 {
                     //生成区块
                     chunk = new(coord.X, coord.Y);
-                    LoadedChunks[coord] = chunk;
+                    Chunks[coord] = chunk;
                     if (work.Type != "NONE")
                         work.Execute(chunk);
                     WorldGenerator.Generator(chunk);
                     OnChunkLoaded?.Invoke(this, chunk);
                 }
 
-                coord = LoadingChunkQuee.Keys.FirstOrDefault();
+                coord = LoadChunkQueue.Keys.FirstOrDefault();
             }
         })), null);
     }
 
-    public virtual void ProcessPlayerLoadQueue()
+    public void ProcessPlayerLoadQueue()
     {
         if (!ServerOn) return;
         if (LoadingPlayers.Count > 0)
@@ -168,8 +180,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     {
                         if (sqliteConnection.CheckPlayerExists(name))
                         {
-                            var bytes = sqliteConnection.GetPlayerByteData(name);
-                            PlayerData player = MemoryPackSerializer.Deserialize<PlayerData>(bytes);
+                            PlayerData player = sqliteConnection.GetPlayerByteData(name);
                             player.Name = name;
                             Players[player.Name] = player;
                             GD.Print($"[{TickTimes}] 加载玩家数据:({name})");
@@ -196,7 +207,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         }
     }
 
-    public virtual bool GetPlayer(string name, out PlayerData playerData)
+    public bool GetPlayer(string name, out PlayerData playerData)
     {
         if (!ServerOn)
         {
@@ -226,9 +237,11 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         return false;
     }
 
-    public virtual void SyncPlayers()
+    public void SyncPlayers()
     {
         if (!ServerOn) return;
+
+        stopwatch.Restart();
         foreach (var Fs in Players)
         {
             foreach (var Ts in Players)
@@ -260,64 +273,116 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     Math.Abs(world.player.playerData.ChunkCoord.Y - pd2.ChunkCoord.Y) <= TileMapHorizon
                 )
                 {
-                    world.RpcId(pd2.PeerId, "RecivePlayer", world.player.playerData.ToByte());
+                    world.RpcId(pd2.PeerId, "RecivePlayer", PlayerData.ToBytes(world.player.playerData));
                 }
             }
         }
+
+        stopwatch.Stop();
+        SyncPlayerTime.X = stopwatch.ElapsedMilliseconds;
+        if (SyncPlayerTime.X > SyncPlayerTime.Y) SyncPlayerTime.Y = SyncPlayerTime.X;
     }
 
-    public virtual void SyncChunks()
+    //同步区块
+    //异步处理序列化,最终在主线程同步
+    public void SyncChunks()
     {
         if (!ServerOn) return;
-        foreach (var chunkset in LoadedChunks)
+
+        stopwatch.Restart();
+        Dictionary<int, PlayerSyncChunks> syncmap = new();
+
+        Interlocked.CompareExchange(ref SyncChunkTask, Task.Run((() =>
         {
-            if (chunkset.Value.update)
-                foreach (var playerset in Players)
+            foreach (var chunkset in Chunks)
+            {
+                //脏标记
+                if (chunkset.Value.update_server || chunkset.Value.update_tilemap)
                 {
                     Chunk chunk = chunkset.Value;
-                    PlayerData pd1 = playerset.Value;
-                    if (
-                        Math.Abs((chunk.X - pd1.ChunkCoord.X)) <= TileMapHorizon &&
-                        Math.Abs((chunk.Y - pd1.ChunkCoord.Y)) <= TileMapHorizon
-                    )
+                    foreach (var playerset in Players)
                     {
-                        if (pd1.Name != Player.LocalName)
+                        PlayerData pd1 = playerset.Value;
+                        //按距离同步
+                        if (
+                            Math.Abs((chunk.X - pd1.ChunkCoord.X)) <= TileMapHorizon &&
+                            Math.Abs((chunk.Y - pd1.ChunkCoord.Y)) <= TileMapHorizon
+                        )
                         {
-                            Error error = world.RpcId(pd1.PeerId, "ReciveChunk", chunk.ToByte());
-                            if (error != Error.Ok)
+                            if (pd1.Name != Player.LocalName)
                             {
-                                GD.PrintErr(pd1.Name, pd1.PeerId);
+                                if (syncmap.ContainsKey(pd1.PeerId))
+                                {
+                                    syncmap[pd1.PeerId].Chunks.Add(chunk);
+                                }
+                                else
+                                {
+                                    syncmap[pd1.PeerId] = new PlayerSyncChunks()
+                                    {
+                                        Chunks = new()
+                                        {
+                                            chunk
+                                        }
+                                    };
+                                }
                             }
                         }
                     }
+
+                    chunk.update_server = false;
                 }
+            }
+
+            foreach (var key in syncmap.Keys)
+            {
+                PlayerSyncChunksCollection.Enqueue((key, PlayerSyncChunks.ToBytes(syncmap[key])));
+            }
+        })), null);
+
+        if (SyncChunkTask != null && SyncChunkTask.IsCompleted && !PlayerSyncChunksCollection.IsEmpty)
+        {
+            foreach (var variabl in PlayerSyncChunksCollection)
+            {
+                world.RpcId(variabl.Item1, "ReciveChunkPack", variabl.Item2);
+            }
+
+            PlayerSyncChunksCollection.Clear();
         }
+
+
+        stopwatch.Stop();
+        SyncChunkTime.X = stopwatch.ElapsedMilliseconds;
+        if (SyncChunkTime.X > SyncChunkTime.Y) SyncChunkTime.Y = SyncChunkTime.X;
     }
 
-    public virtual void SavePlayer(PlayerData playerData)
+    public void OnPlayerJoin(long peer_id)
     {
         if (!ServerOn) return;
-        var bytes = playerData.ToByte();
+        world.RpcId(peer_id, "ReciveWorldTime", TickTimes);
+    }
+
+    public void SavePlayer(PlayerData playerData)
+    {
+        if (!ServerOn) return;
         if (sqliteConnection.CheckPlayerExists(playerData.Name))
-            sqliteConnection.UpdatePlayerByteData(playerData.Name, bytes);
+            sqliteConnection.UpdatePlayerByteData(playerData.Name, playerData);
         else
-            sqliteConnection.InsertPlayerByteValue(playerData.Name, bytes);
+            sqliteConnection.InsertPlayerByteValue(playerData.Name, playerData);
     }
 
-    public virtual void SaveChunk(Chunk chunk)
+    public void SaveChunk(Chunk chunk)
     {
         if (!ServerOn) return;
-        var bytes = chunk.ToByte();
         if (sqliteConnection.CheckChunkExists(chunk.X, chunk.Y))
-            sqliteConnection.UpdateChunkByteData(chunk.X, chunk.Y, bytes);
+            sqliteConnection.UpdateChunkByteData(chunk.X, chunk.Y, chunk);
         else
-            sqliteConnection.InsertChunkByteValue(chunk.X, chunk.Y, bytes);
+            sqliteConnection.InsertChunkByteValue(chunk.X, chunk.Y, chunk);
     }
 
-    public virtual void Save()
+    public void Save()
     {
         if (!ServerOn) return;
-        foreach (var chunkset in LoadedChunks)
+        foreach (var chunkset in Chunks)
             SaveChunk(chunkset.Value);
 
         foreach (var playerset in Players)
@@ -337,9 +402,9 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         ProcessChunkLoadQueue();
         ProcessPlayerLoadQueue();
         ProcessChunkUnloadQueue();
-        foreach (Vector2I coord in LoadedChunks.Keys)
+        foreach (Vector2I coord in Chunks.Keys)
         {
-            Chunk chunk = LoadedChunks[coord];
+            Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
         }
 

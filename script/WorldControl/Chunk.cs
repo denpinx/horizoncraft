@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -10,12 +12,13 @@ using horizoncraft.script.Events;
 using Array = Godot.Collections.Array;
 using MemoryPack;
 using horizoncraft.script.Components;
+using horizoncraft.script.Net;
 using HorizonCraft.script.WorldControl.Service;
 
 namespace horizoncraft.script.WorldControl
 {
     [MemoryPackable]
-    public partial class Chunk
+    public partial class Chunk:AsByteable<Chunk>
     {
         public int X;
         public int Y;
@@ -24,7 +27,8 @@ namespace horizoncraft.script.WorldControl
         public bool spawn = false;
         public string BiomeType = "";
 
-        [MemoryPackIgnore] public bool update = true;
+        [MemoryPackIgnore] public bool update_tilemap = true;
+        [MemoryPackIgnore] public bool update_server = true;
 
         [MemoryPackIgnore]
         public Godot.Vector2I coord
@@ -49,7 +53,8 @@ namespace horizoncraft.script.WorldControl
             get { return data[x, y, z]; }
             set
             {
-                update = true;
+                update_tilemap = true;
+                update_server = true;
                 data[x, y, z] = value;
             }
         }
@@ -77,6 +82,15 @@ namespace horizoncraft.script.WorldControl
         public void Tick(WorldBase WorldService, World world)
         {
             int state = 0;
+            int id = 0;
+            BlockTickEvent blockTickEvnet = new()
+            {
+                World = world,
+                WorldService = WorldService,
+                Chunk = this,
+            };
+            var coord = new Godot.Vector3I(0, 0, 0);
+            //通过在循环不创建任何一个对象来优化
             for (int Z = 0; Z < Chunk.SizeZ; Z++)
             {
                 for (int X = 0; X < Chunk.Size; X++)
@@ -85,22 +99,25 @@ namespace horizoncraft.script.WorldControl
                     {
                         if (data[X, Y, Z].components.Count != 0)
                         {
+                            coord.X = this.coord.X * Chunk.Size + X;
+                            coord.Y = this.coord.Y * Chunk.Size + Y;
+                            coord.Z = Z;
                             state = data[X, Y, Z].STATE;
-                            BlockTickEvent blockTickEvnet = new()
-                            {
-                                World = world,
-                                WorldService = WorldService,
-                                Chunk = this,
-                                Blockdata = data[X, Y, Z],
-                                GloablPos = new Godot.Vector3I(
-                                    coord.X * Chunk.Size + X,
-                                    coord.Y * Chunk.Size + Y,
-                                    Z
-                                ),
-                                LocalPos = new Godot.Vector3I(X, Y, Z),
-                            };
-                            if (state != data[X, Y, Z].STATE) update = true;
+                            id = data[X, Y, Z].ID;
+                            blockTickEvnet.Blockdata = data[X, Y, Z];
+                            blockTickEvnet.GloablPos = coord;
+                            coord.X = X;
+                            coord.Y = Y;
+                            coord.Z = Z;
+                            blockTickEvnet.LocalPos = coord;
+
                             ComponentManager.ExecuteComponents(blockTickEvnet, data[X, Y, Z]);
+
+                            if (state != data[X, Y, Z].STATE || id != data[X, Y, Z].ID)
+                            {
+                                update_tilemap = true;
+                                update_server = true;
+                            }
                         }
                         else
                         {

@@ -35,29 +35,29 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
     {
         if (world == null) return;
         if (world.player.playerData == null) return;
-        LoadingChunkQuee.Clear();
+        LoadChunkQueue.Clear();
         Vector2I CenterCoord = world.player.playerData.ChunkCoord;
         for (int X = CenterCoord.X - LoadHorizon; X <= CenterCoord.X + LoadHorizon; X++)
         {
             for (int Y = CenterCoord.Y - LoadHorizon; Y <= CenterCoord.Y + LoadHorizon; Y++)
             {
                 Vector2I coord = new Vector2I(X, Y);
-                LoadingChunkQuee[coord] = new WorkBase();
+                LoadChunkQueue[coord] = new WorkBase();
             }
         }
 
 
-        foreach (Vector2I coord in LoadedChunks.Keys)
+        foreach (Vector2I coord in Chunks.Keys)
         {
-            if (!LoadingChunkQuee.ContainsKey(coord))
+            if (!LoadChunkQueue.ContainsKey(coord))
             {
-                Chunk chunk = LoadedChunks[coord];
-                UnloadingQuee[coord] = chunk;
-                LoadedChunks.TryRemove(coord, out _);
+                Chunk chunk = Chunks[coord];
+                OffloadChunkQueue[coord] = chunk;
+                Chunks.TryRemove(coord, out _);
             }
             else
             {
-                LoadingChunkQuee.TryRemove(coord, out _);
+                LoadChunkQueue.TryRemove(coord, out _);
             }
         }
     }
@@ -65,16 +65,16 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
     public void ProcessChunkLoadQueue()
     {
         if (world == null) return;
-        foreach (Vector2I coord in LoadingChunkQuee.Keys)
+        foreach (Vector2I coord in LoadChunkQueue.Keys)
         {
-            int max = LoadingChunkQuee.Count;
-            WorkBase work = LoadingChunkQuee[coord];
-            LoadingChunkQuee.TryRemove(coord, out _);
+            int max = LoadChunkQueue.Count;
+            WorkBase work = LoadChunkQueue[coord];
+            LoadChunkQueue.TryRemove(coord, out _);
             Task.Run(() =>
             {
                 //生成区块
                 Chunk chunk = new(coord.X, coord.Y);
-                LoadedChunks[coord] = chunk;
+                Chunks[coord] = chunk;
                 if (work.Type != "NONE")
                     work.Execute(chunk);
                 WorldGenerator.Generator(chunk);
@@ -111,9 +111,9 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
         stopwatch.Restart();
         ProcessChunkLoadQueue();
         UpdataTileMap();
-        foreach (Vector2I coord in LoadedChunks.Keys)
+        foreach (Vector2I coord in Chunks.Keys)
         {
-            Chunk chunk = LoadedChunks[coord];
+            Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
         }
 

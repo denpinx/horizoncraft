@@ -21,13 +21,13 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable
         //连接服务器
         world.Multiplayer.PeerConnected += id =>
         {
-            GD.Print($"客户端连接成功{id}");
+            GD.Print($"[客户端] 连接成功{id}");
             world.RpcId(1, "ConnectDone", Player.LocalName, world.Multiplayer.GetUniqueId());
             Connect = true;
         };
         world.Multiplayer.ConnectionFailed += () =>
         {
-            GD.PrintErr($"客户端连接失败！");
+            GD.PrintErr($"[客户端] 连接失败！");
             Connect = false;
         };
         var peer = new ENetMultiplayerPeer();
@@ -45,28 +45,28 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable
         if (!Connect) return;
         world.RpcId(1, "OnMoveAChunk");
         if (world.player.playerData == null) return;
-        LoadingChunkQuee.Clear();
+        LoadChunkQueue.Clear();
         Vector2I CenterCoord = world.player.playerData.ChunkCoord;
         for (int X = CenterCoord.X - LoadHorizon; X <= CenterCoord.X + LoadHorizon; X++)
         {
             for (int Y = CenterCoord.Y - LoadHorizon; Y <= CenterCoord.Y + LoadHorizon; Y++)
             {
                 Vector2I coord = new Vector2I(X, Y);
-                LoadingChunkQuee[coord] = new WorkBase();
+                LoadChunkQueue[coord] = new WorkBase();
             }
         }
 
-        foreach (Vector2I coord in LoadedChunks.Keys)
+        foreach (Vector2I coord in Chunks.Keys)
         {
-            if (!LoadingChunkQuee.ContainsKey(coord))
+            if (!LoadChunkQueue.ContainsKey(coord))
             {
-                Chunk chunk = LoadedChunks[coord];
-                UnloadingQuee[coord] = chunk;
-                LoadedChunks.TryRemove(coord, out _);
+                Chunk chunk = Chunks[coord];
+                OffloadChunkQueue[coord] = chunk;
+                Chunks.TryRemove(coord, out _);
             }
             else
             {
-                LoadingChunkQuee.TryRemove(coord, out _);
+                LoadChunkQueue.TryRemove(coord, out _);
             }
         }
     }
@@ -107,27 +107,28 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable
 
     public void SavePlayer(PlayerData playerData)
     {
-        if (!Connect) return;
+        if (!Connect || world.Multiplayer.MultiplayerPeer == null) return;
         if (playerData == null)
         {
             GD.PrintErr("playerData is null");
             return;
         }
-        world.RpcId(1, "UpdataPlayer", playerData.Name, playerData.ToByte());
+
+        world.RpcId(1, "UpdataPlayer", playerData.Name, PlayerData.ToBytes(playerData));
     }
 
     public void SaveChunk(Chunk chunk)
     {
-        
     }
 
     public void Save()
     {
     }
+
     public void Tick()
     {
         if (!Connect) return;
-        if(world.player.playerData!=null)SavePlayer(world.player.playerData);
+        if (world.player.playerData != null) SavePlayer(world.player.playerData);
         UpdateLoadChunkCoords();
         UpdataTileMap();
     }
@@ -135,11 +136,12 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable
 
     public override void SetBlock(Vector3I coord, BlockMeta meta, bool replaceAir = false, int state = 0)
     {
-        if(!Connect)return;
+        if (!Connect) return;
         else
         {
             world.RpcId(1, "SetBlock", coord.X, coord.Y, coord.Z, meta.ID, state);
         }
+
         base.SetBlock(coord, meta, replaceAir, state);
     }
 }

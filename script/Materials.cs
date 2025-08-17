@@ -13,6 +13,7 @@ using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 using System.Data.Common;
 using System.Text.Json.Serialization;
 using horizoncraft.script.WorldControl;
+
 namespace horizoncraft.script
 {
     public class Materials
@@ -28,6 +29,7 @@ namespace horizoncraft.script
             entityMetas.Add(meta);
             return meta;
         }
+
         public static EntityMeta GetEntityMeta(String name)
         {
             foreach (EntityMeta em in entityMetas)
@@ -37,8 +39,10 @@ namespace horizoncraft.script
                     return em;
                 }
             }
+
             return null;
         }
+
         public static EntityMeta GetEntityMeta(int id)
         {
             foreach (EntityMeta em in entityMetas)
@@ -48,8 +52,10 @@ namespace horizoncraft.script
                     return em;
                 }
             }
+
             return null;
         }
+
         public static BlockMeta RegBlockMeta(BlockMeta meta)
         {
             meta.ID = blockmetas.Count;
@@ -92,10 +98,12 @@ namespace horizoncraft.script
                 {
                     foreach (string cmp_name in ((Dictionary<string, object>)config["components"]).Keys)
                     {
-                        Dictionary<string, object> cmp_dict = (Dictionary<string, object>)((Dictionary<string, object>)config["components"])[cmp_name];
+                        Dictionary<string, object> cmp_dict =
+                            (Dictionary<string, object>)((Dictionary<string, object>)config["components"])[cmp_name];
                         components.Add(LambdaCreater.CreateLambda(cmp_name, cmp_dict));
                     }
                 }
+
                 var blockmeta = new BlockMeta()
                 {
                     NAME = item_name,
@@ -105,6 +113,7 @@ namespace horizoncraft.script
                 {
                     blockmeta.Tiletype = (string)config["tiletype"];
                 }
+
                 //配置不同状态下的Tile贴图
                 if (config.ContainsKey("state"))
                 {
@@ -128,9 +137,11 @@ namespace horizoncraft.script
                         {
                             tile.texture_name = $"{blockmeta.NAME}_{state_name}";
                         }
+
                         blockTileSets.Add(tile);
                         state_id++;
                     }
+
                     blockmeta.blockTileDatas = blockTileSets;
                 }
                 //没有配置State贴图，则默认加载此地址的贴图
@@ -144,15 +155,10 @@ namespace horizoncraft.script
                 }
 
 
-
                 if (config.ContainsKey("cube")) blockmeta.CUBE = (bool)config["cube"];
                 if (config.ContainsKey("collide")) blockmeta.COLLIDE = (bool)config["collide"];
                 RegBlockMeta(blockmeta);
             }
-
-
-
-
 
 
             RegEntityMeta(new EntityMeta("item_entity", "res://tscn/Entity/ItemEntity.tscn")
@@ -191,31 +197,33 @@ namespace horizoncraft.script
                     atlasSource.TextureRegionSize = new Vector2I(16, 16);
                     blockTileSet.tile_id = tileSet.AddSource(atlasSource);
                     for (int y = 0; y < tilesY; y++)
-                        for (int x = 0; x < tilesX; x++)
+                    for (int x = 0; x < tilesX; x++)
+                    {
+                        var id = new Vector2I(x, y);
+                        atlasSource.CreateTile(id);
+
+                        var tileData = atlasSource.GetTileData(id, 0);
+
+                        if (meta.COLLIDE)
                         {
-                            var id = new Vector2I(x, y);
-                            atlasSource.CreateTile(id);
-
-                            var tileData = atlasSource.GetTileData(id, 0);
-
-                            if (meta.COLLIDE)
+                            var half = 16 / 2.0f;
+                            Vector2[] polygon = new Vector2[]
                             {
-                                var half = 16 / 2.0f;
-                                Vector2[] polygon = new Vector2[]
-                                {
-                            new Vector2(-half, -half),
-                            new Vector2( half, -half),
-                            new Vector2( half,  half),
-                            new Vector2(-half,  half)
-                                };
-                                tileData.AddCollisionPolygon(0);
-                                tileData.SetCollisionPolygonPoints(0, 0, polygon);
-                            }
+                                new Vector2(-half, -half),
+                                new Vector2(half, -half),
+                                new Vector2(half, half),
+                                new Vector2(-half, half)
+                            };
+                            tileData.AddCollisionPolygon(0);
+                            tileData.SetCollisionPolygonPoints(0, 0, polygon);
                         }
+                    }
+
                     blockTileSet.tile_size = tilesX;
                     blockTileSet.tile_count = tilesX * tilesY;
                 }
             }
+
             return tileSet;
         }
     }

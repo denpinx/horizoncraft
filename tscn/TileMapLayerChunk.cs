@@ -7,15 +7,13 @@ using horizoncraft.script.WorldControl;
 
 public partial class TileMapLayerChunk : Node2D
 {
-    [Export]
-    public bool DEBUG = true;
+    [Export] public bool DEBUG = true;
     public Chunk chunk;
     public Player player;
     TileMapLayer tileMapLayer_font;
     TileMapLayer tileMapLayer_back;
     DebugView debugView;
-    [Export]
-    private float perspectiveOffsetFactor = 0.1f;
+    [Export] private float perspectiveOffsetFactor = 0.1f;
 
     public override void _Ready()
     {
@@ -27,14 +25,14 @@ public partial class TileMapLayerChunk : Node2D
     }
 
 
-
     public override void _Process(double delta)
     {
         if (chunk == null || GetParent() == null)
         {
             QueueFree();
         }
-        if (chunk.update)
+
+        if (chunk.update_tilemap)
         {
             debugView.chunk = chunk;
             debugView.QueueRedraw();
@@ -63,11 +61,11 @@ public partial class TileMapLayerChunk : Node2D
                             tileMapLayer_back.SetCell(new(x, y), tile_id, coord);
                         else
                             tileMapLayer_font.SetCell(new(x, y), tile_id, coord);
-
                     }
                 }
             }
-            chunk.update = false;
+
+            chunk.update_tilemap = false;
         }
     }
 }
