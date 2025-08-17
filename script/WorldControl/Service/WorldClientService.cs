@@ -22,7 +22,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable
         world.Multiplayer.PeerConnected += id =>
         {
             GD.Print($"[客户端] 连接成功{id}");
-            world.RpcId(1, "ConnectDone", Player.LocalName, world.Multiplayer.GetUniqueId());
+            world.RpcId(1, "ConnectDone", Player.Profile.Name, world.Multiplayer.GetUniqueId());
             Connect = true;
         };
         world.Multiplayer.ConnectionFailed += () =>
@@ -89,7 +89,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable
             return false;
         }
 
-        if (name == Player.LocalName)
+        if (name == Player.Profile.Name)
         {
             playerdata = world.player.playerData;
             return true;
@@ -128,6 +128,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable
     public void Tick()
     {
         if (!Connect) return;
+        TickTimes++;
         if (world.player.playerData != null) SavePlayer(world.player.playerData);
         UpdateLoadChunkCoords();
         UpdataTileMap();

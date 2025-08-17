@@ -1,67 +1,75 @@
 # 目前已实现功能
-|功能|相关类|描述|
-|----|----|----|
-|旧异步区块加载和卸载|WorldBase, IWorldService, IWorldTickable|需要通过接口组合实现|
-|实体生成和保存|[EntityManage](script/Features/EntityManage.cs)| 跟随区块卸载和加载|
-|世界生成器|[WorldGenerator](script/WorldControl/WorldGenerator.cs)|通过预算周围结构方块实现了方块伪跨区块生成|
-|生物群系|[BiomeManage](script/WorldControl/BiomeManage.cs)|根据当前生物群系数量自动配置权重|
-|组件系统|[ComponentManager](script/Components/ComponentManager.cs)|根据组件搭配可以快速构建方块|
-|多人联机|WorldHostService|实现了区块同步,以及玩家位置同步,性能还待优化|
+
+| 功能         | 相关类                                                       | 描述                      |
+|------------|-----------------------------------------------------------|-------------------------|
+| 旧异步区块加载和卸载 | WorldBase, IWorldService, IWorldTickable                  | 需要通过接口组合实现              |
+| 实体生成和保存    | [EntityManage](script/Features/EntityManage.cs)           | 跟随区块卸载和加载               |
+| 世界生成器      | [WorldGenerator](script/WorldControl/WorldGenerator.cs)   | 通过预算周围结构方块实现了方块伪跨区块生成   |
+| 生物群系       | [BiomeManage](script/WorldControl/BiomeManage.cs)         | 根据当前生物群系数量自动配置权重        |
+| 组件系统       | [ComponentManager](script/Components/ComponentManager.cs) | 根据组件搭配可以快速构建方块          |
+| 多人联机       | WorldHostService                                          | 实现了区块同步,以及玩家位置同步,性能还待优化 |
 
 # 待实现功能
-|功能|描述|
-|----|----|
-|物品系统,容器组件|组成玩家生存必不可缺的一部分,要对所有方块再绘制物品版本贴图|
-|游戏菜单|配合物品系统|
-|合成功能|配合物品系统,已经有思路了|
+
+| 功能        | 描述                             |
+|-----------|--------------------------------|
+| 物品系统,容器组件 | 组成玩家生存必不可缺的一部分,要对所有方块再绘制物品版本贴图 |
+| 游戏菜单      | 配合物品系统                         |
+| 合成功能      | 配合物品系统,已经有思路了                  |
 
 # 多人相关
 
-性能瓶颈在区块数据的分发，同一个区块会在一Tick内被序列化多次。
-接下来打算在分发前先序列化所有要同步的区块。
+服务器性能测试结果:
 
-|类名|继承与接口|描述|
-|----|----|----|
-|WorldHostService|WorldBase, IWorldService, IWorldHostService, IWorldTickable|联机主机,拥有单机的全部功能,额外增加的远程同步功能|
-|WorldClientService|WorldBase, IWorldService, IWorldTickable|联机客户端,没有任何存储功能|
-|WorldSingleService|WorldBase, IWorldService, IWorldTickable|单机,拥有除联机外全部功能|
-|WorldPreviewService|WorldBase, IWorldService, IWorldTickable|预览模式,没有任何存储功能|
-|WorldBase|objcet|存储世界的基本信息,如已加载的区块,待加载的区块,玩家等等|
-|IWorldService|Interface|通过接口强制要求每个子类实现所有方法,以免遗漏|
-|IWorldHostService|Interface|网络同步接口,要求必须实现里面的所有方法|
-|IWorldTickable|Interface|Tick接口|
+| 在线人数(不包含主机) | 加载区块数 | 上传字节数    | 下载字节数    |
+|-------------|-------|----------|----------|
+| 3人          | 196区块 | 300KiB/s | 6kib/s   |
+| 3人          | 63区块  | 450KiB/s | 6kib/s   |
+| 2人          | 63区块  | 234KiB/s | 3.5kib/s |
+| 2人          | 147区块 | 250KiB/s | 3.5kib/s |
+| 1人          | 98区块  | 145KiB/s | 1.5kib/s |
+| 1人          | 49区块  | 120KiB/s | 1.5kib/s |
 
-性能分析
+总结:
+性能上传带宽消耗取决于区块复杂度，越复杂的区块越难被压缩。
 
-|优化方向|进度|描述|
-|----|----|----|
-|不同步整个区块,只同步改变的,或则减少同步频率|20%|目前是直接根据脏标记直接同步整个区块,虽然一个区块压缩后才500字节,还是得考虑有没有更好的办法|
-|减少同步次数|0%|目前是每tick同步所有玩家的所有信息,只做了视距筛选,玩家之间只同步视距内的玩家，但是还不够，主要是区块同步太频繁了。
-
-
-
+| 类名                  | 继承与接口                                                       | 描述                            |
+|---------------------|-------------------------------------------------------------|-------------------------------|
+| WorldHostService    | WorldBase, IWorldService, IWorldHostService, IWorldTickable | 联机主机,拥有单机的全部功能,额外增加的远程同步功能    |
+| WorldClientService  | WorldBase, IWorldService, IWorldTickable                    | 联机客户端,没有任何存储功能                |
+| WorldSingleService  | WorldBase, IWorldService, IWorldTickable                    | 单机,拥有除联机外全部功能                 |
+| WorldPreviewService | WorldBase, IWorldService, IWorldTickable                    | 预览模式,没有任何存储功能                 |
+| WorldBase           | objcet                                                      | 存储世界的基本信息,如已加载的区块,待加载的区块,玩家等等 |
+| IWorldService       | Interface                                                   | 通过接口强制要求每个子类实现所有方法,以免遗漏       |
+| IWorldHostService   | Interface                                                   | 网络同步接口,要求必须实现里面的所有方法          |
+| IWorldTickable      | Interface                                                   | Tick接口                        |
 
 # 已实现组件类
 
-|组件名|描述|父类|
-|----|----|----|
-|[Component](script/Components/Component.cs)|所有组件的基类|无|
-|[TickComponent](script/Components/TickComponent.cs)|时刻组件,所有方块组件的基类|Component|
-|[ExpandComponent](script/Components/ExpandComponent.cs)|扩展组件,让TickComponent可以自定义操作对象|TickComponent|
-|[FluidComponent](script/Components/FluidComponent.cs)|流体组件,让方块具有流体属性|ExpandComponent|
-|[PhysicsComponent](script/Components/PhysicsComponent.cs)|物理组件,方块会像沙子一样下坠|ExpandComponent|
+| 组件名                                                       | 描述                           | 父类              |
+|-----------------------------------------------------------|------------------------------|-----------------|
+| [Component](script/Components/Component.cs)               | 所有组件的基类                      | 无               |
+| [TickComponent](script/Components/TickComponent.cs)       | 时刻组件,所有方块组件的基类               | Component       |
+| [ExpandComponent](script/Components/ExpandComponent.cs)   | 扩展组件,让TickComponent可以自定义操作对象 | TickComponent   |
+| [FluidComponent](script/Components/FluidComponent.cs)     | 流体组件,让方块具有流体属性               | ExpandComponent |
+| [PhysicsComponent](script/Components/PhysicsComponent.cs) | 物理组件,方块会像沙子一样下坠              | ExpandComponent |
 
 # 已实现组件功能
-|组件类型|行为类型|描述|
-|----|----|----|
-|[ExpandComponent](script/Components/ExpandComponent.cs)|BlockCover|配置BlockName,当方块被覆盖时变成指定方块|
-|[ExpandComponent](script/Components/ExpandComponent.cs)|BlockSpread|配置BlockName,让方块能够被任意方块蔓延|
-|[TickComponent](script/Components/TickComponent.cs)|BottomCheck|检查底部是否为完整方块，如果不是则消失|
-|[FluidComponent](script/Components/FluidComponent.cs)|FluidComponent|流体组件,配置BlockName,即可让任意方块实现流体功能|
-|[PhysicsComponent](script/Components/PhysicsComponent.cs)|PhysicsComponent|物理组件,配置BlockName,即可让任意方块能够像让沙子一样下坠|
+
+| 组件类型                                                      | 行为类型             | 描述                                 |
+|-----------------------------------------------------------|------------------|------------------------------------|
+| [ExpandComponent](script/Components/ExpandComponent.cs)   | BlockCover       | 配置BlockName,当方块被覆盖时变成指定方块          |
+| [ExpandComponent](script/Components/ExpandComponent.cs)   | BlockSpread      | 配置BlockName,让方块能够被任意方块蔓延           |
+| [TickComponent](script/Components/TickComponent.cs)       | BottomCheck      | 检查底部是否为完整方块，如果不是则消失                |
+| [FluidComponent](script/Components/FluidComponent.cs)     | FluidComponent   | 流体组件,配置BlockName,即可让任意方块实现流体功能     |
+| [PhysicsComponent](script/Components/PhysicsComponent.cs) | PhysicsComponent | 物理组件,配置BlockName,即可让任意方块能够像让沙子一样下坠 |
+
 # 注册方块
+
 ### 1.打开[配置文件](config\block\Materials.json)
+
 #### 添加配置
+
 ~~~json
     {
         ....
@@ -91,7 +99,9 @@
 ~~~
 
 #### 如果直接配置已有的组件可以省略以下步骤
+
 ### 2.新建组件类,继承[组件](script/Components/Component.cs),注册新的组件类型
+
 ```C#
     [MemoryPackable]
     public partial class MyComponent : TickComponent
@@ -99,7 +109,9 @@
         //这里只写字段，最好不要包含任何方法
     }
 ```
+
 ### 3.打开[组件管理器](script/Components/ComponentManager.cs),注册新的组件类型
+
 ```C#
     static ComponentManager()
     {
@@ -114,7 +126,9 @@
         });
     }
 ```
+
 ### 4.在[组件](script/Components/Component.cs)类中标记新建的组件,用于MemoryPack序列化
+
 ```C#
     //在这里添加，注意下标请勿重复
     [MemoryPackUnion(999, typeof(MyComponent))]
@@ -123,7 +137,9 @@
         public string Name;
     }
 ```
+
 ### 5.在[LambdaCreater](script/Components/LambdaCreater.cs#L12)类中注册新建的组件类用于自动创建Lambda函数
+
 ```C#
     static LambdaCreater()
     {
@@ -132,25 +148,36 @@
         Register<MyComponent>();
     }
 ```
+
 # 注册实体
+
 ## 此功能是半成品，只实现了跟随区块加载和卸载
+
 ### 1.创建一个新场景，继承[EntityNode](script/Entity/EntityNode.cs) 作为实体的游戏实列
+
 ### 2.在[Materials](script/Materials.cs)中创建[EntityMeta](script/Entity/EntityMeta.cs)注册实体,并绑定tscn文件
+
 ### 3.暂时不支持自定义[EntityData](script/Entity/Entitydata.cs)
+
 ###
 
 # 生物群系
-|生物群系类型|继承|描述|
-|----|----|----|
-|BaseBiome|无|生物群系基类
-|LandBiome|BaseBiome|地表群系
-|Biome|BaseBiome|二维群系
+
+| 生物群系类型    | 继承        | 描述     |
+|-----------|-----------|--------|
+| BaseBiome | 无         | 生物群系基类 
+| LandBiome | BaseBiome | 地表群系   
+| Biome     | BaseBiome | 二维群系   
 
 LandBiome生成基于X轴计算,Biome是在LandBiome的基础上再计算的结果,两则不会冲突
 w
+
 ## 注册生物群系
+
 ### 1.在 'script\WorldControl\worldbiomes' 中创建一个名为 XXXBiome.cs的文件
+
 ### 创建地下群系:
+
 ```C#
     public class MyDeepBiome : Biome
     {
@@ -181,7 +208,9 @@ w
         }
     }
 ```
+
 ### 创建地表群系
+
 ```C#
     public class MyLandBiome : LandBiome
     {
@@ -255,7 +284,9 @@ w
         }
     }
 ```
+
 ### 2.打开[群系管理类](script/WorldControl/BiomeManage.cs),调用 'Register(BaseBiome baseBiome)' 方法注册新的生物群系,并配置好权重
+
 ```C#
     static void RegBiomes()
     {

@@ -180,9 +180,10 @@ namespace horizoncraft.script
         {
             if (WorldService != null && WorldService is WorldBase wb && colorRect != null)
             {
-                var t = (float)(wb.TickTimes % wb.DayTimeMax) / wb.DayTimeMax;
-                colorRect.Color = GetEnvironmentColorV2(t);
+                colorRect.Color = Color.Color8(0, 0, 0, GetLightChange(wb.GetTimeProgress()));
+                textureRect.Modulate = GetSkyChange(wb.GetTimeProgress());
             }
+
 
             if (RequeueFreeze > 0) RequeueFreeze -= delta;
             if (player.playerData == null)
@@ -190,7 +191,7 @@ namespace horizoncraft.script
                 if (WorldService is WorldHostService whs)
                 {
                     PlayerData pd;
-                    if (whs.GetPlayer(Player.LocalName, out pd))
+                    if (whs.GetPlayer(Player.Profile.Name, out pd))
                     {
                         player.playerData = pd;
                         player.Position = pd.Position_v2;
@@ -205,11 +206,12 @@ namespace horizoncraft.script
                 {
                     if (RequeueFreeze <= 0)
                     {
-                        RpcId(1, "GetPlayer", Player.LocalName, Multiplayer.GetUniqueId());
+                        RpcId(1, "GetPlayer", Player.Profile.Name, Multiplayer.GetUniqueId());
                         RequeueFreeze = 2;
                     }
                 }
-                else if (WorldService is IWorldService iws && iws.GetPlayer(Player.LocalName, out player.playerData) &&
+                else if (WorldService is IWorldService iws &&
+                         iws.GetPlayer(Player.Profile.Name, out player.playerData) &&
                          player.playerData != null)
                 {
                     player.playerData.player = player;
@@ -230,7 +232,7 @@ namespace horizoncraft.script
                     //添加玩家节点
                     if (!PlayerNodes.ContainsKey(Kvp.Key))
                     {
-                        if (Kvp.Key != Player.LocalName)
+                        if (Kvp.Key != Player.Profile.Name)
                         {
                             Player player = Player_ps.Instantiate<Player>();
                             player.playerData = Kvp.Value;
@@ -244,7 +246,7 @@ namespace horizoncraft.script
                     {
                         //更新玩家节点
                         PlayerNodes[Kvp.Key].playerData = Kvp.Value;
-                        if (Kvp.Key != Player.LocalName)
+                        if (Kvp.Key != Player.Profile.Name)
                         {
                             //PlayerNodes[Kvp.Key].Position = Kvp.Value.Position;
                             Tween tween = GetTree().CreateTween();
@@ -277,30 +279,31 @@ namespace horizoncraft.script
             CilentTicked?.Invoke();
 
             //删除不可见玩家对象
-            if ((WorldService is WorldHostService || WorldService is WorldSingleService) && player.playerData != null &&
-                WorldService is WorldBase worldBase)
+            if (WorldService is WorldClientService && player.playerData != null)
             {
-                foreach (var Kvp in worldBase.Players)
+                foreach (var Kvp in WorldService.Players)
                 {
                     //删除玩家节点
-                    if (Kvp.Key != Player.LocalName)
+                    if (Kvp.Key != Player.Profile.Name)
                     {
                         PlayerData playerData = Kvp.Value;
                         if (
-                            Math.Abs(player.playerData.ChunkCoord.X - player.playerData.ChunkCoord.X) >
+                            Math.Abs(playerData.ChunkCoord.X - player.playerData.ChunkCoord.X) >
                             WorldService.LoadHorizon ||
-                            Math.Abs(player.playerData.ChunkCoord.Y - player.playerData.ChunkCoord.Y) >
+                            Math.Abs(playerData.ChunkCoord.Y - player.playerData.ChunkCoord.Y) >
                             WorldService.LoadHorizon
                         )
                         {
-                            worldBase.Players.TryRemove(Kvp.Key, out _);
+                            WorldService.Players.TryRemove(Kvp.Key, out _);
                         }
                     }
                 }
+            }
 
+            if (WorldService is WorldClientService or WorldHostService)
                 foreach (var kvp in PlayerNodes)
                 {
-                    if (!worldBase.Players.ContainsKey(kvp.Key))
+                    if (!WorldService.Players.ContainsKey(kvp.Key))
                     {
                         var p = kvp.Value;
                         RemoveChild(p);
@@ -308,42 +311,68 @@ namespace horizoncraft.script
                         p.QueueFree();
                     }
                 }
-            }
 
             sw.Stop();
             tick_use_time = sw.ElapsedMilliseconds;
         }
 
 
-        public Color GetEnvironmentColor(float t)
+        public byte GetLightChange(float t)
         {
-            var hour = (int)(t * 24f);
-            switch (hour)
+            float hour = t * 24f;
+            if (hour < 5f || hour >= 20f)
+                return 200;
+            else if (hour >= 5f && hour < 8f)
+                return (byte)(200 * (1f - (hour - 5f) / 3f));
+            else if (hour >= 8f && hour < 17f)
+                return 0;
+            else
+                return (byte)(200 * ((hour - 17f) / 3f));
+        }
+
+        public Color GetSkyChange(float t)
+        {
+            float hour = t * 24f;
+
+            if (hour >= 0 && hour < 6) // 00:00 - 06:00：深夜到黎明
             {
-                case > 20 or < 5:
-                    return Color.Color8(0, 0, 0, 222);
-                case >= 5 and < 8:
-                    return Color.Color8(0, 0, 0, (byte)(222 * (1f - (t - (5f / 24f)) / (3f / 24f))));
-                case >= 8 and <= 17:
-                    return Color.Color8(0, 0, 0, 0);
-                case > 17 and <= 20:
-                    return Color.Color8(0, 0, 0, (byte)(222 * (((17f / 24f) / (3f / 24f))-t)));
-                default:
-                    return Color.Color8(0, 0, 0, 0);
+                float p = hour / 6f;
+                byte r = (byte)Math.Clamp(15 + p * (25 - 15), 0, 255);
+                byte g = (byte)Math.Clamp(25 + p * (55 - 25), 0, 255);
+                byte b = (byte)Math.Clamp(55 + p * (135 - 55), 0, 255);
+                return Color.Color8(r, g, b);
             }
+
+            if (hour >= 6 && hour < 12) // 06:00 - 12:00：黎明到正午
+            {
+                float p = (hour - 6f) / 6f;
+                byte r = (byte)Math.Clamp(25 + p * (135 - 25), 0, 255);
+                byte g = (byte)Math.Clamp(55 + p * (175 - 55), 0, 255);
+                byte b = (byte)Math.Clamp(135 + p * (255 - 135), 0, 255);
+                return Color.Color8(r, g, b);
+            }
+
+            if (hour >= 12 && hour < 18) // 12:00 - 18:00：正午到傍晚
+            {
+                float p = (hour - 12f) / 6f;
+                byte r = (byte)Math.Clamp(135 + p * (255 - 135), 0, 255);
+                byte g = (byte)Math.Clamp(175 + p * (135 - 175), 0, 255);
+                byte b = (byte)Math.Clamp(255 + p * (0 - 255), 0, 255);
+                return Color.Color8(r, g, b);
+            }
+
+            if (hour >= 18 && hour < 24) // 18:00 - 24:00：傍晚到深夜
+            {
+                float p = (hour - 18f) / 6f;
+                byte r = (byte)Math.Clamp(255 + p * (15 - 255), 0, 255);
+                byte g = (byte)Math.Clamp(135 + p * (25 - 135), 0, 255);
+                byte b = (byte)Math.Clamp(0 + p * (55 - 0), 0, 255);
+                return Color.Color8(r, g, b);
+            }
+
+            return Color.Color8(255, 255, 255);
         }
-        public Color GetEnvironmentColorV2(float t)
-        {
-            float hour = t * 24f; // 使用浮点数精确比较
-            if (hour < 5f || hour >= 20f) // 夜晚: [20:00-24:00) + [00:00-05:00)
-                return Color.Color8(0, 0, 0, 200);
-            else if (hour >= 5f && hour < 8f) // 日出: [05:00-08:00)
-                return Color.Color8(0, 0, 0, (byte)(200 * (1f - (hour - 5f) / 3f)));
-            else if (hour >= 8f && hour < 17f) // 白天: [08:00-17:00)
-                return Color.Color8(0, 0, 0, 0);
-            else // 日落: [17:00-20:00)
-                return Color.Color8(0, 0, 0, (byte)(200 * ((hour - 17f) / 3f)));
-        }
+
 
         public static Vector2I MathFloor(Vector3I V3I, int chunkSize)
         {

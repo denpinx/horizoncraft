@@ -36,10 +36,22 @@ shape = SubResource("RectangleShape2D_rnaqb")
 scale = Vector2(0.125, 0.125)
 texture = ExtResource("1_qob58")
 
+[node name="Timer_Tick" type="Timer" parent="."]
+wait_time = 0.05
+autostart = true
+
+[node name="Label_PlayerName" type="Label" parent="."]
+offset_left = -25.0
+offset_top = -65.0
+offset_right = 34.0
+offset_bottom = -42.0
+text = "[player]"
+
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-layer = 100
+layer = 2
 
 [node name="Control" type="Control" parent="CanvasLayer"]
+z_index = 2
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -48,6 +60,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
+mouse_filter = 1
 
 [node name="Label_DEBUG_Left" type="Label" parent="CanvasLayer/Control"]
 visible = false
@@ -103,14 +116,3 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
 text = "调试信息右"
 horizontal_alignment = 2
-
-[node name="Timer_Tick" type="Timer" parent="."]
-wait_time = 0.05
-autostart = true
-
-[node name="Label_PlayerName" type="Label" parent="."]
-offset_left = -25.0
-offset_top = -65.0
-offset_right = 34.0
-offset_bottom = -42.0
-text = "[player]"

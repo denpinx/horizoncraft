@@ -70,4 +70,14 @@ public partial class World
     {
         WorldService.SetBlock(new(x, y, z), Materials.Valueof(id), false, state);
     }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void UpdateChunk(int x, int y)
+    {
+        var pos = new Vector2I(x, y);
+        if (WorldService.Chunks.ContainsKey(pos))
+        {
+            WorldService.Chunks[pos].update_server = true;
+        }
+    }
 }

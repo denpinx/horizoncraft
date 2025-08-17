@@ -22,64 +22,58 @@ region = Rect2(0, 32, 128, 32)
 
 [node name="World" instance=ExtResource("1_n4w62")]
 script = ExtResource("2_lvpjg")
-metadata/_edit_vertical_guides_ = [512.0, 640.0]
-metadata/_edit_horizontal_guides_ = [340.0, 372.0, 332.0, 380.0]
+metadata/_edit_horizontal_guides_ = [372.0]
+metadata/_edit_vertical_guides_ = [448.0, 704.0]
 
-[node name="Player" parent="." index="0"]
+[node name="Player" parent="." index="1"]
 position = Vector2(0, 0)
 
-[node name="CanvasLayer2" type="CanvasLayer" parent="." index="4"]
+[node name="GuiCanvasLayer" type="CanvasLayer" parent="." index="5"]
+layer = 3
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer2" index="0"]
+[node name="ColorRect" type="ColorRect" parent="GuiCanvasLayer" index="0"]
+z_index = -1
 material = SubResource("ShaderMaterial_8lkrk")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
-[node name="TextEdit" type="TextEdit" parent="CanvasLayer2" index="1"]
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -176.0
-offset_top = 8.0
-offset_right = -11.0
-offset_bottom = 47.0
-grow_horizontal = 0
-placeholder_text = "玩家名"
-
-[node name="Button_Single" type="TextureButton" parent="CanvasLayer2" index="2"]
+[node name="Button_Single" type="TextureButton" parent="GuiCanvasLayer" index="1" node_paths=PackedStringArray("shortcut_context")]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -64.0
-offset_top = -24.0
+offset_top = -16.0
 offset_right = 64.0
-offset_bottom = 8.0
+offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
+focus_neighbor_bottom = NodePath("../Button_Host")
+focus_next = NodePath("../Button_Host")
+shortcut_context = NodePath("../Button_Host")
 texture_normal = SubResource("AtlasTexture_wwbxd")
 texture_pressed = SubResource("AtlasTexture_8lkrk")
 texture_hover = SubResource("AtlasTexture_yxxv2")
 
-[node name="Label" type="Label" parent="CanvasLayer2/Button_Single" index="0"]
+[node name="Label" type="Label" parent="GuiCanvasLayer/Button_Single" index="0"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 text = "单人游戏"
 horizontal_alignment = 1
 vertical_alignment = 1
 metadata/_edit_lock_ = true
 
-[node name="Button_Host" type="TextureButton" parent="CanvasLayer2" index="3"]
+[node name="Button_Host" type="TextureButton" parent="GuiCanvasLayer" index="2" node_paths=PackedStringArray("shortcut_context")]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -93,48 +87,65 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+focus_neighbor_bottom = NodePath("../Button_Connect")
+focus_next = NodePath("../Button_Connect")
+shortcut_context = NodePath("../Button_Connect")
 texture_normal = SubResource("AtlasTexture_wwbxd")
 texture_pressed = SubResource("AtlasTexture_8lkrk")
 texture_hover = SubResource("AtlasTexture_yxxv2")
 
-[node name="Label" type="Label" parent="CanvasLayer2/Button_Host" index="0"]
+[node name="Label" type="Label" parent="GuiCanvasLayer/Button_Host" index="0"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 text = "创建多人游戏"
 horizontal_alignment = 1
 vertical_alignment = 1
 metadata/_edit_lock_ = true
 
-[node name="Button_Connect" type="TextureButton" parent="CanvasLayer2" index="4"]
+[node name="Button_Connect" type="TextureButton" parent="GuiCanvasLayer" index="3" node_paths=PackedStringArray("shortcut_context")]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -64.0
-offset_top = 56.0
+offset_top = 48.0
 offset_right = 64.0
-offset_bottom = 88.0
+offset_bottom = 80.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+focus_neighbor_bottom = NodePath("../Button_Single")
+focus_next = NodePath("../Button_Single")
+shortcut_context = NodePath("../Button_Single")
 texture_normal = SubResource("AtlasTexture_wwbxd")
 texture_pressed = SubResource("AtlasTexture_8lkrk")
 texture_hover = SubResource("AtlasTexture_yxxv2")
 
-[node name="Label" type="Label" parent="CanvasLayer2/Button_Connect" index="0"]
+[node name="Label" type="Label" parent="GuiCanvasLayer/Button_Connect" index="0"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 text = "加入多人游戏"
 horizontal_alignment = 1
 vertical_alignment = 1
 metadata/_edit_lock_ = true
+
+[node name="TextEdit" type="TextEdit" parent="GuiCanvasLayer" index="4"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -165.0
+offset_bottom = 39.0
+grow_horizontal = 0
+placeholder_text = "玩家名"

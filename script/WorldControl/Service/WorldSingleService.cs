@@ -137,7 +137,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
             return false;
         }
 
-        if (name == Player.LocalName && world.player.playerData != null)
+        if (name == Player.Profile.Name && world.player.playerData != null)
         {
             playerdata = world.player.playerData;
             return true;
@@ -149,22 +149,22 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
             return true;
         }
 
-        if (sqliteConnection.CheckPlayerExists(Player.LocalName))
+        if (sqliteConnection.CheckPlayerExists(Player.Profile.Name))
         {
-            PlayerData player = sqliteConnection.GetPlayerByteData(Player.LocalName);
-            player.Name = Player.LocalName;
+            PlayerData player = sqliteConnection.GetPlayerByteData(Player.Profile.Name);
+            player.Name = Player.Profile.Name;
             Players[player.Name] = player;
-            GD.Print($"[{TickTimes}] 加载玩家数据:({Player.LocalName})");
+            GD.Print($"[{TickTimes}] 加载玩家数据:({Player.Profile.Name})");
             LoadingPlayers.Clear();
         }
         else
         {
             PlayerData player = new PlayerData()
             {
-                Name = Player.LocalName
+                Name = Player.Profile.Name
             };
-            Players[Player.LocalName] = player;
-            GD.Print($"[{TickTimes}] 新建玩家数据:({Player.LocalName})");
+            Players[Player.Profile.Name] = player;
+            GD.Print($"[{TickTimes}] 新建玩家数据:({Player.Profile.Name})");
             LoadingPlayers.Clear();
         }
 

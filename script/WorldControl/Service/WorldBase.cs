@@ -52,6 +52,8 @@ public class WorldBase
     /// </summary>
     public ConcurrentDictionary<Vector2I, WorkBase> LoadChunkQueue = new();
 
+    public Dictionary<Vector2I, int> UnloadCount = new();
+
     public bool Lock = false;
     public World world;
 
@@ -145,6 +147,21 @@ public class WorldBase
                     if (Chunks.ContainsKey(coord))
                     {
                         world.VisibleChunks[coord] = Chunks[coord];
+                        UnloadCount.Remove(coord);
+                    }
+                    else
+                    {
+                        if (UnloadCount.ContainsKey(coord))
+                            UnloadCount[coord] += 1;
+                        else UnloadCount[coord] = 1;
+
+                        if (UnloadCount[coord] == 40)
+                        {
+                            if (Connect)
+                            {
+                                world.RpcId(1, "UpdateChunk", X, Y);
+                            }
+                        }
                     }
                 }
             }
@@ -166,6 +183,7 @@ public class WorldBase
                 || !Chunks.ContainsKey(coord)
             )
             {
+                UnloadCount.Remove(coord);
                 keysToRemove.Add(coord);
             }
         }
@@ -175,4 +193,7 @@ public class WorldBase
             world.VisibleChunks.Remove(key, out _);
         }
     }
+
+    public float GetTimeProgress() => (float)(TickTimes % DayTimeMax) / DayTimeMax;
+    public float GetTimeHour() => GetTimeProgress() * 24f;
 }

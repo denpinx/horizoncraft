@@ -41,11 +41,8 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
     private Task SyncChunkTask;
 
     //其他异步相关的处理结果
-    private ConcurrentQueue<(int, byte[])> PlayerSyncChunksCollection = new();
-
-    public WorldHostService()
-    {
-    }
+    private ConcurrentQueue<(int, byte[])> ChunkPacks = new();
+    private ConcurrentQueue<(int, byte[])> PlayerPacks = new();
 
     public bool Init()
     {
@@ -112,13 +109,14 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
 
         foreach (Vector2I coord in Chunks.Keys)
         {
+            //当前区块不在所有玩家视野内,则保存卸载
             if (!LoadChunkQueue.ContainsKey(coord))
             {
                 Chunk chunk = Chunks[coord];
                 OffloadChunkQueue[coord] = chunk;
                 Chunks.TryRemove(coord, out _);
             }
-            else
+            else //已存在,取消加载
             {
                 LoadChunkQueue.TryRemove(coord, out _);
             }
@@ -215,7 +213,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
             return false;
         }
 
-        if (name == Player.LocalName && world.player.playerData != null)
+        if (name == Player.Profile.Name && world.player.playerData != null)
         {
             playerData = world.player.playerData;
             return true;
@@ -256,27 +254,32 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                         Math.Abs((pd1.ChunkCoord.Y - pd2.ChunkCoord.Y)) <= LoadHorizon
                     )
                     {
-                        if (pd1.Name != Player.LocalName)
-                            world.RpcId(pd1.PeerId, "UpdataPosition", pd2.Name, pd2.Position.X, pd2.Position.Y);
+                        if (pd1.Name != Player.Profile.Name)
+                            world.RpcId(pd1.PeerId, "RecivePlayer", PlayerData.ToBytes(pd2));
                     }
                 }
             }
+
+            // if (Fs.Value.Name != Player.Profile.Name)
+            // {
+            //     world.RpcId(Fs.Value.PeerId, "ReciveWorldTime", TickTimes);
+            // }
         }
 
-        foreach (var Ts in Players)
-        {
-            if (Player.LocalName != Ts.Key)
-            {
-                PlayerData pd2 = Ts.Value;
-                if (
-                    Math.Abs(world.player.playerData.ChunkCoord.X - pd2.ChunkCoord.X) <= TileMapHorizon &&
-                    Math.Abs(world.player.playerData.ChunkCoord.Y - pd2.ChunkCoord.Y) <= TileMapHorizon
-                )
-                {
-                    world.RpcId(pd2.PeerId, "RecivePlayer", PlayerData.ToBytes(world.player.playerData));
-                }
-            }
-        }
+        // foreach (var Ts in Players)
+        // {
+        //     if (Player.LocalName != Ts.Key)
+        //     {
+        //         PlayerData pd2 = Ts.Value;
+        //         if (
+        //             Math.Abs(world.player.playerData.ChunkCoord.X - pd2.ChunkCoord.X) <= TileMapHorizon &&
+        //             Math.Abs(world.player.playerData.ChunkCoord.Y - pd2.ChunkCoord.Y) <= TileMapHorizon
+        //         )
+        //         {
+        //             world.RpcId(pd2.PeerId, "RecivePlayer", PlayerData.ToBytes(world.player.playerData));
+        //         }
+        //     }
+        // }
 
         stopwatch.Stop();
         SyncPlayerTime.X = stopwatch.ElapsedMilliseconds;
@@ -290,7 +293,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         if (!ServerOn) return;
 
         stopwatch.Restart();
-        Dictionary<int, PlayerSyncChunks> syncmap = new();
+        Dictionary<int, ChunkPack> syncmap = new();
 
         Interlocked.CompareExchange(ref SyncChunkTask, Task.Run((() =>
         {
@@ -305,11 +308,11 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                         PlayerData pd1 = playerset.Value;
                         //按距离同步
                         if (
-                            Math.Abs((chunk.X - pd1.ChunkCoord.X)) <= TileMapHorizon &&
-                            Math.Abs((chunk.Y - pd1.ChunkCoord.Y)) <= TileMapHorizon
+                            Math.Abs(chunk.X - pd1.ChunkCoord.X) <= LoadHorizon &&
+                            Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= LoadHorizon
                         )
                         {
-                            if (pd1.Name != Player.LocalName)
+                            if (pd1.Name != Player.Profile.Name)
                             {
                                 if (syncmap.ContainsKey(pd1.PeerId))
                                 {
@@ -317,7 +320,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                                 }
                                 else
                                 {
-                                    syncmap[pd1.PeerId] = new PlayerSyncChunks()
+                                    syncmap[pd1.PeerId] = new ChunkPack()
                                     {
                                         Chunks = new()
                                         {
@@ -335,18 +338,18 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
 
             foreach (var key in syncmap.Keys)
             {
-                PlayerSyncChunksCollection.Enqueue((key, PlayerSyncChunks.ToBytes(syncmap[key])));
+                ChunkPacks.Enqueue((key, ChunkPack.ToBytes(syncmap[key])));
             }
         })), null);
 
-        if (SyncChunkTask != null && SyncChunkTask.IsCompleted && !PlayerSyncChunksCollection.IsEmpty)
+        if (SyncChunkTask != null && SyncChunkTask.IsCompleted && !ChunkPacks.IsEmpty)
         {
-            foreach (var variabl in PlayerSyncChunksCollection)
+            foreach (var variabl in ChunkPacks)
             {
                 world.RpcId(variabl.Item1, "ReciveChunkPack", variabl.Item2);
             }
 
-            PlayerSyncChunksCollection.Clear();
+            ChunkPacks.Clear();
         }
 
 

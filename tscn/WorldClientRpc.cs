@@ -20,7 +20,7 @@ public partial class World
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void ReciveChunkPack(byte[] data)
     {
-        PlayerSyncChunks sync = PlayerSyncChunks.FromBytes(data);
+        ChunkPack sync = ChunkPack.FromBytes(data);
         for (int i = 0; i < sync.Chunks.Count; i++)
             WorldService.Chunks[sync.Chunks[i].coord] = sync.Chunks[i];
     }
@@ -28,7 +28,7 @@ public partial class World
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void ReciveWorldTime(int time)
     {
-        this.WorldService.TickTimes = tick_use_time;
+        WorldService.TickTimes = time;
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
@@ -37,7 +37,7 @@ public partial class World
         if (WorldService is WorldBase worldBase)
         {
             PlayerData playerData = PlayerData.FromBytes(data);
-            if (playerData.Name == Player.LocalName)
+            if (playerData.Name == Player.Profile.Name)
             {
                 player.playerData = playerData;
                 player.playerData.player = player;

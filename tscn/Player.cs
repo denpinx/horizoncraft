@@ -6,6 +6,7 @@ using Godot;
 using Godot.Collections;
 using horizoncraft.script;
 using horizoncraft.script.Components;
+using horizoncraft.script.Config;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Features;
 using horizoncraft.script.WorldControl;
@@ -14,7 +15,7 @@ using HorizonCraft.script.WorldControl.Service;
 
 public partial class Player : CharacterBody2D
 {
-    public static string LocalName = "Player";
+    public static PlayerProfile Profile;
     public static List<Func<string>> GetInformation = new List<Func<string>>();
 
     //
@@ -143,12 +144,13 @@ public partial class Player : CharacterBody2D
             Text.AppendLine($"当前方块坐标: {MCcoord.X},{MCcoord.Y} ");
             Text.AppendLine($"World.Tick耗时: {world.tick_use_time}MS");
             Text.AppendLine($"ChunkManage.Tick耗时: {world.WorldService.TickConsuming}MS");
+            Text.AppendLine($"加载失败计数: {world.WorldService.UnloadCount.Count}");
 
 
             if (world.WorldService is WorldHostService hostserver)
             {
-                Text.AppendLine($"区块同步耗时: {hostserver.SyncChunkTime.X} max: {hostserver.SyncChunkTime.Y}");
-                Text.AppendLine($"玩家同步耗时: {hostserver.SyncPlayerTime.X} max: {hostserver.SyncPlayerTime.Y}");
+                Text.AppendLine($"区块同步耗时: {hostserver.SyncChunkTime.X}ms max: {hostserver.SyncChunkTime.Y} ms");
+                Text.AppendLine($"玩家同步耗时: {hostserver.SyncPlayerTime.X}ms max: {hostserver.SyncPlayerTime.Y} ms");
             }
 
 

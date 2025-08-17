@@ -7,6 +7,21 @@
 [node name="World" type="Node2D"]
 script = ExtResource("1_oo2r5")
 
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ColorRect_Top" type="ColorRect" parent="CanvasLayer"]
+top_level = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0)
+
+[node name="Player" parent="." instance=ExtResource("2_hb80g")]
+position = Vector2(603, 327)
+
 [node name="CanvasLayer_Back" type="CanvasLayer" parent="."]
 layer = -1
 
@@ -18,9 +33,6 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("3_ip2ov")
 
-[node name="Player" parent="." instance=ExtResource("2_hb80g")]
-position = Vector2(603, 327)
-
 [node name="Timer_Tick" type="Timer" parent="."]
 wait_time = 0.05
 autostart = true
@@ -30,14 +42,3 @@ rotation = -0.686326
 blend_mode = 2
 shadow_enabled = true
 shadow_color = Color(0, 0, 0, 0.282353)
-
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="ColorRect_Top" type="ColorRect" parent="CanvasLayer"]
-top_level = true
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 1)

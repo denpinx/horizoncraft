@@ -2,6 +2,8 @@ using Godot;
 using horizoncraft.script;
 using horizoncraft.script.WorldControl;
 using System;
+using Godot.Collections;
+using horizoncraft.script.Config;
 
 public partial class MainMenu : World
 {
@@ -11,12 +13,13 @@ public partial class MainMenu : World
     public override void _Ready()
     {
         worldMode = WorldMode.Preview;
+        LoadProfile();
         base._Ready();
-        
-        ButtonSingle = GetNode<TextureButton>("CanvasLayer2/Button_Single");
-        ButtonHost = GetNode<TextureButton>("CanvasLayer2/Button_Host");
-        ButtonConnect = GetNode<TextureButton>("CanvasLayer2/Button_Connect");
-        TextEdit = GetNode<TextEdit>("CanvasLayer2/TextEdit");
+
+        ButtonSingle = GetNode<TextureButton>("GuiCanvasLayer/Button_Single");
+        ButtonHost = GetNode<TextureButton>("GuiCanvasLayer/Button_Host");
+        ButtonConnect = GetNode<TextureButton>("GuiCanvasLayer/Button_Connect");
+        TextEdit = GetNode<TextEdit>("GuiCanvasLayer/TextEdit");
 
         ButtonSingle.Pressed += () =>
         {
@@ -33,8 +36,12 @@ public partial class MainMenu : World
             worldMode = WorldMode.MultiplayerClient;
             GetTree().ChangeSceneToFile("res://tscn/world.tscn");
         };
-        TextEdit.TextChanged += () => { Player.LocalName = TextEdit.Text; };
-        Player.LocalName = "玩家" + new Random().Next();
+        TextEdit.Text = Player.Profile.Name;
+        TextEdit.TextChanged += () =>
+        {
+            Player.Profile.Name = TextEdit.Text;
+            SaveProfile();
+        };
     }
 
     public override void _PhysicsProcess(double delta)
@@ -43,6 +50,44 @@ public partial class MainMenu : World
         player.Inputable = false;
         base._PhysicsProcess(delta);
         player.Position += Vector2.Left * 1;
-        if(TextEdit!=null)TextEdit.PlaceholderText = Player.LocalName;
+    }
+
+    public override void _ExitTree()
+    {
+        SaveProfile();
+    }
+
+    private static void LoadProfile()
+    {
+        if (!DirAccess.DirExistsAbsolute($"profile"))
+        {
+            DirAccess.MakeDirAbsolute($"profile");
+        }
+
+        if (!FileAccess.FileExists("profile/player.json"))
+        {
+            Player.Profile = new PlayerProfile()
+            {
+                Name = "玩家" + new Random().Next()
+            };
+            SaveProfile();
+            return;
+        }
+
+        FileAccess fs = FileAccess.Open("profile/player.json", FileAccess.ModeFlags.Read);
+        var json_text = fs.GetAsText();
+        fs.Close();
+        PlayerProfile profile = new();
+        profile.ParseDictionary((Dictionary)Json.ParseString(json_text));
+        Player.Profile = profile;
+    }
+
+    private static void SaveProfile()
+    {
+        if (!DirAccess.DirExistsAbsolute($"profile"))
+            DirAccess.MakeDirAbsolute($"profile");
+        FileAccess fs = FileAccess.Open("profile/player.json", FileAccess.ModeFlags.Write);
+        fs.StoreString(Json.Stringify(Player.Profile.ToDictionary()));
+        fs.Close();
     }
 }
