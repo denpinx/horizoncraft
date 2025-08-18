@@ -1,15 +1,24 @@
+using System;
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Features;
+using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Tool;
 
 namespace HorizonCraft.script.WorldControl.Service;
 
-public class WorldClientService : WorldBase, IWorldService, IWorldTickable
+public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWorldClientService
 {
     private const int Port = 9999;
+
+
+    public ConcurrentQueue<byte[]> ReciveChunkPacks = new();
+    public Task ProcessReciveDataTask;
 
     public bool Init()
     {
@@ -130,6 +139,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable
         if (!Connect) return;
         TickTimes++;
         if (world.player.playerData != null) SavePlayer(world.player.playerData);
+        ProcessDataRecive();
         UpdateLoadChunkCoords();
         UpdataTileMap();
     }
@@ -144,5 +154,36 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable
         }
 
         base.SetBlock(coord, meta, replaceAir, state);
+    }
+
+    public void ProcessDataRecive()
+    {
+        if (!Connect) return;
+        if (!ReciveChunkPacks.IsEmpty)
+            Interlocked.CompareExchange(ref ProcessReciveDataTask, Task.Run(() =>
+            {
+                byte[][] bytes = new byte[ReciveChunkPacks.Count][];
+                ReciveChunkPacks.CopyTo(bytes, 0);
+                ReciveChunkPacks.Clear();
+                foreach (byte[] data in bytes)
+                {
+                    ChunkUpDataPackSet sync = ChunkUpDataPackSet.FromBytes(data);
+                    for (int i = 0; i < sync.packs.Count; i++)
+                    {
+                        ChunkUpdataPack cup = sync.packs[i];
+                        var coord = new Vector2I(cup.x, cup.y);
+                        if (Chunks.ContainsKey(coord))
+                        {
+                            for (int j = 0; j < cup.updates.Count; j++)
+                            {
+                                Chunks[coord][cup.updates[j].x, cup.updates[j].y, cup.updates[j].z]
+                                    .SetMeta(cup.updates[j].id);
+                                Chunks[coord][cup.updates[j].x, cup.updates[j].y, cup.updates[j].z].STATE =
+                                    cup.updates[j].state;
+                            }
+                        }
+                    }
+                }
+            }), null);
     }
 }

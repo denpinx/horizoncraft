@@ -55,10 +55,16 @@ namespace horizoncraft.script.WorldControl
         {
         }
 
+        public void SetMeta(int id)
+        {
+            SetMeta(Materials.Valueof(id));
+        }
+
         public void SetMeta(string name)
         {
             SetMeta(Materials.Valueof(name));
         }
+
         public void SetMeta(BlockMeta meta)
         {
             this.BlockMeta = meta;

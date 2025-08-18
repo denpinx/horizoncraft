@@ -42,6 +42,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
 
     //其他异步相关的处理结果
     private ConcurrentQueue<(int, byte[])> ChunkPacks = new();
+    private ConcurrentQueue<(int, byte[])> ChunkUpdataPacks = new();
     private ConcurrentQueue<(int, byte[])> PlayerPacks = new();
 
     public bool Init()
@@ -72,6 +73,16 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         world.Multiplayer.MultiplayerPeer = peer;
         ServerOn = true;
         sqliteConnection = SqliteTool.InitSqlite();
+        if (sqliteConnection.CheckWorldProfileExists("WorldProfile"))
+        {
+            Profile = sqliteConnection.GetWorldProfileByteData("WorldProfile");
+            TickTimes = Profile.Time;
+        }
+        else
+        {
+            Profile = new WorldProfile();
+        }
+
         return true;
     }
 
@@ -293,16 +304,49 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         if (!ServerOn) return;
 
         stopwatch.Restart();
-        Dictionary<int, ChunkPack> syncmap = new();
-
         Interlocked.CompareExchange(ref SyncChunkTask, Task.Run((() =>
         {
+            Dictionary<int, ChunkPack> syncmap = new();
+            Dictionary<int, ChunkUpDataPackSet> syncmap_updata = new();
             foreach (var chunkset in Chunks)
             {
-                //脏标记
-                if (chunkset.Value.update_server || chunkset.Value.update_tilemap)
+                Chunk chunk = chunkset.Value;
+                //更新区块
+                if (chunk.pack.updates.Count > 0)
                 {
-                    Chunk chunk = chunkset.Value;
+                    foreach (var playerset in Players)
+                    {
+                        PlayerData pd1 = playerset.Value;
+                        //按距离同步
+                        if (
+                            Math.Abs(chunk.X - pd1.ChunkCoord.X) <= TileMapHorizon &&
+                            Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= TileMapHorizon
+                        )
+                        {
+                            if (pd1.Name != Player.Profile.Name)
+                            {
+                                if (syncmap_updata.ContainsKey(pd1.PeerId))
+                                {
+                                    syncmap_updata[pd1.PeerId].packs.Add(chunk.pack);
+                                }
+                                else
+                                {
+                                    syncmap_updata[pd1.PeerId] = new ChunkUpDataPackSet()
+                                    {
+                                        packs = new()
+                                        {
+                                            chunk.pack
+                                        }
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //脏标记
+                if (chunkset.Value.update_server)
+                {
                     foreach (var playerset in Players)
                     {
                         PlayerData pd1 = playerset.Value;
@@ -340,16 +384,34 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
             {
                 ChunkPacks.Enqueue((key, ChunkPack.ToBytes(syncmap[key])));
             }
+
+            foreach (var key in syncmap_updata.Keys)
+            {
+                ChunkUpdataPacks.Enqueue((key, ChunkUpDataPackSet.ToBytes(syncmap_updata[key])));
+            }
         })), null);
 
-        if (SyncChunkTask != null && SyncChunkTask.IsCompleted && !ChunkPacks.IsEmpty)
+        if (SyncChunkTask != null && SyncChunkTask.IsCompleted)
         {
-            foreach (var variabl in ChunkPacks)
+            if (!ChunkPacks.IsEmpty)
             {
-                world.RpcId(variabl.Item1, "ReciveChunkPack", variabl.Item2);
+                foreach (var variabl in ChunkPacks)
+                {
+                    world.RpcId(variabl.Item1, "ReciveChunkPack", variabl.Item2);
+                }
+
+                ChunkPacks.Clear();
             }
 
-            ChunkPacks.Clear();
+            if (!ChunkUpdataPacks.IsEmpty)
+            {
+                foreach (var variabl in ChunkUpdataPacks)
+                {
+                    world.RpcId(variabl.Item1, "ReciveChunkUpdatePack", variabl.Item2);
+                }
+
+                ChunkUpdataPacks.Clear();
+            }
         }
 
 
@@ -373,6 +435,15 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
             sqliteConnection.InsertPlayerByteValue(playerData.Name, playerData);
     }
 
+    public void SaveWorldProfile(WorldProfile worldProfile)
+    {
+        if (!ServerOn) return;
+        if (sqliteConnection.CheckWorldProfileExists("WorldProfile"))
+            sqliteConnection.UpdateWorldProfileByteData("WorldProfile", worldProfile);
+        else
+            sqliteConnection.InsertWorldProfileByteValue("WorldProfile", worldProfile);
+    }
+
     public void SaveChunk(Chunk chunk)
     {
         if (!ServerOn) return;
@@ -390,6 +461,8 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
 
         foreach (var playerset in Players)
             SavePlayer(playerset.Value);
+        Profile.Time = TickTimes;
+        SaveWorldProfile(Profile);
     }
 
     public void Tick()

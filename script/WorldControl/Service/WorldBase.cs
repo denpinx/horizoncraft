@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Features;
+using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.work;
 using Microsoft.Data.Sqlite;
@@ -16,8 +17,9 @@ public class WorldBase
     public Action<WorldBase, Chunk> OnChunkLoaded;
 
     public Action<WorldBase, Chunk> OnChunkUnLoading;
-
+    
     //
+    public WorldProfile Profile;
     public bool Connect = false;
     public bool ServerOn = false;
     public long DayTimeMax = 20 * 60;
@@ -72,14 +74,32 @@ public class WorldBase
             {
                 if (chunk[LocalCoord.X, LocalCoord.Y, coord.Z].IsMeta("air"))
                 {
-                    chunk[LocalCoord.X, LocalCoord.Y, coord.Z] = meta.Blockdata();
+                    chunk[LocalCoord.X, LocalCoord.Y, coord.Z].SetMeta(meta);
                     chunk[LocalCoord.X, LocalCoord.Y, coord.Z].STATE = state;
+                    chunk.pack_buffer.updates.Add(new BlockSnapshot()
+                    {
+                        x = (byte)LocalCoord.X,
+                        y = (byte)LocalCoord.Y,
+                        z = (byte)coord.Z,
+                        id = (byte)meta.ID,
+                        state = (byte)state
+                    });
+                    chunk.update_tilemap = true;
                 }
             }
             else
             {
-                chunk[LocalCoord.X, LocalCoord.Y, coord.Z] = meta.Blockdata();
+                chunk[LocalCoord.X, LocalCoord.Y, coord.Z].SetMeta(meta);
                 chunk[LocalCoord.X, LocalCoord.Y, coord.Z].STATE = state;
+                chunk.pack_buffer.updates.Add(new BlockSnapshot()
+                {
+                    x = (byte)LocalCoord.X,
+                    y = (byte)LocalCoord.Y,
+                    z = (byte)coord.Z,
+                    id = (byte)meta.ID,
+                    state = (byte)state
+                });
+                chunk.update_tilemap = true;
             }
         }
         else

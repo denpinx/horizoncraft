@@ -27,7 +27,6 @@ public partial class Player : CharacterBody2D
     public bool Inputable = true;
     public bool MoreInfo = false;
     [Export] public int mode = 0;
-
     [Export] public bool fly = true;
     public bool Stop = false;
     Camera2D camera2d;
@@ -78,10 +77,6 @@ public partial class Player : CharacterBody2D
 
             if (LastFramIsLeft)
             {
-                // world.chunkManage.SetBlock(
-                //     new(Mousecoord.X, Mousecoord.Y, 1),
-                //     Materials.Valueof("stone")
-                // );
             }
             else
             {
@@ -97,7 +92,7 @@ public partial class Player : CharacterBody2D
         {
             world.WorldService.SetBlock(
                 new(Mousecoord.X, Mousecoord.Y, 1),
-                Materials.Valueof("air")
+                Materials.Valueof("air"), false, 0
             );
         }
     }
@@ -128,54 +123,6 @@ public partial class Player : CharacterBody2D
             if (_worldBase_.Players.ContainsKey(playerData.Name))
                 _worldBase_.Players[playerData.Name].Position = playerData.Position;
         }
-
-
-        if (MoreInfo && Inputable && world.WorldService is WorldBase worldBase)
-        {
-            Label_DEBUG_Left.Text = "";
-            StringBuilder Text = new StringBuilder();
-            Text.AppendLine($"全局A坐标：{playerData.Coord.X},{playerData.Coord.Y}");
-            Text.AppendLine($"区块坐标：{playerData.ChunkCoord.X},{playerData.ChunkCoord.Y}");
-            Text.AppendLine($"加载区块：{world.WorldService.Chunks.Count}");
-            Text.AppendLine($"正在加载：{world.WorldService.LoadChunkQueue.Count}");
-            Text.AppendLine($"TileMap: {world.tileMapLayerChunks.Count}");
-            Text.AppendLine($"显示区块: {world.VisibleChunks.Count}");
-            Text.AppendLine($"鼠标位置: {Mcoord.X},{Mcoord.Y} ");
-            Text.AppendLine($"当前方块坐标: {MCcoord.X},{MCcoord.Y} ");
-            Text.AppendLine($"World.Tick耗时: {world.tick_use_time}MS");
-            Text.AppendLine($"ChunkManage.Tick耗时: {world.WorldService.TickConsuming}MS");
-            Text.AppendLine($"加载失败计数: {world.WorldService.UnloadCount.Count}");
-
-
-            if (world.WorldService is WorldHostService hostserver)
-            {
-                Text.AppendLine($"区块同步耗时: {hostserver.SyncChunkTime.X}ms max: {hostserver.SyncChunkTime.Y} ms");
-                Text.AppendLine($"玩家同步耗时: {hostserver.SyncPlayerTime.X}ms max: {hostserver.SyncPlayerTime.Y} ms");
-            }
-
-
-            Text.AppendLine($"时间: {world.WorldService.TickTimes}");
-            Text.AppendLine($"在线玩家: {worldBase.Players.Count}");
-            Text.AppendLine($"加载玩家实体: {world.PlayerNodes.Count}");
-
-            foreach (Func<string> func in GetInformation)
-                Text.AppendLine(func());
-            Label_DEBUG_Left.Text = Text.ToString();
-            StringBuilder right = new StringBuilder();
-            foreach (var sets in worldBase.Players)
-            {
-                right.AppendLine(
-                    $"在线玩家[{sets.Key}] 坐标:[{sets.Value.ChunkCoord.X},{sets.Value.ChunkCoord.Y}],id{sets.Value.PeerId}");
-            }
-
-            foreach (var sets in world.WorldService.LoadingPlayers)
-            {
-                right.AppendLine($"待加载信息:玩家[{sets}]");
-            }
-
-            Label_DEBUG_Right.Text = right.ToString();
-        }
-
 
         //防止加载地形的时候卡墙里
         if (world == null || !world.WorldService.Chunks.ContainsKey(ChunkCoord))
@@ -254,6 +201,57 @@ public partial class Player : CharacterBody2D
         }
     }
 
+    public void UpdateGui()
+    {
+        if (MoreInfo && Inputable && world.WorldService is WorldBase worldBase)
+        {
+            Vector2I Mcoord = World.MathFloor((Vector2I)GetGlobalMousePosition(), 16);
+            Vector2I MCcoord = World.MathFloor(Mcoord, Chunk.Size);
+            Label_DEBUG_Left.Text = "";
+            StringBuilder Text = new StringBuilder();
+            Text.AppendLine($"全局A坐标：{playerData.Coord.X},{playerData.Coord.Y}");
+            Text.AppendLine($"区块坐标：{playerData.ChunkCoord.X},{playerData.ChunkCoord.Y}");
+            Text.AppendLine($"加载区块：{world.WorldService.Chunks.Count}");
+            Text.AppendLine($"正在加载：{world.WorldService.LoadChunkQueue.Count}");
+            Text.AppendLine($"TileMap: {world.tileMapLayerChunks.Count}");
+            Text.AppendLine($"显示区块: {world.VisibleChunks.Count}");
+            Text.AppendLine($"鼠标位置: {Mcoord.X},{Mcoord.Y} ");
+            Text.AppendLine($"当前方块坐标: {MCcoord.X},{MCcoord.Y} ");
+            Text.AppendLine($"World.Tick耗时: {world.tick_use_time}MS");
+            Text.AppendLine($"ChunkManage.Tick耗时: {world.WorldService.TickConsuming}MS");
+            Text.AppendLine($"加载失败计数: {world.WorldService.UnloadCount.Count}");
+            if (world.WorldService is WorldHostService hostserver)
+            {
+                Text.AppendLine($"区块同步耗时: {hostserver.SyncChunkTime.X}ms max: {hostserver.SyncChunkTime.Y} ms");
+                Text.AppendLine($"玩家同步耗时: {hostserver.SyncPlayerTime.X}ms max: {hostserver.SyncPlayerTime.Y} ms");
+            }
+            if (world.WorldService is WorldClientService wcs)
+            {
+                Text.AppendLine($"接收的增量更新包: {wcs.ReciveChunkPacks.Count}");
+            }
+
+            Text.AppendLine($"时间: {world.WorldService.TickTimes}");
+            Text.AppendLine($"在线玩家: {worldBase.Players.Count}");
+            Text.AppendLine($"加载玩家实体: {world.PlayerNodes.Count}");
+            foreach (Func<string> func in GetInformation)
+                Text.AppendLine(func());
+            Label_DEBUG_Left.Text = Text.ToString();
+            StringBuilder right = new StringBuilder();
+            foreach (var sets in worldBase.Players)
+            {
+                right.AppendLine(
+                    $"在线玩家[{sets.Key}] 坐标:[{sets.Value.ChunkCoord.X},{sets.Value.ChunkCoord.Y}],id{sets.Value.PeerId}");
+            }
+
+            foreach (var sets in world.WorldService.LoadingPlayers)
+            {
+                right.AppendLine($"待加载信息:玩家[{sets}]");
+            }
+
+            Label_DEBUG_Right.Text = right.ToString();
+        }
+    }
+
     public override void _Ready()
     {
         camera2d = GetNode<Camera2D>("Camera2D");
@@ -263,5 +261,7 @@ public partial class Player : CharacterBody2D
         Timer_Tick = GetNode<Timer>("Timer_Tick");
         if (playerData != null)
             playerData.player = this;
+
+        Timer_Tick.Timeout += UpdateGui;
     }
 }

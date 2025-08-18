@@ -7,6 +7,7 @@ using Godot.Collections;
 using horizoncraft.script.Components;
 using horizoncraft.script.Events;
 using horizoncraft.script.WorldControl;
+
 namespace horizoncraft.script
 {
     public class BlockMeta
@@ -34,6 +35,7 @@ namespace horizoncraft.script
             {
                 if (blockTileDatas[i].state == state) return blockTileDatas[i];
             }
+
             if (blockTileDatas.Count == 1) return blockTileDatas[0];
             else return null;
         }

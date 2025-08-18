@@ -14,6 +14,15 @@ public partial class MainMenu : World
     {
         worldMode = WorldMode.Preview;
         LoadProfile();
+
+        var cmd = OS.GetCmdlineArgs();
+        if (cmd.Length > 0)
+        {
+            Player.Profile.Name = cmd[1];
+            GD.Print($"运行参数：{string.Join(",",cmd)}");
+        }
+
+
         base._Ready();
 
         ButtonSingle = GetNode<TextureButton>("GuiCanvasLayer/Button_Single");

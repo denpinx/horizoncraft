@@ -90,44 +90,43 @@ namespace horizoncraft.script.Components
                     FluidComponent fc = cmp as FluidComponent;
                     BlockMeta blockMeta = Materials.Valueof(fc.BlockName);
 
-                    bool MoveFluid(Blockdata target)
-                    {
-                        if (e.CheckMeta(target, blockMeta))
-                        {
-                            if (target.STATE > e.Blockdata.STATE + 1)
-                            {
-                                target.GetComponent<FluidComponent>("FluidComponent").mobility = true;
-                                target.STATE = e.Blockdata.STATE + 1;
-                                return true;
-                            }
-                        }
-
-                        if (e.CheckMeta(target, Materials.Valueof("air")))
-                        {
-                            target.SetMeta(blockMeta);
-                            target.GetComponent<FluidComponent>("FluidComponent").mobility = true;
-                            target.STATE = e.Blockdata.STATE + 1;
-                            return true;
-                        }
-
-                        return false;
-                    }
-
                     if (e.CheckMeta(e.TopBlock, blockMeta))
                     {
                         e.Blockdata.STATE = 0;
                     }
 
+                    if (fc.mobility && e.Blockdata.STATE < 7)
+                    {
+                        if (e.CheckMeta(e.LeftBlock, blockMeta) && e.LeftBlock.STATE < e.Blockdata.STATE - 1)
+                            e.Blockdata.STATE = e.LeftBlock.STATE + 1;
+                        
+
+                        if (e.CheckMeta(e.RightBlock, blockMeta) && e.RightBlock.STATE < e.Blockdata.STATE - 1)
+                            e.Blockdata.STATE = e.RightBlock.STATE + 1;
+                        
+                    }
+
+
                     if (e.CheckMeta(e.BottomBlock, Materials.Valueof("air")))
                     {
-                        e.BottomBlock.SetMeta(blockMeta);
+                        e.SetBottomBlock(blockMeta, 1);
                         e.BottomBlock.GetComponent<FluidComponent>("FluidComponent").mobility = true;
                     }
-                    else
+
+                    if (e.CheckMeta(e.BottomBlock, blockMeta))
                     {
                         if (e.Blockdata.STATE >= 7) return;
-                        MoveFluid(e.LeftBlock);
-                        MoveFluid(e.RightBlock);
+                        if (e.CheckMeta(e.LeftBlock, Materials.Valueof("air")))
+                        {
+                            e.SetLeftBlock(blockMeta, 1);
+                            e.LeftBlock.GetComponent<FluidComponent>("FluidComponent").mobility = true;
+                        }
+
+                        if (e.CheckMeta(e.RightBlock, Materials.Valueof("air")))
+                        {
+                            e.SetRightBlock(blockMeta, 1);
+                            e.RightBlock.GetComponent<FluidComponent>("FluidComponent").mobility = true;
+                        }
                     }
                 },
             });
@@ -141,22 +140,22 @@ namespace horizoncraft.script.Components
                     BlockMeta air = Materials.Valueof("air");
                     if (e.CheckMeta(e.BottomBlock, air))
                     {
-                        e.BottomBlock.SetMeta(pcmeta);
-                        e.Blockdata.SetMeta(air);
+                        e.SetBottomBlock(pcmeta, 0);
+                        e.SetBlockMeta = air;
                         return;
                     }
                     else if (e.CheckMeta(e.TopBlock, pcmeta))
                     {
                         if (e.CheckMeta(e.LeftBlock, air))
                         {
-                            e.LeftBlock.SetMeta(pcmeta);
-                            e.Blockdata.SetMeta(air);
+                            e.SetLeftBlock(pcmeta, 0);
+                            e.SetBlockMeta = air;
                             return;
                         }
                         else if (e.CheckMeta(e.RightBlock, air))
                         {
-                            e.RightBlock.SetMeta(pcmeta);
-                            e.Blockdata.SetMeta(air);
+                            e.SetRightBlock(pcmeta, 0);
+                            e.SetBlockMeta = air;
                             return;
                         }
                     }

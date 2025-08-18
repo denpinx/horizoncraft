@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="HorizonCraft"
-run/main_scene="res://tscn/world.tscn"
+run/main_scene="uid://b387xrf6eof4w"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 

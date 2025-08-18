@@ -182,6 +182,7 @@ namespace horizoncraft.script
             tileSet.TileSize = new Vector2I(16, 16);
 
             tileSet.AddPhysicsLayer();
+            tileSet.AddOcclusionLayer();
             for (int i = 0; i < blockmetas.Count; i++)
             {
                 BlockMeta meta = blockmetas[i];
@@ -201,7 +202,6 @@ namespace horizoncraft.script
                     {
                         var id = new Vector2I(x, y);
                         atlasSource.CreateTile(id);
-
                         var tileData = atlasSource.GetTileData(id, 0);
 
                         if (meta.COLLIDE)
@@ -216,6 +216,11 @@ namespace horizoncraft.script
                             };
                             tileData.AddCollisionPolygon(0);
                             tileData.SetCollisionPolygonPoints(0, 0, polygon);
+                            tileData.AddOccluderPolygon(0);
+                            tileData.SetOccluderPolygon(0,0,new OccluderPolygon2D()
+                            {
+                                Polygon = polygon
+                            });
                         }
                     }
 

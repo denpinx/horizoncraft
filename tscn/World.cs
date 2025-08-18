@@ -58,7 +58,7 @@ namespace horizoncraft.script
         public Player player;
         public Timer timer;
         public TextureRect textureRect;
-
+        public DirectionalLight2D DirectionalLight2D;
         public ColorRect colorRect;
         public double RequeueFreeze = 0;
 
@@ -122,6 +122,7 @@ namespace horizoncraft.script
             timer = GetNode<Timer>("Timer_Tick");
             textureRect = GetNode<TextureRect>("CanvasLayer_Back/TextureRect_Sky");
             colorRect = GetNode<ColorRect>("CanvasLayer/ColorRect_Top");
+            DirectionalLight2D = GetNode<DirectionalLight2D>("DirectionalLight2D");
             timer.Timeout += CilentTick;
             player.world = this;
 
@@ -180,11 +181,13 @@ namespace horizoncraft.script
         {
             if (WorldService != null && WorldService is WorldBase wb && colorRect != null)
             {
-                colorRect.Color = Color.Color8(0, 0, 0, GetLightChange(wb.GetTimeProgress()));
-                textureRect.Modulate = GetSkyChange(wb.GetTimeProgress());
+                float t = wb.GetTimeProgress();
+                colorRect.Color = Color.Color8(0, 0, 0, GetLightChange(t));
+                textureRect.Modulate = GetSkyChange(t);
+                DirectionalLight2D.Energy = 1 - GetLightChange(t) / 255f;
+                DirectionalLight2D.RotationDegrees = (1 - t) * 360f + 180f;
+                //Math.Clamp(t * 360f + 180f,90,270);
             }
-
-
             if (RequeueFreeze > 0) RequeueFreeze -= delta;
             if (player.playerData == null)
             {
@@ -248,9 +251,9 @@ namespace horizoncraft.script
                         PlayerNodes[Kvp.Key].playerData = Kvp.Value;
                         if (Kvp.Key != Player.Profile.Name)
                         {
-                            //PlayerNodes[Kvp.Key].Position = Kvp.Value.Position;
-                            Tween tween = GetTree().CreateTween();
-                            tween.TweenProperty(PlayerNodes[Kvp.Key], "position", Kvp.Value.Position_v2, 0.05f);
+                            PlayerNodes[Kvp.Key].Position = Kvp.Value.Position_v2;
+                            //Tween tween = GetTree().CreateTween();
+                            //tween.TweenProperty(PlayerNodes[Kvp.Key], "position", Kvp.Value.Position_v2, 0.05f);
                         }
                     }
                 }

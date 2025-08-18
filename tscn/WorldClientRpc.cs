@@ -26,6 +26,15 @@ public partial class World
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void ReciveChunkUpdatePack(byte[] data)
+    {
+        if (WorldService is WorldClientService wcs)
+        {
+            wcs.ReciveChunkPacks.Enqueue(data);
+        }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void ReciveWorldTime(int time)
     {
         WorldService.TickTimes = time;
@@ -37,7 +46,7 @@ public partial class World
         if (WorldService is WorldBase worldBase)
         {
             PlayerData playerData = PlayerData.FromBytes(data);
-            if (playerData.Name == Player.Profile.Name)
+            if (playerData.Name == Player.Profile.Name && player.playerData == null)
             {
                 player.playerData = playerData;
                 player.playerData.player = player;
