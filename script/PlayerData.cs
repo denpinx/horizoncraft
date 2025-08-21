@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
+using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using MemoryPack;
@@ -16,12 +17,13 @@ using Vector2I = Godot.Vector2I;
 namespace horizoncraft.script
 {
     [MemoryPackable]
-    public partial class PlayerData : AsByteable<PlayerData>
+    public partial class PlayerData
     {
         public int PeerId;
         public String Name;
         public Vector2 Position;
-        public List<Vector2> SubscribeChunkCoord = new List<Vector2>();
+        public PlayerInventory Inventory = new();
+
         [MemoryPackIgnore] public Player player;
 
         [MemoryPackIgnore]
@@ -48,6 +50,7 @@ namespace horizoncraft.script
 
         public PlayerData()
         {
+            
         }
     }
 }

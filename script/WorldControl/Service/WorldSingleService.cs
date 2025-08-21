@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Features;
+using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Service;
 using horizoncraft.script.WorldControl.Tool;
@@ -31,6 +32,15 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
         world.timer.Timeout += Tick;
         world.player.OnMoveToChunk += UpdateLoadChunkCoords;
         sqliteConnection = SqliteTool.InitSqlite();
+        if (sqliteConnection.CheckWorldProfileExists("WorldProfile"))
+        {
+            Profile = sqliteConnection.GetWorldProfileByteData("WorldProfile");
+            TickTimes = Profile.Time;
+        }
+        else
+        {
+            Profile = new WorldProfile();
+        }
 
         GD.Print("【单人游戏】 初始化成功");
         return true;
@@ -190,6 +200,15 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
             sqliteConnection.InsertChunkByteValue(chunk.X, chunk.Y, chunk);
     }
 
+    public void SaveWorldProfile(WorldProfile worldProfile)
+    {
+        if (!ServerOn) return;
+        if (sqliteConnection.CheckWorldProfileExists("WorldProfile"))
+            sqliteConnection.UpdateWorldProfileByteData("WorldProfile", worldProfile);
+        else
+            sqliteConnection.InsertWorldProfileByteValue("WorldProfile", worldProfile);
+    }
+
     public void Save()
     {
         if (world == null) return;
@@ -198,6 +217,8 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
 
         foreach (var playerset in Players)
             SavePlayer(playerset.Value);
+        Profile.Time = TickTimes;
+        SaveWorldProfile(Profile);
     }
 
     public void Tick()

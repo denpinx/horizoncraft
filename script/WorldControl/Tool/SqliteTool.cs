@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using Godot;
+using horizoncraft.script.Net;
 using Microsoft.Data.Sqlite;
 
 namespace horizoncraft.script.WorldControl.Tool;
@@ -33,6 +34,7 @@ public static class SqliteTool
             );
             sqliteConnection.Open();
 
+            sqliteConnection.InitTable_WorldProfile();
             sqliteConnection.InitTable_World();
             sqliteConnection.InitTable_Player();
             return sqliteConnection;
@@ -47,7 +49,7 @@ public static class SqliteTool
 
     public static void UpdateChunkByteData(this SqliteConnection sqliteConnection, int x, int y, Chunk chunk)
     {
-        var bytes = Chunk.ToBytes(chunk);
+        var bytes = ByteTool.ToBytes<Chunk>(chunk);
 
         string query = "UPDATE World SET byte = @Byte WHERE x = @KeyX AND y = @KeyY";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
@@ -61,7 +63,7 @@ public static class SqliteTool
 
     public static void InsertChunkByteValue(this SqliteConnection sqliteConnection, int x, int y, Chunk chunk)
     {
-        var bytes = Chunk.ToBytes(chunk);
+        var bytes = ByteTool.ToBytes<Chunk>(chunk);
         string query = "INSERT INTO World (x, y, byte) VALUES (@KeyX, @KeyY, @Byte)";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
         {
@@ -80,7 +82,7 @@ public static class SqliteTool
             command.Parameters.AddWithValue("@KeyX", x);
             command.Parameters.AddWithValue("@KeyY", y);
             var result = command.ExecuteScalar() as byte[];
-            return Chunk.FromBytes(result);
+            return ByteTool.FromBytes<Chunk>(result);
         }
     }
 
@@ -109,7 +111,7 @@ public static class SqliteTool
 
     public static void UpdatePlayerByteData(this SqliteConnection sqliteConnection, string name, PlayerData playerData)
     {
-        var bytes = PlayerData.ToBytes(playerData);
+        var bytes = ByteTool.ToBytes(playerData);
         //GD.Print($"[{time}] UpdatePlayerByteData(name:{name})");
         // using var output = new MemoryStream();
         // using (var gzip = new GZipStream(output, CompressionMode.Compress, leaveOpen: true))
@@ -128,7 +130,7 @@ public static class SqliteTool
 
     public static void InsertPlayerByteValue(this SqliteConnection sqliteConnection, string name, PlayerData playerData)
     {
-        var bytes = PlayerData.ToBytes(playerData);
+        var bytes = ByteTool.ToBytes(playerData);
 
         string query = "INSERT INTO Player (name,byte) VALUES (@Name, @Byte)";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
@@ -146,7 +148,62 @@ public static class SqliteTool
         {
             command.Parameters.AddWithValue("@Name", name);
             var result = command.ExecuteScalar() as byte[];
-            return PlayerData.FromBytes(result);
+            return ByteTool.FromBytes<PlayerData>(result);
+        }
+    }
+
+    public static void InsertWorldProfileByteValue(this SqliteConnection sqliteConnection, string name,
+        WorldProfile worldProfile)
+    {
+        var bytes = ByteTool.ToBytes<WorldProfile>(worldProfile);
+        string query = "INSERT INTO WorldProfile (name,byte) VALUES (@Name, @Byte)";
+        using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
+        {
+            command.Parameters.AddWithValue("@Name", name);
+            command.Parameters.AddWithValue("@Byte", bytes);
+            command.ExecuteNonQuery();
+        }
+    }
+
+    public static bool CheckWorldProfileExists(this SqliteConnection sqliteConnection, string name)
+    {
+        string query = "SELECT COUNT(*) FROM WorldProfile WHERE name = @Name";
+        using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
+        {
+            command.Parameters.AddWithValue("@Name", name);
+            int count = Convert.ToInt32(command.ExecuteScalar());
+            return count > 0;
+        }
+    }
+
+    public static void UpdateWorldProfileByteData(this SqliteConnection sqliteConnection, string name,
+        WorldProfile profile)
+    {
+        var bytes = ByteTool.ToBytes<WorldProfile>(profile);
+        //GD.Print($"[{time}] UpdatePlayerByteData(name:{name})");
+        // using var output = new MemoryStream();
+        // using (var gzip = new GZipStream(output, CompressionMode.Compress, leaveOpen: true))
+        // {
+        //     gzip.Write(bytes, 0, bytes.Length);
+        // }
+
+        string query = "UPDATE WorldProfile SET byte = @Byte WHERE name = @Name";
+        using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
+        {
+            command.Parameters.AddWithValue("@Name", name);
+            command.Parameters.AddWithValue("@Byte", bytes);
+            command.ExecuteNonQuery();
+        }
+    }
+
+    public static WorldProfile GetWorldProfileByteData(this SqliteConnection sqliteConnection, string name)
+    {
+        string query = "SELECT byte FROM WorldProfile WHERE name = @Name";
+        using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
+        {
+            command.Parameters.AddWithValue("@Name", name);
+            var result = command.ExecuteScalar() as byte[];
+            return ByteTool.FromBytes<WorldProfile>(result);
         }
     }
 
@@ -177,5 +234,17 @@ public static class SqliteTool
         new SqliteCommand(createTableQuery, sqliteConnection).ExecuteNonQuery();
         const string createidx = @"CREATE UNIQUE INDEX IF NOT EXISTS Player_name ON Player(name)";
         new SqliteCommand(createidx, sqliteConnection).ExecuteNonQuery();
+    }
+
+    public static void InitTable_WorldProfile(this SqliteConnection sqliteConnection)
+    {
+        GD.Print($"InitTable_WorldProfile()");
+        const string createTableQuery =
+            $"CREATE TABLE IF NOT EXISTS WorldProfile ("
+            + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + "name TEXT NOT NULL UNIQUE, "
+            + "byte BLOB "
+            + ")";
+        new SqliteCommand(createTableQuery, sqliteConnection).ExecuteNonQuery();
     }
 }

@@ -47,10 +47,11 @@ public partial class TileMapLayerChunk : Node2D
                         Blockdata block_font = chunk[x, y, 1];
 
                         int tile_id = block.GetTileId();
+                        int tile_size = block.GetTileSize();
                         Vector2I coord = new(0, 0);
                         if (block.BlockMeta.Tiletype == "tile")
                         {
-                            coord = new(x % 2, y % 2);
+                            coord = new(x % tile_size, y % tile_size);
                         }
                         else if (block.BlockMeta.Tiletype == "atlas")
                         {

@@ -20,21 +20,21 @@ using HorizonCraft.script.WorldControl.Service;
 namespace horizoncraft.script.WorldControl
 {
     [MemoryPackable]
-    public partial class Chunk : AsByteable<Chunk>
+    public partial class Chunk
     {
-        public int X;
-        public int Y;
         public static int SizeZ = 2;
         public static int Size = 24;
         public bool spawn = false;
+        public long version;
+        
+        public int X;
+        public int Y;
+        
 
         public string BiomeType = "";
+        [MemoryPackIgnore] public List<Vector3I> UpdateList = new();
+        [MemoryPackIgnore] public List<Vector3I> UpdateList_buffer = new();
 
-        //对外只读
-        [MemoryPackIgnore] public ChunkUpdataPack pack = new();
-
-        //外部通过这个修改
-        [MemoryPackIgnore] public ChunkUpdataPack pack_buffer = new();
         [MemoryPackIgnore] public bool update_tilemap = true;
         [MemoryPackIgnore] public bool update_server = true;
 
@@ -85,38 +85,18 @@ namespace horizoncraft.script.WorldControl
                 }
             }
         }
-
-        public BlockSnapShotItem[,,] Copy()
-        {
-            BlockSnapShotItem[,,] blocks = new BlockSnapShotItem[Chunk.Size, Chunk.Size, Chunk.SizeZ];
-            for (int Z = 0; Z < Chunk.SizeZ; Z++)
-            {
-                for (int X = 0; X < Chunk.Size; X++)
-                {
-                    for (int Y = 0; Y < Chunk.Size; Y++)
-                    {
-                        blocks[X, Y, Z] = new BlockSnapShotItem()
-                        {
-                            id = (short)data[X, Y, Z].ID,
-                            state = (byte)data[X, Y, Z].STATE
-                        };
-                    }
-                }
-            }
-
-            return blocks;
-        }
-
+        
         public void Tick(WorldBase WorldService, World world)
         {
-            pack.updates.Clear();
-            if (pack_buffer.updates.Count > 0)
+            version = WorldService.TickTimes;
+            
+            UpdateList.Clear();
+            if (UpdateList_buffer.Count > 0)
             {
-                pack.updates.AddRange(pack_buffer.updates);
-                pack_buffer.updates.Clear();
+                UpdateList.AddRange(UpdateList_buffer);
+                UpdateList_buffer.Clear();
             }
 
-            BlockSnapShotItem[,,] blockSnapShotItem = Copy();
             BlockTickEvent blockTickEvnet = new()
             {
                 World = world,
@@ -125,6 +105,8 @@ namespace horizoncraft.script.WorldControl
             };
             var coord = new Godot.Vector3I(0, 0, 0);
             var coord_local = new Godot.Vector3I(0, 0, 0);
+            int id = 0;
+            int state = 0;
             //通过在循环不创建任何一个对象来优化
             for (byte Z = 0; Z < Chunk.SizeZ; Z++)
             {
@@ -143,22 +125,17 @@ namespace horizoncraft.script.WorldControl
                             blockTickEvnet.Blockdata = data[X, Y, Z];
                             blockTickEvnet.GloablPos = coord;
                             blockTickEvnet.LocalPos = coord_local;
+                            id = data[X, Y, Z].ID;
+                            state = data[X, Y, Z].STATE;
                             ComponentManager.ExecuteComponents(blockTickEvnet, data[X, Y, Z]);
-                            if (blockSnapShotItem[X, Y, Z].state != data[X, Y, Z].STATE ||
-                                blockSnapShotItem[X, Y, Z].id != data[X, Y, Z].ID)
+                            if (state != data[X, Y, Z].STATE ||
+                                id != data[X, Y, Z].ID)
                             {
                                 update_tilemap = true;
                                 //update_server = true;
 
                                 //增量更新数据
-                                pack.updates.Add(new BlockSnapshot()
-                                {
-                                    x = X,
-                                    y = Y,
-                                    z = Z,
-                                    id = (byte)data[X, Y, Z].ID,
-                                    state = (byte)data[X, Y, Z].STATE,
-                                });
+                                UpdateList.Add(new Vector3I(X, Y, Z));
                             }
                         }
                         else
@@ -172,16 +149,6 @@ namespace horizoncraft.script.WorldControl
                     }
                 }
             }
-
-            //第二次判断，有组件在运行时修改了其他方块的值
-            if (pack_buffer.updates.Count > 0)
-            {
-                pack.updates.AddRange(pack_buffer.updates);
-                pack_buffer.updates.Clear();
-            }
-
-            pack.x = X;
-            pack.y = Y;
         }
     }
 }

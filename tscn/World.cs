@@ -36,7 +36,7 @@ namespace horizoncraft.script
         public static WorldMode worldMode = WorldMode.Single;
 
         //
-        public PackedScene Player_ps;
+        public PackedScene PlayerSnapshot_ps;
 
         //事件
         public Action CilentTicked;
@@ -51,7 +51,7 @@ namespace horizoncraft.script
         public WorldBase WorldService;
         public PackedScene PSTilemapLayerChunk;
         public List<TileMapLayerChunk> tileMapLayerChunks = new();
-        public System.Collections.Generic.Dictionary<string, Player> PlayerNodes = new();
+        public System.Collections.Generic.Dictionary<string, PlayerSnapshot> PlayerNodes = new();
         public System.Collections.Generic.Dictionary<Vector2I, Chunk> VisibleChunks = new();
 
         //Node
@@ -116,7 +116,7 @@ namespace horizoncraft.script
         public override void _Ready()
         {
             _ = Materials.blockmetas;
-            Player_ps = GD.Load<PackedScene>("res://tscn/Player.tscn");
+            PlayerSnapshot_ps = GD.Load<PackedScene>("res://tscn/PlayerSnapshot.tscn");
             PSTilemapLayerChunk = GD.Load<PackedScene>("res://tscn/TileMapLayerChunk.tscn");
             player = GetNode<Player>("Player");
             timer = GetNode<Timer>("Timer_Tick");
@@ -163,8 +163,7 @@ namespace horizoncraft.script
                 wps.world = this;
                 wps.Init();
                 wps.UpdateLoadChunkCoords();
-                player.playerData = new PlayerData() { Name = "Player" };
-
+                player.playerData = new PlayerData() { Name = Player.Profile.Name };
                 player.Inputable = false;
                 player.Visible = false;
                 player.MoreInfo = false;
@@ -179,15 +178,16 @@ namespace horizoncraft.script
 
         public override void _Process(double delta)
         {
-            if (WorldService != null && WorldService is WorldBase wb && colorRect != null)
+            if (WorldService != null && colorRect != null)
             {
-                float t = wb.GetTimeProgress();
+                float t = WorldService.GetTimeProgress();
                 colorRect.Color = Color.Color8(0, 0, 0, GetLightChange(t));
                 textureRect.Modulate = GetSkyChange(t);
                 DirectionalLight2D.Energy = 1 - GetLightChange(t) / 255f;
                 DirectionalLight2D.RotationDegrees = (1 - t) * 360f + 180f;
                 //Math.Clamp(t * 360f + 180f,90,270);
             }
+
             if (RequeueFreeze > 0) RequeueFreeze -= delta;
             if (player.playerData == null)
             {
@@ -224,39 +224,9 @@ namespace horizoncraft.script
                         player.Visible = false;
                         player.Visible = false;
                     }
-
                     iws.UpdateLoadChunkCoords();
                 }
             }
-
-            if (WorldService is WorldBase worldBase && WorldService is not WorldPreviewService)
-                foreach (var Kvp in worldBase.Players)
-                {
-                    //添加玩家节点
-                    if (!PlayerNodes.ContainsKey(Kvp.Key))
-                    {
-                        if (Kvp.Key != Player.Profile.Name)
-                        {
-                            Player player = Player_ps.Instantiate<Player>();
-                            player.playerData = Kvp.Value;
-                            player.world = this;
-                            player.Inputable = false;
-                            PlayerNodes.Add(Kvp.Key, player);
-                            AddChild(player);
-                        }
-                    }
-                    else
-                    {
-                        //更新玩家节点
-                        PlayerNodes[Kvp.Key].playerData = Kvp.Value;
-                        if (Kvp.Key != Player.Profile.Name)
-                        {
-                            PlayerNodes[Kvp.Key].Position = Kvp.Value.Position_v2;
-                            //Tween tween = GetTree().CreateTween();
-                            //tween.TweenProperty(PlayerNodes[Kvp.Key], "position", Kvp.Value.Position_v2, 0.05f);
-                        }
-                    }
-                }
         }
 
         public void CilentTick()
@@ -278,9 +248,41 @@ namespace horizoncraft.script
             {
                 AddTileMap(VisibleChunks[key]);
             }
-
             CilentTicked?.Invoke();
+            SyncPlayerSnapshot();
 
+            sw.Stop();
+            tick_use_time = sw.ElapsedMilliseconds;
+        }
+
+
+        public void SyncPlayerSnapshot()
+        {
+            if (WorldService is not WorldPreviewService)
+                foreach (var Kvp in WorldService.Players)
+                {
+                    //添加玩家节点
+                    if (!PlayerNodes.ContainsKey(Kvp.Key))
+                    {
+                        if (Kvp.Key != Player.Profile.Name)
+                        {
+                            PlayerSnapshot player = PlayerSnapshot_ps.Instantiate<PlayerSnapshot>();
+                            PlayerNodes.Add(Kvp.Key, player);
+                            AddChild(player);
+                        }
+                    }
+                    else
+                    {
+                        //更新玩家节点
+                        PlayerNodes[Kvp.Key].SetData(Kvp.Value);
+                        if (Kvp.Key != Player.Profile.Name)
+                        {
+                            PlayerNodes[Kvp.Key].Position = Kvp.Value.Position_v2;
+                            //Tween tween = GetTree().CreateTween();
+                            //tween.TweenProperty(PlayerNodes[Kvp.Key], "position", Kvp.Value.Position_v2, 0.05f);
+                        }
+                    }
+                }
             //删除不可见玩家对象
             if (WorldService is WorldClientService && player.playerData != null)
             {
@@ -314,9 +316,6 @@ namespace horizoncraft.script
                         p.QueueFree();
                     }
                 }
-
-            sw.Stop();
-            tick_use_time = sw.ElapsedMilliseconds;
         }
 
 

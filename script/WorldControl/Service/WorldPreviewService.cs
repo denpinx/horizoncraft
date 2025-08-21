@@ -36,6 +36,8 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
         if (world == null) return;
         if (world.player.playerData == null) return;
         LoadChunkQueue.Clear();
+        
+        GD.Print("移动");
         Vector2I CenterCoord = world.player.playerData.ChunkCoord;
         for (int X = CenterCoord.X - LoadHorizon; X <= CenterCoord.X + LoadHorizon; X++)
         {

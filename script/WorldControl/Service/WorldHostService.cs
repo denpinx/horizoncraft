@@ -45,6 +45,8 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
     private ConcurrentQueue<(int, byte[])> ChunkUpdataPacks = new();
     private ConcurrentQueue<(int, byte[])> PlayerPacks = new();
 
+    private WorldSnapshot snapshot = new WorldSnapshot();
+
     public bool Init()
     {
         if (world == null) return false;
@@ -238,7 +240,6 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
 
         if (!LoadingPlayers.Contains(name))
         {
-            GD.Print($"[{TickTimes}] 玩家({name}) 加入到待加载表中");
             LoadingPlayers.Enqueue(name);
         }
 
@@ -266,7 +267,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     )
                     {
                         if (pd1.Name != Player.Profile.Name)
-                            world.RpcId(pd1.PeerId, "RecivePlayer", PlayerData.ToBytes(pd2));
+                            world.RpcId(pd1.PeerId, "RecivePlayer", ByteTool.ToBytes<PlayerData>(pd2));
                     }
                 }
             }
@@ -304,116 +305,100 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         if (!ServerOn) return;
 
         stopwatch.Restart();
-        Interlocked.CompareExchange(ref SyncChunkTask, Task.Run((() =>
+        // Interlocked.CompareExchange(ref SyncChunkTask, Task.Run((() =>
+        // {
+        Dictionary<int, ChunkPack> syncmap = new();
+        Dictionary<int, WorldSnapshot> syncmap_updata = new();
+        foreach (var chunk in snapshot.chunks)
         {
-            Dictionary<int, ChunkPack> syncmap = new();
-            Dictionary<int, ChunkUpDataPackSet> syncmap_updata = new();
-            foreach (var chunkset in Chunks)
+            //更新区块
+
+            foreach (var playerset in Players)
             {
-                Chunk chunk = chunkset.Value;
-                //更新区块
-                if (chunk.pack.updates.Count > 0)
+                PlayerData pd1 = playerset.Value;
+                //按距离同步
+                if (
+                    Math.Abs(chunk.x - pd1.ChunkCoord.X) <= TileMapHorizon &&
+                    Math.Abs(chunk.y - pd1.ChunkCoord.Y) <= TileMapHorizon
+                )
                 {
-                    foreach (var playerset in Players)
+                    if (pd1.Name != Player.Profile.Name)
                     {
-                        PlayerData pd1 = playerset.Value;
-                        //按距离同步
-                        if (
-                            Math.Abs(chunk.X - pd1.ChunkCoord.X) <= TileMapHorizon &&
-                            Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= TileMapHorizon
-                        )
-                        {
-                            if (pd1.Name != Player.Profile.Name)
-                            {
-                                if (syncmap_updata.ContainsKey(pd1.PeerId))
-                                {
-                                    syncmap_updata[pd1.PeerId].packs.Add(chunk.pack);
-                                }
-                                else
-                                {
-                                    syncmap_updata[pd1.PeerId] = new ChunkUpDataPackSet()
-                                    {
-                                        packs = new()
-                                        {
-                                            chunk.pack
-                                        }
-                                    };
-                                }
-                            }
-                        }
+                        if (!syncmap_updata.ContainsKey(pd1.PeerId))
+                            syncmap_updata[pd1.PeerId] = new WorldSnapshot();
+                        syncmap_updata[pd1.PeerId].chunks.Add(chunk);
                     }
                 }
-
-                //脏标记
-                if (chunkset.Value.update_server)
-                {
-                    foreach (var playerset in Players)
-                    {
-                        PlayerData pd1 = playerset.Value;
-                        //按距离同步
-                        if (
-                            Math.Abs(chunk.X - pd1.ChunkCoord.X) <= TileMapHorizon &&
-                            Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= TileMapHorizon
-                        )
-                        {
-                            if (pd1.Name != Player.Profile.Name)
-                            {
-                                if (syncmap.ContainsKey(pd1.PeerId))
-                                {
-                                    syncmap[pd1.PeerId].Chunks.Add(chunk);
-                                }
-                                else
-                                {
-                                    syncmap[pd1.PeerId] = new ChunkPack()
-                                    {
-                                        Chunks = new()
-                                        {
-                                            chunk
-                                        }
-                                    };
-                                }
-                            }
-                        }
-                    }
-
-                    chunk.update_server = false;
-                }
-            }
-
-            foreach (var key in syncmap.Keys)
-            {
-                ChunkPacks.Enqueue((key, ChunkPack.ToBytes(syncmap[key])));
-            }
-
-            foreach (var key in syncmap_updata.Keys)
-            {
-                ChunkUpdataPacks.Enqueue((key, ChunkUpDataPackSet.ToBytes(syncmap_updata[key])));
-            }
-        })), null);
-
-        if (SyncChunkTask != null && SyncChunkTask.IsCompleted)
-        {
-            if (!ChunkPacks.IsEmpty)
-            {
-                foreach (var variabl in ChunkPacks)
-                {
-                    world.RpcId(variabl.Item1, "ReciveChunkPack", variabl.Item2);
-                }
-
-                ChunkPacks.Clear();
-            }
-
-            if (!ChunkUpdataPacks.IsEmpty)
-            {
-                foreach (var variabl in ChunkUpdataPacks)
-                {
-                    world.RpcId(variabl.Item1, "ReciveChunkUpdatePack", variabl.Item2);
-                }
-
-                ChunkUpdataPacks.Clear();
             }
         }
 
+        //脏标记
+        foreach (var chunk in Chunks.Values)
+            if (chunk.update_server)
+            {
+                foreach (var playerset in Players)
+                {
+                    PlayerData pd1 = playerset.Value;
+                    //按距离同步
+                    if (
+                        Math.Abs(chunk.X - pd1.ChunkCoord.X) <= TileMapHorizon &&
+                        Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= TileMapHorizon
+                    )
+                    {
+                        if (pd1.Name != Player.Profile.Name)
+                        {
+                            if (syncmap.ContainsKey(pd1.PeerId))
+                            {
+                                syncmap[pd1.PeerId].Chunks.Add(chunk);
+                            }
+                            else
+                            {
+                                syncmap[pd1.PeerId] = new ChunkPack()
+                                {
+                                    Chunks = new()
+                                    {
+                                        chunk
+                                    }
+                                };
+                            }
+                        }
+                    }
+                }
+
+                chunk.update_server = false;
+            }
+
+
+        foreach (var key in syncmap.Keys)
+        {
+            ChunkPacks.Enqueue((key, ByteTool.ToBytes<ChunkPack>(syncmap[key])));
+        }
+
+        foreach (var key in syncmap_updata.Keys)
+        {
+            ChunkUpdataPacks.Enqueue((key, ByteTool.ToBytes<WorldSnapshot>(syncmap_updata[key])));
+        }
+        //})), null);
+
+        if (!ChunkPacks.IsEmpty)
+        {
+            foreach (var variabl in ChunkPacks)
+            {
+                world.RpcId(variabl.Item1, "ReciveChunkPack", variabl.Item2);
+            }
+
+            ChunkPacks.Clear();
+        }
+
+        if (!ChunkUpdataPacks.IsEmpty)
+        {
+            foreach (var variabl in ChunkUpdataPacks)
+            {
+                world.RpcId(variabl.Item1, "ReciveChunkUpdatePack", variabl.Item2);
+            }
+
+            ChunkUpdataPacks.Clear();
+        }
 
         stopwatch.Stop();
         SyncChunkTime.X = stopwatch.ElapsedMilliseconds;
@@ -478,10 +463,40 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         ProcessChunkLoadQueue();
         ProcessPlayerLoadQueue();
         ProcessChunkUnloadQueue();
+
+        snapshot.chunks.Clear();
+
         foreach (Vector2I coord in Chunks.Keys)
         {
             Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
+        }
+
+        foreach (Vector2I coord in Chunks.Keys)
+        {
+            Chunk chunk = Chunks[coord];
+            if (chunk.UpdateList.Count > 0)
+            {
+                ChunkSnapshot cs = new()
+                {
+                    version = TickTimes,
+                    x = coord.X,
+                    y = coord.Y,
+                };
+                foreach (var v in chunk.UpdateList)
+                {
+                    cs.list.Add(new BlockSnapshot()
+                    {
+                        x = (byte)v.X,
+                        y = (byte)v.Y,
+                        z = (byte)v.Z,
+                        id = (short)chunk[v.X, v.Y, v.Z].ID,
+                        state = (byte)chunk[v.X, v.Y, v.Z].STATE
+                    });
+                }
+
+                snapshot.chunks.Add(cs);
+            }
         }
 
         stopwatch.Stop();

@@ -35,6 +35,8 @@ public partial class Player : CharacterBody2D
     Label Label_DEBUG_Right;
     Label Label_PlayerName;
 
+    HotBar hotBar = new HotBar();
+
     public bool LastFramIsLeft = false;
 
     public override void _Input(InputEvent @event)
@@ -46,42 +48,16 @@ public partial class Player : CharacterBody2D
         );
         if (Input.IsActionPressed("breakblock"))
         {
-            Blockdata blockdata = world.WorldService.GetBlock(new(Mousecoord.X, Mousecoord.Y, 1));
-            if (blockdata?.components.Count > 0)
-            {
-                GD.Print($"点击方块名：{blockdata.BlockMeta.NAME}");
-                GD.Print($"点击方块状态：{blockdata.STATE}");
-                for (int i = 0; i < blockdata.components.Count; i++)
-                {
-                    if (blockdata.components[i] != null)
-                    {
-                        if (blockdata.components[i] is TickComponent tc)
-                            GD.Print($"当前 {tc.Current},最大{tc.Max} 组件名{tc.Name}");
-                        else
-                        {
-                            GD.PrintErr(blockdata.components[i].GetType());
-                            GD.PrintErr(blockdata.components[i].Name);
-                        }
-
-                        if (blockdata.components[i] is FluidComponent fc)
-                        {
-                            GD.Print($"流体名:{fc.Name},是否流动：{fc.mobility}");
-                        }
-                    }
-                    else
-                    {
-                        GD.Print("ISnull!");
-                    }
-                }
-            }
+            world.WorldService.SetBlock(
+                new(Mousecoord.X, Mousecoord.Y, 1),
+                Materials.Valueof("air"), false, 0
+            );
 
             if (LastFramIsLeft)
             {
             }
             else
-            {
                 LastFramIsLeft = true;
-            }
         }
         else
         {
@@ -90,16 +66,27 @@ public partial class Player : CharacterBody2D
 
         if (Input.IsActionPressed("placeblock"))
         {
-            world.WorldService.SetBlock(
-                new(Mousecoord.X, Mousecoord.Y, 1),
-                Materials.Valueof("air"), false, 0
-            );
+            if (playerData != null)
+            {
+                var item = playerData.Inventory.GetItem(playerData.Inventory.HandSlot);
+                if (item != null)
+                {
+                    BlockMeta bm = item.GetBlockMeta();
+                    if (bm != null)
+                        world.WorldService.SetBlock(
+                            new(Mousecoord.X, Mousecoord.Y, 1),
+                            bm, false, 0
+                        );
+                }
+            }
         }
     }
 
     public override void _PhysicsProcess(double delta)
     {
         if (playerData == null) return;
+        if (playerData.Name != Player.Profile.Name) return;
+
         Vector2I Mcoord = World.MathFloor((Vector2I)GetGlobalMousePosition(), 16);
         Vector2I MCcoord = World.MathFloor(Mcoord, Chunk.Size);
         Vector2I ChunkCoord = new Vector2I(
@@ -133,6 +120,24 @@ public partial class Player : CharacterBody2D
         {
             if (mode == 0)
                 Stop = false;
+        }
+
+        if (Inputable)
+        {
+            if (playerData != null)
+            {
+                if (Input.IsActionJustPressed("roller_up"))
+                {
+                    playerData.Inventory.HandSlot -= 1;
+                    if (playerData.Inventory.HandSlot < 0) playerData.Inventory.HandSlot = 8;
+                }
+
+                if (Input.IsActionJustPressed("roller_down"))
+                {
+                    playerData.Inventory.HandSlot += 1;
+                    if (playerData.Inventory.HandSlot > 8) playerData.Inventory.HandSlot = 0;
+                }
+            }
         }
 
         if (mode == 0 && Inputable)
@@ -199,11 +204,26 @@ public partial class Player : CharacterBody2D
             Label_DEBUG_Left.Visible = MoreInfo;
             Label_DEBUG_Right.Visible = MoreInfo;
         }
+
+        if (Input.IsActionJustPressed("F4") && Inputable)
+        {
+            foreach (var item in Materials.itemmetas)
+            {
+                playerData.Inventory.TryAddItem(item.GetItemStack());
+            }
+        }
+
+        if (Input.IsActionJustPressed("F5") && Inputable)
+        {
+            Position = new Vector2(new Random().Next(100000), Position.Y);
+            OnMoveToChunk?.Invoke();
+        }
     }
 
     public void UpdateGui()
     {
-        if (MoreInfo && Inputable && world.WorldService is WorldBase worldBase)
+        if (MoreInfo && Inputable &&
+            world.WorldService is WorldBase worldBase && playerData != null)
         {
             Vector2I Mcoord = World.MathFloor((Vector2I)GetGlobalMousePosition(), 16);
             Vector2I MCcoord = World.MathFloor(Mcoord, Chunk.Size);
@@ -225,6 +245,7 @@ public partial class Player : CharacterBody2D
                 Text.AppendLine($"区块同步耗时: {hostserver.SyncChunkTime.X}ms max: {hostserver.SyncChunkTime.Y} ms");
                 Text.AppendLine($"玩家同步耗时: {hostserver.SyncPlayerTime.X}ms max: {hostserver.SyncPlayerTime.Y} ms");
             }
+
             if (world.WorldService is WorldClientService wcs)
             {
                 Text.AppendLine($"接收的增量更新包: {wcs.ReciveChunkPacks.Count}");
@@ -259,9 +280,10 @@ public partial class Player : CharacterBody2D
         Label_DEBUG_Right = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Right");
         Label_PlayerName = GetNode<Label>("Label_PlayerName");
         Timer_Tick = GetNode<Timer>("Timer_Tick");
+        hotBar = GetNode<HotBar>("CanvasLayer/HotBar");
         if (playerData != null)
             playerData.player = this;
-
         Timer_Tick.Timeout += UpdateGui;
+        hotBar.Player = this;
     }
 }

@@ -11,9 +11,3 @@ public partial struct BlockSnapshot
     public short id;
     public byte state;
 }
-
-public struct BlockSnapShotItem
-{
-    public short id;
-    public byte state;
-}

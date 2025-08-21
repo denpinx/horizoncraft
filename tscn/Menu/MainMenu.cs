@@ -16,10 +16,10 @@ public partial class MainMenu : World
         LoadProfile();
 
         var cmd = OS.GetCmdlineArgs();
-        if (cmd.Length > 0)
+        if (cmd.Length > 1)
         {
             Player.Profile.Name = cmd[1];
-            GD.Print($"运行参数：{string.Join(",",cmd)}");
+            GD.Print($"运行参数：{string.Join(",", cmd)}");
         }
 
 
@@ -89,6 +89,7 @@ public partial class MainMenu : World
         PlayerProfile profile = new();
         profile.ParseDictionary((Dictionary)Json.ParseString(json_text));
         Player.Profile = profile;
+        GD.Print($"加载文档:{Player.Profile.Name}");
     }
 
     private static void SaveProfile()

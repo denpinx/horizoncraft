@@ -191,13 +191,13 @@ namespace horizoncraft.script.WorldControl
                         biomeTerrainContext.Blockdata = chunk[x, y, z];
                         landbiome.GeneratorTerrain(biomeTerrainContext);
 
-                        if (gy >= highmap[x, z] && biomeTerrainContext.Noise > 0.2f && z == 1)
-                            chunk[x, y, z] = Materials.Valueof("air").Blockdata();
+                        if (gy >= highmap[x, z] && FastNoiseLite.GetNoise2D(gx / 0.5f, gy) > 0.2f && z == 1)
+                            chunk[x, y, z].SetMeta(Materials.Valueof("air"));
 
                         var data = GetStructData(structs, gx, gy, z);
                         if (data.Item1 != null)
                         {
-                            chunk[x, y, z] = data.Item1.Blockdata();
+                            chunk[x, y, z].SetMeta(data.Item1);
                             chunk[x, y, z].STATE = data.Item2;
                         }
                     }
@@ -237,9 +237,9 @@ namespace horizoncraft.script.WorldControl
                         biomeTerrainContext.GlobalY = gy;
                         biomeTerrainContext.Noise = FastNoiseLite.GetNoise2D(gx, gy);
                         biomeTerrainContext.Blockdata = chunk[x, y, z];
-                        if (gy > highmap[x, z] && FastNoiseLite.GetNoise2D(gx, gy) > 0.3f && z == 1)
-                            chunk[x, y, z] = Materials.Valueof("air").Blockdata();
-                        else if (biomeType == BiomeType.Deep) chunk[x, y, z] = Materials.Valueof("stone").Blockdata();
+                        if (gy > highmap[x, z] && FastNoiseLite.GetNoise2D(gx / 0.5f, gy) > 0.3f && z == 1)
+                            chunk[x, y, z].SetMeta(Materials.Valueof("air"));
+                        else if (biomeType == BiomeType.Deep) chunk[x, y, z].SetMeta("stone");
 
                         biome.GeneratorTerrain(biomeTerrainContext);
 
@@ -254,8 +254,10 @@ namespace horizoncraft.script.WorldControl
             }
 
             StopWatch.Stop();
+            chunk.UpdateList.Clear();
             chunk.SpawnCostTime = (int)StopWatch.ElapsedMilliseconds;
             chunk.update_tilemap = true;
+            chunk.update_server = true;
         }
     }
 }

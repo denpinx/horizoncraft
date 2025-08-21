@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://bem5bibh4ch2d" path="res://tscn/world.tscn" id="1_n4w62"]
 [ext_resource type="Script" uid="uid://er56e2mbajku" path="res://tscn/Menu/MainMenu.cs" id="2_lvpjg"]
-[ext_resource type="Texture2D" uid="uid://baf6hjwqh4psh" path="res://texture/button.png" id="3_t0cg7"]
+[ext_resource type="Texture2D" uid="uid://baf6hjwqh4psh" path="res://texture/Gui/button.png" id="3_t0cg7"]
 [ext_resource type="Shader" uid="uid://bu2dhuwhrsatn" path="res://tscn/Menu/MainMenu.gdshader" id="3_wwbxd"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8lkrk"]

@@ -123,7 +123,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
             return;
         }
 
-        world.RpcId(1, "UpdataPlayer", playerData.Name, PlayerData.ToBytes(playerData));
+        world.RpcId(1, "UpdataPlayer", playerData.Name, ByteTool.ToBytes<PlayerData>(playerData));
     }
 
     public void SaveChunk(Chunk chunk)
@@ -162,28 +162,36 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         if (!ReciveChunkPacks.IsEmpty)
             Interlocked.CompareExchange(ref ProcessReciveDataTask, Task.Run(() =>
             {
-                byte[][] bytes = new byte[ReciveChunkPacks.Count][];
-                ReciveChunkPacks.CopyTo(bytes, 0);
-                ReciveChunkPacks.Clear();
-                foreach (byte[] data in bytes)
+                foreach (byte[] data in ReciveChunkPacks)
                 {
-                    ChunkUpDataPackSet sync = ChunkUpDataPackSet.FromBytes(data);
-                    for (int i = 0; i < sync.packs.Count; i++)
+                    WorldSnapshot sync = ByteTool.FromBytes<WorldSnapshot>(data);
+                    for (int i = 0; i < sync.chunks.Count; i++)
                     {
-                        ChunkUpdataPack cup = sync.packs[i];
+                        ChunkSnapshot cup = sync.chunks[i];
                         var coord = new Vector2I(cup.x, cup.y);
                         if (Chunks.ContainsKey(coord))
                         {
-                            for (int j = 0; j < cup.updates.Count; j++)
+                            if (Chunks[coord].version <= cup.version)
                             {
-                                Chunks[coord][cup.updates[j].x, cup.updates[j].y, cup.updates[j].z]
-                                    .SetMeta(cup.updates[j].id);
-                                Chunks[coord][cup.updates[j].x, cup.updates[j].y, cup.updates[j].z].STATE =
-                                    cup.updates[j].state;
+                                Chunks[coord].version = cup.version;
+                                for (int j = 0; j < cup.list.Count; j++)
+                                {
+                                    var item = cup.list[j];
+                                    Chunks[coord][item.x, item.y, item.z]
+                                        .SetMeta(item.id);
+                                    Chunks[coord][item.x, item.y, item.z].STATE =
+                                        item.state;
+                                }
+                            }
+                            else
+                            {
+                                GD.Print($"异常同步！新版本{cup.version} : 旧版本{Chunks[coord].version}");
                             }
                         }
                     }
                 }
+
+                ReciveChunkPacks.Clear();
             }), null);
     }
 }

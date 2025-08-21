@@ -5,7 +5,7 @@ using MemoryPack;
 namespace horizoncraft.script.Config;
 
 [MemoryPackable]
-public partial class PlayerProfile : AsByteable<PlayerProfile>
+public partial class PlayerProfile
 {
     public string Name;
 

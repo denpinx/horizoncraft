@@ -12,6 +12,7 @@ using horizoncraft.script.Events;
 using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 using System.Data.Common;
 using System.Text.Json.Serialization;
+using horizoncraft.script.Inventory;
 using horizoncraft.script.WorldControl;
 
 namespace horizoncraft.script
@@ -19,7 +20,11 @@ namespace horizoncraft.script
     public class Materials
     {
         public static TileSet tileSet;
-        public static List<BlockMeta> blockmetas = new List<BlockMeta>();
+        public static List<BlockMeta> blockmetas = new();
+        public static List<ItemMeta> itemmetas = new();
+        public static Dictionary<string, ItemMeta> Dictionary_itemmetas = new();
+
+
         public static Dictionary<string, BlockMeta> Dictionary_blockmetas = new();
         public static List<EntityMeta> entityMetas = new List<EntityMeta>();
 
@@ -56,11 +61,32 @@ namespace horizoncraft.script
             return null;
         }
 
+        public static ItemMeta RegItemMeta(ItemMeta meta)
+        {
+            meta.Id = itemmetas.Count;
+            itemmetas.Add(meta);
+            Dictionary_itemmetas.Add(meta.Name, meta);
+            GD.Print($"[注册物品]{meta.Id} >{meta.Name}");
+            return meta;
+        }
+
         public static BlockMeta RegBlockMeta(BlockMeta meta)
         {
             meta.ID = blockmetas.Count;
             blockmetas.Add(meta);
             Dictionary_blockmetas.Add(meta.NAME, meta);
+            GD.Print($"[注册方块]{meta.ID} >{meta.NAME}");
+            if (!Dictionary_itemmetas.ContainsKey(meta.NAME) && meta.NAME != "air")
+            {
+                ItemMeta itemMeta = new ItemMeta()
+                {
+                    Name = meta.NAME,
+                    HasBlock = true
+                };
+                itemMeta.Itemset.TextureNames.Add(meta.NAME);
+                RegItemMeta(itemMeta);
+            }
+
             return meta;
         }
 
@@ -86,6 +112,64 @@ namespace horizoncraft.script
                     CUBE = false,
                 }
             );
+
+            LoadItemConfigs();
+            LoadBlockConfigs();
+            ProcessEntity();
+            CreateTileSet();
+            ProcessTextures();
+        }
+
+        private static void ProcessEntity()
+        {
+            RegEntityMeta(new EntityMeta("item_entity", "res://tscn/Entity/ItemEntity.tscn")
+            {
+                get_entity_node = (PackedScene packedScene) => (Node2D)packedScene.Instantiate<ItemEntity>()
+            });
+            RegEntityMeta(new EntityMeta("tree", "res://tscn/Entity/TreeEntity.tscn")
+            {
+                get_entity_node = (PackedScene packedScene) => (Node2D)packedScene.Instantiate<TreeEntity>()
+            });
+        }
+
+        private static void LoadItemConfigs()
+        {
+            var fileAccess = FileAccess.Open("res://config/item/Materials.json", FileAccess.ModeFlags.Read);
+            var jsonText = fileAccess.GetAsText();
+            fileAccess.Close();
+            var dict = JsonCleaner.FromJson(jsonText);
+            foreach (string item_name in dict.Keys)
+            {
+                ItemMeta itemMeta = new ItemMeta()
+                {
+                    Name = item_name,
+                };
+                if (dict.ContainsKey("state"))
+                {
+                    var itemset = new ItemStateSet();
+                    var dict_state = (Dictionary<string, object>)dict["state"];
+                    foreach (string state_name in dict_state.Keys)
+                        itemset.TextureNames.Add(state_name);
+                    itemMeta.Itemset = itemset;
+                }
+                else
+                {
+                    var itemset = new ItemStateSet()
+                    {
+                        TextureNames = new List<string>()
+                        {
+                            item_name
+                        }
+                    };
+                    itemMeta.Itemset = itemset;
+                }
+
+                RegItemMeta(itemMeta);
+            }
+        }
+
+        private static void LoadBlockConfigs()
+        {
             FileAccess fileAccess = FileAccess.Open("res://config/block/Materials.json", FileAccess.ModeFlags.Read);
             string jsonText = fileAccess.GetAsText();
             fileAccess.Close();
@@ -159,19 +243,43 @@ namespace horizoncraft.script
                 if (config.ContainsKey("collide")) blockmeta.COLLIDE = (bool)config["collide"];
                 RegBlockMeta(blockmeta);
             }
-
-
-            RegEntityMeta(new EntityMeta("item_entity", "res://tscn/Entity/ItemEntity.tscn")
-            {
-                get_entity_node = (PackedScene packedScene) => (Node2D)packedScene.Instantiate<ItemEntity>()
-            });
-            RegEntityMeta(new EntityMeta("tree", "res://tscn/Entity/TreeEntity.tscn")
-            {
-                get_entity_node = (PackedScene packedScene) => (Node2D)packedScene.Instantiate<TreeEntity>()
-            });
-            CreateTileSet();
         }
 
+        public static void ProcessTextures()
+        {
+            var default_image = ResourceLoader.Load<Texture2D>(
+                $"res://texture/item/default.png");
+
+            for (int i = 0; i < itemmetas.Count; i++)
+            {
+                ItemMeta meta = itemmetas[i];
+                for (int j = 0; j < meta.Itemset.TextureNames.Count; j++)
+                {
+                    var dir = $"res://texture/item/{meta.Itemset.TextureNames[j]}.png";
+                    if (FileAccess.FileExists(dir))
+                    {
+                        var image = ResourceLoader.Load<Texture2D>(dir);
+                        meta.Itemset.Textures.Add(j, image);
+                    }
+                    else
+                    {
+                        if (meta.HasBlock)
+                        {
+                            var block_dir = $"res://texture/block/{meta.Itemset.TextureNames[j]}.png";
+                            if (FileAccess.FileExists(block_dir))
+                            {
+                                var block_image = ResourceLoader.Load<Texture2D>(block_dir);
+                                meta.Itemset.Textures.Add(j, block_image);
+                            }
+                            else
+                                meta.Itemset.Textures.Add(j, default_image);
+                        }
+                        else
+                            meta.Itemset.Textures.Add(j, default_image);
+                    }
+                }
+            }
+        }
 
         public static TileSet CreateTileSet()
         {
@@ -217,7 +325,7 @@ namespace horizoncraft.script
                             tileData.AddCollisionPolygon(0);
                             tileData.SetCollisionPolygonPoints(0, 0, polygon);
                             tileData.AddOccluderPolygon(0);
-                            tileData.SetOccluderPolygon(0,0,new OccluderPolygon2D()
+                            tileData.SetOccluderPolygon(0, 0, new OccluderPolygon2D()
                             {
                                 Polygon = polygon
                             });

@@ -90,5 +90,16 @@ namespace horizoncraft.script.WorldControl
                 return BlockMeta.GetBlockTileSet(0).tile_id;
             return -1;
         }
+
+        public int GetTileSize()
+        {
+            BlockMeta = Materials.Valueof(this.ID);
+            if (BlockMeta.blockTileDatas.Count == 0) return -1;
+            if (BlockMeta.Tiletype == "tile")
+                return BlockMeta.GetBlockTileSet(STATE).tile_size;
+            if (BlockMeta.Tiletype == "atlas")
+                return BlockMeta.GetBlockTileSet(0).tile_count;
+            return -1;
+        }
     }
 }

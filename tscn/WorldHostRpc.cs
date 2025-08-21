@@ -3,6 +3,7 @@ using System.IO.Compression;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using HorizonCraft.script.WorldControl.Service;
 using horizoncraft.script.WorldControl.Tool;
@@ -21,7 +22,7 @@ public partial class World
         if (WorldService is IWorldService iws && iws.GetPlayer(name, out playerData))
         {
             playerData.PeerId = peerid;
-            var bytes = PlayerData.ToBytes(playerData);
+            var bytes = ByteTool.ToBytes(playerData);
             RpcId(peerid, "RecivePlayer", bytes);
             GD.Print($"[成功获取,即将返回]{name}");
         }
@@ -38,7 +39,7 @@ public partial class World
         ;
         if (WorldService is { } worldBase)
         {
-            PlayerData playerData = PlayerData.FromBytes(bytes);
+            PlayerData playerData = ByteTool.FromBytes<PlayerData>(bytes);
             worldBase.Players[name] = playerData;
         }
     }

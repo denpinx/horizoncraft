@@ -4,8 +4,11 @@ using MemoryPack;
 
 namespace horizoncraft.script.Net;
 
+/// <summary>
+/// 增量同步
+/// </summary>
 [MemoryPackable]
-public partial class ChunkUpdataPack : AsByteable<ChunkUpdataPack>
+public partial class ChunkUpdataPack
 {
     public int x;
     public int y;

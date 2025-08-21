@@ -17,7 +17,7 @@ public class WorldBase
     public Action<WorldBase, Chunk> OnChunkLoaded;
 
     public Action<WorldBase, Chunk> OnChunkUnLoading;
-    
+
     //
     public WorldProfile Profile;
     public bool Connect = false;
@@ -76,14 +76,9 @@ public class WorldBase
                 {
                     chunk[LocalCoord.X, LocalCoord.Y, coord.Z].SetMeta(meta);
                     chunk[LocalCoord.X, LocalCoord.Y, coord.Z].STATE = state;
-                    chunk.pack_buffer.updates.Add(new BlockSnapshot()
-                    {
-                        x = (byte)LocalCoord.X,
-                        y = (byte)LocalCoord.Y,
-                        z = (byte)coord.Z,
-                        id = (byte)meta.ID,
-                        state = (byte)state
-                    });
+                    chunk.UpdateList_buffer.Add(new(LocalCoord.X,
+                        LocalCoord.Y,
+                        coord.Z));
                     chunk.update_tilemap = true;
                 }
             }
@@ -91,14 +86,9 @@ public class WorldBase
             {
                 chunk[LocalCoord.X, LocalCoord.Y, coord.Z].SetMeta(meta);
                 chunk[LocalCoord.X, LocalCoord.Y, coord.Z].STATE = state;
-                chunk.pack_buffer.updates.Add(new BlockSnapshot()
-                {
-                    x = (byte)LocalCoord.X,
-                    y = (byte)LocalCoord.Y,
-                    z = (byte)coord.Z,
-                    id = (byte)meta.ID,
-                    state = (byte)state
-                });
+                chunk.UpdateList_buffer.Add(new(LocalCoord.X,
+                    LocalCoord.Y,
+                    coord.Z));
                 chunk.update_tilemap = true;
             }
         }

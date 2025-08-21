@@ -4,9 +4,9 @@ using MemoryPack;
 
 namespace horizoncraft.script.Net;
 
-public class AsByteable<T>
+public static class ByteTool
 {
-    public static byte[] ToBytes(T t)
+    public static byte[] ToBytes<T>(T t)
     {
         var bytes = MemoryPackSerializer.Serialize(t);
         using var output = new MemoryStream();
@@ -18,7 +18,7 @@ public class AsByteable<T>
         return output.ToArray();
     }
 
-    public static T FromBytes(byte[] bytes)
+    public static T FromBytes<T>(byte[] bytes)
     {
         using var input = new MemoryStream(bytes);
         using var gzip = new GZipStream(input, CompressionMode.Decompress);
