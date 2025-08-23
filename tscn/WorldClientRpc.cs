@@ -97,27 +97,33 @@ public partial class World
     {
         Blockdata block = ByteTool.FromBytes<Blockdata>(data);
         WorldService.SetBlock(new Vector3I(x, y, z), block);
-
-        if (player.ShowView != null && player.ShowView.TargetBlockGlobalPos == new Vector3I(x, y, z))
-            player.ShowView.TargetInvBase = block.GetComponent<InventoryComponent>().GetInventory();
+        if (player.ShowView != null && player.playerData.OpenInventory == new System.Numerics.Vector3(x, y, z))
+        {
+            player.ShowView.TargetBlock = block;
+        }
+        else if (player.ShowView != null)
+        {
+        }
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void ReciveBlockInventoryData(byte[] data, byte[] playerinv)
+    public void ReciveOpenBlockData(byte[] data, byte[] playerinv)
     {
-        InventoryComponent inventory = ByteTool.FromBytes<InventoryComponent>(data);
+        Blockdata blockdata = ByteTool.FromBytes<Blockdata>(data);
         PlayerInventory inv = ByteTool.FromBytes<PlayerInventory>(playerinv);
+        player.playerData.Inventory = inv;
+
         if (player.ShowView != null)
         {
-            player.ShowView.TargetInvBase = inventory.GetInventory();
+            player.ShowView.TargetBlock = blockdata;
             player.ShowView.PlayerInvBase = inv;
         }
-
         else
         {
             if (player.playerData.OpeningBlockInventory && WorldService is WorldClientService wcs)
             {
-                wcs.OpenBlockView(inventory);
+                GD.Print("收到数据,打开菜单");
+                wcs.OpenBlockView(blockdata);
             }
         }
     }
@@ -125,6 +131,7 @@ public partial class World
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void RecivePlayerInv(byte[] data)
     {
+        if (player.playerData == null) return;
         PlayerInventory inv = ByteTool.FromBytes<PlayerInventory>(data);
         player.playerData.Inventory = inv;
         if (player.ShowView != null)

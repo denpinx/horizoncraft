@@ -1,4 +1,5 @@
 using MemoryPack;
+
 namespace horizoncraft.script.Components
 {
     [MemoryPackable]

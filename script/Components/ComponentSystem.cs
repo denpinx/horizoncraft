@@ -11,5 +11,7 @@ namespace horizoncraft.script.Components
     public interface IComponentSystem
     {
         void Execute(WorldEvent worldEvent, Component component);
+
+        void SetComponentValue(Component component, Dictionary<string, string> value);
     }
 }

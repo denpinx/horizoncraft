@@ -232,7 +232,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
 
         ProcessChunkUnloadQueue();
 
-        foreach (Vector2I coord in Chunks.Keys)
+        foreach (Vector2I coord in Chunks.Keys.ToArray())
         {
             Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);

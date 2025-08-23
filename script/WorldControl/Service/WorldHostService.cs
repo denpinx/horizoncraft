@@ -256,7 +256,6 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         stopwatch.Restart();
 
         Dictionary<long, PlayerPack> packs = new();
-
         foreach (var Fs in Players)
         {
             foreach (var Ts in Players)
@@ -299,22 +298,14 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
 
                 if (player.OpeningBlockInventory)
                 {
-                    var blockdata = GetBlock(new Vector3I((int)player.OpenInventory.X, (int)player.OpenInventory.Y,
-                        (int)player.OpenInventory.Z));
+                    var pos = new Vector3I((int)player.OpenInventory.X, (int)player.OpenInventory.Y,
+                        (int)player.OpenInventory.Z);
+                    var blockdata = GetBlock(pos);
                     if (blockdata != null)
                     {
-                        var data = blockdata.GetComponent<InventoryComponent>();
-                        if (data != null)
-                        {
-                            world.RpcId(player.PeerId, "ReciveBlockInventoryData",
-                                ByteTool.ToBytes<InventoryComponent>(data),
-                                ByteTool.ToBytes<PlayerInventory>(player.Inventory));
-                        }
-                        else
-                        {
-                            player.OpeningBlockInventory = false;
-                            GD.PrintErr($"blockdata is null! at{player.OpenInventory.ToString()}");
-                        }
+                        world.RpcId(player.PeerId, "ReciveOpenBlockData",
+                            ByteTool.ToBytes<Blockdata>(blockdata),
+                            ByteTool.ToBytes<PlayerInventory>(player.Inventory));
                     }
                 }
             }
@@ -432,6 +423,17 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         if (SyncChunkTime.X > SyncChunkTime.Y) SyncChunkTime.Y = SyncChunkTime.X;
     }
 
+    public override void SetOpenBlockComponent(PlayerData playerData, SetComponentData data)
+    {
+        GD.Print("修改组件！");
+        var pos = new Vector3I((int)playerData.OpenInventory.X, (int)playerData.OpenInventory.Y,
+            (int)playerData.OpenInventory.Z);
+        
+        var block = GetBlock(pos);
+        if (block != null)
+            ComponentManager.SetBlockComponentData(block, data);
+    }
+
     public void OnPlayerJoin(long peer_id)
     {
         if (!ServerOn) return;
@@ -492,7 +494,6 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         ProcessChunkUnloadQueue();
 
         snapshot.chunks.Clear();
-
         foreach (Vector2I coord in Chunks.Keys)
         {
             Chunk chunk = Chunks[coord];
@@ -517,8 +518,8 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                         x = (byte)v.X,
                         y = (byte)v.Y,
                         z = (byte)v.Z,
-                        id = (short)chunk[v.X, v.Y, v.Z].ID,
-                        state = (byte)chunk[v.X, v.Y, v.Z].STATE
+                        id = (short)chunk.GetBlock(v.X, v.Y, v.Z).ID,
+                        state = (byte)chunk.GetBlock(v.X, v.Y, v.Z).STATE
                     });
                 }
 

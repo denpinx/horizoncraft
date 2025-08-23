@@ -83,27 +83,14 @@ public class WorldBase
         if (Chunks.ContainsKey(ChunkCoord))
         {
             Chunk chunk = Chunks[ChunkCoord];
+            var block = chunk.GetBlock(LocalCoord.X, LocalCoord.Y, coord.Z);
             if (replaceAir)
             {
-                if (chunk[LocalCoord.X, LocalCoord.Y, coord.Z].IsMeta("air"))
-                {
-                    chunk[LocalCoord.X, LocalCoord.Y, coord.Z].SetMeta(meta);
-                    chunk[LocalCoord.X, LocalCoord.Y, coord.Z].STATE = state;
-                    chunk.UpdateList_buffer.Add(new(LocalCoord.X,
-                        LocalCoord.Y,
-                        coord.Z));
-                    chunk.update_tilemap = true;
-                }
+                if (block.IsMeta("air"))
+                    chunk.SetBlock(LocalCoord.X, LocalCoord.Y, coord.Z, meta, state);
             }
             else
-            {
-                chunk[LocalCoord.X, LocalCoord.Y, coord.Z].SetMeta(meta);
-                chunk[LocalCoord.X, LocalCoord.Y, coord.Z].STATE = state;
-                chunk.UpdateList_buffer.Add(new(LocalCoord.X,
-                    LocalCoord.Y,
-                    coord.Z));
-                chunk.update_tilemap = true;
-            }
+                chunk.SetBlock(LocalCoord.X, LocalCoord.Y, coord.Z, meta, state);
         }
         else
         {
@@ -161,14 +148,19 @@ public class WorldBase
         return false;
     }
 
-    public virtual Blockdata GetBlock(Vector3I coord)
+    public virtual Blockdata GetBlock(Vector3I coord, bool update = false, bool fullUpdate = false)
     {
         Vector2I ChunkCoord = World.MathFloor(coord, Chunk.Size);
         Vector2I LocalCoord = World.Remainder(coord, Chunk.Size);
         if (Chunks.ContainsKey(ChunkCoord))
         {
             Chunk chunk = Chunks[ChunkCoord];
-            return chunk[LocalCoord.X, LocalCoord.Y, coord.Z];
+            if (update)
+            {
+                chunk.UpdateList_buffer.Add(new Vector3I(LocalCoord.X, LocalCoord.Y, coord.Z));
+            }
+
+            return chunk.GetBlock(LocalCoord.X, LocalCoord.Y, coord.Z);
         }
         else
         {
@@ -243,6 +235,7 @@ public class WorldBase
     public virtual void SharItem(InventoryBase inventory, int index)
     {
     }
+
     //不直接写在 InventoryBase 因为这涉及到用户交互和网络传输
     public virtual bool PickItem(PlayerData playerdata, InventoryBase inventory, int index)
     {
@@ -285,10 +278,10 @@ public class WorldBase
             world.player.RemoveChild(world.player.ShowView);
         }
 
-        var Invcomponent = world.WorldService.GetBlock(new(x, y, z))?.GetComponent<InventoryComponent>();
-        if (Invcomponent == null) return false;
+        var block = world.WorldService.GetBlock(new(x, y, z));
+        if (block == null) return false;
         world.player.ShowView = InventoryManage.GetInventory<InventoryNode>(viewName);
-        world.player.ShowView.TargetInvBase = Invcomponent.GetInventory();
+        world.player.ShowView.TargetBlock = block;
         world.player.ShowView.TargetBlockGlobalPos = new(x, y, z);
         world.player.ShowView.player = world.player;
         world.player.AddChild(world.player.ShowView);
@@ -306,6 +299,10 @@ public class WorldBase
         world.player.ShowView = InventoryManage.GetInventory<InventoryNode>(viewName);
         world.player.ShowView.player = world.player;
         world.player.AddChild(world.player.ShowView);
+    }
+
+    public virtual void SetOpenBlockComponent(PlayerData playerData, SetComponentData data)
+    {
     }
 
     public virtual void CloseView()

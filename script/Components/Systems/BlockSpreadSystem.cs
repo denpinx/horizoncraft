@@ -14,12 +14,12 @@ public class BlockSpreadSystem : TickSystem
         if (e.CheckIsCube(e.TopBlock)) return;
         if (e.CheckMeta(e.LeftBlock, meta) && _Random.Next(0, 5) < 1)
         {
-            e.Blockdata.SetMeta(meta);
+            e.SetBlockMeta = meta;
         }
 
         if (e.CheckMeta(e.RightBlock, meta) && _Random.Next(0, 5) < 1)
         {
-            e.Blockdata.SetMeta(meta);
+            e.SetBlockMeta = meta;
         }
     }
 }

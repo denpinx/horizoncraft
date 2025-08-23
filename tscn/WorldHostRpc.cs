@@ -70,6 +70,16 @@ public partial class World
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void SetOpenBlockComponent(string name, byte[] bytes)
+    {
+        if (!WorldService.Players.ContainsKey(name)) return;
+
+        var player = WorldService.Players[name];
+        var scd = ByteTool.FromBytes<SetComponentData>(bytes);
+        WorldService.SetOpenBlockComponent(player, scd);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void SetBlock(int x, int y, int z, int id, int state)
     {
         WorldService.SetBlock(new(x, y, z), Materials.Valueof(id), false, state);
@@ -88,8 +98,8 @@ public partial class World
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void PickBlockInvItem(string player, int index)
     {
+        if (!WorldService.Players.ContainsKey(player)) return;
         var playerdata = WorldService.Players[player];
-        if (playerdata == null) return;
         if (playerdata.OpeningBlockInventory)
         {
             var pos = playerdata.OpenInventory;
@@ -98,45 +108,48 @@ public partial class World
             if (inv == null) return;
             WorldService.PickItem(playerdata, inv, index);
         }
-
-        //var bytes = ByteTool.ToBytes<Blockdata>(WorldService.GetBlock(new Vector3I(x, y, z)));
-        //RpcId(playerdata.PeerId, "ReciveBlockData", bytes, x, y, z);
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void OpenPlayerInv(string name)
+    public void OpenPlayerInv(string player)
     {
-        GD.Print("Host_OpenBlockInv");
-        var playerdata = WorldService.Players[name];
+        if (!WorldService.Players.ContainsKey(player)) return;
+        var playerdata = WorldService.Players[player];
         if (playerdata == null) return;
         playerdata.OpeningBlockInventory = true;
     }
 
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void OpenBlockInv(string name, int x, int y, int z)
+    public void OpenBlockInv(string player, int x, int y, int z)
     {
-        GD.Print("Host_OpenBlockInv");
-        var playerdata = WorldService.Players[name];
-        if (playerdata == null) return;
+        if (!WorldService.Players.ContainsKey(player)) return;
+        var playerdata = WorldService.Players[player];
         playerdata.OpeningBlockInventory = true;
         playerdata.OpenInventory = new Vector3(x, y, z);
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void CloseBlockInv(string name)
+    public void CloseBlockInv(string player)
     {
-        GD.Print("CloseBlockInv");
-        var playerdata = WorldService.Players[name];
-        if (playerdata == null) return;
+        if (!WorldService.Players.ContainsKey(player)) return;
+        var playerdata = WorldService.Players[player];
         playerdata.OpeningBlockInventory = false;
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void PickInvItem(string player, int index)
     {
+        if (!WorldService.Players.ContainsKey(player)) return;
         var playerdata = WorldService.Players[player];
-        if (playerdata == null) return;
         WorldService.PickItem(playerdata, playerdata.Inventory, index);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void SetHandSlot(string player, int slot)
+    {
+        if (!WorldService.Players.ContainsKey(player)) return;
+        var playerdata = WorldService.Players[player];
+        playerdata.Inventory.HandSlot = (short)slot;
     }
 }

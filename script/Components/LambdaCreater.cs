@@ -47,7 +47,6 @@ namespace horizoncraft.script.Components
 
                 var body = Expression.MemberInit(newExpr, bindings);
                 var lambda = Expression.Lambda<Func<Dict, Component>>(body, Expression.Parameter(typeof(Dict), "cfg"));
-                //Godot.GD.Print($"[Lambda] {lambda}");
                 return lambda.Compile()(cfg);
             };
         }

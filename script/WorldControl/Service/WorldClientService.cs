@@ -165,13 +165,15 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         return true;
     }
 
-    public void OpenBlockView(InventoryComponent cmp)
+    public void OpenBlockView(Blockdata blockdata)
     {
         if (world == null || world.player.playerData == null) return;
         if (world.player.ShowView != null)
             world.player.RemoveChild(world.player.ShowView);
-        world.player.ShowView = InventoryManage.GetInventory<InventoryNode>(cmp.InventoryName);
-        world.player.ShowView.TargetInvBase = cmp.GetInventory();
+
+        world.player.ShowView =
+            InventoryManage.GetInventory<InventoryNode>(blockdata.GetComponent<InventoryComponent>().InventoryName);
+        world.player.ShowView.TargetBlock = blockdata;
         world.player.ShowView.player = world.player;
         world.player.AddChild(world.player.ShowView);
     }
@@ -214,10 +216,9 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
                                 for (int j = 0; j < cup.list.Count; j++)
                                 {
                                     var item = cup.list[j];
-                                    Chunks[coord][item.x, item.y, item.z]
-                                        .SetMeta(item.id);
-                                    Chunks[coord][item.x, item.y, item.z].STATE =
-                                        item.state;
+                                    var block = Chunks[coord].GetBlock(item.x, item.y, item.z);
+                                    block.SetMeta(item.id);
+                                    block.STATE = item.state;
                                 }
                             }
                             else
@@ -230,5 +231,10 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
 
                 ReciveChunkPacks.Clear();
             }), null);
+    }
+
+    public override void SetOpenBlockComponent(PlayerData playerData, SetComponentData data)
+    {
+        world.RpcId(1, "SetOpenBlockComponent", playerData.Name, ByteTool.ToBytes(data));
     }
 }

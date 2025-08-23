@@ -27,19 +27,19 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             switch (num)
             {
                 case 0:
-                    context.Blockdata.SetMeta("snow");
+                    context.SetBlock("snow");
                     break;
                 case -1:
-                    context.Blockdata.SetMeta("snow");
+                    context.SetBlock("snow");
                     break;
                 case -2:
-                    context.Blockdata.SetMeta("snow");
+                    context.SetBlock("snow");
                     break;
                 case -3:
-                    context.Blockdata.SetMeta("snow");
+                    context.SetBlock("snow");
                     break;
                 case <= -4:
-                    context.Blockdata.SetMeta("stone");
+                    context.SetBlock("stone");
                     break;
             }
         }

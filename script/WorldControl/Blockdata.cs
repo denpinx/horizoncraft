@@ -29,7 +29,6 @@ namespace horizoncraft.script.WorldControl
             {
                 if (_blockMeta == null)
                 {
-                    // o(1)
                     _blockMeta = Materials.Valueof(ID);
                 }
 
@@ -37,7 +36,6 @@ namespace horizoncraft.script.WorldControl
             }
             set { _blockMeta = value; }
         }
-
         public T GetComponent<T>() where T : Component
         {
             for (int i = 0; i < components.Count; i++)

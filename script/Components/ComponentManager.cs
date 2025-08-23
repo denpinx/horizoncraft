@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using horizoncraft.script.Components.Systems;
 using horizoncraft.script.Events;
+using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 
 namespace horizoncraft.script.Components
@@ -35,6 +36,30 @@ namespace horizoncraft.script.Components
             }
         }
 
+        public static void SetBlockComponentData(Blockdata blockdata, SetComponentData setComponentData)
+        {
+            for (int i = 0; i < blockdata.components.Count; i++)
+            {
+                Component component = blockdata.components[i];
+                if (component == null)
+                {
+                    GD.PrintErr("组件被异常删除!");
+                    blockdata.components.RemoveAt(i);
+                    return;
+                }
+
+                if (setComponentData.ComponentSets.ContainsKey(component.Name))
+                {
+                    var d = setComponentData.ComponentSets[component.Name];
+                    ComponentSets[component.Name].system.SetComponentValue(component, d);
+                }
+                else
+                {
+                    GD.Print("修改失败！不存在组件");
+                }
+            }
+        }
+
         public static void Register(String key, Func<Component> func, IComponentSystem System)
         {
             ComponentSets.Add(key, new ComponentAndSystem()
@@ -52,7 +77,7 @@ namespace horizoncraft.script.Components
             Register("BottomCheck", () => new TickComponent(), new BottomCheckSystem());
             Register("FluidComponent", () => new FluidComponent(), new FluidSystem());
             Register("PhysicsComponent", () => new PhysicsComponent(), new PhysicsSystem());
-            Register("BoxComponent", () => new InventoryComponent(), new TickSystem());
+            Register("BoxComponent", () => new InventoryComponent(), new InventorySystem());
         }
     }
 }

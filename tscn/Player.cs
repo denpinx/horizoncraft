@@ -112,6 +112,7 @@ public partial class Player : CharacterBody2D
                 if (item != null)
                 {
                     BlockMeta bm = item.GetBlockMeta();
+                    GD.Print($"has tick:{bm.Components.Count > 0}");
                     if (bm != null)
                         world.WorldService.SetBlock(
                             targetpos,
@@ -126,7 +127,6 @@ public partial class Player : CharacterBody2D
                 if (world.WorldService is WorldClientService wcs)
                 {
                     playerData.OpeningBlockInventory = true;
-                    playerData.OpenInventory = new Vector3(targetpos.X, targetpos.Y, targetpos.Z);
                     GD.Print("Cilent_OpenBlockInv");
                     world.RpcId(1, "OpenBlockInv",
                         Profile.Name,
@@ -136,6 +136,7 @@ public partial class Player : CharacterBody2D
                 }
                 else
                 {
+                    playerData.OpenInventory = new Vector3(targetpos.X, targetpos.Y, targetpos.Z);
                     var blockinv = targetblock.GetComponent<InventoryComponent>();
                     if (blockinv != null)
                     {
@@ -198,12 +199,16 @@ public partial class Player : CharacterBody2D
                 {
                     playerData.Inventory.HandSlot -= 1;
                     if (playerData.Inventory.HandSlot < 0) playerData.Inventory.HandSlot = 8;
+                    if (world.WorldService is WorldClientService wcs)
+                        world.RpcId(1, "SetHandSlot", playerData.Name, playerData.Inventory.HandSlot);
                 }
 
                 if (Input.IsActionJustPressed("roller_down"))
                 {
                     playerData.Inventory.HandSlot += 1;
                     if (playerData.Inventory.HandSlot > 8) playerData.Inventory.HandSlot = 0;
+                    if (world.WorldService is WorldClientService wcs)
+                        world.RpcId(1, "SetHandSlot", playerData.Name, playerData.Inventory.HandSlot);
                 }
 
                 if (Input.IsActionJustPressed("e"))
@@ -212,11 +217,11 @@ public partial class Player : CharacterBody2D
                     {
                         if (world.WorldService is WorldClientService wcs)
                         {
-                            world.RpcId(1, "CloseBlockInv");
+                            world.RpcId(1, "CloseBlockInv", Player.Profile.Name);
                         }
 
                         world.player.playerData.OpeningBlockInventory = false;
-                        
+
                         RemoveChild(ShowView);
                         ShowView = null;
                     }

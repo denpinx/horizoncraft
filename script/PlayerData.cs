@@ -24,8 +24,6 @@ namespace horizoncraft.script
         public String Name;
         public Vector2 Position;
         public bool OpeningBlockInventory = false;
-
-
         public Vector3 OpenInventory;
         public PlayerInventory Inventory = new();
         [MemoryPackIgnore] public Player player;

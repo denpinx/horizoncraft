@@ -6,6 +6,6 @@ public class BottomCheckSystem : TickSystem
 {
     public override void Ticking(BlockTickEvent e, TickComponent component)
     {
-        if (!e.CheckIsCube(e.BottomBlock)) e.Blockdata.SetMeta(Materials.Valueof("air"));
+        if (!e.CheckIsCube(e.BottomBlock)) e.SetBlockMeta = Materials.Valueof("air");
     }
 }

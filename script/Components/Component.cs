@@ -14,6 +14,13 @@ namespace horizoncraft.script.Components
     [MemoryPackUnion(5, typeof(InventoryComponent))]
     public abstract partial class Component
     {
+        public enum TickType
+        {
+            None, //
+            Timer, //计时器
+        }
+
         public string Name;
+        public virtual TickType Type { get; set; } = TickType.Timer;
     }
 }

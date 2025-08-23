@@ -42,9 +42,9 @@ public partial class TileMapLayerChunk : Node2D
                 {
                     for (int y = 0; y < Chunk.Size; y++)
                     {
-                        Blockdata block = chunk[x, y, z];
-                        Blockdata block_back = chunk[x, y, 0];
-                        Blockdata block_font = chunk[x, y, 1];
+                        Blockdata block = chunk.GetBlock(x, y, z);
+                        Blockdata block_back = chunk.GetBlock(x, y, 0);
+                        Blockdata block_font = chunk.GetBlock(x, y, 1);
 
                         int tile_id = block.GetTileId();
                         int tile_size = block.GetTileSize();

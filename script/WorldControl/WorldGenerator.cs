@@ -188,18 +188,15 @@ namespace horizoncraft.script.WorldControl
                         biomeTerrainContext.GlobalX = gx;
                         biomeTerrainContext.GlobalY = gy;
                         biomeTerrainContext.Noise = FastNoiseLite.GetNoise2D(gx, gy);
-                        biomeTerrainContext.Blockdata = chunk[x, y, z];
+                        biomeTerrainContext.Blockdata = chunk.GetBlock(x, y, z);
                         landbiome.GeneratorTerrain(biomeTerrainContext);
 
                         if (gy >= highmap[x, z] && FastNoiseLite.GetNoise2D(gx / 0.5f, gy) > 0.2f && z == 1)
-                            chunk[x, y, z].SetMeta(Materials.Valueof("air"));
+                            chunk.SetBlock(x, y, z, Materials.Valueof("air"));
 
                         var data = GetStructData(structs, gx, gy, z);
                         if (data.Item1 != null)
-                        {
-                            chunk[x, y, z].SetMeta(data.Item1);
-                            chunk[x, y, z].STATE = data.Item2;
-                        }
+                            chunk.SetBlock(x, y, z, data.Item1, data.Item2);
                     }
                 }
             }
@@ -236,19 +233,16 @@ namespace horizoncraft.script.WorldControl
                         biomeTerrainContext.GlobalX = gx;
                         biomeTerrainContext.GlobalY = gy;
                         biomeTerrainContext.Noise = FastNoiseLite.GetNoise2D(gx, gy);
-                        biomeTerrainContext.Blockdata = chunk[x, y, z];
+                        biomeTerrainContext.Blockdata = chunk.GetBlock(x, y, z);
                         if (gy > highmap[x, z] && FastNoiseLite.GetNoise2D(gx / 0.5f, gy) > 0.3f && z == 1)
-                            chunk[x, y, z].SetMeta(Materials.Valueof("air"));
-                        else if (biomeType == BiomeType.Deep) chunk[x, y, z].SetMeta("stone");
+                            chunk.SetBlock(x, y, z, Materials.Valueof("air"));
+                        else if (biomeType == BiomeType.Deep) chunk.SetBlock(x, y, z, Materials.Valueof("stone"));
 
                         biome.GeneratorTerrain(biomeTerrainContext);
 
                         var data = GetStructData(structs, gx, gy, z);
                         if (data.Item1 != null)
-                        {
-                            chunk[x, y, z] = data.Item1.Blockdata();
-                            chunk[x, y, z].STATE = data.Item2;
-                        }
+                            chunk.SetBlock(x, y, z, data.Item1, data.Item2);
                     }
                 }
             }

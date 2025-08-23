@@ -29,25 +29,25 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                 switch (num)
                 {
                     case > 0:
-                        context.Blockdata.SetMeta("sand");
+                        context.SetBlock("sand");
                         break;
                     case 0:
-                        context.Blockdata.SetMeta("sand");
+                        context.SetBlock("sand");
                         break;
                     case -1:
-                        context.Blockdata.SetMeta("sand");
+                        context.SetBlock("sand");
                         break;
                     case -2:
-                        context.Blockdata.SetMeta("sand");
+                        context.SetBlock("sand");
                         break;
                     case -3:
                         if (context.Random.Next(2) == 1)
-                            context.Blockdata.SetMeta("sand");
+                            context.SetBlock("sand");
                         else
-                            context.Blockdata.SetMeta("stone");
+                            context.SetBlock("stone");
                         break;
                     case <= -4:
-                        context.Blockdata.SetMeta("stone");
+                        context.SetBlock("stone");
                         break;
                 }
             }
@@ -57,22 +57,22 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                 {
                     case 1:
                         if (context.Random.Next(2) == 1)
-                            context.Blockdata.SetMeta("bush");
+                            context.SetBlock("bush");
                         break;
                     case 0:
-                        context.Blockdata.SetMeta("grass");
+                        context.SetBlock("grass");
                         break;
                     case -1:
-                        context.Blockdata.SetMeta("dirt");
+                        context.SetBlock("dirt");
                         break;
                     case -2:
-                        context.Blockdata.SetMeta("dirt");
+                        context.SetBlock("dirt");
                         break;
                     case -3:
-                        context.Blockdata.SetMeta("dirt");
+                        context.SetBlock("dirt");
                         break;
                     case <= -4:
-                        context.Blockdata.SetMeta("stone");
+                        context.SetBlock("stone");
                         break;
                 }
             }

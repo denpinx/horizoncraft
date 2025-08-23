@@ -36,7 +36,7 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
         if (world == null) return;
         if (world.player.playerData == null) return;
         LoadChunkQueue.Clear();
-        
+
         GD.Print("移动");
         Vector2I CenterCoord = world.player.playerData.ChunkCoord;
         for (int X = CenterCoord.X - LoadHorizon; X <= CenterCoord.X + LoadHorizon; X++)
@@ -71,18 +71,15 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
         {
             int max = LoadChunkQueue.Count;
             WorkBase work = LoadChunkQueue[coord];
-            LoadChunkQueue.TryRemove(coord, out _);
-            Task.Run(() =>
-            {
-                //生成区块
-                Chunk chunk = new(coord.X, coord.Y);
-                Chunks[coord] = chunk;
-                if (work.Type != "NONE")
-                    work.Execute(chunk);
-                WorldGenerator.Generator(chunk);
-                OnChunkLoaded?.Invoke(this, chunk);
-            });
+            Chunk chunk = new(coord.X, coord.Y);
+            Chunks[coord] = chunk;
+            if (work.Type != "NONE")
+                work.Execute(chunk);
+            WorldGenerator.Generator(chunk);
+            OnChunkLoaded?.Invoke(this, chunk);
         }
+
+        LoadChunkQueue.Clear();
     }
 
     public void ProcessPlayerLoadQueue()

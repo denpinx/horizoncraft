@@ -11,109 +11,112 @@ namespace horizoncraft.script.Events
     {
         public Blockdata Blockdata;
 
-        public Vector3I GloablPos;
+        public Vector3I Globalpos;
         public Vector3I LocalPos;
 
         public BlockMeta SetBlockMeta
         {
-            set { Blockdata.SetMeta(value); }
+            set { Chunk.SetBlock(LocalPos.X, LocalPos.Y, LocalPos.Z, value); }
         }
+
+        public void SetBlock(BlockMeta meta, int state) =>
+            Chunk.SetBlock(LocalPos.X, LocalPos.Y, LocalPos.Z, meta, state);
 
         /// <summary>获取下方方块</summary>
         public Blockdata BottomBlock
         {
-            get { return WorldService.GetBlock(GloablPos + Vector3I.Up); }
+            get { return WorldService.GetBlock(Globalpos + Vector3I.Up); }
         }
 
         /// <summary>设置下方方块</summary>
         [Obsolete]
         public BlockMeta BottomBlockMeta
         {
-            set { WorldService.SetBlock(GloablPos + Vector3I.Up, value); }
+            set { WorldService.SetBlock(Globalpos + Vector3I.Up, value); }
         }
 
         public void SetBottomBlock(BlockMeta meta, int state) =>
-            WorldService.SetBlock(GloablPos + Vector3I.Up, meta, false, state);
+            WorldService.SetBlock(Globalpos + Vector3I.Up, meta, false, state);
 
         /// <summary>获取上方方块</summary>
         public Blockdata TopBlock
         {
-            get { return WorldService.GetBlock(GloablPos + Vector3I.Down); }
+            get { return WorldService.GetBlock(Globalpos + Vector3I.Down); }
         }
 
         public void SetTopBlock(BlockMeta meta, int state) =>
-            WorldService.SetBlock(GloablPos + Vector3I.Down, meta, false, state);
+            WorldService.SetBlock(Globalpos + Vector3I.Down, meta, false, state);
 
         /// <summary>设置上方方块</summary>
         [Obsolete]
         public BlockMeta TopBlockMeta
         {
-            set { WorldService.SetBlock(GloablPos + Vector3I.Down, value); }
+            set { WorldService.SetBlock(Globalpos + Vector3I.Down, value); }
         }
 
         /// <summary>获取左边方块</summary>
         public Blockdata LeftBlock
         {
-            get { return WorldService.GetBlock(GloablPos + Vector3I.Left); }
+            get { return WorldService.GetBlock(Globalpos + Vector3I.Left); }
         }
 
         /// <summary>设置左边方块</summary>
         [Obsolete]
         public BlockMeta LeftBlockMeta
         {
-            set { WorldService.SetBlock(GloablPos + Vector3I.Left, value); }
+            set { WorldService.SetBlock(Globalpos + Vector3I.Left, value); }
         }
 
         public void SetLeftBlock(BlockMeta meta, int state) =>
-            WorldService.SetBlock(GloablPos + Vector3I.Left, meta, false, state);
+            WorldService.SetBlock(Globalpos + Vector3I.Left, meta, false, state);
 
         /// <summary>获取右边方块</summary>
         public Blockdata RightBlock
         {
-            get { return WorldService.GetBlock(GloablPos + Vector3I.Right); }
+            get { return WorldService.GetBlock(Globalpos + Vector3I.Right); }
         }
 
         /// <summary>设置右边方块</summary>
         [Obsolete]
         public BlockMeta RightBlockMeta
         {
-            set { WorldService.SetBlock(GloablPos + Vector3I.Right, value); }
+            set { WorldService.SetBlock(Globalpos + Vector3I.Right, value); }
         }
 
         public void SetRightBlock(BlockMeta meta, int state) =>
-            WorldService.SetBlock(GloablPos + Vector3I.Right, meta, false, state);
+            WorldService.SetBlock(Globalpos + Vector3I.Right, meta, false, state);
 
         /// <summary>获取前景方块</summary>
         public Blockdata FontBlock
         {
-            get { return WorldService.GetBlock(new(GloablPos.X, GloablPos.Y, 1)); }
+            get { return WorldService.GetBlock(new(Globalpos.X, Globalpos.Y, 1)); }
         }
 
         /// <summary>设置前景方块</summary>
         [Obsolete]
         public BlockMeta FontBlockmeta
         {
-            set { WorldService.SetBlock(new(GloablPos.X, GloablPos.Y, 1), value); }
+            set { WorldService.SetBlock(new(Globalpos.X, Globalpos.Y, 1), value); }
         }
 
         public void SetFontBlock(BlockMeta meta, int state) =>
-            WorldService.SetBlock(new(GloablPos.X, GloablPos.Y, 1), meta, false, state);
+            WorldService.SetBlock(new(Globalpos.X, Globalpos.Y, 1), meta, false, state);
 
         /// <summary>获取背景方块</summary>
         public Blockdata BackBlock
         {
-            get { return WorldService.GetBlock(new(GloablPos.X, GloablPos.Y, 0)); }
+            get { return WorldService.GetBlock(new(Globalpos.X, Globalpos.Y, 0)); }
         }
 
         /// <summary>设置背景方块</summary>
         [Obsolete]
         public BlockMeta BackBlockmeta
         {
-            set { WorldService.SetBlock(new(GloablPos.X, GloablPos.Y, 0), value); }
+            set { WorldService.SetBlock(new(Globalpos.X, Globalpos.Y, 0), value); }
         }
 
         public void SetBackBlock(BlockMeta meta, int state) =>
-            WorldService.SetBlock(new(GloablPos.X, GloablPos.Y, 0), meta, false, state);
+            WorldService.SetBlock(new(Globalpos.X, Globalpos.Y, 0), meta, false, state);
 
         /// <summary>检查方块是否为指定材质且不为null,成功则执行action</summary>
         public bool CheckMeta(Blockdata blockdata, BlockMeta meta)

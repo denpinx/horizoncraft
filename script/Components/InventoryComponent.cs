@@ -7,6 +7,7 @@ namespace horizoncraft.script.Components;
 public partial class InventoryComponent : Component
 {
     public string InventoryName = "";
+    public string InventoryTile = "容器";
     public int Size = 36;
 
     public BlockInventory Inventory;

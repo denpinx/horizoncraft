@@ -17,5 +17,11 @@ namespace horizoncraft.script.WorldControl
         public int GlobalY;
         public int GlobalZ;
         public Blockdata Blockdata;
+
+
+        public void SetBlock(string name, int id = 0)
+        {
+            Chunk.SetBlock(LocalX, LocalY, GlobalZ, Materials.Valueof(name), id);
+        }
     }
 }

@@ -21,6 +21,10 @@ namespace horizoncraft.script.Components
             }
         }
 
+        public virtual void SetComponentValue(Component component, Dictionary<string, string> value)
+        {
+        }
+
         public virtual void Ticking(BlockTickEvent evnet, TickComponent component)
         {
         }

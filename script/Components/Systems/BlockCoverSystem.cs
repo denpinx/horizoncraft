@@ -7,6 +7,6 @@ public class BlockCoverSystem : TickSystem
     public override void Ticking(BlockTickEvent e, TickComponent cmp)
     {
         var ec = cmp as ExpandComponent;
-        if (e.CheckIsCube(e.TopBlock)) e.Blockdata.SetMeta(Materials.Valueof(ec.BlockName));
+        if (e.CheckIsCube(e.TopBlock)) e.SetBlockMeta = Materials.Valueof(ec.BlockName);
     }
 }
