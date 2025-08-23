@@ -12,34 +12,32 @@ namespace horizoncraft.script.Components
     //Link & Execut,ECS
     public class ComponentManager
     {
-        static Dictionary<string, ComponentAndSystem> CMPSets = new();
+        static Dictionary<string, ComponentAndSystem> ComponentSets = new();
 
         public static void ExecuteComponents(WorldEvent worldEvent, Blockdata blockdata)
         {
             int start_id = blockdata.ID;
-            int start_state = blockdata.STATE;
             for (int i = 0; i < blockdata.components.Count; i++)
             {
                 Component component = blockdata.components[i];
                 if (component == null)
                 {
-                    //按理说不应该出现这个报错，如果出现了，得严查
-                    GD.PrintErr("item is null");
+                    GD.PrintErr("组件被异常删除!");
                     blockdata.components.RemoveAt(i);
                     return;
                 }
 
-                if (CMPSets.ContainsKey(component.Name))
-                    CMPSets[component.Name].system.Execute(worldEvent, component);
-                //方块类型和状态已经被组件给修改了，防止其他组件异常执行，直接跳过之后的组件
-                if (blockdata.ID != start_id || blockdata.STATE != start_state)
+                if (ComponentSets.ContainsKey(component.Name))
+                    ComponentSets[component.Name].system.Execute(worldEvent, component);
+                //方块类型和状态可能已经被组件给修改了，blockdata.componets的状态已经成为未知状态了,之后就不用继续运行
+                if (blockdata.ID != start_id)
                     return;
             }
         }
 
         public static void Register(String key, Func<Component> func, IComponentSystem System)
         {
-            CMPSets.Add(key, new ComponentAndSystem()
+            ComponentSets.Add(key, new ComponentAndSystem()
             {
                 GetComponect = func,
                 system = System,
@@ -54,6 +52,7 @@ namespace horizoncraft.script.Components
             Register("BottomCheck", () => new TickComponent(), new BottomCheckSystem());
             Register("FluidComponent", () => new FluidComponent(), new FluidSystem());
             Register("PhysicsComponent", () => new PhysicsComponent(), new PhysicsSystem());
+            Register("BoxComponent", () => new InventoryComponent(), new TickSystem());
         }
     }
 }

@@ -1,3 +1,4 @@
+using Godot;
 using MemoryPack;
 
 namespace horizoncraft.script.Inventory;
@@ -6,10 +7,21 @@ namespace horizoncraft.script.Inventory;
 public partial class PlayerInventory : InventoryBase
 {
     public short HandSlot = 0;
+    public ItemStack HandItemStack;
 
-    public PlayerInventory()
+    public PlayerInventory() : base(4 * 9)
     {
-        Size = 4 * 9;
-        Items = new ItemStack[Size];
+    }
+
+    public void SubHandItemAmount(int amount = 0)
+    {
+        if (HandItemStack == null)
+        {
+            GD.PrintErr("SubHandItemAmount: HandItemStack is null");
+            return;
+        }
+
+        HandItemStack.Amount -= amount;
+        if (HandItemStack.Amount <= 0) HandItemStack = null;
     }
 }

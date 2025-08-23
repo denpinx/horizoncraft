@@ -13,9 +13,11 @@ public class ItemMeta
     public bool HasBlock = false;
     public int MaxAmount = 64;
     public ItemStateSet Itemset = new ItemStateSet();
-    
+    public Texture2D ShowTexture;
+
     public Texture2D GetTexture(int state)
     {
+        if (ShowTexture != null) return ShowTexture;
         if (state > Itemset.Textures.Count)
             GD.PrintErr("物品状态贴图遗漏!");
         else return Itemset.Textures[state];

@@ -5,7 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script;
+using horizoncraft.script.Components;
 using horizoncraft.script.Features;
+using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Tool;
@@ -15,7 +17,7 @@ namespace HorizonCraft.script.WorldControl.Service;
 public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWorldClientService
 {
     private const int Port = 9999;
-
+    public PlayerData LastFarmeData = null;
 
     public ConcurrentQueue<byte[]> ReciveChunkPacks = new();
     public Task ProcessReciveDataTask;
@@ -123,7 +125,14 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
             return;
         }
 
-        world.RpcId(1, "UpdataPlayer", playerData.Name, ByteTool.ToBytes<PlayerData>(playerData));
+        var player = PlayerdataSnapshot.ToSnapshot(playerData);
+
+        if (LastFarmeData == null || LastFarmeData.Position != playerData.Position)
+            world.RpcId(1, "UpdataPlayer", playerData.Name, ByteTool.ToBytes<PlayerdataSnapshot>(player));
+        if (LastFarmeData == null) LastFarmeData = new PlayerData();
+        LastFarmeData.Position = playerData.Position;
+
+        //world.RpcId(1, "UpdataPlayer", playerData.Name, ByteTool.ToBytes<PlayerdataSnapshot>(player));
     }
 
     public void SaveChunk(Chunk chunk)
@@ -144,6 +153,34 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         UpdataTileMap();
     }
 
+    public override bool PickItem(PlayerData playerdata, InventoryBase inventory, int index)
+    {
+        world.player.playerData.OpeningBlockInventory = true;
+        if (world.player.ShowView == null) return false;
+        if (inventory is BlockInventory bi)
+            world.RpcId(1, "PickBlockInvItem",
+                playerdata.Name, index);
+        else
+            world.RpcId(1, "PickInvItem", playerdata.Name, index);
+        return true;
+    }
+
+    public void OpenBlockView(InventoryComponent cmp)
+    {
+        if (world == null || world.player.playerData == null) return;
+        if (world.player.ShowView != null)
+            world.player.RemoveChild(world.player.ShowView);
+        world.player.ShowView = InventoryManage.GetInventory<InventoryNode>(cmp.InventoryName);
+        world.player.ShowView.TargetInvBase = cmp.GetInventory();
+        world.player.ShowView.player = world.player;
+        world.player.AddChild(world.player.ShowView);
+    }
+
+    public override void CloseView()
+    {
+        world.player.playerData.OpeningBlockInventory = false;
+        world.RpcId(1, "CloseBlockInv", Player.Profile.Name);
+    }
 
     public override void SetBlock(Vector3I coord, BlockMeta meta, bool replaceAir = false, int state = 0)
     {

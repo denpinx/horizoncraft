@@ -17,4 +17,7 @@
   <ItemGroup>
     <PackageReference Update="GodotSharpEditor" Version="4.4.1" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="script\Inventory\InventorySet.cs" />
+  </ItemGroup>
 </Project>

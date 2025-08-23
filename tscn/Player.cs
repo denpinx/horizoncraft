@@ -9,12 +9,15 @@ using horizoncraft.script.Components;
 using horizoncraft.script.Config;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Features;
+using horizoncraft.script.Inventory;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Service;
 using HorizonCraft.script.WorldControl.Service;
+using Vector3 = System.Numerics.Vector3;
 
 public partial class Player : CharacterBody2D
 {
+    private const bool TEST_MODE = true;
     public static PlayerProfile Profile;
     public static List<Func<string>> GetInformation = new List<Func<string>>();
 
@@ -35,9 +38,14 @@ public partial class Player : CharacterBody2D
     Label Label_DEBUG_Right;
     Label Label_PlayerName;
 
-    HotBar hotBar = new HotBar();
+    public InventoryNode ShowView;
 
-    public bool LastFramIsLeft = false;
+    public HotBar hotBar;
+
+    private bool LastFramIsLeft = false;
+    private bool LastFramIsRight = false;
+
+    private Vector2I LastFramPosition;
 
     public override void _Input(InputEvent @event)
     {
@@ -46,37 +54,97 @@ public partial class Player : CharacterBody2D
             (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
         );
-        if (Input.IsActionPressed("breakblock"))
-        {
-            world.WorldService.SetBlock(
-                new(Mousecoord.X, Mousecoord.Y, 1),
-                Materials.Valueof("air"), false, 0
-            );
+        // List<Vector2I> interpolatePos = new();
+        // if (LastFramIsLeft || LastFramIsRight)
+        // {
+        //     var v1 = LastFramPosition - Mousecoord;
+        //     var v2 = v1.Abs();
+        //     var v3 = (Vector2)LastFramPosition;
+        //     var v4 = (Vector2)Mousecoord;
+        //     var t = (int)MathF.Max(v2.X, v2.Y);
+        //     for (int i = 0; i < t; i++)
+        //     {
+        //         interpolatePos.Add((Vector2I)v3.Lerp(v4, (float)i / (float)t));
+        //     }
+        // }
 
-            if (LastFramIsLeft)
+        if (Input.IsActionPressed("breakblock") && playerData != null && ShowView == null)
+        {
+            var targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 1);
+            var fontblock = world.WorldService.GetBlock(targetpos);
+            if (fontblock == null) return;
+            if (fontblock.IsMeta("air")) targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
+            var fblock = world.WorldService.GetBlock(targetpos);
+            if (!world.WorldService.CheckIsCloseBlock(targetpos))
+                if (fblock != null && !fblock.IsMeta("air"))
+                {
+                    world.WorldService.SetBlock(
+                        new(targetpos.X, targetpos.Y, targetpos.Z),
+                        Materials.Valueof("air"), false, 0
+                    );
+                }
+        }
+
+
+        if (Input.IsActionPressed("placeblock") && playerData != null && ShowView == null)
+        {
+            var targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
+            var backblock = world.WorldService.GetBlock(targetpos);
+            var fontblock = world.WorldService.GetBlock(new Vector3I(Mousecoord.X, Mousecoord.Y, 1));
+
+            if (fontblock != null && backblock != null)
             {
+                if (fontblock.IsMeta("air"))
+                    if (backblock.IsMeta("air"))
+                        targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
+                    else targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 1);
+                else if (!fontblock.IsMeta("air"))
+                    targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 1);
             }
-            else
-                LastFramIsLeft = true;
-        }
-        else
-        {
-            LastFramIsLeft = false;
-        }
+            else return;
 
-        if (Input.IsActionPressed("placeblock"))
-        {
-            if (playerData != null)
+            var targetblock = world.WorldService.GetBlock(targetpos);
+            if (targetblock != null && targetblock.IsMeta("air"))
             {
+                GD.Print("place block");
+                //放置方块
                 var item = playerData.Inventory.GetItem(playerData.Inventory.HandSlot);
                 if (item != null)
                 {
                     BlockMeta bm = item.GetBlockMeta();
                     if (bm != null)
                         world.WorldService.SetBlock(
-                            new(Mousecoord.X, Mousecoord.Y, 1),
+                            targetpos,
                             bm, false, 0
                         );
+                    if (mode == 0) playerData.Inventory.SubItemAmount(playerData.Inventory.HandSlot);
+                }
+                //交互方块
+            }
+            else
+            {
+                if (world.WorldService is WorldClientService wcs)
+                {
+                    playerData.OpeningBlockInventory = true;
+                    playerData.OpenInventory = new Vector3(targetpos.X, targetpos.Y, targetpos.Z);
+                    GD.Print("Cilent_OpenBlockInv");
+                    world.RpcId(1, "OpenBlockInv",
+                        Profile.Name,
+                        targetpos.X,
+                        targetpos.Y,
+                        targetpos.Z);
+                }
+                else
+                {
+                    var blockinv = targetblock.GetComponent<InventoryComponent>();
+                    if (blockinv != null)
+                    {
+                        GD.Print("打开方块物品栏");
+                        world.WorldService.OpenBlockView(blockinv.InventoryName, targetpos.X, targetpos.Y, targetpos.Z);
+                    }
+                    else
+                        GD.Print(
+                            $"{targetblock.ID} 组件 InventoryComponent 不存在!,cmp count:{targetblock.components.Count}]");
                 }
             }
         }
@@ -137,86 +205,109 @@ public partial class Player : CharacterBody2D
                     playerData.Inventory.HandSlot += 1;
                     if (playerData.Inventory.HandSlot > 8) playerData.Inventory.HandSlot = 0;
                 }
-            }
-        }
 
-        if (mode == 0 && Inputable)
-        {
-            Vector2 velocity = Velocity;
-            if (!IsOnFloor() && (!fly || !Stop))
-            {
-                velocity += GetGravity() * (float)delta;
-            }
-
-            if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
-            {
-                velocity.Y = JumpVelocity;
-            }
-
-            Vector2 direction = Input.GetVector("move_left", "move_right", "move_up", "move_down");
-            if (direction != Vector2.Zero)
-            {
-                velocity.X = direction.X * Speed;
-            }
-            else
-            {
-                velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
-            }
-
-            Velocity = velocity;
-            MoveAndSlide();
-        }
-
-        if (mode == 1 && Inputable)
-        {
-            if (Input.IsActionPressed("zoom_1"))
-                camera2d.Zoom = new(2, 2);
-            if (Input.IsActionPressed("zoom_2"))
-                camera2d.Zoom = new(1, 1);
-            if (Input.IsActionPressed("zoom_3"))
-                camera2d.Zoom = new(0.5f, 0.5f);
-            if (Input.IsActionPressed("zoom_4"))
-                camera2d.Zoom = new(0.25f, 0.25f);
-            Vector2 direction = Input.GetVector("move_left", "move_right", "move_up", "move_down");
-
-            Position += direction * 64;
-
-            if (Input.IsActionJustPressed("TEST_1"))
-            {
-                //生成生物
-                if (EntityManage.Enable)
+                if (Input.IsActionJustPressed("e"))
                 {
-                    EntityMeta entityMeta = Materials.GetEntityMeta("item_entity");
-                    EntityNode entity = entityMeta.GetEntityNode();
-                    entity.Data.position = new(GetGlobalMousePosition().X, GetGlobalMousePosition().Y);
-                    EntityManage.waitEntitys.Add(entity);
+                    if (ShowView != null)
+                    {
+                        if (world.WorldService is WorldClientService wcs)
+                        {
+                            world.RpcId(1, "CloseBlockInv");
+                        }
+
+                        world.player.playerData.OpeningBlockInventory = false;
+                        
+                        RemoveChild(ShowView);
+                        ShowView = null;
+                    }
+                    else
+                    {
+                        world.WorldService.OpenView("PlayerInventory");
+                    }
                 }
             }
-        }
 
-        if (Input.IsActionJustPressed("F1") && Inputable)
-            mode = mode == 0 ? 1 : 0;
-        if (Input.IsActionJustPressed("F2") && Inputable)
-            DebugView.DEBUG = !DebugView.DEBUG;
-        if (Input.IsActionJustPressed("F3") && Inputable)
-        {
-            MoreInfo = !MoreInfo;
-            Label_DEBUG_Left.Visible = MoreInfo;
-            Label_DEBUG_Right.Visible = MoreInfo;
-        }
-
-        if (Input.IsActionJustPressed("F4") && Inputable)
-        {
-            foreach (var item in Materials.itemmetas)
+            if (mode == 0)
             {
-                playerData.Inventory.TryAddItem(item.GetItemStack());
-            }
-        }
+                Vector2 velocity = Velocity;
+                if (!IsOnFloor() && (!fly || !Stop))
+                {
+                    velocity += GetGravity() * (float)delta;
+                }
 
-        if (Input.IsActionJustPressed("F5") && Inputable)
-        {
-            Position = new Vector2(new Random().Next(100000), Position.Y);
-            OnMoveToChunk?.Invoke();
+                if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
+                {
+                    velocity.Y = JumpVelocity;
+                }
+
+                Vector2 direction = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+                if (direction != Vector2.Zero)
+                {
+                    velocity.X = direction.X * Speed;
+                }
+                else
+                {
+                    velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
+                }
+
+                Velocity = velocity;
+                MoveAndSlide();
+            }
+
+            if (mode == 1)
+            {
+                if (Input.IsActionPressed("zoom_1"))
+                    camera2d.Zoom = new(2, 2);
+                if (Input.IsActionPressed("zoom_2"))
+                    camera2d.Zoom = new(1, 1);
+                if (Input.IsActionPressed("zoom_3"))
+                    camera2d.Zoom = new(0.5f, 0.5f);
+                if (Input.IsActionPressed("zoom_4"))
+                    camera2d.Zoom = new(0.25f, 0.25f);
+                Vector2 direction = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+
+                Position += direction * 64;
+            }
+
+            if (TEST_MODE)
+            {
+                if (Input.IsActionJustPressed("TEST_1"))
+                {
+                    //生成生物
+                    if (EntityManage.Enable)
+                    {
+                        EntityMeta entityMeta = Materials.GetEntityMeta("item_entity");
+                        EntityNode entity = entityMeta.GetEntityNode();
+                        entity.Data.position = new(GetGlobalMousePosition().X, GetGlobalMousePosition().Y);
+                        EntityManage.waitEntitys.Add(entity);
+                    }
+                }
+
+                if (Input.IsActionJustPressed("F1") && Inputable)
+                    mode = mode == 0 ? 1 : 0;
+                if (Input.IsActionJustPressed("F2") && Inputable)
+                    DebugView.DEBUG = !DebugView.DEBUG;
+                if (Input.IsActionJustPressed("F3") && Inputable)
+                {
+                    MoreInfo = !MoreInfo;
+                    Label_DEBUG_Left.Visible = MoreInfo;
+                    Label_DEBUG_Right.Visible = MoreInfo;
+                }
+
+                if (Input.IsActionJustPressed("F4") && Inputable)
+                {
+                    foreach (var item in Materials.itemmetas)
+                    {
+                        playerData.Inventory.TryAddItem(item.GetItemStack());
+                    }
+                }
+
+                if (Input.IsActionJustPressed("F5") && Inputable)
+                {
+                    Position = new Vector2(new Random().Next(100000), Position.Y);
+                    OnMoveToChunk?.Invoke();
+                }
+            }
         }
     }
 
@@ -285,5 +376,6 @@ public partial class Player : CharacterBody2D
             playerData.player = this;
         Timer_Tick.Timeout += UpdateGui;
         hotBar.Player = this;
+        ;
     }
 }

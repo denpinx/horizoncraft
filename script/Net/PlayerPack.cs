@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using MemoryPack;
 
 namespace horizoncraft.script.Net;
 
-public class PlayerPack
+[MemoryPackable]
+public partial class PlayerPack
 {
-    public List<PlayerData> players = new();
+    public List<PlayerdataSnapshot> players = new();
 }

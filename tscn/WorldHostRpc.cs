@@ -3,11 +3,14 @@ using System.IO.Compression;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using horizoncraft.script.Components;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using HorizonCraft.script.WorldControl.Service;
 using horizoncraft.script.WorldControl.Tool;
 using MemoryPack;
+using Vector2 = System.Numerics.Vector2;
+using Vector3 = System.Numerics.Vector3;
 
 namespace horizoncraft.script;
 
@@ -39,8 +42,8 @@ public partial class World
         ;
         if (WorldService is { } worldBase)
         {
-            PlayerData playerData = ByteTool.FromBytes<PlayerData>(bytes);
-            worldBase.Players[name] = playerData;
+            PlayerdataSnapshot playerData = ByteTool.FromBytes<PlayerdataSnapshot>(bytes);
+            worldBase.Players[name].Position = new Vector2(playerData.x, playerData.y);
         }
     }
 
@@ -80,5 +83,60 @@ public partial class World
         {
             WorldService.Chunks[pos].update_server = true;
         }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void PickBlockInvItem(string player, int index)
+    {
+        var playerdata = WorldService.Players[player];
+        if (playerdata == null) return;
+        if (playerdata.OpeningBlockInventory)
+        {
+            var pos = playerdata.OpenInventory;
+            var inv = WorldService.GetBlock(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z))
+                ?.GetComponent<InventoryComponent>()?.GetInventory();
+            if (inv == null) return;
+            WorldService.PickItem(playerdata, inv, index);
+        }
+
+        //var bytes = ByteTool.ToBytes<Blockdata>(WorldService.GetBlock(new Vector3I(x, y, z)));
+        //RpcId(playerdata.PeerId, "ReciveBlockData", bytes, x, y, z);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void OpenPlayerInv(string name)
+    {
+        GD.Print("Host_OpenBlockInv");
+        var playerdata = WorldService.Players[name];
+        if (playerdata == null) return;
+        playerdata.OpeningBlockInventory = true;
+    }
+
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void OpenBlockInv(string name, int x, int y, int z)
+    {
+        GD.Print("Host_OpenBlockInv");
+        var playerdata = WorldService.Players[name];
+        if (playerdata == null) return;
+        playerdata.OpeningBlockInventory = true;
+        playerdata.OpenInventory = new Vector3(x, y, z);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void CloseBlockInv(string name)
+    {
+        GD.Print("CloseBlockInv");
+        var playerdata = WorldService.Players[name];
+        if (playerdata == null) return;
+        playerdata.OpeningBlockInventory = false;
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void PickInvItem(string player, int index)
+    {
+        var playerdata = WorldService.Players[player];
+        if (playerdata == null) return;
+        WorldService.PickItem(playerdata, playerdata.Inventory, index);
     }
 }

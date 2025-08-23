@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using Godot;
 using horizoncraft.script.Net;
 using Microsoft.Data.Sqlite;
@@ -9,7 +11,6 @@ namespace horizoncraft.script.WorldControl.Tool;
 
 public static class SqliteTool
 {
-    //如果 sqliteConnection 本身是 null的话，这里新建的对象的地址还会传回去吗？
     public static SqliteConnection InitSqlite()
     {
         try
@@ -97,7 +98,6 @@ public static class SqliteTool
             return count > 0;
         }
     }
-
     public static bool CheckPlayerExists(this SqliteConnection sqliteConnection, string name)
     {
         string query = "SELECT COUNT(*) FROM Player WHERE name = @Name";
@@ -112,13 +112,6 @@ public static class SqliteTool
     public static void UpdatePlayerByteData(this SqliteConnection sqliteConnection, string name, PlayerData playerData)
     {
         var bytes = ByteTool.ToBytes(playerData);
-        //GD.Print($"[{time}] UpdatePlayerByteData(name:{name})");
-        // using var output = new MemoryStream();
-        // using (var gzip = new GZipStream(output, CompressionMode.Compress, leaveOpen: true))
-        // {
-        //     gzip.Write(bytes, 0, bytes.Length);
-        // }
-
         string query = "UPDATE Player SET byte = @Byte WHERE name = @Name";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
         {
@@ -180,13 +173,6 @@ public static class SqliteTool
         WorldProfile profile)
     {
         var bytes = ByteTool.ToBytes<WorldProfile>(profile);
-        //GD.Print($"[{time}] UpdatePlayerByteData(name:{name})");
-        // using var output = new MemoryStream();
-        // using (var gzip = new GZipStream(output, CompressionMode.Compress, leaveOpen: true))
-        // {
-        //     gzip.Write(bytes, 0, bytes.Length);
-        // }
-
         string query = "UPDATE WorldProfile SET byte = @Byte WHERE name = @Name";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
         {

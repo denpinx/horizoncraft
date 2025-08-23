@@ -13,6 +13,7 @@ using horizoncraft.script.WorldControl;
 using MemoryPack;
 using Vector2 = System.Numerics.Vector2;
 using Vector2I = Godot.Vector2I;
+using Vector3 = System.Numerics.Vector3;
 
 namespace horizoncraft.script
 {
@@ -22,8 +23,11 @@ namespace horizoncraft.script
         public int PeerId;
         public String Name;
         public Vector2 Position;
-        public PlayerInventory Inventory = new();
+        public bool OpeningBlockInventory = false;
 
+
+        public Vector3 OpenInventory;
+        public PlayerInventory Inventory = new();
         [MemoryPackIgnore] public Player player;
 
         [MemoryPackIgnore]
@@ -50,7 +54,6 @@ namespace horizoncraft.script
 
         public PlayerData()
         {
-            
         }
     }
 }

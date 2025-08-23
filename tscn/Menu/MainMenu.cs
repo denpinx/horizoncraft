@@ -12,6 +12,7 @@ public partial class MainMenu : World
 
     public override void _Ready()
     {
+        
         worldMode = WorldMode.Preview;
         LoadProfile();
 
@@ -25,9 +26,11 @@ public partial class MainMenu : World
 
         base._Ready();
 
-        ButtonSingle = GetNode<TextureButton>("GuiCanvasLayer/Button_Single");
-        ButtonHost = GetNode<TextureButton>("GuiCanvasLayer/Button_Host");
-        ButtonConnect = GetNode<TextureButton>("GuiCanvasLayer/Button_Connect");
+        player.hotBar.Visible = false;
+
+        ButtonSingle = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/Button_Single");
+        ButtonHost = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/Button_Host");
+        ButtonConnect = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/Button_Connect");
         TextEdit = GetNode<TextEdit>("GuiCanvasLayer/TextEdit");
 
         ButtonSingle.Pressed += () =>

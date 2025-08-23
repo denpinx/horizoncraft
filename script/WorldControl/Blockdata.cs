@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Godot;
 using Godot.Collections;
 using horizoncraft.script.Components;
+using horizoncraft.script.Inventory;
 using MemoryPack;
 
 namespace horizoncraft.script.WorldControl
@@ -35,6 +36,14 @@ namespace horizoncraft.script.WorldControl
                 return _blockMeta;
             }
             set { _blockMeta = value; }
+        }
+
+        public T GetComponent<T>() where T : Component
+        {
+            for (int i = 0; i < components.Count; i++)
+                if (components[i] is T t)
+                    return t;
+            return null;
         }
 
         public T GetComponent<T>(string name) where T : Component
@@ -71,7 +80,7 @@ namespace horizoncraft.script.WorldControl
             this.ID = meta.ID;
             components.Clear();
             foreach (Func<Component> cmp in meta.Components)
-                components.Add(cmp.Invoke());
+                components.Add(cmp());
         }
 
         public bool IsMeta(String ID)

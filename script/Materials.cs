@@ -269,7 +269,16 @@ namespace horizoncraft.script
                             if (FileAccess.FileExists(block_dir))
                             {
                                 var block_image = ResourceLoader.Load<Texture2D>(block_dir);
+                                var wide = block_image.GetWidth();
+                                var high = block_image.GetHeight();
                                 meta.Itemset.Textures.Add(j, block_image);
+                                if (wide != high)
+                                {
+                                    var min = Mathf.Min(wide, high);
+                                    var img = block_image.GetImage();
+                                    img.Crop(min, min);
+                                    meta.ShowTexture = ImageTexture.CreateFromImage(img);
+                                }
                             }
                             else
                                 meta.Itemset.Textures.Add(j, default_image);

@@ -1,4 +1,6 @@
 using System.Threading;
+using horizoncraft.script.Components;
+using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using HorizonCraft.script.WorldControl.Service;
 using horizoncraft.script.WorldControl.Tool;
@@ -252,6 +254,9 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         if (!ServerOn) return;
 
         stopwatch.Restart();
+
+        Dictionary<long, PlayerPack> packs = new();
+
         foreach (var Fs in Players)
         {
             foreach (var Ts in Players)
@@ -267,31 +272,53 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     )
                     {
                         if (pd1.Name != Player.Profile.Name)
-                            world.RpcId(pd1.PeerId, "RecivePlayer", ByteTool.ToBytes<PlayerData>(pd2));
+                        {
+                            if (!packs.ContainsKey(pd1.PeerId)) packs.Add(pd1.PeerId, new PlayerPack());
+                            packs[pd1.PeerId].players.Add(PlayerdataSnapshot.ToSnapshot(pd2));
+                        }
                     }
                 }
             }
-
-            // if (Fs.Value.Name != Player.Profile.Name)
-            // {
-            //     world.RpcId(Fs.Value.PeerId, "ReciveWorldTime", TickTimes);
-            // }
         }
 
-        // foreach (var Ts in Players)
-        // {
-        //     if (Player.LocalName != Ts.Key)
-        //     {
-        //         PlayerData pd2 = Ts.Value;
-        //         if (
-        //             Math.Abs(world.player.playerData.ChunkCoord.X - pd2.ChunkCoord.X) <= TileMapHorizon &&
-        //             Math.Abs(world.player.playerData.ChunkCoord.Y - pd2.ChunkCoord.Y) <= TileMapHorizon
-        //         )
-        //         {
-        //             world.RpcId(pd2.PeerId, "RecivePlayer", PlayerData.ToBytes(world.player.playerData));
-        //         }
-        //     }
-        // }
+        foreach (var sets in packs)
+        {
+            world.RpcId(sets.Key, "RecivePlayerDatas", ByteTool.ToBytes<PlayerPack>(sets.Value));
+        }
+
+
+        foreach (var player in Players.Values)
+        {
+            if (player.Name != Player.Profile.Name)
+            {
+                if (player.Inventory.update)
+                {
+                    player.Inventory.update = false;
+                    world.RpcId(player.PeerId, "RecivePlayerInv", ByteTool.ToBytes<PlayerInventory>(player.Inventory));
+                }
+
+                if (player.OpeningBlockInventory)
+                {
+                    var blockdata = GetBlock(new Vector3I((int)player.OpenInventory.X, (int)player.OpenInventory.Y,
+                        (int)player.OpenInventory.Z));
+                    if (blockdata != null)
+                    {
+                        var data = blockdata.GetComponent<InventoryComponent>();
+                        if (data != null)
+                        {
+                            world.RpcId(player.PeerId, "ReciveBlockInventoryData",
+                                ByteTool.ToBytes<InventoryComponent>(data),
+                                ByteTool.ToBytes<PlayerInventory>(player.Inventory));
+                        }
+                        else
+                        {
+                            player.OpeningBlockInventory = false;
+                            GD.PrintErr($"blockdata is null! at{player.OpenInventory.ToString()}");
+                        }
+                    }
+                }
+            }
+        }
 
         stopwatch.Stop();
         SyncPlayerTime.X = stopwatch.ElapsedMilliseconds;

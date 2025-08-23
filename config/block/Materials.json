@@ -38,9 +38,6 @@
       }
     }
   },
-  "oak_leaves": {},
-  "snow": {},
-  "iceblock": {},
   "water": {
     "collide": false,
     "cube": false,
@@ -62,5 +59,18 @@
         "Current": 0
       }
     }
-  }
+  },
+  "wooden_storage_box": {
+    "components": {
+      "InventoryComponent": {
+        "Name": "BoxComponent",
+        "Size": 36,
+        "InventoryName": "StorageBoxInv"
+      }
+    }
+  },
+  "oak_leaves": {},
+  "oak_plank": {},
+  "snow": {},
+  "iceblock": {}
 }

@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Godot;
 using horizoncraft.script;
+using horizoncraft.script.Components;
 using horizoncraft.script.Features;
+using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.work;
@@ -61,6 +63,17 @@ public class WorldBase
 
     public WorldBase()
     {
+    }
+
+    public virtual void SetBlock(Vector3I coord, Blockdata blockdata)
+    {
+        Vector2I ChunkCoord = World.MathFloor(coord, Chunk.Size);
+        Vector2I LocalCoord = World.Remainder(coord, Chunk.Size);
+        if (Chunks.ContainsKey(ChunkCoord))
+        {
+            Chunk chunk = Chunks[ChunkCoord];
+            chunk.SetBlock(LocalCoord.X, LocalCoord.Y, coord.Z, blockdata);
+        }
     }
 
     public virtual void SetBlock(Vector3I coord, BlockMeta meta, bool replaceAir = false, int state = 0)
@@ -123,6 +136,29 @@ public class WorldBase
                 LoadChunkQueue[ChunkCoord] = sbw;
             }
         }
+    }
+
+    public bool CheckIsCloseBlock(Vector3I pos)
+    {
+        var block = GetBlock(pos);
+        var u = GetBlock(pos + Vector3I.Down);
+        var d = GetBlock(pos + Vector3I.Up);
+        var l = GetBlock(pos + Vector3I.Left);
+        var r = GetBlock(pos + Vector3I.Right);
+        if (block != null && u != null && d != null && l != null && r != null)
+        {
+            if (
+                !u.IsMeta("air") &&
+                !d.IsMeta("air") &&
+                !l.IsMeta("air") &&
+                !r.IsMeta("air")
+            )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public virtual Blockdata GetBlock(Vector3I coord)
@@ -202,6 +238,78 @@ public class WorldBase
         {
             world.VisibleChunks.Remove(key, out _);
         }
+    }
+
+    public virtual void SharItem(InventoryBase inventory, int index)
+    {
+    }
+    //不直接写在 InventoryBase 因为这涉及到用户交互和网络传输
+    public virtual bool PickItem(PlayerData playerdata, InventoryBase inventory, int index)
+    {
+        if (playerdata == null) return false;
+        var handitem = playerdata.Inventory.HandItemStack;
+        var targetitem = inventory.GetItem(index);
+        if (targetitem != null && handitem != null && targetitem.Id == handitem.Id)
+        {
+            int space = targetitem.GetItemMeta().MaxAmount - targetitem.Amount;
+            if (space > 0)
+            {
+                if (space >= handitem.Amount)
+                {
+                    targetitem.Amount += handitem.Amount;
+                    playerdata.Inventory.HandItemStack = null;
+                }
+                else
+                {
+                    targetitem.Amount += space;
+                    handitem.Amount -= space;
+                }
+            }
+        }
+        else
+        {
+            playerdata.Inventory.update = true;
+            playerdata.Inventory.HandItemStack = targetitem;
+            inventory.SetItem(index, handitem);
+        }
+
+        return true;
+    }
+
+    public bool OpenBlockView(string viewName, int x, int y, int z)
+    {
+        if (world == null || world.player.playerData == null) return false;
+        if (world.player.ShowView != null)
+        {
+            CloseView();
+            world.player.RemoveChild(world.player.ShowView);
+        }
+
+        var Invcomponent = world.WorldService.GetBlock(new(x, y, z))?.GetComponent<InventoryComponent>();
+        if (Invcomponent == null) return false;
+        world.player.ShowView = InventoryManage.GetInventory<InventoryNode>(viewName);
+        world.player.ShowView.TargetInvBase = Invcomponent.GetInventory();
+        world.player.ShowView.TargetBlockGlobalPos = new(x, y, z);
+        world.player.ShowView.player = world.player;
+        world.player.AddChild(world.player.ShowView);
+        return true;
+    }
+
+    public void OpenView(string viewName)
+    {
+        if (world.player.ShowView != null)
+        {
+            CloseView();
+            world.player.RemoveChild(world.player.ShowView);
+        }
+
+        world.player.ShowView = InventoryManage.GetInventory<InventoryNode>(viewName);
+        world.player.ShowView.player = world.player;
+        world.player.AddChild(world.player.ShowView);
+    }
+
+    public virtual void CloseView()
+    {
     }
 
     public float GetTimeProgress() => (float)(TickTimes % DayTimeMax) / DayTimeMax;

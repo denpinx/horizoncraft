@@ -11,6 +11,7 @@ namespace horizoncraft.script.Components
     [MemoryPackUnion(2, typeof(FluidComponent))]
     [MemoryPackUnion(3, typeof(PhysicsComponent))]
     [MemoryPackUnion(4, typeof(ItemComponent))]
+    [MemoryPackUnion(5, typeof(InventoryComponent))]
     public abstract partial class Component
     {
         public string Name;

@@ -1,11 +1,12 @@
+using Godot;
 using horizoncraft.script.Net;
 using MemoryPack;
 
 namespace horizoncraft.script.Inventory;
 
 [MemoryPackable]
-[MemoryPackUnion(0, typeof(InventorySet))]
-[MemoryPackUnion(1, typeof(PlayerInventory))]
+[MemoryPackUnion(0, typeof(PlayerInventory))]
+[MemoryPackUnion(1, typeof(BlockInventory))]
 public abstract partial class InventoryBase
 {
     [MemoryPackIgnore] public bool update = true;
@@ -13,8 +14,9 @@ public abstract partial class InventoryBase
     public ItemStack[] Items;
 
 
-    public InventoryBase()
+    public InventoryBase(int size)
     {
+        this.Size = size;
         Items = new ItemStack[Size];
     }
 
@@ -25,6 +27,23 @@ public abstract partial class InventoryBase
     {
         Items[id] = item;
         update = true;
+    }
+
+    public void SubItemAmount(int id, int amount = 1)
+    {
+        if (Items[id] == null)
+        {
+            GD.PrintErr("Inventory: SubItemAmount: Item not found!");
+            return;
+        }
+
+        Items[id].Amount -= amount;
+        if (Items[id].Amount <= 0) Items[id] = null;
+    }
+
+    public bool IsEmpty(int index)
+    {
+        return Items[index] == null;
     }
 
     public bool TryAddItem(ItemStack additem)
@@ -44,7 +63,7 @@ public abstract partial class InventoryBase
                 int max = item.GetItemMeta().MaxAmount;
                 int space = max - item.Amount;
                 //空间足够 
-                if (space > 0 && space <= additem.Amount)
+                if (space > 0 && space >= additem.Amount)
                 {
                     item.Amount += additem.Amount;
                     additem.Amount = 0;
@@ -53,7 +72,7 @@ public abstract partial class InventoryBase
                 }
 
                 //空间不足
-                if (space > 0)
+                if (space > 0 && space < additem.Amount)
                 {
                     item.Amount = max;
                     additem.Amount -= space;

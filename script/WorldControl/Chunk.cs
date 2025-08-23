@@ -26,12 +26,13 @@ namespace horizoncraft.script.WorldControl
         public static int Size = 24;
         public bool spawn = false;
         public long version;
-        
+
         public int X;
         public int Y;
-        
+
 
         public string BiomeType = "";
+        public string BiomeName = "";
         [MemoryPackIgnore] public List<Vector3I> UpdateList = new();
         [MemoryPackIgnore] public List<Vector3I> UpdateList_buffer = new();
 
@@ -85,11 +86,15 @@ namespace horizoncraft.script.WorldControl
                 }
             }
         }
-        
+
+        public void SetBlock(int x, int y, int z,Blockdata blockdata)
+        {
+            data[x, y, z] = blockdata;
+        }
         public void Tick(WorldBase WorldService, World world)
         {
             version = WorldService.TickTimes;
-            
+
             UpdateList.Clear();
             if (UpdateList_buffer.Count > 0)
             {
