@@ -72,5 +72,56 @@
   "oak_leaves": {},
   "oak_plank": {},
   "snow": {},
-  "iceblock": {}
+  "iceblock": {},
+  "ladder": {
+    "collide": false,
+    "cube": false
+  },
+  "brickblock": {},
+  "rose": {
+    "collide": false,
+    "cube": false
+  },
+  "furnace": {
+    "state": {
+      "normal": {
+        "texture": "furnace"
+      },
+      "working": {
+        "texture": "res://config/block_tscn/furnace_1.tscn",
+        "scene": true
+      }
+    },
+    "components": {
+      "FurnaceComponent": {
+        "Name": "FurnaceComponent",
+        "Max": 1,
+        "Size": 3,
+        "InventoryName": "FurnaceInv"
+      }
+    }
+  },
+  "logistics_pipeline": {
+    "collide": false,
+    "cube": false,
+    "tiletype": "terrain",
+    "tags": {
+      "link": "net"
+    }
+  },
+  "input_block": {
+    "tags": {
+      "link": "net"
+    }
+  },
+  "output_block": {
+    "tags": {
+      "link": "net"
+    }
+  },
+  "interface_block": {
+    "tags": {
+      "link": "net"
+    }
+  }
 }

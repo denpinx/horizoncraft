@@ -78,6 +78,7 @@ namespace horizoncraft.script.Components
             Register("FluidComponent", () => new FluidComponent(), new FluidSystem());
             Register("PhysicsComponent", () => new PhysicsComponent(), new PhysicsSystem());
             Register("BoxComponent", () => new InventoryComponent(), new InventorySystem());
+            Register("FurnaceComponent", () => new FurnaceComponent(), new FurnaceSystem());
         }
     }
 }

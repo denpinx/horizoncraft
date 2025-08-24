@@ -29,5 +29,7 @@ public class InventoryManage
         RegInv("PlayerInventory", GD.Load<PackedScene>("res://tscn/Menu/Inventory/InventoryNode.tscn").Instantiate());
         RegInv("StorageBoxInv",
             GD.Load<PackedScene>("res://tscn/Menu/Inventory/StorageBoxInv.tscn").Instantiate<StorageBoxInv>());
+        RegInv("FurnaceInv",
+            GD.Load<PackedScene>("res://tscn/Menu/Inventory/FurnaceInv.tscn").Instantiate<FurnaceInv>());
     }
 }

@@ -36,6 +36,7 @@ namespace horizoncraft.script.WorldControl
             }
             set { _blockMeta = value; }
         }
+
         public T GetComponent<T>() where T : Component
         {
             for (int i = 0; i < components.Count; i++)
@@ -83,30 +84,37 @@ namespace horizoncraft.script.WorldControl
 
         public bool IsMeta(String ID)
         {
-            BlockMeta = Materials.Valueof(this.ID);
             return BlockMeta.ID == Materials.Valueof(ID).ID;
         }
 
-        public int GetTileId()
+        public BlockTileSet GetBlockTileSet()
         {
-            BlockMeta = Materials.Valueof(this.ID);
-            if (BlockMeta.blockTileDatas.Count == 0) return -1;
+            if (BlockMeta.blockTileDatas.Count == 0) return null;
             if (BlockMeta.Tiletype == "tile")
-                return BlockMeta.GetBlockTileSet(STATE).tile_id;
+                return BlockMeta.GetBlockTileSet(STATE);
             if (BlockMeta.Tiletype == "atlas")
-                return BlockMeta.GetBlockTileSet(0).tile_id;
-            return -1;
+                return BlockMeta.GetBlockTileSet(0);
+            if (BlockMeta.Tiletype == "terrain")
+                return BlockMeta.GetBlockTileSet(STATE);
+            return null;
         }
 
         public int GetTileSize()
         {
-            BlockMeta = Materials.Valueof(this.ID);
             if (BlockMeta.blockTileDatas.Count == 0) return -1;
             if (BlockMeta.Tiletype == "tile")
                 return BlockMeta.GetBlockTileSet(STATE).tile_size;
             if (BlockMeta.Tiletype == "atlas")
                 return BlockMeta.GetBlockTileSet(0).tile_count;
             return -1;
+        }
+
+        public bool CheckTag(string tagname, string value)
+        {
+            var v = BlockMeta.GetTag(tagname);
+            if (v == null) return false;
+            if (v == value) return true;
+            return false;
         }
     }
 }

@@ -144,10 +144,18 @@ namespace horizoncraft.script
                 {
                     Name = item_name,
                 };
-                if (dict.ContainsKey("state"))
+                var item_dict = (Dictionary<string, object>)dict[item_name];
+                if (item_dict.ContainsKey("tags"))
+                {
+                    var dict_attr = (Dictionary<string, object>)item_dict["tags"];
+                    foreach (var v in dict_attr)
+                        itemMeta.Tags.Add(v.Key, (string)v.Value);
+                }
+
+                if (item_dict.ContainsKey("state"))
                 {
                     var itemset = new ItemStateSet();
-                    var dict_state = (Dictionary<string, object>)dict["state"];
+                    var dict_state = (Dictionary<string, object>)item_dict["state"];
                     foreach (string state_name in dict_state.Keys)
                         itemset.TextureNames.Add(state_name);
                     itemMeta.Itemset = itemset;
@@ -198,6 +206,13 @@ namespace horizoncraft.script
                     blockmeta.Tiletype = (string)config["tiletype"];
                 }
 
+                if (config.ContainsKey("tags"))
+                {
+                    var dict_attr = (Dictionary<string, object>)config["tags"];
+                    foreach (var v in dict_attr)
+                        blockmeta.Tags.Add(v.Key, (string)v.Value);
+                }
+
                 //配置不同状态下的Tile贴图
                 if (config.ContainsKey("state"))
                 {
@@ -211,6 +226,8 @@ namespace horizoncraft.script
                         {
                             state = state_id,
                         };
+
+                        GD.Print($"创建贴图状态{state_name} -> {state_id}");
                         //定义了详细的名称就用定义的
                         if (sdict.ContainsKey("texture"))
                         {
@@ -220,6 +237,12 @@ namespace horizoncraft.script
                         else
                         {
                             tile.texture_name = $"{blockmeta.NAME}_{state_name}";
+                        }
+
+                        if (sdict.ContainsKey("scene"))
+                        {
+                            tile.scene = (bool)sdict["scene"];
+                            GD.Print($"{tile.texture_name} halight at {tile.scene}");
                         }
 
                         blockTileSets.Add(tile);
@@ -307,42 +330,59 @@ namespace horizoncraft.script
                 for (int state_index = 0; state_index < meta.blockTileDatas.Count; state_index++)
                 {
                     BlockTileSet blockTileSet = meta.blockTileDatas[state_index];
-                    var image = ResourceLoader.Load<Texture2D>($"res://texture/block/{blockTileSet.texture_name}.png");
-                    int tilesX = image.GetWidth() / 16;
-                    int tilesY = image.GetHeight() / 16;
-                    var atlasSource = new TileSetAtlasSource();
-                    atlasSource.Texture = image;
-                    atlasSource.TextureRegionSize = new Vector2I(16, 16);
-                    blockTileSet.tile_id = tileSet.AddSource(atlasSource);
-                    for (int y = 0; y < tilesY; y++)
-                    for (int x = 0; x < tilesX; x++)
+                    if (blockTileSet.scene)
                     {
-                        var id = new Vector2I(x, y);
-                        atlasSource.CreateTile(id);
-                        var tileData = atlasSource.GetTileData(id, 0);
-
-                        if (meta.COLLIDE)
-                        {
-                            var half = 16 / 2.0f;
-                            Vector2[] polygon = new Vector2[]
-                            {
-                                new Vector2(-half, -half),
-                                new Vector2(half, -half),
-                                new Vector2(half, half),
-                                new Vector2(-half, half)
-                            };
-                            tileData.AddCollisionPolygon(0);
-                            tileData.SetCollisionPolygonPoints(0, 0, polygon);
-                            tileData.AddOccluderPolygon(0);
-                            tileData.SetOccluderPolygon(0, 0, new OccluderPolygon2D()
-                            {
-                                Polygon = polygon
-                            });
-                        }
+                        var ts = new TileSetScenesCollectionSource();
+                        blockTileSet.tile_id = tileSet.AddSource(ts);
+                        PackedScene ps = GD.Load<PackedScene>(blockTileSet.texture_name);
+                        blockTileSet.id = ts.CreateSceneTile(ps);
+                        blockTileSet.tile_count = 1;
+                        blockTileSet.tile_size = 1;
+                        GD.Print(
+                            $"创建场景集合 {meta.NAME},{blockTileSet.tile_id},{blockTileSet.scene} id:{blockTileSet.id}");
                     }
+                    else
+                    {
+                        var image = ResourceLoader.Load<Texture2D>(
+                            $"res://texture/block/{blockTileSet.texture_name}.png");
+                        int tilesX = image.GetWidth() / 16;
+                        int tilesY = image.GetHeight() / 16;
+                        var atlasSource = new TileSetAtlasSource();
+                        blockTileSet.tile_id = tileSet.AddSource(atlasSource);
 
-                    blockTileSet.tile_size = tilesX;
-                    blockTileSet.tile_count = tilesX * tilesY;
+                        atlasSource.Texture = image;
+                        atlasSource.TextureRegionSize = new Vector2I(16, 16);
+                        GD.Print($"创建图集{blockTileSet.tile_id}");
+                        for (int y = 0; y < tilesY; y++)
+                        for (int x = 0; x < tilesX; x++)
+                        {
+                            var id = new Vector2I(x, y);
+                            atlasSource.CreateTile(id);
+                            var tileData = atlasSource.GetTileData(id, 0);
+
+                            if (meta.COLLIDE)
+                            {
+                                var half = 16 / 2.0f;
+                                Vector2[] polygon = new Vector2[]
+                                {
+                                    new Vector2(-half, -half),
+                                    new Vector2(half, -half),
+                                    new Vector2(half, half),
+                                    new Vector2(-half, half)
+                                };
+                                tileData.AddCollisionPolygon(0);
+                                tileData.SetCollisionPolygonPoints(0, 0, polygon);
+                                tileData.AddOccluderPolygon(0);
+                                tileData.SetOccluderPolygon(0, 0, new OccluderPolygon2D()
+                                {
+                                    Polygon = polygon
+                                });
+                            }
+                        }
+
+                        blockTileSet.tile_size = tilesX;
+                        blockTileSet.tile_count = tilesX * tilesY;
+                    }
                 }
             }
 

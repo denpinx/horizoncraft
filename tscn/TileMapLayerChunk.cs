@@ -45,23 +45,40 @@ public partial class TileMapLayerChunk : Node2D
                         Blockdata block = chunk.GetBlock(x, y, z);
                         Blockdata block_back = chunk.GetBlock(x, y, 0);
                         Blockdata block_font = chunk.GetBlock(x, y, 1);
+                        int tile_id = -1;
+                        var bts = block.GetBlockTileSet();
+                        if (bts != null) tile_id = bts.tile_id;
 
-                        int tile_id = block.GetTileId();
                         int tile_size = block.GetTileSize();
                         Vector2I coord = new(0, 0);
                         if (block.BlockMeta.Tiletype == "tile")
                         {
                             coord = new(x % tile_size, y % tile_size);
                         }
-                        else if (block.BlockMeta.Tiletype == "atlas")
+
+                        if (block.BlockMeta.Tiletype == "atlas")
                         {
                             coord = new(block.STATE, 0);
                         }
 
+                        if (block.BlockMeta.Tiletype == "terrain")
+                        {
+                            var global = new Vector3I(chunk.X * Chunk.Size + x, chunk.Y * Chunk.Size + y, z);
+                            coord = player.world.WorldService.GetTerrain(global);
+                        }
+
                         if (z == 0 && !block_font.BlockMeta.CUBE)
-                            tileMapLayer_back.SetCell(new(x, y), tile_id, coord);
+                        {
+                            if (bts != null && bts.scene)
+                                tileMapLayer_back.SetCell(new Vector2I(x, y), tile_id, Vector2I.Zero, bts.id);
+                            else tileMapLayer_back.SetCell(new(x, y), tile_id, coord);
+                        }
                         else
-                            tileMapLayer_font.SetCell(new(x, y), tile_id, coord);
+                        {
+                            if (bts != null && bts.scene)
+                                tileMapLayer_font.SetCell(new Vector2I(x, y), tile_id, Vector2I.Zero, bts.id);
+                            else tileMapLayer_font.SetCell(new(x, y), tile_id, coord);
+                        }
                     }
                 }
             }

@@ -25,7 +25,11 @@ public abstract partial class InventoryBase
 
     public void SetItem(int id, ItemStack item)
     {
-        Items[id] = item;
+        if (item==null||item.Amount <= 0)
+            Items[id] = null;
+        else
+            Items[id] = item;
+
         update = true;
     }
 

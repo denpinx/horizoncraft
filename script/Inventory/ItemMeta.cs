@@ -15,6 +15,8 @@ public class ItemMeta
     public ItemStateSet Itemset = new ItemStateSet();
     public Texture2D ShowTexture;
 
+    public Dictionary<string, string> Tags = new Dictionary<string, string>();
+
     public Texture2D GetTexture(int state)
     {
         if (ShowTexture != null) return ShowTexture;
@@ -32,5 +34,11 @@ public class ItemMeta
             Amount = 1,
         };
         return item;
+    }
+
+    public string GetTag(string name)
+    {
+        if (Tags.ContainsKey(name)) return Tags[name];
+        return null;
     }
 }

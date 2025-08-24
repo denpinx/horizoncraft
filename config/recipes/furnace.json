@@ -1,0 +1,35 @@
+{
+  "tag": "furnace",
+  "recipes": [
+    {
+      "process": 20,
+      "cost": [
+        [
+          "grass",
+          1
+        ]
+      ],
+      "result": [
+        [
+          "dirt",
+          1
+        ]
+      ]
+    },
+    {
+      "process": 20,
+      "cost": [
+        [
+          "dirt",
+          1
+        ]
+      ],
+      "result": [
+        [
+          "grass",
+          1
+        ]
+      ]
+    }
+  ]
+}

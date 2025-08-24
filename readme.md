@@ -1,3 +1,7 @@
+# 前言
+
+    代码迭代的很快，文档不一定准确。
+
 # 目前已实现功能
 
 | 功能         | 相关类                                                       | 描述                      |
@@ -8,28 +12,28 @@
 | 生物群系       | [BiomeManage](script/WorldControl/BiomeManage.cs)         | 根据当前生物群系数量自动配置权重        |
 | 组件系统       | [ComponentManager](script/Components/ComponentManager.cs) | 根据组件搭配可以快速构建方块          |
 | 多人联机       | WorldHostService                                          | 实现了区块同步,以及玩家位置同步,性能还待优化 |
+| 物品系统,容器组件  | Materials                                                 | 实现了容器的多人同步,仅在玩家打开容器时同步  |
 
 # 待实现功能
 
-| 功能        | 描述                             |
-|-----------|--------------------------------|
-| 物品系统,容器组件 | 组成玩家生存必不可缺的一部分,要对所有方块再绘制物品版本贴图 |已完成一半
-| 游戏菜单      | 配合物品系统                         |制作中
-| 合成功能      | 配合物品系统,已经有思路了                  |
+| 功能   | 描述     |
+|------|--------|
+| 游戏菜单 | 配合物品系统 | 已完成3个
+| 合成功能 | 配合物品系统 |最后一块拼图
+
+# 距离真正的可玩还差 20% 的进度
 
 # 多人相关
 
 服务器性能测试结果:
 增量同步，静默状态
 
-| 在线人数(不包含主机) | 同步范围 | 加载区块数 | 上传字节数      | 下载字节数  | 描述   |
-|-------------|------|-------|------------|--------|------|
-| 3人          | 5*5  | 100区块 | 1.38KiB/s  | 6KiB/s | 玩家分散 |
-| 3人          | 5*5  | 25区块  | 27.26KiB/s | 6KiB/s | 玩家聚集 |
+| 在线人数(不包含主机) | 同步范围 | 加载区块数 | 上传字节数     | 下载字节数  | 描述   |
+|-------------|------|-------|-----------|--------|------|
+| 3人          | 5*5  | 100区块 | 0KiB/s    | 180B/s | 玩家分散 |
+| 3人          | 5*5  | 25区块  | 4.66KiB/s | 180B/s | 玩家聚集 |
 
-总结，在玩家分散的静默状态下，不管多少人都是1.38KiB/s的流量。
-玩家聚集时反而会提高流量消耗,因为聚集时要给每个玩家发送其他玩家的数据包，目前还是全量同步，之后改成快照同步
-玩家高速跑图时，只会造成10KiB/s每人的流量消耗
+总结:客户端做了增量同步给服务端，只有客户端移动时才会同步给服务端,服务端也做了增量同步,区块信息,玩家背包信息全部都是增量同步,当有一个玩家高速跑图时，服务端上传峰值是14KiB/s
 
 | 类名                  | 继承与接口                                                       | 描述                            |
 |---------------------|-------------------------------------------------------------|-------------------------------|
@@ -44,23 +48,25 @@
 
 # 已实现组件类
 
-| 组件名                                                       | 描述                           | 父类              |
-|-----------------------------------------------------------|------------------------------|-----------------|
-| [Component](script/Components/Component.cs)               | 所有组件的基类                      | 无               |
-| [TickComponent](script/Components/TickComponent.cs)       | 时刻组件,所有方块组件的基类               | Component       |
-| [ExpandComponent](script/Components/ExpandComponent.cs)   | 扩展组件,让TickComponent可以自定义操作对象 | TickComponent   |
-| [FluidComponent](script/Components/FluidComponent.cs)     | 流体组件,让方块具有流体属性               | ExpandComponent |
-| [PhysicsComponent](script/Components/PhysicsComponent.cs) | 物理组件,方块会像沙子一样下坠              | ExpandComponent |
+| 组件名                                                           | 描述                           | 父类              |
+|---------------------------------------------------------------|------------------------------|-----------------|
+| [Component](script/Components/Component.cs)                   | 所有组件的基类                      | 无               |
+| [TickComponent](script/Components/TickComponent.cs)           | 时刻组件,所有方块组件的基类               | Component       |
+| [ExpandComponent](script/Components/ExpandComponent.cs)       | 扩展组件,让TickComponent可以自定义操作对象 | TickComponent   |
+| [FluidComponent](script/Components/FluidComponent.cs)         | 流体组件,让方块具有流体属性               | ExpandComponent |
+| [PhysicsComponent](script/Components/PhysicsComponent.cs)     | 物理组件,方块会像沙子一样下坠              | ExpandComponent |
+| [InventoryComponent](script/Components/InventoryComponent.cs) | 容器组件，能够让方块存储物品               | ExpandComponent |
 
 # 已实现组件功能
 
-| 组件类型                                                      | 行为类型             | 描述                                 |
-|-----------------------------------------------------------|------------------|------------------------------------|
-| [ExpandComponent](script/Components/ExpandComponent.cs)   | BlockCover       | 配置BlockName,当方块被覆盖时变成指定方块          |
-| [ExpandComponent](script/Components/ExpandComponent.cs)   | BlockSpread      | 配置BlockName,让方块能够被任意方块蔓延           |
-| [TickComponent](script/Components/TickComponent.cs)       | BottomCheck      | 检查底部是否为完整方块，如果不是则消失                |
-| [FluidComponent](script/Components/FluidComponent.cs)     | FluidComponent   | 流体组件,配置BlockName,即可让任意方块实现流体功能     |
-| [PhysicsComponent](script/Components/PhysicsComponent.cs) | PhysicsComponent | 物理组件,配置BlockName,即可让任意方块能够像让沙子一样下坠 |
+| 组件类型                                                        | 行为类型               | 描述                                 |
+|-------------------------------------------------------------|--------------------|------------------------------------|
+| [ExpandComponent](script/Components/ExpandComponent.cs)     | BlockCover         | 配置BlockName,当方块被覆盖时变成指定方块          |
+| [ExpandComponent](script/Components/ExpandComponent.cs)     | BlockSpread        | 配置BlockName,让方块能够被任意方块蔓延           |
+| [TickComponent](script/Components/TickComponent.cs)         | BottomCheck        | 检查底部是否为完整方块，如果不是则消失                |
+| [FluidComponent](script/Components/FluidComponent.cs)       | FluidComponent     | 流体组件,配置BlockName,即可让任意方块实现流体功能     |
+| [PhysicsComponent](script/Components/PhysicsComponent.cs)   | PhysicsComponent   | 物理组件,配置BlockName,即可让任意方块能够像让沙子一样下坠 |
+| [InventoryComponent](script/Components/PhysicsComponent.cs) | InventoryComponent | 容器组件,默认无任何功能                       |
 
 # 注册方块
 
@@ -156,6 +162,17 @@
     }
 ```
 
+### 6.创建容器菜单
+
+（1）打开Godot编辑器,创建新场景,将根节点设置为CanvasLayer类型
+
+（2）添加C#脚本，继承InventoryNode,配置容器配置
+
+（3）打开[InventoryManage]("script/Inventory/InventoryManage.cs") 在其中注册当前菜单
+
+（4）打开Materials.json文件找到你想添加容器组件的方块,将其添加容器组件后在组件内配置 "InventoryName":"容器菜单"
+属性,这个属性是决定玩家右键打开的是什么菜单
+
 # 注册实体
 
 ## 此功能是半成品，只实现了跟随区块加载和卸载
@@ -177,7 +194,6 @@
 | Biome     | BaseBiome | 二维群系   
 
 LandBiome生成基于X轴计算,Biome是在LandBiome的基础上再计算的结果,两则不会冲突
-w
 
 ## 注册生物群系
 

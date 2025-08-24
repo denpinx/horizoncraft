@@ -16,6 +16,26 @@ namespace HorizonCraft.script.WorldControl.Service;
 
 public class WorldBase
 {
+    private Vector2I[] TerrainCoord =
+    {
+        new Vector2I(3, 3), //无0
+        new Vector2I(3, 2), //下1
+        new Vector2I(3, 0), //上2
+        new Vector2I(3, 1), //上下3
+        new Vector2I(2, 3), //右4
+        new Vector2I(2, 2), //左上10
+        new Vector2I(2, 0), //右上6
+        new Vector2I(2, 1), //上下左11
+        new Vector2I(0, 3), //左8
+        new Vector2I(0, 2), //左下9
+        new Vector2I(0, 0), //右下相同5
+        new Vector2I(0, 1), //上下右7
+        new Vector2I(1, 3), //左右12
+        new Vector2I(1, 2), //上左右13
+        new Vector2I(1, 0), //下左右
+        new Vector2I(1, 1), //全部相同15
+    };
+
     public Action<WorldBase, Chunk> OnChunkLoaded;
 
     public Action<WorldBase, Chunk> OnChunkUnLoading;
@@ -125,6 +145,26 @@ public class WorldBase
         }
     }
 
+    public Vector2I GetTerrain(Vector3I pos)
+    {
+        var block = GetBlock(pos);
+        if (block == null) return new Vector2I(1, 1);
+
+        var up = GetBlock(pos + Vector3I.Down);
+        var down = GetBlock(pos + Vector3I.Up);
+        var left = GetBlock(pos + Vector3I.Left);
+        var right = GetBlock(pos + Vector3I.Right);
+
+
+        int id = block.ID;
+        int state = 0;
+        if (up != null && up.CheckTag("link", "net")) state |= 1; // 位0: 上相同
+        if (down != null && down.CheckTag("link", "net")) state |= 2; // 位1: 下相同
+        if (left != null && left.CheckTag("link", "net")) state |= 4; // 位2: 左相同
+        if (right != null && right.CheckTag("link", "net")) state |= 8; // 位3: 右相同
+        return TerrainCoord[state];
+    }
+
     public bool CheckIsCloseBlock(Vector3I pos)
     {
         var block = GetBlock(pos);
@@ -230,10 +270,6 @@ public class WorldBase
         {
             world.VisibleChunks.Remove(key, out _);
         }
-    }
-
-    public virtual void SharItem(InventoryBase inventory, int index)
-    {
     }
 
     //不直接写在 InventoryBase 因为这涉及到用户交互和网络传输

@@ -7,7 +7,7 @@ public class BlockSpreadSystem : TickSystem
 {
     Random _Random = new Random();
 
-    public override void Ticking(BlockTickEvent e, TickComponent cmp)
+    public override void Ticking(BlockTickEvent e, Component cmp)
     {
         var ec = cmp as ExpandComponent;
         var meta = Materials.Valueof(ec.BlockName);

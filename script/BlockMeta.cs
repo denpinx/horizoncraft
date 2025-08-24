@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Godot;
-using Godot.Collections;
 using horizoncraft.script.Components;
 using horizoncraft.script.Events;
 using horizoncraft.script.WorldControl;
+using Dictionary = System.Collections.Generic.Dictionary<string, string>;
 
 namespace horizoncraft.script
 {
@@ -17,6 +15,7 @@ namespace horizoncraft.script
         public Action<PlaceBlockEvent> PlaceBlockEvent;
         public Action<BlockTickEvent> BlockTickEvent;
         public List<BlockTileSet> blockTileDatas = new();
+        public Dictionary Tags = new();
         public string Tiletype = "tile";
         public string NAME;
         public int SourceID;
@@ -38,6 +37,11 @@ namespace horizoncraft.script
 
             if (blockTileDatas.Count == 1) return blockTileDatas[0];
             else return null;
+        }
+        public string GetTag(string name)
+        {
+            if (Tags.ContainsKey(name)) return Tags[name];
+            return null;
         }
     }
 }

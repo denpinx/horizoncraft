@@ -12,6 +12,7 @@ namespace horizoncraft.script.Components
     [MemoryPackUnion(3, typeof(PhysicsComponent))]
     [MemoryPackUnion(4, typeof(ItemComponent))]
     [MemoryPackUnion(5, typeof(InventoryComponent))]
+    [MemoryPackUnion(6, typeof(FurnaceComponent))]
     public abstract partial class Component
     {
         public enum TickType

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using horizoncraft.script.Components.Systems;
 using horizoncraft.script.Events;
+using horizoncraft.script.Inventory;
 
 namespace horizoncraft.script.Components
 {
@@ -19,13 +21,19 @@ namespace horizoncraft.script.Components
                     tc.Current++;
                 }
             }
+            else if (component is InventoryComponent ic)
+                ProcessTick(worldEvent as BlockTickEvent, ic);
         }
 
         public virtual void SetComponentValue(Component component, Dictionary<string, string> value)
         {
         }
 
-        public virtual void Ticking(BlockTickEvent evnet, TickComponent component)
+        public virtual void Ticking(BlockTickEvent evnet, Component component)
+        {
+        }
+
+        public virtual void ProcessTick(BlockTickEvent evnet, InventoryComponent component)
         {
         }
     }

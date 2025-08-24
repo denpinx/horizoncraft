@@ -13,9 +13,10 @@ namespace horizoncraft.script.WorldControl
         //tile_count:当前图集的图块数
         public int state = 0;
         public int tile_id;
+        public int id = 0;
         public int tile_size;
         public int tile_count;
-
+        public bool scene = false;
         public string texture_name;
     }
 }

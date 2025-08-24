@@ -4,7 +4,7 @@ namespace horizoncraft.script.Components.Systems;
 
 public class FluidSystem : TickSystem
 {
-    public override void Ticking(BlockTickEvent e, TickComponent cmp)
+    public override void Ticking(BlockTickEvent e, Component cmp)
     {
         FluidComponent fc = cmp as FluidComponent;
         BlockMeta blockMeta = Materials.Valueof(fc.BlockName);

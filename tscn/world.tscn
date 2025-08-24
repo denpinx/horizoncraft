@@ -8,6 +8,7 @@
 script = ExtResource("1_oo2r5")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="ColorRect_Top" type="ColorRect" parent="CanvasLayer"]
 top_level = true

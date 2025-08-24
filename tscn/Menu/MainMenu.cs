@@ -12,7 +12,6 @@ public partial class MainMenu : World
 
     public override void _Ready()
     {
-        
         worldMode = WorldMode.Preview;
         LoadProfile();
 
@@ -25,7 +24,6 @@ public partial class MainMenu : World
 
 
         base._Ready();
-
         player.hotBar.Visible = false;
 
         ButtonSingle = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/Button_Single");

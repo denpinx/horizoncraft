@@ -18,6 +18,7 @@ namespace horizoncraft.script.Components
             Register<FluidComponent>();
             Register<PhysicsComponent>();
             Register<InventoryComponent>();
+            Register<FurnaceComponent>();
         }
 
         public static void Register<T>() where T : Component, new()

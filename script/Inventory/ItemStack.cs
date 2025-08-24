@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Godot;
 using horizoncraft.script.Components;
 using horizoncraft.script.Net;
 using MemoryPack;
@@ -19,6 +20,15 @@ public partial class ItemStack
     }
 
     public ItemMeta GetItemMeta() => Materials.itemmetas[Id];
-
     public BlockMeta GetBlockMeta() => Materials.Valueof(GetItemMeta().Name);
+
+    public ItemStack Copy(int amount = 0)
+    {
+        return new ItemStack()
+        {
+            Id = this.Id,
+            Amount = amount == 0 ? this.Amount : amount,
+            State = this.State
+        };
+    }
 }
