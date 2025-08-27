@@ -9,7 +9,7 @@ public partial class PlayerInventory : InventoryBase
     public short HandSlot = 0;
     public ItemStack HandItemStack;
 
-    public PlayerInventory() : base(4 * 9)
+    public PlayerInventory() : base(4 * 9 + 4)
     {
     }
 

@@ -19,6 +19,8 @@ namespace horizoncraft.script.WorldControl
         public List<Component> components = new();
         public int ID;
         public int STATE = 0;
+        
+        public int Light = 0;
 
         [MemoryPackIgnore] private BlockMeta _blockMeta;
 
@@ -115,6 +117,11 @@ namespace horizoncraft.script.WorldControl
             if (v == null) return false;
             if (v == value) return true;
             return false;
+        }
+
+        public void SetLight(int light)
+        {
+            this.Light = light;
         }
     }
 }

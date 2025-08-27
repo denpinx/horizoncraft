@@ -12,6 +12,6 @@ namespace horizoncraft.script.Components
     {
         void Execute(WorldEvent worldEvent, Component component);
 
-        void SetComponentValue(Component component, Dictionary<string, string> value);
+        void SetComponentValue(PlayerData player,Component component, Dictionary<string, string> value);
     }
 }

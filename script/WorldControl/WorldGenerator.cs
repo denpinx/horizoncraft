@@ -248,6 +248,8 @@ namespace horizoncraft.script.WorldControl
             }
 
             StopWatch.Stop();
+
+            chunk.HighMap = highmap;
             chunk.UpdateList.Clear();
             chunk.SpawnCostTime = (int)StopWatch.ElapsedMilliseconds;
             chunk.update_tilemap = true;

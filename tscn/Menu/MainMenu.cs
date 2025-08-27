@@ -4,6 +4,9 @@ using horizoncraft.script.WorldControl;
 using System;
 using Godot.Collections;
 using horizoncraft.script.Config;
+using World = HorizonCraft.script;
+
+namespace horizoncraft.script;
 
 public partial class MainMenu : World
 {

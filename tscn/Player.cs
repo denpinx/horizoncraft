@@ -15,6 +15,8 @@ using horizoncraft.script.WorldControl.Service;
 using HorizonCraft.script.WorldControl.Service;
 using Vector3 = System.Numerics.Vector3;
 
+namespace horizoncraft.script;
+
 public partial class Player : CharacterBody2D
 {
     private const bool TEST_MODE = true;
@@ -39,9 +41,9 @@ public partial class Player : CharacterBody2D
     Label Label_PlayerName;
 
     public InventoryNode ShowView;
-
+    public Sprite2D Cursor;
     public HotBar hotBar;
-
+    public RayCast2D RayCast;
     private bool LastFramIsLeft = false;
     private bool LastFramIsRight = false;
 
@@ -72,6 +74,8 @@ public partial class Player : CharacterBody2D
         {
             var targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 1);
             var fontblock = world.WorldService.GetBlock(targetpos);
+
+
             if (fontblock == null) return;
             if (fontblock.IsMeta("air")) targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
             var fblock = world.WorldService.GetBlock(targetpos);
@@ -91,6 +95,7 @@ public partial class Player : CharacterBody2D
             var targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
             var backblock = world.WorldService.GetBlock(targetpos);
             var fontblock = world.WorldService.GetBlock(new Vector3I(Mousecoord.X, Mousecoord.Y, 1));
+
 
             if (fontblock != null && backblock != null)
             {
@@ -118,7 +123,7 @@ public partial class Player : CharacterBody2D
                             targetpos,
                             bm, false, 0
                         );
-                    if (mode == 0) playerData.Inventory.SubItemAmount(playerData.Inventory.HandSlot);
+                    if (mode == 0) playerData.Inventory.ReduceItemAmount(playerData.Inventory.HandSlot);
                 }
                 //交互方块
             }
@@ -325,6 +330,9 @@ public partial class Player : CharacterBody2D
             Vector2I MCcoord = World.MathFloor(Mcoord, Chunk.Size);
             Label_DEBUG_Left.Text = "";
             StringBuilder Text = new StringBuilder();
+
+            var targetblock = world?.WorldService?.GetBlock(new Vector3I(Mcoord.X, Mcoord.Y, 1));
+
             Text.AppendLine($"全局A坐标：{playerData.Coord.X},{playerData.Coord.Y}");
             Text.AppendLine($"区块坐标：{playerData.ChunkCoord.X},{playerData.ChunkCoord.Y}");
             Text.AppendLine($"加载区块：{world.WorldService.Chunks.Count}");
@@ -332,6 +340,8 @@ public partial class Player : CharacterBody2D
             Text.AppendLine($"TileMap: {world.tileMapLayerChunks.Count}");
             Text.AppendLine($"显示区块: {world.VisibleChunks.Count}");
             Text.AppendLine($"鼠标位置: {Mcoord.X},{Mcoord.Y} ");
+            if (targetblock != null)
+                Text.AppendLine($"光照: {targetblock.Light} ");
             Text.AppendLine($"当前方块坐标: {MCcoord.X},{MCcoord.Y} ");
             Text.AppendLine($"World.Tick耗时: {world.tick_use_time}MS");
             Text.AppendLine($"ChunkManage.Tick耗时: {world.WorldService.TickConsuming}MS");
@@ -371,6 +381,8 @@ public partial class Player : CharacterBody2D
 
     public override void _Ready()
     {
+        //RayCast = GetNode<RayCast2D>("RayCast2D");
+        //Cursor = GetNode<Sprite2D>("Cursor");
         camera2d = GetNode<Camera2D>("Camera2D");
         Label_DEBUG_Left = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Left");
         Label_DEBUG_Right = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Right");

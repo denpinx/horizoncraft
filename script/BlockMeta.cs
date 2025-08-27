@@ -22,6 +22,11 @@ namespace horizoncraft.script
         public int ID;
         public bool COLLIDE = true;
         public bool CUBE = true;
+        public bool Light = false;
+
+
+        public HashSet<int> InputMask = new();
+        public HashSet<int> OutputMask = new();
 
         public Blockdata Blockdata()
         {
@@ -38,6 +43,7 @@ namespace horizoncraft.script
             if (blockTileDatas.Count == 1) return blockTileDatas[0];
             else return null;
         }
+
         public string GetTag(string name)
         {
             if (Tags.ContainsKey(name)) return Tags[name];

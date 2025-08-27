@@ -19,5 +19,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="script\Inventory\InventorySet.cs" />
+    <Compile Remove="script\Net\RemoteFunctionItem.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="script\Interface\" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,40 @@
+using System.Collections.Generic;
+using Godot;
+using horizoncraft.script.Events;
+using horizoncraft.script.Inventory;
+using horizoncraft.script.Recipes;
+
+namespace horizoncraft.script.Components.Systems;
+
+public class WorkBenchSystem : TickSystem
+{
+    public override void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)
+    {
+        var BlockInv = (component as InventoryComponent).GetInventory();
+        if (value.ContainsKey("Action") && value["Action"] == "Craft")
+        {
+            var gri = RecipeManage.GetRecipe(BlockInv, 3);
+            if (gri != null)
+            {
+                var handitme = player.Inventory.HandItemStack;
+                if (handitme == null
+                   )
+                {
+                    player.Inventory.HandItemStack = gri.Result.Copy();
+                }
+                else if (
+                    handitme.Id == gri.Result.Id &&
+                    handitme.Amount + gri.Result.Amount <= gri.Result.GetItemMeta().MaxAmount
+                )
+                {
+                    handitme.Amount += gri.Result.Amount;
+                }
+
+                for (int i = 0; i < 9; i++)
+                {
+                    BlockInv.ReduceItemAmount(i);
+                }
+            }
+        }
+    }
+}

@@ -150,6 +150,8 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         if (world.player.playerData != null) SavePlayer(world.player.playerData);
         ProcessDataRecive();
         UpdateLoadChunkCoords();
+        
+        UpdateLights();
         UpdataTileMap();
     }
 
@@ -162,6 +164,14 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
                 playerdata.Name, index);
         else
             world.RpcId(1, "PickInvItem", playerdata.Name, index);
+
+        // if (inventory is BlockInventory bi)
+        //     world.RpcId(1, "InvokePlayerFunc",
+        //         playerdata.Name, "pick_block_inv_item", index);
+        // else
+        //     world.RpcId(1, "InvokePlayerFunc", playerdata.Name, "pick_inv_item", index);
+
+
         return true;
     }
 
@@ -182,6 +192,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
     {
         world.player.playerData.OpeningBlockInventory = false;
         world.RpcId(1, "CloseBlockInv", Player.Profile.Name);
+        //world.RpcId(1, "InvokePlayerFunc", Player.Profile.Name, "close_inventory");
     }
 
     public override void SetBlock(Vector3I coord, BlockMeta meta, bool replaceAir = false, int state = 0)
@@ -236,5 +247,10 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
     public override void SetOpenBlockComponent(PlayerData playerData, SetComponentData data)
     {
         world.RpcId(1, "SetOpenBlockComponent", playerData.Name, ByteTool.ToBytes(data));
+    }
+
+    public override void CraftGridRecipeItem(PlayerData player)
+    {
+        world.RpcId(1, "CraftGridRecipeItem", player.Name);
     }
 }

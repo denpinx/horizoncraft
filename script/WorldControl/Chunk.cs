@@ -16,6 +16,7 @@ using MemoryPack;
 using horizoncraft.script.Components;
 using horizoncraft.script.Net;
 using HorizonCraft.script.WorldControl.Service;
+using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
 
 namespace horizoncraft.script.WorldControl
@@ -24,20 +25,20 @@ namespace horizoncraft.script.WorldControl
     public partial class Chunk
     {
         public static int SizeZ = 2;
-        public static int Size = 24;
+        public static int Size = 50;
         public bool spawn = false;
         public long version;
-
         public int X;
         public int Y;
-
-
+        public int[,] HighMap = new int[Size, SizeZ];
         public string BiomeType = "";
         public string BiomeName = "";
         public List<Vector3> TickList = new();
+        public List<Vector2> LightList = new();
 
-        [MemoryPackIgnore] public List<Vector3I> UpdateList = new();
+        [MemoryPackIgnore] public List<Vector3I> UpdateList = new(32);
         [MemoryPackIgnore] public List<Vector3I> UpdateList_buffer = new();
+
         [MemoryPackIgnore] public bool update_tilemap = true;
         [MemoryPackIgnore] public bool update_server = true;
 
@@ -68,7 +69,6 @@ namespace horizoncraft.script.WorldControl
         {
             this.X = x;
             this.Y = y;
-
             for (int X = 0; X < Chunk.Size; X++)
             {
                 for (int Y = 0; Y < Chunk.Size; Y++)
@@ -89,6 +89,7 @@ namespace horizoncraft.script.WorldControl
         public void SetBlock(int x, int y, int z, BlockMeta meta, int state = 0)
         {
             var pos = new Vector3(x, y, z);
+            var posv2 = new Vector2(x, y);
             if (meta.Components.Count > 0)
             {
                 if (!TickList.Contains(pos))
@@ -98,6 +99,21 @@ namespace horizoncraft.script.WorldControl
             }
             else if (data[x, y, z].BlockMeta.Components.Count > 0)
                 TickList.Remove(pos);
+
+            if (z == 1)
+            {
+                if (meta.Light)
+                {
+                    if (!LightList.Contains(posv2))
+                    {
+                        LightList.Add(posv2);
+                    }
+                }
+                else if (data[x, y, z].BlockMeta.Light)
+                {
+                    LightList.Remove(posv2);
+                }
+            }
 
 
             data[x, y, z].SetMeta(meta);
@@ -129,6 +145,7 @@ namespace horizoncraft.script.WorldControl
         public void Tick(WorldBase WorldService, World world)
         {
             version = WorldService.TickTimes;
+
             UpdateList.Clear();
             if (UpdateList_buffer.Count > 0)
             {
@@ -179,70 +196,13 @@ namespace horizoncraft.script.WorldControl
             }
         }
 
-        // public void Tick(WorldBase WorldService, World world)
-        // {
-        //     version = WorldService.TickTimes;
-        //
-        //     UpdateList.Clear();
-        //     if (UpdateList_buffer.Count > 0)
-        //     {
-        //         UpdateList.AddRange(UpdateList_buffer);
-        //         UpdateList_buffer.Clear();
-        //     }
-        //
-        //     BlockTickEvent blockTickEvnet = new()
-        //     {
-        //         World = world,
-        //         WorldService = WorldService,
-        //         Chunk = this,
-        //     };
-        //     var coord = new Godot.Vector3I(0, 0, 0);
-        //     var coord_local = new Godot.Vector3I(0, 0, 0);
-        //     int id = 0;
-        //     int state = 0;
-        //     //通过在循环不创建任何一个对象来优化
-        //     for (byte Z = 0; Z < Chunk.SizeZ; Z++)
-        //     {
-        //         coord_local.Z = Z;
-        //         coord.Z = Z;
-        //         for (byte X = 0; X < Chunk.Size; X++)
-        //         {
-        //             coord_local.X = X;
-        //             coord.X = this.coord.X * Chunk.Size + X;
-        //             for (byte Y = 0; Y < Chunk.Size; Y++)
-        //             {
-        //                 coord_local.Y = Y;
-        //                 coord.Y = this.coord.Y * Chunk.Size + Y;
-        //                 var block = GetBlock(X, Y, Z);
-        //                 if (block.components.Count != 0)
-        //                 {
-        //                     blockTickEvnet.Blockdata = block;
-        //                     blockTickEvnet.GloablPos = coord;
-        //                     blockTickEvnet.LocalPos = coord_local;
-        //                     id = block.ID;
-        //                     state = block.STATE;
-        //                     ComponentManager.ExecuteComponents(blockTickEvnet, block);
-        //                     if (state != block.STATE ||
-        //                         id != block.ID)
-        //                     {
-        //                         update_tilemap = true;
-        //                         //update_server = true;
-        //
-        //                         //增量更新数据
-        //                         UpdateList.Add(new Vector3I(X, Y, Z));
-        //                     }
-        //                 }
-        //                 else
-        //                 {
-        //                     //异常方块重置组件
-        //                     if (block.BlockMeta.Components.Count != 0)
-        //                     {
-        //                         block.SetMeta(block.BlockMeta);
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        public void ClearLight()
+        {
+            for (int x = 0; x < Chunk.Size; x++)
+            for (int y = 0; y < Chunk.Size; y++)
+            {
+                data[x, y, 1].Light = 0;
+            }
+        }
     }
 }

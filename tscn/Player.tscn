@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://dlka0sc4kl0vb"]
+[gd_scene load_steps=7 format=3 uid="uid://dlka0sc4kl0vb"]
 
 [ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="1_qob58"]
 [ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/Player.cs" id="1_uuqip"]
 [ext_resource type="Script" uid="uid://c4uuiue21aw2o" path="res://tscn/Camera2d.cs" id="3_vvow5"]
 [ext_resource type="PackedScene" uid="uid://cakto4xqnoeua" path="res://tscn/Menu/HotBar.tscn" id="4_kghmo"]
+[ext_resource type="Texture2D" uid="uid://b0p2vi2slpmco" path="res://texture/Gui/Cursor.png" id="5_gqu4d"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rnaqb"]
 size = Vector2(14, 15)
@@ -88,3 +89,13 @@ horizontal_alignment = 2
 [node name="HotBar" parent="CanvasLayer" instance=ExtResource("4_kghmo")]
 scale = Vector2(1.3, 1.3)
 transform = Transform2D(1.3, 0, 0, 1.3, 0, 0)
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+visible = false
+target_position = Vector2(128, 0)
+
+[node name="Cursor" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(-20, -191)
+texture = ExtResource("5_gqu4d")
+centered = false

@@ -152,6 +152,7 @@ namespace horizoncraft.script
                         itemMeta.Tags.Add(v.Key, (string)v.Value);
                 }
 
+
                 if (item_dict.ContainsKey("state"))
                 {
                     var itemset = new ItemStateSet();
@@ -206,11 +207,33 @@ namespace horizoncraft.script
                     blockmeta.Tiletype = (string)config["tiletype"];
                 }
 
+                if (config.ContainsKey("light"))
+                {
+                    blockmeta.Light = (bool)config["light"];
+                }
+
                 if (config.ContainsKey("tags"))
                 {
                     var dict_attr = (Dictionary<string, object>)config["tags"];
                     foreach (var v in dict_attr)
                         blockmeta.Tags.Add(v.Key, (string)v.Value);
+                }
+
+                if (config.ContainsKey("mask"))
+                {
+                    var dict_mask = (Dictionary<string, object>)config["mask"];
+                    if (dict_mask.ContainsKey("input")) ;
+                    {
+                        var list = (List<object>)dict_mask["input"];
+                        foreach (var i in list)
+                            blockmeta.InputMask.Add((int)i);
+                    }
+                    if (dict_mask.ContainsKey("output")) ;
+                    {
+                        var list = (List<object>)dict_mask["output"];
+                        foreach (var i in list)
+                            blockmeta.OutputMask.Add((int)i);
+                    }
                 }
 
                 //配置不同状态下的Tile贴图

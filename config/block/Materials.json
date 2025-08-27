@@ -82,7 +82,25 @@
     "collide": false,
     "cube": false
   },
+  "workbench": {
+    "components": {
+      "InventoryComponent": {
+        "Name": "WorkBenchComponent",
+        "Size": 9,
+        "InventoryName": "CraftingTableInventory"
+      }
+    }
+  },
   "furnace": {
+    "mask": {
+      "input": [
+        0,
+        1
+      ],
+      "output": [
+        2
+      ]
+    },
     "state": {
       "normal": {
         "texture": "furnace"
@@ -109,7 +127,21 @@
       "link": "net"
     }
   },
+  "big_logistics_pipeline": {
+    "collide": false,
+    "cube": false,
+    "tiletype": "terrain",
+    "tags": {
+      "link": "net"
+    }
+  },
   "input_block": {
+    "components": {
+      "TickComponent": {
+        "Name": "LogisticsInputComponent",
+        "Max": 20
+      }
+    },
     "tags": {
       "link": "net"
     }
@@ -123,5 +155,10 @@
     "tags": {
       "link": "net"
     }
+  },
+  "light": {
+    "collide": false,
+    "cube": false,
+    "light": true
   }
 }

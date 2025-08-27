@@ -43,11 +43,12 @@ public partial class DebugView : Node2D
             }, color, 4
         );
 
-        //DrawRect(new Rect2(0, 0, new(16 * Chunk.Size, 16 * Chunk.Size)), color);
-        DrawString(font, new(0, 9 * Chunk.Size), $"坐标：{chunk.coord.X}，{chunk.coord.Y} ");
-        DrawString(font, new(0, 10 * Chunk.Size), $"生成耗时：{chunk.SpawnCostTime} ms");
-        DrawString(font, new(0, 14 * Chunk.Size), $"生物群系类型：{chunk.BiomeType} ");
-        DrawString(font, new(0, 15 * Chunk.Size), $"更新时间戳：{chunk.version} ");
-        DrawString(font, new(0, 16 * Chunk.Size), $"Tick数：{chunk.TickList.Count} ");
+        DrawRect(new Rect2(0, 0, new(16 * Chunk.Size, 16 * Chunk.Size)), color);
+        DrawString(font, new(0, 1 * Chunk.Size), $"坐标：{chunk.coord.X}，{chunk.coord.Y} ");
+        DrawString(font, new(0, 2 * Chunk.Size), $"生成耗时：{chunk.SpawnCostTime} ms");
+        DrawString(font, new(0, 3 * Chunk.Size), $"生物群系类型：{chunk.BiomeType} ");
+        DrawString(font, new(0, 4 * Chunk.Size), $"更新时间戳：{chunk.version} ");
+        DrawString(font, new(0, 5 * Chunk.Size), $"Tick数：{chunk.TickList.Count} ");
+        DrawString(font, new(0, 6 * Chunk.Size), $"光源对象：{chunk.LightList.Count} ");
     }
 }

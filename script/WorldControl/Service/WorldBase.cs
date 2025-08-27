@@ -8,14 +8,18 @@ using horizoncraft.script.Components;
 using horizoncraft.script.Features;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
+using horizoncraft.script.Recipes;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.work;
 using Microsoft.Data.Sqlite;
+using Vector2 = System.Numerics.Vector2;
 
 namespace HorizonCraft.script.WorldControl.Service;
 
 public class WorldBase
 {
+    private int LightSize = 8;
+
     private Vector2I[] TerrainCoord =
     {
         new Vector2I(3, 3), //无0
@@ -47,8 +51,8 @@ public class WorldBase
     public long DayTimeMax = 20 * 60;
     public long TickTimes;
     public long TickConsuming;
-    public int LoadHorizon = 3;
-    public int TileMapHorizon = 2;
+    public int LoadHorizon = 2;
+    public int TileMapHorizon = 1;
     public Stopwatch stopwatch = new Stopwatch();
 
     /// <summary>
@@ -145,7 +149,7 @@ public class WorldBase
         }
     }
 
-    public Vector2I GetTerrain(Vector3I pos)
+    public Vector2I GetTerrain(Vector3I pos, string tagname, string value)
     {
         var block = GetBlock(pos);
         if (block == null) return new Vector2I(1, 1);
@@ -155,13 +159,11 @@ public class WorldBase
         var left = GetBlock(pos + Vector3I.Left);
         var right = GetBlock(pos + Vector3I.Right);
 
-
-        int id = block.ID;
         int state = 0;
-        if (up != null && up.CheckTag("link", "net")) state |= 1; // 位0: 上相同
-        if (down != null && down.CheckTag("link", "net")) state |= 2; // 位1: 下相同
-        if (left != null && left.CheckTag("link", "net")) state |= 4; // 位2: 左相同
-        if (right != null && right.CheckTag("link", "net")) state |= 8; // 位3: 右相同
+        if (up != null && up.CheckTag(tagname, value)) state |= 1;
+        if (down != null && down.CheckTag(tagname, value)) state |= 2;
+        if (left != null && left.CheckTag(tagname, value)) state |= 4;
+        if (right != null && right.CheckTag(tagname, value)) state |= 8;
         return TerrainCoord[state];
     }
 
@@ -337,8 +339,134 @@ public class WorldBase
         world.player.AddChild(world.player.ShowView);
     }
 
+    //修改或调用组件的自定义方法
     public virtual void SetOpenBlockComponent(PlayerData playerData, SetComponentData data)
     {
+        var pos = new Vector3I((int)playerData.OpenInventory.X, (int)playerData.OpenInventory.Y,
+            (int)playerData.OpenInventory.Z);
+        var block = GetBlock(pos);
+        if (block != null)
+            ComponentManager.SetBlockComponentData(playerData, block, data);
+    }
+
+    public virtual void CraftGridRecipeItem(PlayerData player)
+    {
+        var gri = RecipeManage.GetRecipe(player.Inventory, 2, 36);
+        if (gri != null)
+        {
+            var handitme = player.Inventory.HandItemStack;
+            if (handitme == null
+               )
+            {
+                player.Inventory.HandItemStack = gri.Result.Copy();
+            }
+            else if (
+                handitme.Id == gri.Result.Id &&
+                handitme.Amount + gri.Result.Amount <= gri.Result.GetItemMeta().MaxAmount
+            )
+            {
+                handitme.Amount += gri.Result.Amount;
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                player.Inventory.ReduceItemAmount(36 + i);
+            }
+        }
+    }
+
+
+    public void ManhattanRange(int cx, int cy, int r)
+    {
+        int d = 2 * r + 1; // 菱形外接正方形边长
+        int total = d * d; // 总格子数
+
+        for (int k = 0; k < total; k++)
+        {
+            int ox = k % d - r; // [-r , r]
+            int oy = k / d - r; // [-r , r]
+            int tr = Math.Abs(ox) + Math.Abs(oy);
+            if (tr <= r) // 曼哈顿距离过滤
+            {
+            }
+        }
+    }
+
+
+    //更新光源
+    public void UpdateLightPoint(int x, int y, int value)
+    {
+        int d = 2 * value + 1; // 菱形外接正方形边长
+        int total = d * d; // 总格子数
+        for (int k = 0; k < total; k++)
+        {
+            int ox = k % d - value; // [-r , r]
+            int oy = k / d - value; // [-r , r]
+            int tr = Math.Abs(ox) + Math.Abs(oy);
+            if (tr <= value) // 曼哈顿距离过滤
+            {
+                SetBlockLight(new Vector3I(x + ox, y + oy, 1), value - tr);
+            }
+        }
+    }
+
+    public void SetBlockLight(Vector3I coord, int value)
+    {
+        var block = GetBlock(coord);
+        if (block == null) return;
+
+        if (block.Light < value)
+            block.Light = value;
+    }
+
+    //更新单个区块的所有光源
+    public void UpdataChunkLight(Chunk chunk)
+    {
+        var highmap = chunk.HighMap;
+        if (highmap == null)
+            chunk.HighMap = WorldGenerator.GetHighMap(chunk.X);
+        
+        for (int x = 0; x < Chunk.Size; x++)
+        {
+            for (int y = 0; y < Chunk.Size; y++)
+            {
+                var gy = chunk.Y * Chunk.Size + y;
+                int skyLight = LightSize + Math.Min(0, highmap[x, 1] - gy);
+                skyLight = Math.Clamp(skyLight, 0, LightSize);
+
+                chunk.GetBlock(x, y, 1).SetLight(skyLight);
+            }
+        }
+
+        if (chunk.LightList.Count > 0)
+        {
+            foreach (var point in chunk.LightList)
+            {
+                var light = new Vector2I(chunk.X * Chunk.Size + (int)point.X,
+                    chunk.Y * Chunk.Size + (int)point.Y);
+                UpdateLightPoint((int)light.X, (int)light.Y, LightSize);
+            }
+        }
+    }
+
+    //更新区块的所有光照更新
+
+    public void UpdateLights()
+    {
+        foreach (var sts in Chunks)
+            sts.Value.ClearLight();
+
+        foreach (var sts in Chunks)
+        {
+            var chunk = sts.Value;
+            UpdataChunkLight(chunk);
+        }
+
+        foreach (var sts in Players)
+        {
+            var player = sts.Value;
+            UpdateLightPoint(player.Coord.X, player.Coord.Y, LightSize * 2);
+        }
     }
 
     public virtual void CloseView()

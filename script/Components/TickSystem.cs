@@ -25,7 +25,7 @@ namespace horizoncraft.script.Components
                 ProcessTick(worldEvent as BlockTickEvent, ic);
         }
 
-        public virtual void SetComponentValue(Component component, Dictionary<string, string> value)
+        public virtual void SetComponentValue(PlayerData player,Component component, Dictionary<string, string> value)
         {
         }
 

@@ -26,7 +26,9 @@ public class InventoryManage
 
     static InventoryManage()
     {
-        RegInv("PlayerInventory", GD.Load<PackedScene>("res://tscn/Menu/Inventory/InventoryNode.tscn").Instantiate());
+        RegInv("PlayerInventory", GD.Load<PackedScene>("res://tscn/Menu/Inventory/craft_inventory.tscn").Instantiate());
+        RegInv("CraftingTableInventory",
+            GD.Load<PackedScene>("res://tscn/Menu/Inventory/CraftingTableInventory.tscn").Instantiate());
         RegInv("StorageBoxInv",
             GD.Load<PackedScene>("res://tscn/Menu/Inventory/StorageBoxInv.tscn").Instantiate<StorageBoxInv>());
         RegInv("FurnaceInv",

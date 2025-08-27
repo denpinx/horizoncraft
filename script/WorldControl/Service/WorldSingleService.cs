@@ -113,6 +113,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
                     if (!chunk.spawn)
                     {
                         WorldGenerator.Generator(chunk);
+
                         GD.PrintErr("异常区块重构！");
                     }
 
@@ -129,6 +130,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
                     OnChunkLoaded?.Invoke(this, chunk);
                 }
 
+                UpdataChunkLight(chunk);
                 coord = LoadChunkQueue.Keys.FirstOrDefault();
             }
         })), null);
@@ -228,8 +230,6 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
 
         ProcessChunkLoadQueue();
         ProcessPlayerLoadQueue();
-        UpdataTileMap();
-
         ProcessChunkUnloadQueue();
 
         foreach (Vector2I coord in Chunks.Keys.ToArray())
@@ -237,7 +237,11 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
             Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
         }
-
+        UpdateLights();
+        UpdataTileMap();
+        
+        
+        
         stopwatch.Stop();
         TickConsuming = stopwatch.ElapsedMilliseconds;
     }

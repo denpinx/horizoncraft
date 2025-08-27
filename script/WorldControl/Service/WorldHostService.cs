@@ -301,11 +301,15 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     var pos = new Vector3I((int)player.OpenInventory.X, (int)player.OpenInventory.Y,
                         (int)player.OpenInventory.Z);
                     var blockdata = GetBlock(pos);
-                    if (blockdata != null)
+                    if (blockdata != null && blockdata.GetComponent<InventoryComponent>() != null)
                     {
                         world.RpcId(player.PeerId, "ReciveOpenBlockData",
                             ByteTool.ToBytes<Blockdata>(blockdata),
                             ByteTool.ToBytes<PlayerInventory>(player.Inventory));
+                    }
+                    else
+                    {
+                        player.OpeningBlockInventory = player.OpeningBlockInventory = false;
                     }
                 }
             }
@@ -428,10 +432,10 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         GD.Print("修改组件！");
         var pos = new Vector3I((int)playerData.OpenInventory.X, (int)playerData.OpenInventory.Y,
             (int)playerData.OpenInventory.Z);
-        
+
         var block = GetBlock(pos);
         if (block != null)
-            ComponentManager.SetBlockComponentData(block, data);
+            ComponentManager.SetBlockComponentData(playerData, block, data);
     }
 
     public void OnPlayerJoin(long peer_id)
@@ -488,7 +492,6 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
 
         SyncPlayers();
         SyncChunks();
-        UpdataTileMap();
         ProcessChunkLoadQueue();
         ProcessPlayerLoadQueue();
         ProcessChunkUnloadQueue();
@@ -526,6 +529,10 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                 snapshot.chunks.Add(cs);
             }
         }
+
+
+        UpdateLights();
+        UpdataTileMap();
 
         stopwatch.Stop();
         TickConsuming = stopwatch.ElapsedMilliseconds;

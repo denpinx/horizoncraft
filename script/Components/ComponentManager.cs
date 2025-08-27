@@ -36,7 +36,8 @@ namespace horizoncraft.script.Components
             }
         }
 
-        public static void SetBlockComponentData(Blockdata blockdata, SetComponentData setComponentData)
+        public static void SetBlockComponentData(PlayerData player, Blockdata blockdata,
+            SetComponentData setComponentData)
         {
             for (int i = 0; i < blockdata.components.Count; i++)
             {
@@ -51,7 +52,7 @@ namespace horizoncraft.script.Components
                 if (setComponentData.ComponentSets.ContainsKey(component.Name))
                 {
                     var d = setComponentData.ComponentSets[component.Name];
-                    ComponentSets[component.Name].system.SetComponentValue(component, d);
+                    ComponentSets[component.Name].system.SetComponentValue(player, component, d);
                 }
                 else
                 {
@@ -79,6 +80,8 @@ namespace horizoncraft.script.Components
             Register("PhysicsComponent", () => new PhysicsComponent(), new PhysicsSystem());
             Register("BoxComponent", () => new InventoryComponent(), new InventorySystem());
             Register("FurnaceComponent", () => new FurnaceComponent(), new FurnaceSystem());
+            Register("LogisticsInputComponent", () => new TickComponent(), new LogisticsInputSystem());
+            Register("WorkBenchComponent", () => new InventoryComponent(), new WorkBenchSystem());
         }
     }
 }

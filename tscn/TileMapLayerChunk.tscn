@@ -1,7 +1,22 @@
-[gd_scene load_steps=3 format=3 uid="uid://b8sm5vjvrp1v2"]
+[gd_scene load_steps=6 format=3 uid="uid://b8sm5vjvrp1v2"]
 
 [ext_resource type="Script" uid="uid://ckrstqs6hvawg" path="res://tscn/TileMapLayerChunk.cs" id="1_2arkn"]
+[ext_resource type="Texture2D" uid="uid://cg50yloerq0wx" path="res://texture/shadow.png" id="2_61nbq"]
 [ext_resource type="Script" uid="uid://ckokgwlpye0pe" path="res://tscn/DebugView.cs" id="8_agw1w"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wribj"]
+texture = ExtResource("2_61nbq")
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_bfswo"]
+sources/0 = SubResource("TileSetAtlasSource_wribj")
 
 [node name="TileMapLayerChunk" type="Node2D"]
 top_level = true
@@ -15,6 +30,10 @@ navigation_enabled = false
 
 [node name="TileMapLayer_font" type="TileMapLayer" parent="."]
 z_index = 1
+
+[node name="TileMapLayer_shadow" type="TileMapLayer" parent="."]
+z_index = 2
+tile_set = SubResource("TileSet_bfswo")
 
 [node name="DebugView" type="Node2D" parent="."]
 self_modulate = Color(1, 1, 1, 0.462745)

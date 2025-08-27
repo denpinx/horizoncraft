@@ -19,14 +19,12 @@ public class FurnaceSystem : TickSystem
         {
             if (input != null)
             {
-                loadfuel = furnace.Fuel <= 0;
                 var recipe = RecipeManage.GetRecipeItem("furnace",
                     recipeItem => recipeItem.Cost[0].Id == input.Id && recipeItem.Cost[0].Amount <= input.Amount);
                 if (recipe != null)
                 {
-                    input.Amount -= recipe.Cost[0].Amount;
-                    furnace.GetInventory().SetItem(0, input);
-
+                    loadfuel = furnace.Fuel <= 0;
+                    furnace.GetInventory().ReduceItemAmount(0, recipe.Cost[0].Amount);
                     furnace.ProcessTick = recipe.ProcessTick;
                     furnace.Progress = 0;
                     furnace.Result = recipe.Result;
@@ -46,8 +44,7 @@ public class FurnaceSystem : TickSystem
                 }
                 else if (output.Id == result.Id && output.Amount + result.Amount <= result.GetItemMeta().MaxAmount)
                 {
-                    output.Amount += result.Amount;
-                    furnace.GetInventory().SetItem(2, output);
+                    furnace.GetInventory().AddItemAmount(2, result.Amount);
                     furnace.Progress = 0;
                     furnace.Result = null;
                 }
@@ -77,6 +74,7 @@ public class FurnaceSystem : TickSystem
                 var str = fuel.GetItemMeta().GetTag("fuel");
                 if (str != null)
                 {
+                    furnace.GetInventory().ReduceItemAmount(1);
                     GD.Print($"加油！{str}");
                     int f = str.ToInt();
                     furnace.Fuel += f;

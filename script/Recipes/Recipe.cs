@@ -12,7 +12,6 @@ public class Recipe
 
     public RecipeType Type { get; set; }
     public string Tag;
-    public int Size = 3 * 3;
 
     public List<RecipeItem> recipes = new List<RecipeItem>();
 }

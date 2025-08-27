@@ -1,0 +1,47 @@
+{
+  "type": "craft",
+  "tag": "player",
+  "recipes": [
+    {
+      "cost": [
+        "#"
+      ],
+      "mask": {
+        "#": "oak_log"
+      },
+      "result": [
+        "oak_plank",
+        4
+      ]
+    },
+    {
+      "cost": [
+        "#",
+        "#"
+      ],
+      "mask": {
+        "#": "oak_plank"
+      },
+      "result": [
+        "stick",
+        4
+      ]
+    },
+    {
+      "cost": [
+        "###",
+        "-!-",
+        "-!-"
+      ],
+      "mask": {
+        "-": "air",
+        "!": "stick",
+        "#": "oak_plank"
+      },
+      "result": [
+        "wood_pickaxe",
+        1
+      ]
+    }
+  ]
+}

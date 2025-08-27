@@ -60,10 +60,7 @@ public partial class World
             }
             else
             {
-                if (player.ShowView != null)
-                {
-                    player.ShowView.PlayerInvBase = playerData.Inventory;
-                }
+                
             }
         }
 
@@ -116,7 +113,6 @@ public partial class World
         if (player.ShowView != null)
         {
             player.ShowView.TargetBlock = blockdata;
-            player.ShowView.PlayerInvBase = inv;
         }
         else
         {
@@ -136,7 +132,7 @@ public partial class World
         player.playerData.Inventory = inv;
         if (player.ShowView != null)
         {
-            player.ShowView.PlayerInvBase = inv;
+            
         }
     }
 }
