@@ -23,7 +23,6 @@ public partial class Player : CharacterBody2D
     public static PlayerProfile Profile;
     public static List<Func<string>> GetInformation = new List<Func<string>>();
 
-    //
     public Action OnMoveToChunk;
     public PlayerData playerData;
     public World world;
@@ -33,17 +32,24 @@ public partial class Player : CharacterBody2D
     public bool MoreInfo = false;
     [Export] public int mode = 0;
     [Export] public bool fly = true;
+
     public bool Stop = false;
+
+    //
     Camera2D camera2d;
     Timer Timer_Tick;
     Label Label_DEBUG_Left;
     Label Label_DEBUG_Right;
     Label Label_PlayerName;
-
     public InventoryNode ShowView;
     public Sprite2D Cursor;
     public HotBar hotBar;
     public RayCast2D RayCast;
+    //
+
+    PlayerBreakProcess BreakProcess = new PlayerBreakProcess();
+
+
     private bool LastFramIsLeft = false;
     private bool LastFramIsRight = false;
 
@@ -52,10 +58,6 @@ public partial class Player : CharacterBody2D
     public override void _Input(InputEvent @event)
     {
         if (!Inputable) return;
-        Vector2I Mousecoord = new(
-            (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
-            (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
-        );
         // List<Vector2I> interpolatePos = new();
         // if (LastFramIsLeft || LastFramIsRight)
         // {
@@ -69,90 +71,74 @@ public partial class Player : CharacterBody2D
         //         interpolatePos.Add((Vector2I)v3.Lerp(v4, (float)i / (float)t));
         //     }
         // }
+    }
+
+    public override void _Process(double delta)
+    {
+        if (!Inputable) return;
+
+        Vector2I Mousecoord = new(
+            (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
+            (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
+        );
 
         if (Input.IsActionPressed("breakblock") && playerData != null && ShowView == null)
         {
-            var targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 1);
-            var fontblock = world.WorldService.GetBlock(targetpos);
+            var pos = Mousecoord;
+            var pos0 = new Vector3I(pos.X, pos.Y, 0);
+            var pos1 = new Vector3I(pos.X, pos.Y, 1);
+            var block1 = world.WorldService.GetBlock(pos0);
+            var block2 = world.WorldService.GetBlock(pos1);
 
+            if (block1 == null || block2 == null) return;
 
-            if (fontblock == null) return;
-            if (fontblock.IsMeta("air")) targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
-            var fblock = world.WorldService.GetBlock(targetpos);
-            if (!world.WorldService.CheckIsCloseBlock(targetpos))
-                if (fblock != null && !fblock.IsMeta("air"))
-                {
-                    world.WorldService.SetBlock(
-                        new(targetpos.X, targetpos.Y, targetpos.Z),
-                        Materials.Valueof("air"), false, 0
-                    );
-                }
+            Vector3I finalpos;
+            Blockdata InterfaceBlock;
+            if (!block2.IsMeta("air"))
+            {
+                finalpos = pos1;
+                InterfaceBlock = block2;
+            }
+            else
+            {
+                finalpos = pos0;
+                InterfaceBlock = block1;
+            }
+            if (InterfaceBlock.IsMeta("air")) return;
+            
+            if (BreakProcess.ProcessTime >= BreakProcess.FinalTime)
+            {
+                GD.Print("break！");
+                world.WorldService.BreakBlock(playerData, BreakProcess.Position);
+                BreakProcess.ProcessTime = 0;
+            }
+            else if (BreakProcess.ProcessTime > 0)
+            {
+                GD.Print(BreakProcess.ProcessTime);
+                BreakProcess.ProcessTime += (float)delta;
+                
+                if (BreakProcess.Position != finalpos)
+                    BreakProcess.Reset();
+            }
+            else
+            {
+                BreakProcess.FinalTime = 2f;
+                BreakProcess.Position = finalpos;
+                BreakProcess.ProcessTime += (float)delta;
+            }
+
+            GD.Print(BreakProcess.ProcessTime);
         }
-
+        else
+        {
+            if (BreakProcess.ProcessTime > 0) BreakProcess.ProcessTime = 0;
+        }
 
         if (Input.IsActionPressed("placeblock") && playerData != null && ShowView == null)
         {
             var targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
-            var backblock = world.WorldService.GetBlock(targetpos);
-            var fontblock = world.WorldService.GetBlock(new Vector3I(Mousecoord.X, Mousecoord.Y, 1));
-
-
-            if (fontblock != null && backblock != null)
-            {
-                if (fontblock.IsMeta("air"))
-                    if (backblock.IsMeta("air"))
-                        targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
-                    else targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 1);
-                else if (!fontblock.IsMeta("air"))
-                    targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 1);
-            }
-            else return;
-
-            var targetblock = world.WorldService.GetBlock(targetpos);
-            if (targetblock != null && targetblock.IsMeta("air"))
-            {
-                GD.Print("place block");
-                //放置方块
-                var item = playerData.Inventory.GetItem(playerData.Inventory.HandSlot);
-                if (item != null)
-                {
-                    BlockMeta bm = item.GetBlockMeta();
-                    GD.Print($"has tick:{bm.Components.Count > 0}");
-                    if (bm != null)
-                        world.WorldService.SetBlock(
-                            targetpos,
-                            bm, false, 0
-                        );
-                    if (mode == 0) playerData.Inventory.ReduceItemAmount(playerData.Inventory.HandSlot);
-                }
-                //交互方块
-            }
-            else
-            {
-                if (world.WorldService is WorldClientService wcs)
-                {
-                    playerData.OpeningBlockInventory = true;
-                    GD.Print("Cilent_OpenBlockInv");
-                    world.RpcId(1, "OpenBlockInv",
-                        Profile.Name,
-                        targetpos.X,
-                        targetpos.Y,
-                        targetpos.Z);
-                }
-                else
-                {
-                    playerData.OpenInventory = new Vector3(targetpos.X, targetpos.Y, targetpos.Z);
-                    var blockinv = targetblock.GetComponent<InventoryComponent>();
-                    if (blockinv != null)
-                    {
-                        GD.Print("打开方块物品栏");
-                        world.WorldService.OpenBlockView(blockinv.InventoryName, targetpos.X, targetpos.Y, targetpos.Z);
-                    }
-                    else
-                        GD.Print(
-                            $"{targetblock.ID} 组件 InventoryComponent 不存在!,cmp count:{targetblock.components.Count}]");
-                }
-            }
+            if (!world.WorldService.PlaceBlock(playerData, targetpos))
+                world.WorldService.InterfaceBlock(playerData, targetpos);
         }
     }
 
@@ -162,6 +148,12 @@ public partial class Player : CharacterBody2D
         if (playerData.Name != Player.Profile.Name) return;
 
         Vector2I Mcoord = World.MathFloor((Vector2I)GetGlobalMousePosition(), 16);
+
+        Cursor.GlobalPosition = Mcoord * 16;
+        if (BreakProcess.ProcessTime >= 0)
+            Cursor.Frame = (int)(8 * (BreakProcess.ProcessTime / BreakProcess.FinalTime));
+        else Cursor.Frame = 0;
+
         Vector2I MCcoord = World.MathFloor(Mcoord, Chunk.Size);
         Vector2I ChunkCoord = new Vector2I(
             (int)Mathf.Floor(Position.X / (16 * Chunk.Size)),
@@ -175,8 +167,6 @@ public partial class Player : CharacterBody2D
 
         //更新自身数据
         playerData.Position = new System.Numerics.Vector2(Position.X, Position.Y);
-
-
         Label_PlayerName.Text = playerData.Name;
 
         if (world.WorldService is WorldHostService whs && world.WorldService is WorldBase _worldBase_)
@@ -343,8 +333,9 @@ public partial class Player : CharacterBody2D
             if (targetblock != null)
                 Text.AppendLine($"光照: {targetblock.Light} ");
             Text.AppendLine($"当前方块坐标: {MCcoord.X},{MCcoord.Y} ");
-            Text.AppendLine($"World.Tick耗时: {world.tick_use_time}MS");
-            Text.AppendLine($"ChunkManage.Tick耗时: {world.WorldService.TickConsuming}MS");
+            Text.AppendLine($"World更新耗时: {world.tick_use_time}MS");
+            Text.AppendLine($"时刻更新耗时: {world.WorldService.TickConsuming}MS");
+            Text.AppendLine($"光照更新耗时: {world.WorldService.LightConsuming}MS");
             Text.AppendLine($"加载失败计数: {world.WorldService.UnloadCount.Count}");
             if (world.WorldService is WorldHostService hostserver)
             {
@@ -381,8 +372,7 @@ public partial class Player : CharacterBody2D
 
     public override void _Ready()
     {
-        //RayCast = GetNode<RayCast2D>("RayCast2D");
-        //Cursor = GetNode<Sprite2D>("Cursor");
+        Cursor = GetNode<Sprite2D>("Cursor");
         camera2d = GetNode<Camera2D>("Camera2D");
         Label_DEBUG_Left = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Left");
         Label_DEBUG_Right = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Right");

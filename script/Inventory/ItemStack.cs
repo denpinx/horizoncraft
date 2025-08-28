@@ -20,8 +20,7 @@ public partial class ItemStack
     }
 
     public ItemMeta GetItemMeta() => Materials.itemmetas[Id];
-    public BlockMeta GetBlockMeta() => Materials.Valueof(GetItemMeta().Name);
-
+    public BlockMeta GetBlockMeta() => GetItemMeta().BlockMeta;
     public ItemStack Copy(int amount = 0)
     {
         return new ItemStack()

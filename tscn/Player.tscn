@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/Player.cs" id="1_uuqip"]
 [ext_resource type="Script" uid="uid://c4uuiue21aw2o" path="res://tscn/Camera2d.cs" id="3_vvow5"]
 [ext_resource type="PackedScene" uid="uid://cakto4xqnoeua" path="res://tscn/Menu/HotBar.tscn" id="4_kghmo"]
-[ext_resource type="Texture2D" uid="uid://b0p2vi2slpmco" path="res://texture/Gui/Cursor.png" id="5_gqu4d"]
+[ext_resource type="Texture2D" uid="uid://bij7ptef3igbq" path="res://texture/break_process.png" id="5_gqu4d"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rnaqb"]
 size = Vector2(14, 15)
@@ -95,7 +95,7 @@ visible = false
 target_position = Vector2(128, 0)
 
 [node name="Cursor" type="Sprite2D" parent="."]
-visible = false
 position = Vector2(-20, -191)
 texture = ExtResource("5_gqu4d")
 centered = false
+hframes = 9

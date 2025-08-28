@@ -25,6 +25,16 @@ public abstract partial class InventoryBase
         Items = new ItemStack[Size];
     }
 
+    public int GetEmpyIndex()
+    {
+        for (int i = 0; i < Size; i++)
+        {
+            if (GetItem(i) == null) return i;
+        }
+
+        return -1;
+    }
+
     public ItemStack GetItem(int id)
     {
         if (Items[id] != null && Items[id].Amount <= 0)
@@ -49,10 +59,7 @@ public abstract partial class InventoryBase
     public void ReduceItemAmount(int id, int amount = 1)
     {
         if (Items[id] == null)
-        {
-            GD.PrintErr("Inventory: ReduceItemAmount: Item not found!");
             return;
-        }
 
         Items[id].Amount -= amount;
         if (Items[id].Amount <= 0) Items[id] = null;
@@ -78,8 +85,8 @@ public abstract partial class InventoryBase
         int les = Items[id].Amount - Items[id].GetItemMeta().MaxAmount;
         if (les > 0)
             return les;
-        return 0;
         OnAddItemAmount?.Invoke(id, amount);
+        return 0;
     }
 
     public bool IsLoaded()
@@ -175,7 +182,7 @@ public abstract partial class InventoryBase
     public void Sort()
     {
         //压缩空间
-        for (int i = Size - 1; i >= 0; i--)
+        for (int i = Size - 1; i > 0; i--)
         {
             ItemStack item = GetItem(i);
             if (item != null)
@@ -194,7 +201,6 @@ public abstract partial class InventoryBase
         }
 
         update = true;
-        GD.Print("排序完成");
         //排序
     }
 

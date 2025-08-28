@@ -1,34 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://bxbyt7xwls8t1"]
+[gd_scene load_steps=2 format=3 uid="uid://bxbyt7xwls8t1"]
 
 [ext_resource type="Script" uid="uid://d1hvo1g7s4g13" path="res://tscn/TestTscn.cs" id="1_vgwlw"]
-[ext_resource type="PackedScene" uid="uid://dxodnsxhi3elq" path="res://tscn/Menu/Inventory/InventoryNode.tscn" id="2_02vyt"]
 
 [node name="TestTscn" type="Node2D"]
 script = ExtResource("1_vgwlw")
-
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-layer = 2
-
-[node name="Button" type="Button" parent="CanvasLayer"]
-offset_left = 147.0
-offset_top = 64.0
-offset_right = 229.0
-offset_bottom = 95.0
-text = "12541245"
-
-[node name="Label" type="Label" parent="CanvasLayer/Button"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 1
-
-[node name="TextureButton" type="TextureButton" parent="CanvasLayer"]
-offset_left = 265.0
-offset_top = 35.0
-offset_right = 491.0
-offset_bottom = 131.0
-
-[node name="InventoryNode" parent="CanvasLayer" instance=ExtResource("2_02vyt")]

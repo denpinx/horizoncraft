@@ -32,6 +32,11 @@ public partial class PlayerData
 
     //物品栏
     public PlayerInventory Inventory = new();
+
+    //
+    public int Mode = 0;
+
+
     [MemoryPackIgnore] public Player player;
 
     [MemoryPackIgnore]

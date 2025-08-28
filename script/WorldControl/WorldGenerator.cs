@@ -32,8 +32,8 @@ namespace horizoncraft.script.WorldControl
 
         public static int[,] GetHighMap(int x)
         {
-            int[,] highmap = new int[Chunk.Size, 2];
-            for (int z = 0; z < 2; z++)
+            int[,] highmap = new int[Chunk.Size, Chunk.SizeZ];
+            for (int z = 0; z < Chunk.SizeZ; z++)
             {
                 // 获取相邻区块的关键高度点（确保控制点覆盖当前区块）
                 float p0 = GetLandBiome(x - 1).GetHigh(FastNoiseLite, x - 1, z);

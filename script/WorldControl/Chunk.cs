@@ -149,7 +149,8 @@ namespace horizoncraft.script.WorldControl
             UpdateList.Clear();
             if (UpdateList_buffer.Count > 0)
             {
-                UpdateList.AddRange(UpdateList_buffer);
+                for (int i = 0; i < UpdateList_buffer.Count; i++)
+                    UpdateList.Add(UpdateList_buffer[i]);
                 UpdateList_buffer.Clear();
             }
 

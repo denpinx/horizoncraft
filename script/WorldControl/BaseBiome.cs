@@ -11,5 +11,7 @@ namespace horizoncraft.script.WorldControl
         public string name;
         public int weight;
         public Vector2 weight_range;
+        
+        public Color color;
     }
 }

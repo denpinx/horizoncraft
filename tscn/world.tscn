@@ -39,6 +39,7 @@ wait_time = 0.05
 autostart = true
 
 [node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]
+visible = false
 rotation = 6.28319
 blend_mode = 2
 shadow_enabled = true

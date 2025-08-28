@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Godot;
 using static horizoncraft.script.WorldControl.BiomeManage;
 
 namespace horizoncraft.script.WorldControl.worldbiomes
@@ -13,6 +10,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             name = "深层";
             biomeType = BiomeType.Deep;
             weight = 100;
+            color = Color.Color8(41, 41, 41);
         }
         public override void GeneratorTerrain(BiomeTerrainContext btc)
         {

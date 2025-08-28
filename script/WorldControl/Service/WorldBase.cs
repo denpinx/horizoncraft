@@ -18,7 +18,16 @@ namespace HorizonCraft.script.WorldControl.Service;
 
 public class WorldBase
 {
+    public enum LightModeEnum
+    {
+        RayCastMode,
+        DFSMode
+    }
+
+    public LightModeEnum LightMode = LightModeEnum.DFSMode;
+
     private int LightSize = 8;
+    private int SkyLight = 8;
 
     private Vector2I[] TerrainCoord =
     {
@@ -53,7 +62,12 @@ public class WorldBase
     public long TickConsuming;
     public int LoadHorizon = 2;
     public int TileMapHorizon = 1;
+
+    public Vector2I LightConsuming;
+    public Vector2I TileMapConsuming;
     public Stopwatch stopwatch = new Stopwatch();
+    public Stopwatch stopwatch_tilemap = new Stopwatch();
+    public Stopwatch stopwatch_light = new Stopwatch();
 
     /// <summary>
     /// 已加载区块
@@ -275,33 +289,66 @@ public class WorldBase
     }
 
     //不直接写在 InventoryBase 因为这涉及到用户交互和网络传输
-    public virtual bool PickItem(PlayerData playerdata, InventoryBase inventory, int index)
+    public virtual bool PickItem(PlayerData playerdata, InventoryBase inventory, int index, int ActionType)
     {
+        if (inventory == null) return false;
         if (playerdata == null) return false;
         var handitem = playerdata.Inventory.HandItemStack;
+        inventory.update = true;
         var targetitem = inventory.GetItem(index);
         if (targetitem != null && handitem != null && targetitem.Id == handitem.Id)
         {
+            //目标有物品，且id相同，且有空间
             int space = targetitem.GetItemMeta().MaxAmount - targetitem.Amount;
             if (space > 0)
             {
-                if (space >= handitem.Amount)
+                if (ActionType == 1)
                 {
-                    targetitem.Amount += handitem.Amount;
-                    playerdata.Inventory.HandItemStack = null;
+                    targetitem.Amount += 1;
+                    playerdata.Inventory.HandItemStack.Amount -= 1;
                 }
                 else
                 {
-                    targetitem.Amount += space;
-                    handitem.Amount -= space;
+                    if (space >= handitem.Amount)
+                    {
+                        targetitem.Amount += handitem.Amount;
+                        playerdata.Inventory.HandItemStack = null;
+                    }
+                    else
+                    {
+                        targetitem.Amount += space;
+                        handitem.Amount -= space;
+                    }
                 }
             }
         }
         else
         {
-            playerdata.Inventory.update = true;
-            playerdata.Inventory.HandItemStack = targetitem;
-            inventory.SetItem(index, handitem);
+            if (ActionType == 1)
+            {
+                if (handitem != null && targetitem == null)
+                {
+                    inventory.SetItem(index, handitem.Copy(1));
+                    handitem.Amount -= 1;
+                    playerdata.Inventory.update = true;
+                }
+
+                if (handitem == null && targetitem != null)
+                {
+                    var left = targetitem.Amount / 2;
+                    var right = targetitem.Amount - left;
+
+                    targetitem.Amount = left;
+                    playerdata.Inventory.HandItemStack = targetitem.Copy(right);
+                    playerdata.Inventory.update = true;
+                }
+            }
+            else
+            {
+                playerdata.Inventory.update = true;
+                playerdata.Inventory.HandItemStack = targetitem;
+                inventory.SetItem(index, handitem);
+            }
         }
 
         return true;
@@ -349,10 +396,41 @@ public class WorldBase
             ComponentManager.SetBlockComponentData(playerData, block, data);
     }
 
-    public virtual void CraftGridRecipeItem(PlayerData player)
+    public virtual void CraftGridRecipeItem(PlayerData player, bool all = false)
     {
         var gri = RecipeManage.GetRecipe(player.Inventory, 2, 36);
-        if (gri != null)
+
+        if (all)
+        {
+            while (gri != null)
+            {
+                var handitme = player.Inventory.HandItemStack;
+                if (handitme == null
+                   )
+                {
+                    player.Inventory.HandItemStack = gri.Result.Copy();
+                }
+                else if (
+                    handitme.Id == gri.Result.Id &&
+                    handitme.Amount + gri.Result.Amount <= gri.Result.GetItemMeta().MaxAmount
+                )
+                {
+                    handitme.Amount += gri.Result.Amount;
+                }
+                else
+                {
+                    return;
+                }
+
+                for (int i = 0; i < 4; i++)
+                {
+                    player.Inventory.ReduceItemAmount(36 + i);
+                }
+
+                gri = RecipeManage.GetRecipe(player.Inventory, 2, 36);
+            }
+        }
+        else if (gri != null)
         {
             var handitme = player.Inventory.HandItemStack;
             if (handitme == null
@@ -367,6 +445,10 @@ public class WorldBase
             {
                 handitme.Amount += gri.Result.Amount;
             }
+            else
+            {
+                return;
+            }
 
             for (int i = 0; i < 4; i++)
             {
@@ -375,48 +457,54 @@ public class WorldBase
         }
     }
 
-
-    public void ManhattanRange(int cx, int cy, int r)
+    //基于光线追踪的光照计算
+    public void RayCastLights(Vector3I coord, int value)
     {
-        int d = 2 * r + 1; // 菱形外接正方形边长
-        int total = d * d; // 总格子数
+        var angle_step = 16;
+        float angleIncrement = 2 * Mathf.Pi / angle_step;
 
-        for (int k = 0; k < total; k++)
+        for (int angle = 0; angle < angle_step; angle++)
         {
-            int ox = k % d - r; // [-r , r]
-            int oy = k / d - r; // [-r , r]
-            int tr = Math.Abs(ox) + Math.Abs(oy);
-            if (tr <= r) // 曼哈顿距离过滤
+            var currentAngle = angle * angleIncrement;
+            var direction = new Godot.Vector2(Mathf.Cos(currentAngle), Mathf.Sin(currentAngle));
+            int light = value - 1;
+            for (var step = 1; step < value; step++)
             {
+                if (light < 0) break;
+                var offset = direction * step;
+                var CurrentPos = coord + new Vector3I((int)offset.X, (int)offset.Y, 0);
+                var block = GetBlock(CurrentPos);
+                if (block == null) continue;
+                if (block.Light < light)
+                    block.Light = light;
+                //else break;
+                // 遇到完整方块衰减光线
+                if (block.BlockMeta.CUBE) light -= 2;
+                else light -= 1;
             }
         }
     }
 
-
-    //更新光源
-    public void UpdateLightPoint(int x, int y, int value)
+    public void DFSUpdateLight(Vector3I coord, int value)
     {
-        int d = 2 * value + 1; // 菱形外接正方形边长
-        int total = d * d; // 总格子数
-        for (int k = 0; k < total; k++)
-        {
-            int ox = k % d - value; // [-r , r]
-            int oy = k / d - value; // [-r , r]
-            int tr = Math.Abs(ox) + Math.Abs(oy);
-            if (tr <= value) // 曼哈顿距离过滤
-            {
-                SetBlockLight(new Vector3I(x + ox, y + oy, 1), value - tr);
-            }
-        }
-    }
+        if (value <= 0) return;
 
-    public void SetBlockLight(Vector3I coord, int value)
-    {
         var block = GetBlock(coord);
         if (block == null) return;
-
         if (block.Light < value)
             block.Light = value;
+        else
+        {
+            return;
+        }
+
+        if (block.BlockMeta.CUBE) value -= 2;
+        else value -= 1;
+
+        DFSUpdateLight(coord - Vector3I.Left, value);
+        DFSUpdateLight(coord - Vector3I.Right, value);
+        DFSUpdateLight(coord - Vector3I.Up, value);
+        DFSUpdateLight(coord - Vector3I.Down, value);
     }
 
     //更新单个区块的所有光源
@@ -425,16 +513,20 @@ public class WorldBase
         var highmap = chunk.HighMap;
         if (highmap == null)
             chunk.HighMap = WorldGenerator.GetHighMap(chunk.X);
-        
+
         for (int x = 0; x < Chunk.Size; x++)
         {
             for (int y = 0; y < Chunk.Size; y++)
             {
+                var gx = chunk.X * Chunk.Size + x;
                 var gy = chunk.Y * Chunk.Size + y;
-                int skyLight = LightSize + Math.Min(0, highmap[x, 1] - gy);
-                skyLight = Math.Clamp(skyLight, 0, LightSize);
-
-                chunk.GetBlock(x, y, 1).SetLight(skyLight);
+                var num = highmap[x, 1] - gy;
+                if (num > 0) chunk.GetBlock(x, y, 1).SetLight(SkyLight);
+                if (num == 0)
+                {
+                    if (LightMode == LightModeEnum.RayCastMode) RayCastLights(new Vector3I(gx, gy, 1), LightSize);
+                    if (LightMode == LightModeEnum.DFSMode) DFSUpdateLight(new Vector3I(gx, gy, 1), LightSize);
+                }
             }
         }
 
@@ -444,15 +536,18 @@ public class WorldBase
             {
                 var light = new Vector2I(chunk.X * Chunk.Size + (int)point.X,
                     chunk.Y * Chunk.Size + (int)point.Y);
-                UpdateLightPoint((int)light.X, (int)light.Y, LightSize);
+                if (LightMode == LightModeEnum.DFSMode)
+                    DFSUpdateLight(new Vector3I((int)light.X, (int)light.Y, 1), LightSize);
+                if (LightMode == LightModeEnum.RayCastMode)
+                    RayCastLights(new Vector3I((int)light.X, (int)light.Y, 1), LightSize);
             }
         }
     }
 
     //更新区块的所有光照更新
-
     public void UpdateLights()
     {
+        stopwatch_light.Restart();
         foreach (var sts in Chunks)
             sts.Value.ClearLight();
 
@@ -465,8 +560,110 @@ public class WorldBase
         foreach (var sts in Players)
         {
             var player = sts.Value;
-            UpdateLightPoint(player.Coord.X, player.Coord.Y, LightSize * 2);
+            if (LightMode == LightModeEnum.DFSMode)
+                DFSUpdateLight(new Vector3I(player.Coord.X, player.Coord.Y, 1), LightSize * 2);
+            if (LightMode == LightModeEnum.RayCastMode)
+                RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), LightSize * 2);
         }
+
+        stopwatch_light.Stop();
+
+        LightConsuming.X = (int)stopwatch_light.ElapsedMilliseconds;
+        if (LightConsuming.X > LightConsuming.Y)
+            LightConsuming.Y = LightConsuming.X;
+    }
+
+
+    public virtual bool PlaceBlock(PlayerData player, Vector3I pos)
+    {
+        var pos0 = new Vector3I(pos.X, pos.Y, 0);
+        var pos1 = new Vector3I(pos.X, pos.Y, 1);
+        var block1 = world.WorldService.GetBlock(pos0);
+        var block2 = world.WorldService.GetBlock(pos1);
+
+        if (block1 == null || block2 == null) return false;
+
+        Vector3I finalpos;
+        Blockdata finalblock;
+
+        if (block1.IsMeta("air"))
+        {
+            finalblock = block1;
+            finalpos = pos0;
+        }
+        else
+        {
+            finalblock = block2;
+            finalpos = pos1;
+        }
+
+        if (!finalblock.IsMeta("air")) return false;
+
+        var item = player.Inventory.GetItem(player.Inventory.HandSlot);
+        if (item == null) return false;
+
+        BlockMeta bm = item.GetBlockMeta();
+        if (bm == null) return false;
+
+        SetBlock(finalpos, bm, false, 0);
+        if (player.Mode == 0) player.Inventory.ReduceItemAmount(player.Inventory.HandSlot);
+        return true;
+    }
+
+    public virtual bool BreakBlock(PlayerData player, Vector3I pos)
+    {
+        var fblock = world.WorldService.GetBlock(pos);
+        if (world.WorldService.CheckIsCloseBlock(pos) || fblock == null || fblock.IsMeta("air")) return false;
+
+        if (player.Mode == 0)
+        {
+            var item = fblock.BlockMeta?.ItemMeta?.GetItemStack();
+            if (item != null)
+            {
+                GD.Print($"添加物品！ :{item.GetItemMeta().Name}");
+                player.Inventory.TryAddItem(item);
+            }
+            else
+            {
+                GD.PrintErr($"物品不存在！ :{fblock.BlockMeta.NAME}");
+            }
+        }
+
+        SetBlock(pos, Materials.Valueof("air"), false, 0);
+        return true;
+    }
+
+    public virtual bool InterfaceBlock(PlayerData player, Vector3I pos)
+    {
+        var pos0 = new Vector3I(pos.X, pos.Y, 0);
+        var pos1 = new Vector3I(pos.X, pos.Y, 1);
+        var block1 = world.WorldService.GetBlock(pos0);
+        var block2 = world.WorldService.GetBlock(pos1);
+
+        if (block1 == null || block2 == null) return false;
+
+        Vector3I finalpos;
+        Blockdata InterfaceBlock;
+        if (!block2.IsMeta("air"))
+        {
+            finalpos = pos1;
+            InterfaceBlock = block2;
+        }
+        else
+        {
+            finalpos = pos0;
+            InterfaceBlock = block1;
+        }
+
+        if (InterfaceBlock.IsMeta("air")) return false;
+
+        player.OpeningBlockInventory = true;
+        player.OpenInventory = new System.Numerics.Vector3(finalpos.X, finalpos.Y, finalpos.Z);
+        var blockinv = InterfaceBlock.GetComponent<InventoryComponent>();
+        if (blockinv == null) return false;
+
+        world.WorldService.OpenBlockView(blockinv.InventoryName, finalpos.X, finalpos.Y, finalpos.Z);
+        return true;
     }
 
     public virtual void CloseView()

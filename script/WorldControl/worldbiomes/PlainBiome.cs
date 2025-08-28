@@ -13,6 +13,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
         {
             name = "平原";
             weight = 1;
+            color = Color.Color8(80, 255, 80);
         }
 
         public override int GetHigh(FastNoiseLite noise, int x, int z)
@@ -29,7 +30,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                 switch (num)
                 {
                     case > 0:
-                        context.SetBlock("sand");
+                        context.SetBlock("water");
                         break;
                     case 0:
                         context.SetBlock("sand");

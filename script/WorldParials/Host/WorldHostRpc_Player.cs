@@ -46,7 +46,7 @@ public partial class World
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void PickBlockInvItem(string player, int index)
+    public void PickBlockInvItem(string player, int index, int ActionType)
     {
         if (!WorldService.Players.ContainsKey(player)) return;
         var playerdata = WorldService.Players[player];
@@ -56,7 +56,7 @@ public partial class World
             var inv = WorldService.GetBlock(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z))
                 ?.GetComponent<InventoryComponent>()?.GetInventory();
             if (inv == null) return;
-            WorldService.PickItem(playerdata, inv, index);
+            WorldService.PickItem(playerdata, inv, index, ActionType);
         }
     }
 
@@ -87,11 +87,11 @@ public partial class World
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void PickInvItem(string player, int index)
+    public void PickInvItem(string player, int index, int ActionType)
     {
         if (!WorldService.Players.ContainsKey(player)) return;
         var playerdata = WorldService.Players[player];
-        WorldService.PickItem(playerdata, playerdata.Inventory, index);
+        WorldService.PickItem(playerdata, playerdata.Inventory, index, ActionType);
         playerdata.Inventory.update = true;
     }
 
@@ -104,10 +104,10 @@ public partial class World
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void CraftGridRecipeItem(string player)
+    public void CraftGridRecipeItem(string player,bool all)
     {
         if (!WorldService.Players.ContainsKey(player)) return;
         var playerdata = WorldService.Players[player];
-        WorldService.CraftGridRecipeItem(playerdata);
+        WorldService.CraftGridRecipeItem(playerdata,all);
     }
 }

@@ -150,20 +150,20 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         if (world.player.playerData != null) SavePlayer(world.player.playerData);
         ProcessDataRecive();
         UpdateLoadChunkCoords();
-        
+
         UpdateLights();
         UpdataTileMap();
     }
 
-    public override bool PickItem(PlayerData playerdata, InventoryBase inventory, int index)
+    public override bool PickItem(PlayerData playerdata, InventoryBase inventory, int index, int ActionType)
     {
         world.player.playerData.OpeningBlockInventory = true;
         if (world.player.ShowView == null) return false;
         if (inventory is BlockInventory bi)
             world.RpcId(1, "PickBlockInvItem",
-                playerdata.Name, index);
+                playerdata.Name, index, ActionType);
         else
-            world.RpcId(1, "PickInvItem", playerdata.Name, index);
+            world.RpcId(1, "PickInvItem", playerdata.Name, index, ActionType);
 
         // if (inventory is BlockInventory bi)
         //     world.RpcId(1, "InvokePlayerFunc",
@@ -186,6 +186,39 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         world.player.ShowView.TargetBlock = blockdata;
         world.player.ShowView.player = world.player;
         world.player.AddChild(world.player.ShowView);
+    }
+
+    public override bool InterfaceBlock(PlayerData player, Vector3I pos)
+    {
+        var pos0 = new Vector3I(pos.X, pos.Y, 0);
+        var pos1 = new Vector3I(pos.X, pos.Y, 1);
+        var block1 = world.WorldService.GetBlock(pos0);
+        var block2 = world.WorldService.GetBlock(pos1);
+
+        if (block1 == null || block2 == null) return false;
+
+        Vector3I finalpos;
+        Blockdata InterfaceBlock;
+        if (!block2.IsMeta("air"))
+        {
+            finalpos = pos1;
+            InterfaceBlock = block2;
+        }
+        else
+        {
+            finalpos = pos0;
+            InterfaceBlock = block1;
+        }
+
+        if (InterfaceBlock.IsMeta("air")) return false;
+
+        player.OpeningBlockInventory = true;
+        world.RpcId(1, "OpenBlockInv",
+            Player.Profile.Name,
+            finalpos.X,
+            finalpos.Y,
+            finalpos.Z);
+        return true;
     }
 
     public override void CloseView()
@@ -249,8 +282,8 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         world.RpcId(1, "SetOpenBlockComponent", playerData.Name, ByteTool.ToBytes(data));
     }
 
-    public override void CraftGridRecipeItem(PlayerData player)
+    public override void CraftGridRecipeItem(PlayerData player,bool all)
     {
-        world.RpcId(1, "CraftGridRecipeItem", player.Name);
+        world.RpcId(1, "CraftGridRecipeItem", player.Name,all);
     }
 }

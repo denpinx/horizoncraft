@@ -109,13 +109,14 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
         TickTimes++;
         stopwatch.Restart();
         ProcessChunkLoadQueue();
-        UpdataTileMap();
+        
         foreach (Vector2I coord in Chunks.Keys)
         {
             Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
         }
-
+        UpdateLights();
+        UpdataTileMap();
         stopwatch.Stop();
         TickConsuming = stopwatch.ElapsedMilliseconds;
     }

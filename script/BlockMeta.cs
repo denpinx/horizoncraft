@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using horizoncraft.script.Components;
 using horizoncraft.script.Events;
+using horizoncraft.script.Inventory;
 using horizoncraft.script.WorldControl;
 using Dictionary = System.Collections.Generic.Dictionary<string, string>;
 
@@ -23,8 +24,7 @@ namespace horizoncraft.script
         public bool COLLIDE = true;
         public bool CUBE = true;
         public bool Light = false;
-
-
+        public ItemMeta ItemMeta = null;
         public HashSet<int> InputMask = new();
         public HashSet<int> OutputMask = new();
 

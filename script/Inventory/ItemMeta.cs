@@ -14,7 +14,7 @@ public class ItemMeta
     public int MaxAmount = 64;
     public ItemStateSet Itemset = new ItemStateSet();
     public Texture2D ShowTexture;
-
+    public BlockMeta BlockMeta = null;
     public Dictionary<string, string> Tags = new Dictionary<string, string>();
 
     public Texture2D GetTexture(int state)

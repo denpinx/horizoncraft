@@ -64,8 +64,20 @@ namespace horizoncraft.script
         public static ItemMeta RegItemMeta(ItemMeta meta)
         {
             meta.Id = itemmetas.Count;
-            itemmetas.Add(meta);
-            Dictionary_itemmetas.Add(meta.Name, meta);
+            if (Dictionary_itemmetas.ContainsKey(meta.Name))
+            {
+                GD.PrintErr($"{meta.Name} already exists");
+                var blockmeta = Dictionary_itemmetas[meta.Name].BlockMeta;
+                Dictionary_itemmetas[meta.Name] = meta;
+                meta.BlockMeta = blockmeta;
+                blockmeta.ItemMeta = meta;
+            }
+            else
+            {
+                itemmetas.Add(meta);
+                Dictionary_itemmetas.Add(meta.Name, meta);
+            }
+
             GD.Print($"[注册物品]{meta.Id} >{meta.Name}");
             return meta;
         }
@@ -76,15 +88,28 @@ namespace horizoncraft.script
             blockmetas.Add(meta);
             Dictionary_blockmetas.Add(meta.NAME, meta);
             GD.Print($"[注册方块]{meta.ID} >{meta.NAME}");
-            if (!Dictionary_itemmetas.ContainsKey(meta.NAME) && meta.NAME != "air")
+
+            if (meta.NAME != "air")
             {
-                ItemMeta itemMeta = new ItemMeta()
+                if (!Dictionary_itemmetas.ContainsKey(meta.NAME))
                 {
-                    Name = meta.NAME,
-                    HasBlock = true
-                };
-                itemMeta.Itemset.TextureNames.Add(meta.NAME);
-                RegItemMeta(itemMeta);
+                    ItemMeta itemMeta = new ItemMeta()
+                    {
+                        Name = meta.NAME,
+                        HasBlock = true
+                    };
+                    GD.Print($"[方块注册物品]{itemMeta.Name}");
+                    itemMeta.Itemset.TextureNames.Add(meta.NAME);
+                    RegItemMeta(itemMeta);
+                    itemMeta.BlockMeta = meta;
+                    meta.ItemMeta = itemMeta;
+                }
+                else
+                {
+                    GD.Print($"[更新方块物品信息]{Dictionary_itemmetas[meta.NAME].Name}");
+                    Dictionary_itemmetas[meta.NAME].BlockMeta = meta;
+                    meta.ItemMeta = Dictionary_itemmetas[meta.NAME];
+                }
             }
 
             return meta;
@@ -112,7 +137,6 @@ namespace horizoncraft.script
                     CUBE = false,
                 }
             );
-
             LoadItemConfigs();
             LoadBlockConfigs();
             ProcessEntity();
@@ -222,13 +246,14 @@ namespace horizoncraft.script
                 if (config.ContainsKey("mask"))
                 {
                     var dict_mask = (Dictionary<string, object>)config["mask"];
-                    if (dict_mask.ContainsKey("input")) ;
+                    if (dict_mask.ContainsKey("input"))
                     {
                         var list = (List<object>)dict_mask["input"];
                         foreach (var i in list)
                             blockmeta.InputMask.Add((int)i);
                     }
-                    if (dict_mask.ContainsKey("output")) ;
+
+                    if (dict_mask.ContainsKey("output"))
                     {
                         var list = (List<object>)dict_mask["output"];
                         foreach (var i in list)
