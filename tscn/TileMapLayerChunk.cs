@@ -14,7 +14,9 @@ public partial class TileMapLayerChunk : Node2D
     TileMapLayer tileMapLayer_back;
     TileMapLayer tileMapLayer_shadow;
     DebugView debugView;
-    [Export] private float perspectiveOffsetFactor = 0.1f;
+    //[Export] private float perspectiveOffsetFactor = 0.1f;
+    
+    private long time;
 
     public override void _Ready()
     {
@@ -34,8 +36,10 @@ public partial class TileMapLayerChunk : Node2D
         {
             QueueFree();
         }
+        
         if (chunk.update_tilemap)
         {
+            debugView.time = time++;
             debugView.chunk = chunk;
             debugView.QueueRedraw();
             for (int z = 0; z < Chunk.SizeZ && z < 2; z++)

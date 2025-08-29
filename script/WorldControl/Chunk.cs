@@ -196,7 +196,14 @@ namespace horizoncraft.script.WorldControl
                 }
             }
         }
-
+        public void FillLight(int value)
+        {
+            for (int x = 0; x < Chunk.Size; x++)
+            for (int y = 0; y < Chunk.Size; y++)
+            {
+                data[x, y, 1].Light = value;
+            }
+        }
         public void ClearLight()
         {
             for (int x = 0; x < Chunk.Size; x++)

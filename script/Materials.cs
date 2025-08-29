@@ -236,6 +236,12 @@ namespace horizoncraft.script
                     blockmeta.Light = (bool)config["light"];
                 }
 
+                if (config.ContainsKey("rigidity"))
+                {
+                    blockmeta.Rigidity = (float)Convert.ToDouble(config["rigidity"]);
+                    GD.Print($"{blockmeta.NAME} rgdt : {blockmeta.Rigidity}");
+                }
+
                 if (config.ContainsKey("tags"))
                 {
                     var dict_attr = (Dictionary<string, object>)config["tags"];

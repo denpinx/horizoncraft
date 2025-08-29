@@ -20,6 +20,7 @@ public class WorldBase
 {
     public enum LightModeEnum
     {
+        None,
         RayCastMode,
         DFSMode
     }
@@ -288,7 +289,15 @@ public class WorldBase
         }
     }
 
-    //不直接写在 InventoryBase 因为这涉及到用户交互和网络传输
+    //不直接写在 InventoryBase 因为这涉及到用户交互和网络传输,当前函数仅处于 Host 和 Single 模式中存在
+    /// <summary>
+    /// 拾取物品
+    /// </summary>
+    /// <param name="playerdata">玩家</param>
+    /// <param name="inventory">容器</param>
+    /// <param name="index">下标</param>
+    /// <param name="ActionType">交互类型,0为的左键,1为右键</param>
+    /// <returns>是否成功拾取物品</returns>
     public virtual bool PickItem(PlayerData playerdata, InventoryBase inventory, int index, int ActionType)
     {
         if (inventory == null) return false;
@@ -458,9 +467,9 @@ public class WorldBase
     }
 
     //基于光线追踪的光照计算
-    public void RayCastLights(Vector3I coord, int value)
+    public void RayCastLights(Vector3I coord, int value, int detail = 16)
     {
-        var angle_step = 16;
+        var angle_step = detail;
         float angleIncrement = 2 * Mathf.Pi / angle_step;
 
         for (int angle = 0; angle < angle_step; angle++)
@@ -477,7 +486,6 @@ public class WorldBase
                 if (block == null) continue;
                 if (block.Light < light)
                     block.Light = light;
-                //else break;
                 // 遇到完整方块衰减光线
                 if (block.BlockMeta.CUBE) light -= 2;
                 else light -= 1;
@@ -485,7 +493,7 @@ public class WorldBase
         }
     }
 
-    public void DFSUpdateLight(Vector3I coord, int value)
+    public void DfsUpdateLight(Vector3I coord, int value)
     {
         if (value <= 0) return;
 
@@ -501,15 +509,21 @@ public class WorldBase
         if (block.BlockMeta.CUBE) value -= 2;
         else value -= 1;
 
-        DFSUpdateLight(coord - Vector3I.Left, value);
-        DFSUpdateLight(coord - Vector3I.Right, value);
-        DFSUpdateLight(coord - Vector3I.Up, value);
-        DFSUpdateLight(coord - Vector3I.Down, value);
+        DfsUpdateLight(coord - Vector3I.Left, value);
+        DfsUpdateLight(coord - Vector3I.Right, value);
+        DfsUpdateLight(coord - Vector3I.Up, value);
+        DfsUpdateLight(coord - Vector3I.Down, value);
     }
 
     //更新单个区块的所有光源
     public void UpdataChunkLight(Chunk chunk)
     {
+        if (LightMode == LightModeEnum.None)
+        {
+            return;
+        }
+
+
         var highmap = chunk.HighMap;
         if (highmap == null)
             chunk.HighMap = WorldGenerator.GetHighMap(chunk.X);
@@ -525,7 +539,7 @@ public class WorldBase
                 if (num == 0)
                 {
                     if (LightMode == LightModeEnum.RayCastMode) RayCastLights(new Vector3I(gx, gy, 1), LightSize);
-                    if (LightMode == LightModeEnum.DFSMode) DFSUpdateLight(new Vector3I(gx, gy, 1), LightSize);
+                    if (LightMode == LightModeEnum.DFSMode) DfsUpdateLight(new Vector3I(gx, gy, 1), LightSize);
                 }
             }
         }
@@ -537,7 +551,7 @@ public class WorldBase
                 var light = new Vector2I(chunk.X * Chunk.Size + (int)point.X,
                     chunk.Y * Chunk.Size + (int)point.Y);
                 if (LightMode == LightModeEnum.DFSMode)
-                    DFSUpdateLight(new Vector3I((int)light.X, (int)light.Y, 1), LightSize);
+                    DfsUpdateLight(new Vector3I((int)light.X, (int)light.Y, 1), LightSize);
                 if (LightMode == LightModeEnum.RayCastMode)
                     RayCastLights(new Vector3I((int)light.X, (int)light.Y, 1), LightSize);
             }
@@ -549,7 +563,10 @@ public class WorldBase
     {
         stopwatch_light.Restart();
         foreach (var sts in Chunks)
+        {
             sts.Value.ClearLight();
+        }
+
 
         foreach (var sts in Chunks)
         {
@@ -561,9 +578,9 @@ public class WorldBase
         {
             var player = sts.Value;
             if (LightMode == LightModeEnum.DFSMode)
-                DFSUpdateLight(new Vector3I(player.Coord.X, player.Coord.Y, 1), LightSize * 2);
+                DfsUpdateLight(new Vector3I(player.Coord.X, player.Coord.Y, 1), LightSize / 2);
             if (LightMode == LightModeEnum.RayCastMode)
-                RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), LightSize * 2);
+                RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), LightSize / 2, 32);
         }
 
         stopwatch_light.Stop();
@@ -613,14 +630,14 @@ public class WorldBase
     public virtual bool BreakBlock(PlayerData player, Vector3I pos)
     {
         var fblock = world.WorldService.GetBlock(pos);
-        if (world.WorldService.CheckIsCloseBlock(pos) || fblock == null || fblock.IsMeta("air")) return false;
+
 
         if (player.Mode == 0)
         {
+            if (world.WorldService.CheckIsCloseBlock(pos) || fblock == null || fblock.IsMeta("air")) return false;
             var item = fblock.BlockMeta?.ItemMeta?.GetItemStack();
             if (item != null)
             {
-                GD.Print($"添加物品！ :{item.GetItemMeta().Name}");
                 player.Inventory.TryAddItem(item);
             }
             else

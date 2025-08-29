@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 
 namespace horizoncraft.script.WorldControl.Struct.structs;
@@ -18,7 +19,7 @@ public class MegaOakTreeStruct : StructBuild
         var blocks = new BlockStruct();
         Grow(blocks, rand, x, y, z, 25);
 
-        foreach (var bsi in blocks.blockStructItems.ToArray())
+        foreach (var bsi in blocks.blockStructItems.Values.ToArray())
         {
             if (bsi.Coord.Y < y - 4)
             {

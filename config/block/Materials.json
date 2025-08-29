@@ -1,5 +1,6 @@
 {
   "dirt": {
+    "rigidity": 0.4,
     "components": {
       "ExpandComponent": {
         "Name": "BlockSpread",
@@ -9,6 +10,7 @@
     }
   },
   "grass": {
+    "rigidity": 0.5,
     "components": {
       "ExpandComponent": {
         "Name": "BlockCover",
@@ -18,12 +20,14 @@
     }
   },
   "stone": {
+    "rigidity": 2,
     "tiletype": "terrain",
     "tags": {
       "link": "stone"
     }
   },
   "bush": {
+    "rigidity": 0.1,
     "collide": false,
     "cube": false,
     "components": {
@@ -34,6 +38,7 @@
     }
   },
   "oak_log": {
+    "rigidity": 1,
     "state": {
       "normal": {
         "texture": "oak_log"
@@ -44,6 +49,7 @@
     }
   },
   "water": {
+    "rigidity": 1,
     "collide": false,
     "cube": false,
     "tiletype": "atlas",
@@ -56,6 +62,7 @@
     }
   },
   "sand": {
+    "rigidity": 0.5,
     "components": {
       "PhysicsComponent": {
         "Name": "PhysicsComponent",
@@ -66,6 +73,7 @@
     }
   },
   "wooden_storage_box": {
+    "rigidity": 0.5,
     "components": {
       "InventoryComponent": {
         "Name": "BoxComponent",
@@ -74,20 +82,33 @@
       }
     }
   },
-  "oak_leaves": {},
-  "oak_plank": {},
-  "snow": {},
-  "iceblock": {},
+  "oak_leaves": {
+    "rigidity": 0.2
+  },
+  "oak_plank": {
+    "rigidity": 0.5
+  },
+  "snow": {
+    "rigidity": 0.2
+  },
+  "iceblock": {
+    "rigidity": 0.5
+  },
   "ladder": {
+    "rigidity": 0.5,
     "collide": false,
     "cube": false
   },
-  "brickblock": {},
+  "brickblock": {
+    "rigidity": 2
+  },
   "rose": {
+    "rigidity": 0.1,
     "collide": false,
     "cube": false
   },
   "workbench": {
+    "rigidity": 0.5,
     "components": {
       "InventoryComponent": {
         "Name": "WorkBenchComponent",
@@ -97,6 +118,7 @@
     }
   },
   "furnace": {
+    "rigidity": 0.5,
     "mask": {
       "input": [
         0,
@@ -125,6 +147,7 @@
     }
   },
   "logistics_pipeline": {
+    "rigidity": 0.5,
     "collide": false,
     "cube": false,
     "tiletype": "terrain",
@@ -133,6 +156,7 @@
     }
   },
   "big_logistics_pipeline": {
+    "rigidity": 0.8,
     "collide": false,
     "cube": false,
     "tiletype": "terrain",
@@ -141,6 +165,7 @@
     }
   },
   "input_block": {
+    "rigidity": 0.5,
     "components": {
       "TickComponent": {
         "Name": "LogisticsInputComponent",
@@ -152,16 +177,19 @@
     }
   },
   "output_block": {
+    "rigidity": 0.5,
     "tags": {
       "link": "net"
     }
   },
   "interface_block": {
+    "rigidity": 0.5,
     "tags": {
       "link": "net"
     }
   },
   "light": {
+    "rigidity": 0.1,
     "collide": false,
     "cube": false,
     "light": true

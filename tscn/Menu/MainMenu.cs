@@ -1,14 +1,12 @@
-using Godot;
-using horizoncraft.script;
-using horizoncraft.script.WorldControl;
 using System;
+using Godot;
 using Godot.Collections;
+using horizoncraft.script;
 using horizoncraft.script.Config;
-using World = HorizonCraft.script;
 
-namespace horizoncraft.script;
+namespace HorizonCraft.tscn.Menu;
 
-public partial class MainMenu : World
+public partial class MainMenu : horizoncraft.script.World
 {
     private TextureButton ButtonSingle, ButtonHost, ButtonConnect;
     private TextEdit TextEdit;
@@ -77,9 +75,9 @@ public partial class MainMenu : World
             DirAccess.MakeDirAbsolute($"profile");
         }
 
-        if (!FileAccess.FileExists("profile/player.json"))
+        if (!FileAccess.FileExists("profile/local.json"))
         {
-            Player.Profile = new PlayerProfile()
+            Player.Profile = new LocalProfile()
             {
                 Name = "玩家" + new Random().Next()
             };
@@ -87,10 +85,10 @@ public partial class MainMenu : World
             return;
         }
 
-        FileAccess fs = FileAccess.Open("profile/player.json", FileAccess.ModeFlags.Read);
+        FileAccess fs = FileAccess.Open("profile/local.json", FileAccess.ModeFlags.Read);
         var json_text = fs.GetAsText();
         fs.Close();
-        PlayerProfile profile = new();
+        LocalProfile profile = new();
         profile.ParseDictionary((Dictionary)Json.ParseString(json_text));
         Player.Profile = profile;
         GD.Print($"加载文档:{Player.Profile.Name}");
@@ -100,7 +98,7 @@ public partial class MainMenu : World
     {
         if (!DirAccess.DirExistsAbsolute($"profile"))
             DirAccess.MakeDirAbsolute($"profile");
-        FileAccess fs = FileAccess.Open("profile/player.json", FileAccess.ModeFlags.Write);
+        FileAccess fs = FileAccess.Open("profile/local.json", FileAccess.ModeFlags.Write);
         fs.StoreString(Json.Stringify(Player.Profile.ToDictionary()));
         fs.Close();
     }

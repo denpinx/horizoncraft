@@ -130,7 +130,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
                     OnChunkLoaded?.Invoke(this, chunk);
                 }
 
-                UpdataChunkLight(chunk);
+                //UpdataChunkLight(chunk);
                 coord = LoadChunkQueue.Keys.FirstOrDefault();
             }
         })), null);

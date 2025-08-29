@@ -20,7 +20,7 @@ namespace horizoncraft.script;
 public partial class Player : CharacterBody2D
 {
     private const bool TEST_MODE = true;
-    public static PlayerProfile Profile;
+    public static LocalProfile Profile;
     public static List<Func<string>> GetInformation = new List<Func<string>>();
 
     public Action OnMoveToChunk;
@@ -30,7 +30,6 @@ public partial class Player : CharacterBody2D
     public const float JumpVelocity = -200.0f;
     public bool Inputable = true;
     public bool MoreInfo = false;
-    [Export] public int mode = 0;
     [Export] public bool fly = true;
 
     public bool Stop = false;
@@ -41,6 +40,8 @@ public partial class Player : CharacterBody2D
     Label Label_DEBUG_Left;
     Label Label_DEBUG_Right;
     Label Label_PlayerName;
+    CollisionShape2D collisionShape2D;
+
     public InventoryNode ShowView;
     public Sprite2D Cursor;
     public HotBar hotBar;
@@ -104,30 +105,30 @@ public partial class Player : CharacterBody2D
                 finalpos = pos0;
                 InterfaceBlock = block1;
             }
+
             if (InterfaceBlock.IsMeta("air")) return;
-            
+
             if (BreakProcess.ProcessTime >= BreakProcess.FinalTime)
             {
-                GD.Print("break！");
                 world.WorldService.BreakBlock(playerData, BreakProcess.Position);
                 BreakProcess.ProcessTime = 0;
+                BreakProcess.FinalTime = 2;
             }
             else if (BreakProcess.ProcessTime > 0)
             {
-                GD.Print(BreakProcess.ProcessTime);
                 BreakProcess.ProcessTime += (float)delta;
-                
+
                 if (BreakProcess.Position != finalpos)
                     BreakProcess.Reset();
             }
             else
             {
-                BreakProcess.FinalTime = 2f;
+                BreakProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity;
                 BreakProcess.Position = finalpos;
                 BreakProcess.ProcessTime += (float)delta;
-            }
 
-            GD.Print(BreakProcess.ProcessTime);
+                if (playerData.Mode == 1) BreakProcess.FinalTime = 0;
+            }
         }
         else
         {
@@ -137,8 +138,13 @@ public partial class Player : CharacterBody2D
         if (Input.IsActionPressed("placeblock") && playerData != null && ShowView == null)
         {
             var targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
-            if (!world.WorldService.PlaceBlock(playerData, targetpos))
+            if (!IsInRange(targetpos.X * 16, targetpos.Y * 16) && world.WorldService.PlaceBlock(playerData, targetpos))
+            {
+            }
+            else
+            {
                 world.WorldService.InterfaceBlock(playerData, targetpos);
+            }
         }
     }
 
@@ -182,7 +188,7 @@ public partial class Player : CharacterBody2D
         }
         else
         {
-            if (mode == 0)
+            if (playerData.Mode == 0)
                 Stop = false;
         }
 
@@ -227,7 +233,7 @@ public partial class Player : CharacterBody2D
                 }
             }
 
-            if (mode == 0)
+            if (playerData.Mode == 0)
             {
                 Vector2 velocity = Velocity;
                 if (!IsOnFloor() && (!fly || !Stop))
@@ -254,7 +260,7 @@ public partial class Player : CharacterBody2D
                 MoveAndSlide();
             }
 
-            if (mode == 1)
+            if (playerData.Mode == 1)
             {
                 if (Input.IsActionPressed("zoom_1"))
                     camera2d.Zoom = new(2, 2);
@@ -284,7 +290,7 @@ public partial class Player : CharacterBody2D
                 }
 
                 if (Input.IsActionJustPressed("F1") && Inputable)
-                    mode = mode == 0 ? 1 : 0;
+                    playerData.Mode = playerData.Mode == 0 ? 1 : 0;
                 if (Input.IsActionJustPressed("F2") && Inputable)
                     DebugView.DEBUG = !DebugView.DEBUG;
                 if (Input.IsActionJustPressed("F3") && Inputable)
@@ -372,6 +378,7 @@ public partial class Player : CharacterBody2D
 
     public override void _Ready()
     {
+        collisionShape2D = GetNode<CollisionShape2D>("CollisionShape2D");
         Cursor = GetNode<Sprite2D>("Cursor");
         camera2d = GetNode<Camera2D>("Camera2D");
         Label_DEBUG_Left = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Left");
@@ -384,5 +391,21 @@ public partial class Player : CharacterBody2D
         Timer_Tick.Timeout += UpdateGui;
         hotBar.Player = this;
         ;
+    }
+
+
+    public bool IsInRange(int x, int y, float w = 16f, float h = 16f)
+    {
+        var rect1 = collisionShape2D.Shape.GetRect();
+        var rect2 = new Rect2(collisionShape2D.GlobalPosition + rect1.Position, rect1.Size);
+        var rec3 = new Rect2(x, y, w, h);
+        if (rect2.Intersects(rec3))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

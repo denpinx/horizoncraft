@@ -5,11 +5,10 @@ using MemoryPack;
 namespace horizoncraft.script.Config;
 
 [MemoryPackable]
-public partial class PlayerProfile
+public partial class LocalProfile
 {
     public string Name;
-
-
+    
     public void ParseDictionary(Dictionary dict)
     {
         this.Name = (string)dict["Name"];

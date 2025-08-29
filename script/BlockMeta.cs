@@ -27,6 +27,7 @@ namespace horizoncraft.script
         public ItemMeta ItemMeta = null;
         public HashSet<int> InputMask = new();
         public HashSet<int> OutputMask = new();
+        public float Rigidity = 0.5f;
 
         public Blockdata Blockdata()
         {

@@ -123,7 +123,7 @@ namespace horizoncraft.script
             textureRect = GetNode<TextureRect>("CanvasLayer_Back/TextureRect_Sky");
             colorRect = GetNode<ColorRect>("CanvasLayer/ColorRect_Top");
             DirectionalLight2D = GetNode<DirectionalLight2D>("DirectionalLight2D");
-            timer.Timeout += CilentTick;
+            timer.Timeout += ClientTick;
             player.world = this;
 
             if (worldMode == WorldMode.Single)
@@ -229,20 +229,31 @@ namespace horizoncraft.script
             }
         }
 
-        public void CilentTick()
+        public void ClientTick()
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            for (int i = 0; i < tileMapLayerChunks.Count; i++)
+
+            foreach (var tmly in tileMapLayerChunks.ToArray())
             {
-                TileMapLayerChunk tmly = tileMapLayerChunks[i];
                 if (!VisibleChunks.ContainsKey(tmly.chunk.coord))
                 {
                     RemoveChild(tmly);
-                    tileMapLayerChunks.RemoveAt(i);
+                    tileMapLayerChunks.Remove(tmly);
                     tmly.QueueFree();
                 }
             }
+            
+            // for (int i = 0; i < tileMapLayerChunks.Count; i++)
+            // {
+            //     TileMapLayerChunk tmly = tileMapLayerChunks[i];
+            //     if (!VisibleChunks.ContainsKey(tmly.chunk.coord))
+            //     {
+            //         RemoveChild(tmly);
+            //         tileMapLayerChunks.RemoveAt(i);
+            //         tmly.QueueFree();
+            //     }
+            // }
 
             foreach (var key in VisibleChunks.Keys)
             {
@@ -336,7 +347,7 @@ namespace horizoncraft.script
         {
             float hour = t * 24f;
 
-            if (hour >= 0 && hour < 6) // 00:00 - 06:00：深夜到黎明
+            if (hour >= 0 && hour < 6) // 00:00 - 06:00
             {
                 float p = hour / 6f;
                 byte r = (byte)Math.Clamp(15 + p * (25 - 15), 0, 255);
@@ -345,7 +356,7 @@ namespace horizoncraft.script
                 return Color.Color8(r, g, b);
             }
 
-            if (hour >= 6 && hour < 12) // 06:00 - 12:00：黎明到正午
+            if (hour >= 6 && hour < 12) // 06:00 - 12:00
             {
                 float p = (hour - 6f) / 6f;
                 byte r = (byte)Math.Clamp(25 + p * (135 - 25), 0, 255);
@@ -354,7 +365,7 @@ namespace horizoncraft.script
                 return Color.Color8(r, g, b);
             }
 
-            if (hour >= 12 && hour < 18) // 12:00 - 18:00：正午到傍晚
+            if (hour >= 12 && hour < 18) // 12:00 - 18:00
             {
                 float p = (hour - 12f) / 6f;
                 byte r = (byte)Math.Clamp(135 + p * (255 - 135), 0, 255);
@@ -363,7 +374,7 @@ namespace horizoncraft.script
                 return Color.Color8(r, g, b);
             }
 
-            if (hour >= 18 && hour < 24) // 18:00 - 24:00：傍晚到深夜
+            if (hour >= 18 && hour < 24) // 18:00 - 24:00
             {
                 float p = (hour - 18f) / 6f;
                 byte r = (byte)Math.Clamp(255 + p * (15 - 255), 0, 255);

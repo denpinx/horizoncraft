@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 
 namespace horizoncraft.script.WorldControl.Struct.structs;
 
@@ -18,7 +19,7 @@ public class OakTreeStruct : StructBuild
         var blocks = new BlockStruct();
         Grow(blocks, rand, x, y, z, 10);
 
-        foreach (var bsi in blocks.blockStructItems.ToArray())
+        foreach (var bsi in blocks.blockStructItems.Values.ToArray())
         {
             if (bsi.Coord.Y < y - 4)
             {

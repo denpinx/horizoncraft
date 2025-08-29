@@ -24,10 +24,10 @@ public abstract partial class InventoryBase
         this.Size = size;
         Items = new ItemStack[Size];
     }
-
-    public int GetEmpyIndex()
+    
+    public int GetEmpyIndex(int start = 0)
     {
-        for (int i = 0; i < Size; i++)
+        for (int i = start; i < Size; i++)
         {
             if (GetItem(i) == null) return i;
         }
@@ -177,31 +177,58 @@ public abstract partial class InventoryBase
 
 
     /// <summary>
-    /// 自动排序
+    /// 排序
     /// </summary>
     public void Sort()
     {
-        //压缩空间
-        for (int i = Size - 1; i > 0; i--)
+        List<ItemStack> ItemStacks = new();
+        for (int Index = 0; Index < Size; Index++)
         {
-            ItemStack item = GetItem(i);
+            ItemStack item = GetItem(Index);
             if (item != null)
             {
-                for (int j = 0; j < Size; j++)
+                for (var resultIndex = 0; resultIndex < ItemStacks.Count; resultIndex++)
                 {
-                    ItemStack target = GetItem(j);
-                    if (target == null)
+                    if (ItemStacks[resultIndex].Id == item.Id)
                     {
-                        SetItem(j, item.Copy());
-                        SetItem(i, null);
-                        break;
+                        var space = ItemStacks[resultIndex].GetItemMeta().MaxAmount - ItemStacks[resultIndex].Amount;
+                        if (space > 0)
+                        {
+                            if (space < item.Amount)
+                            {
+                                ItemStacks[resultIndex].Amount += space;
+                                item.Amount -= space;
+                            }
+
+                            if (space >= item.Amount)
+                            {
+                                ItemStacks[resultIndex].Amount += item.Amount;
+                                item.Amount = 0;
+                                break;
+                            }
+                        }
                     }
                 }
+
+                if (item.Amount > 0)
+                    ItemStacks.Add(item);
+            }
+        }
+
+        ItemStacks.Sort((a, b) => a.Id.CompareTo(b.Id));
+        for (int i = 0; i < Size; i++)
+        {
+            if (i < ItemStacks.Count)
+            {
+                Items[i] = ItemStacks[i];
+            }
+            else
+            {
+                Items[i] = null;
             }
         }
 
         update = true;
-        //排序
     }
 
     public void Clear()

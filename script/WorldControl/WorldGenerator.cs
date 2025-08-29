@@ -135,7 +135,7 @@ namespace horizoncraft.script.WorldControl
         {
             for (int i = 0; i < structs.Count; i++)
             {
-                (BlockMeta, int) data = structs[i].GetBlockMeta(x, y, z);
+                (BlockMeta, int) data = structs[i].GetBlockMeta(x, y, z); //里面是字典，理论上是o(1)
                 if (data.Item1 != null) return data;
             }
 
@@ -145,19 +145,17 @@ namespace horizoncraft.script.WorldControl
         //生成区块
         //不涉及跨区块生成，跨区块方块，通过使用预知获取周围区块的跨区块结构，每个方块都是独立生成
         //区块只生成一次，之后加载不会再重新生成，花点时间可以理解.
-        //旧算法每次设置方块都需要遍历所有的区块才能命中，以及还要等待区块异步加载的延迟，现在直接100%命中
-        //当前运行速度50chunk+/s
+        
         //去除stopwatch的误差，单区块平均生成耗时小于1ms
 
         /*
-            单线程生成 1000 区块耗时12669 ms
-            平均耗时12 ms
-            多线程生成 1000 区块耗时2528 ms
-            平均耗时2 ms
+            单线程生成 1000 区块耗时31393 ms
+            平均耗时31 ms
+            多线程生成 1000 区块耗时6784 ms
+            平均耗时6 ms
          */
         public static void Generator(Chunk chunk)
         {
-            StopWatch.Restart();
             chunk.spawn = true;
             var landbiome = BiomeManage.GetLandBiome(chunk.X);
             int[,] highmap = GetHighMap(chunk.X);
@@ -246,12 +244,8 @@ namespace horizoncraft.script.WorldControl
                     }
                 }
             }
-
-            StopWatch.Stop();
-
             chunk.HighMap = highmap;
             chunk.UpdateList.Clear();
-            chunk.SpawnCostTime = (int)StopWatch.ElapsedMilliseconds;
             chunk.update_tilemap = true;
             chunk.update_server = true;
         }

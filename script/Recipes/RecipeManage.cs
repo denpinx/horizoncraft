@@ -15,11 +15,9 @@ public class RecipeManage
     {
         var gr = GridRecipes.Find(gr => gr.Tag == tag);
         if (gr == null) return null;
-
         var gri = gr.recipes.Find(gri => gri.Match(items));
         return gri;
     }
-
     public static GridRecipeItem GetRecipe(InventoryBase inventory, int RecipeSize, int start_index = 0)
     {
         ItemStack[,] PrimeItems = new ItemStack[RecipeSize, RecipeSize];

@@ -70,11 +70,8 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
         foreach (Vector2I coord in LoadChunkQueue.Keys)
         {
             int max = LoadChunkQueue.Count;
-            WorkBase work = LoadChunkQueue[coord];
             Chunk chunk = new(coord.X, coord.Y);
             Chunks[coord] = chunk;
-            if (work.Type != "NONE")
-                work.Execute(chunk);
             WorldGenerator.Generator(chunk);
             OnChunkLoaded?.Invoke(this, chunk);
         }
@@ -109,12 +106,13 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
         TickTimes++;
         stopwatch.Restart();
         ProcessChunkLoadQueue();
-        
+
         foreach (Vector2I coord in Chunks.Keys)
         {
             Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
         }
+
         UpdateLights();
         UpdataTileMap();
         stopwatch.Stop();

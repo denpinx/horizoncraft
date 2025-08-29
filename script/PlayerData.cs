@@ -66,36 +66,4 @@ public partial class PlayerData
     public PlayerData()
     {
     }
-
-
-    public bool PickItem(int index)
-    {
-        var handitem = Inventory.HandItemStack;
-        var targetitem = Inventory.GetItem(index);
-        if (targetitem != null && handitem != null && targetitem.Id == handitem.Id)
-        {
-            int space = targetitem.GetItemMeta().MaxAmount - targetitem.Amount;
-            if (space > 0)
-            {
-                if (space >= handitem.Amount)
-                {
-                    targetitem.Amount += handitem.Amount;
-                    Inventory.HandItemStack = null;
-                }
-                else
-                {
-                    targetitem.Amount += space;
-                    handitem.Amount -= space;
-                }
-            }
-        }
-        else
-        {
-            Inventory.update = true;
-            Inventory.HandItemStack = targetitem;
-            Inventory.SetItem(index, handitem);
-        }
-
-        return true;
-    }
 }
