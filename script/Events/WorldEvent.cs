@@ -12,9 +12,8 @@ namespace horizoncraft.script.Events
 {
     public class WorldEvent
     {
-        public Player Player;
+        public PlayerData Player;
         public World World;
         public WorldBase WorldService;
-        public Chunk Chunk;
     }
 }

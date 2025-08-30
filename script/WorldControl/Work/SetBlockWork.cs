@@ -20,7 +20,7 @@ namespace horizoncraft.script.WorldControl.work
         {
             foreach (var item in ExclList)
             {
-                chunk.SetBlock(item.Item1.X, item.Item1.Y, item.Item1.Z, item.Item2.Blockdata(), item.Item3);
+                chunk.SetBlock(item.Item1.X, item.Item1.Y, item.Item1.Z, item.Item2.CreateBlockData(), item.Item3);
             }
         }
     }

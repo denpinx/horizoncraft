@@ -12,22 +12,34 @@ public partial class ItemStack
     public int Id;
     public int Amount;
     public int State;
-
-    public void SetItemMeta(string name)
-    {
-        ItemMeta meta = Materials.Dictionary_itemmetas[name];
-        this.Id = meta.Id;
-    }
-
-    public ItemMeta GetItemMeta() => Materials.itemmetas[Id];
+    public List<Component> Components = new();
+    
+    public ItemMeta GetItemMeta() => Materials.ItemMetas[Id];
     public BlockMeta GetBlockMeta() => GetItemMeta().BlockMeta;
+
+    //深拷贝
     public ItemStack Copy(int amount = 0)
     {
-        return new ItemStack()
-        {
-            Id = this.Id,
-            Amount = amount == 0 ? this.Amount : amount,
-            State = this.State
-        };
+        var item = GetItemMeta().GetItemStack();
+        item.Amount = amount==0?Amount:amount;
+        item.State = State;
+        item.Components.Clear();
+        foreach (var component in this.Components)
+            item.Components.Add(((ItemComponent)component).Copy());
+        return item;
+    }
+
+    public T GetComponent<T>() where T : Component
+    {
+        var result = Components.Find(cmp => cmp is T);
+        if (result != null) return result as T;
+        return null;
+    }
+
+    public T GetComponent<T>(string name) where T : Component
+    {
+        var result = Components.Find(cmp => cmp is T && cmp.Name == name);
+        if (result != null) return result as T;
+        return null;
     }
 }

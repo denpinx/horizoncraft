@@ -6,6 +6,7 @@ using Godot;
 using Godot.Collections;
 using horizoncraft.script;
 using horizoncraft.script.Components;
+using horizoncraft.script.Components.Item;
 using horizoncraft.script.Config;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Features;
@@ -25,12 +26,13 @@ public partial class Player : CharacterBody2D
 
     public Action OnMoveToChunk;
     public PlayerData playerData;
+
     public World world;
     public const float Speed = 300.0f;
     public const float JumpVelocity = -200.0f;
     public bool Inputable = true;
     public bool MoreInfo = false;
-    [Export] public bool fly = true;
+    //[Export] public bool fly = true;
 
     public bool Stop = false;
 
@@ -91,22 +93,39 @@ public partial class Player : CharacterBody2D
             var block1 = world.WorldService.GetBlock(pos0);
             var block2 = world.WorldService.GetBlock(pos1);
 
-            if (block1 == null || block2 == null) return;
+            if (block1 == null || block2 == null)
+            {
+                BreakProcess.Reset();
+                return;
+            }
 
             Vector3I finalpos;
             Blockdata InterfaceBlock;
-            if (!block2.IsMeta("air"))
+            if (Input.IsKeyPressed(Key.Shift))
             {
                 finalpos = pos1;
                 InterfaceBlock = block2;
             }
             else
             {
-                finalpos = pos0;
-                InterfaceBlock = block1;
+                if (!block2.IsMeta("air"))
+                {
+                    finalpos = pos1;
+                    InterfaceBlock = block2;
+                }
+                else
+                {
+                    finalpos = pos0;
+                    InterfaceBlock = block1;
+                }
             }
 
-            if (InterfaceBlock.IsMeta("air")) return;
+
+            if (InterfaceBlock.IsMeta("air"))
+            {
+                BreakProcess.Reset();
+                return;
+            }
 
             if (BreakProcess.ProcessTime >= BreakProcess.FinalTime)
             {
@@ -123,11 +142,33 @@ public partial class Player : CharacterBody2D
             }
             else
             {
-                BreakProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity;
-                BreakProcess.Position = finalpos;
-                BreakProcess.ProcessTime += (float)delta;
+                if (!world.WorldService.CheckIsCloseBlock(finalpos))
+                {
+                    var meta = InterfaceBlock.BlockMeta;
+                    float efficiency = 1f;
+                    float gap = meta.BreakLevel;
 
-                if (playerData.Mode == 1) BreakProcess.FinalTime = 0;
+                    var durable = playerData.Inventory.GetItemInHand()?.GetComponent<ItemDurableComponent>();
+                    if (durable != null)
+                    {
+                        string tag = InterfaceBlock.GetTag("type");
+                        if ((tag != null && durable.HasTag(tag)) || durable.HasTag("any"))
+                            efficiency = 1f + durable.Efficiency * 0.25f;
+                        gap = meta.BreakLevel - durable.ToolLevel;
+                    }
+
+                    //工具等级差距过大
+                    if (gap > 1) return;
+
+                    BreakProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity / efficiency * (gap + 1);
+                    BreakProcess.Position = finalpos;
+                    BreakProcess.ProcessTime += (float)delta;
+                    if (playerData.Mode == 1) BreakProcess.FinalTime = 0;
+                }
+                else
+                {
+                    Cursor.Frame = 1;
+                }
             }
         }
         else
@@ -138,7 +179,17 @@ public partial class Player : CharacterBody2D
         if (Input.IsActionPressed("placeblock") && playerData != null && ShowView == null)
         {
             var targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
-            if (!IsInRange(targetpos.X * 16, targetpos.Y * 16) && world.WorldService.PlaceBlock(playerData, targetpos))
+            bool coercive = false;
+            if (Input.IsKeyPressed(Key.Shift))
+            {
+                coercive = true;
+                targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
+            }
+
+
+            if (
+                world.WorldService.PlaceBlock(playerData, targetpos, coercive,
+                    IsInRange(targetpos.X * 16, targetpos.Y * 16)))
             {
             }
             else
@@ -153,14 +204,16 @@ public partial class Player : CharacterBody2D
         if (playerData == null) return;
         if (playerData.Name != Player.Profile.Name) return;
 
-        Vector2I Mcoord = World.MathFloor((Vector2I)GetGlobalMousePosition(), 16);
 
+        Vector2I Mcoord = World.MathFloor((Vector2I)GetGlobalMousePosition(), 16);
         Cursor.GlobalPosition = Mcoord * 16;
-        if (BreakProcess.ProcessTime >= 0)
-            Cursor.Frame = (int)(8 * (BreakProcess.ProcessTime / BreakProcess.FinalTime));
+
+        float f1 = BreakProcess.ProcessTime / BreakProcess.FinalTime;
+        if (f1 > 1) f1 = 1;
+        if (BreakProcess.ProcessTime > 0)
+            Cursor.Frame = 1 + (int)(8 * f1);
         else Cursor.Frame = 0;
 
-        Vector2I MCcoord = World.MathFloor(Mcoord, Chunk.Size);
         Vector2I ChunkCoord = new Vector2I(
             (int)Mathf.Floor(Position.X / (16 * Chunk.Size)),
             (int)Mathf.Floor(Position.Y / (16 * Chunk.Size))
@@ -192,129 +245,7 @@ public partial class Player : CharacterBody2D
                 Stop = false;
         }
 
-        if (Inputable)
-        {
-            if (playerData != null)
-            {
-                if (Input.IsActionJustPressed("roller_up"))
-                {
-                    playerData.Inventory.HandSlot -= 1;
-                    if (playerData.Inventory.HandSlot < 0) playerData.Inventory.HandSlot = 8;
-                    if (world.WorldService is WorldClientService wcs)
-                        world.RpcId(1, "SetHandSlot", playerData.Name, playerData.Inventory.HandSlot);
-                }
-
-                if (Input.IsActionJustPressed("roller_down"))
-                {
-                    playerData.Inventory.HandSlot += 1;
-                    if (playerData.Inventory.HandSlot > 8) playerData.Inventory.HandSlot = 0;
-                    if (world.WorldService is WorldClientService wcs)
-                        world.RpcId(1, "SetHandSlot", playerData.Name, playerData.Inventory.HandSlot);
-                }
-
-                if (Input.IsActionJustPressed("e"))
-                {
-                    if (ShowView != null)
-                    {
-                        if (world.WorldService is WorldClientService wcs)
-                        {
-                            world.RpcId(1, "CloseBlockInv", Player.Profile.Name);
-                        }
-
-                        world.player.playerData.OpeningBlockInventory = false;
-
-                        RemoveChild(ShowView);
-                        ShowView = null;
-                    }
-                    else
-                    {
-                        world.WorldService.OpenView("PlayerInventory");
-                    }
-                }
-            }
-
-            if (playerData.Mode == 0)
-            {
-                Vector2 velocity = Velocity;
-                if (!IsOnFloor() && (!fly || !Stop))
-                {
-                    velocity += GetGravity() * (float)delta;
-                }
-
-                if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
-                {
-                    velocity.Y = JumpVelocity;
-                }
-
-                Vector2 direction = Input.GetVector("move_left", "move_right", "move_up", "move_down");
-                if (direction != Vector2.Zero)
-                {
-                    velocity.X = direction.X * Speed;
-                }
-                else
-                {
-                    velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
-                }
-
-                Velocity = velocity;
-                MoveAndSlide();
-            }
-
-            if (playerData.Mode == 1)
-            {
-                if (Input.IsActionPressed("zoom_1"))
-                    camera2d.Zoom = new(2, 2);
-                if (Input.IsActionPressed("zoom_2"))
-                    camera2d.Zoom = new(1, 1);
-                if (Input.IsActionPressed("zoom_3"))
-                    camera2d.Zoom = new(0.5f, 0.5f);
-                if (Input.IsActionPressed("zoom_4"))
-                    camera2d.Zoom = new(0.25f, 0.25f);
-                Vector2 direction = Input.GetVector("move_left", "move_right", "move_up", "move_down");
-
-                Position += direction * 64;
-            }
-
-            if (TEST_MODE)
-            {
-                if (Input.IsActionJustPressed("TEST_1"))
-                {
-                    //生成生物
-                    if (EntityManage.Enable)
-                    {
-                        EntityMeta entityMeta = Materials.GetEntityMeta("item_entity");
-                        EntityNode entity = entityMeta.GetEntityNode();
-                        entity.Data.position = new(GetGlobalMousePosition().X, GetGlobalMousePosition().Y);
-                        EntityManage.waitEntitys.Add(entity);
-                    }
-                }
-
-                if (Input.IsActionJustPressed("F1") && Inputable)
-                    playerData.Mode = playerData.Mode == 0 ? 1 : 0;
-                if (Input.IsActionJustPressed("F2") && Inputable)
-                    DebugView.DEBUG = !DebugView.DEBUG;
-                if (Input.IsActionJustPressed("F3") && Inputable)
-                {
-                    MoreInfo = !MoreInfo;
-                    Label_DEBUG_Left.Visible = MoreInfo;
-                    Label_DEBUG_Right.Visible = MoreInfo;
-                }
-
-                if (Input.IsActionJustPressed("F4") && Inputable)
-                {
-                    foreach (var item in Materials.itemmetas)
-                    {
-                        playerData.Inventory.TryAddItem(item.GetItemStack());
-                    }
-                }
-
-                if (Input.IsActionJustPressed("F5") && Inputable)
-                {
-                    Position = new Vector2(new Random().Next(100000), Position.Y);
-                    OnMoveToChunk?.Invoke();
-                }
-            }
-        }
+        InputHandle(delta);
     }
 
     public void UpdateGui()
@@ -375,6 +306,152 @@ public partial class Player : CharacterBody2D
             Label_DEBUG_Right.Text = right.ToString();
         }
     }
+
+    public void InputHandle(double delta)
+    {
+        if (!Inputable) return;
+
+        if (playerData != null)
+        {
+            for (int i = 1; i < 10; i++)
+                if (Input.IsKeyPressed(i + Key.Key0))
+                {
+                    playerData.Inventory.HandSlot = (byte)(i - 1);
+                    if (world.WorldService is WorldClientService wcs)
+                        world.RpcId(1, "SetHandSlot", playerData.Name, playerData.Inventory.HandSlot);
+                }
+
+
+            if (Input.IsActionJustPressed("roller_up"))
+            {
+                playerData.Inventory.HandSlot -= 1;
+                if (playerData.Inventory.HandSlot < 0) playerData.Inventory.HandSlot = 8;
+                if (world.WorldService is WorldClientService wcs)
+                    world.RpcId(1, "SetHandSlot", playerData.Name, playerData.Inventory.HandSlot);
+            }
+
+            if (Input.IsActionJustPressed("roller_down"))
+            {
+                playerData.Inventory.HandSlot += 1;
+                if (playerData.Inventory.HandSlot > 8) playerData.Inventory.HandSlot = 0;
+                if (world.WorldService is WorldClientService wcs)
+                    world.RpcId(1, "SetHandSlot", playerData.Name, playerData.Inventory.HandSlot);
+            }
+
+            if (Input.IsActionJustPressed("e"))
+            {
+                if (ShowView != null)
+                {
+                    if (world.WorldService is WorldClientService wcs)
+                    {
+                        world.RpcId(1, "CloseBlockInv", Player.Profile.Name);
+                    }
+
+                    world.player.playerData.OpeningBlockInventory = false;
+
+                    RemoveChild(ShowView);
+                    ShowView = null;
+                }
+                else
+                {
+                    world.WorldService.OpenView("PlayerInventory");
+                }
+            }
+        }
+
+        if (playerData.Mode == 0)
+        {
+            Vector2 velocity = Velocity;
+            if (!IsOnFloor() && (!playerData.Fly.Value || !Stop))
+            {
+                velocity += GetGravity() * (float)delta;
+            }
+
+            if (Input.IsActionPressed("ui_accept") && (IsOnFloor() || playerData.Fly.Value))
+            {
+                velocity.Y = JumpVelocity;
+            }
+
+            Vector2 direction = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+            if (direction != Vector2.Zero)
+            {
+                velocity.X = direction.X * Speed;
+            }
+            else
+            {
+                velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
+            }
+
+            Velocity = velocity * playerData.Resistance.Value;
+            MoveAndSlide();
+        }
+
+        if (playerData.Mode == 1)
+        {
+            if (Input.IsActionPressed("zoom_1"))
+                camera2d.Zoom = new(2, 2);
+            if (Input.IsActionPressed("zoom_2"))
+                camera2d.Zoom = new(1, 1);
+            if (Input.IsActionPressed("zoom_3"))
+                camera2d.Zoom = new(0.5f, 0.5f);
+            if (Input.IsActionPressed("zoom_4"))
+                camera2d.Zoom = new(0.25f, 0.25f);
+            Vector2 direction = Input.GetVector("move_left", "move_right", "move_up", "move_down");
+
+            Position += direction * 64;
+        }
+
+        if (TEST_MODE)
+        {
+            if (Input.IsActionJustPressed("TEST_1"))
+            {
+                //生成生物
+                if (EntityManage.Enable)
+                {
+                    var chunk_coord = playerData.Coord;
+                    // Chunk chunk;
+                    // world.WorldService.Chunks.TryGetValue(chunk_coord, out chunk);
+                    // if (chunk != null)
+                    // {
+                    //     chunk.entities.Add(new Entitydata());
+                    // }
+
+                    if (world.WorldService.Chunks.ContainsKey(chunk_coord)) ;
+                    EntityMeta entityMeta = Materials.GetEntityMeta("item_entity");
+                    EntityNode entity = entityMeta.GetEntityNode();
+                    entity.Data.Position = new(GetGlobalMousePosition().X, GetGlobalMousePosition().Y);
+
+                    EntityManage.waitEntitys.TryAdd(entity.Data.Uuid, entity);
+                }
+            }
+
+            if (Input.IsActionJustPressed("F1") && Inputable)
+                playerData.Mode = playerData.Mode == 0 ? 1 : 0;
+            if (Input.IsActionJustPressed("F2") && Inputable)
+                DebugView.DEBUG = !DebugView.DEBUG;
+            if (Input.IsActionJustPressed("F3") && Inputable)
+            {
+                MoreInfo = !MoreInfo;
+                Label_DEBUG_Left.Visible = MoreInfo;
+                Label_DEBUG_Right.Visible = MoreInfo;
+            }
+
+            if (Input.IsActionJustPressed("F4") && Inputable)
+            {
+                foreach (var item in Materials.ItemMetas)
+                {
+                    playerData.Inventory.TryAddItem(item.GetItemStack());
+                }
+            }
+
+            if (Input.IsActionJustPressed("F5") && Inputable)
+            {
+                Position = new Vector2(new Random().Next(100000), Position.Y);
+                OnMoveToChunk?.Invoke();
+            }
+        }
+    }
+
 
     public override void _Ready()
     {

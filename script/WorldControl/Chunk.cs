@@ -75,7 +75,7 @@ namespace horizoncraft.script.WorldControl
                 {
                     for (int Z = 0; Z < Chunk.SizeZ; Z++)
                     {
-                        data[X, Y, Z] = Materials.Valueof("air").Blockdata();
+                        data[X, Y, Z] = Materials.Valueof("air").CreateBlockData();
                     }
                 }
             }
@@ -117,7 +117,7 @@ namespace horizoncraft.script.WorldControl
 
 
             data[x, y, z].SetMeta(meta);
-            data[x, y, z].STATE = state;
+            data[x, y, z].State = state;
             UpdateList_buffer.Add(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z));
             update_tilemap = true;
         }
@@ -136,7 +136,7 @@ namespace horizoncraft.script.WorldControl
                 TickList.Remove(pos);
 
             data[x, y, z] = blockdata;
-            data[x, y, z].STATE = state;
+            data[x, y, z].State = state;
             UpdateList_buffer.Add(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z));
             update_tilemap = true;
         }
@@ -180,10 +180,10 @@ namespace horizoncraft.script.WorldControl
                     blockTickEvnet.Blockdata = block;
                     blockTickEvnet.Globalpos = coord;
                     blockTickEvnet.LocalPos = local;
-                    id = block.ID;
-                    state = block.STATE;
+                    id = block.Id;
+                    state = block.State;
                     ComponentManager.ExecuteComponents(blockTickEvnet, block);
-                    if (state != block.STATE || id != block.ID)
+                    if (state != block.State || id != block.Id)
                     {
                         update_tilemap = true;
                         UpdateList.Add(local);

@@ -24,4 +24,16 @@ public partial class PlayerInventory : InventoryBase
         HandItemStack.Amount -= amount;
         if (HandItemStack.Amount <= 0) HandItemStack = null;
     }
+
+    public ItemStack GetHandItemStack()
+    {
+        if(HandItemStack==null)return null;
+        if (HandItemStack.Amount <= 0) return null;
+        return HandItemStack;
+    }
+
+    public ItemStack GetItemInHand()
+    {
+        return GetItem(HandSlot);
+    }
 }

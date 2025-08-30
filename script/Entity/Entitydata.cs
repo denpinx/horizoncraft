@@ -12,12 +12,20 @@ namespace horizoncraft.script.Entity
     [MemoryPackable]
     public partial class Entitydata
     {
-        public Vector2 position;
-        public int id;
+        public string Uuid = "";
+        public Vector2 Position;
+        public int Id;
 
         [MemoryPackIgnore]
-        public Vector2I Coord { get { return World.MathFloor(new Vector2I((int)position.X, (int)position.Y), 16); } }
+        public Vector2I Coord
+        {
+            get { return World.MathFloor(new Vector2I((int)Position.X, (int)Position.Y), 16); }
+        }
+
         [MemoryPackIgnore]
-        public Vector2I ChunkCoord { get { return World.MathFloor(new Vector2I((int)position.X, (int)position.Y), Chunk.Size * 16); } }
+        public Vector2I ChunkCoord
+        {
+            get { return World.MathFloor(new Vector2I((int)Position.X, (int)Position.Y), Chunk.Size * 16); }
+        }
     }
 }

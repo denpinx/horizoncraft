@@ -7,6 +7,9 @@ namespace horizoncraft.script.Inventory;
 
 public class ItemMeta
 {
+    /// <summary>组件属性集合</summary>
+    public List<Func<Component>> Components = new();
+
     public int Id;
     public string Name;
     public string Description;
@@ -33,6 +36,8 @@ public class ItemMeta
             Id = Id,
             Amount = 1,
         };
+        foreach (var component in Components)
+            item.Components.Add(component());
         return item;
     }
 

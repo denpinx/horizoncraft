@@ -18,7 +18,7 @@ public class WorkBenchSystem : TickSystem
                 var gri = RecipeManage.GetRecipe(BlockInv, 3);
                 while (gri!=null)
                 {
-                    var handitme = player.Inventory.HandItemStack;
+                    var handitme = player.Inventory.GetHandItemStack();
                     if (handitme == null
                        )
                     {
@@ -50,7 +50,7 @@ public class WorkBenchSystem : TickSystem
                 var gri = RecipeManage.GetRecipe(BlockInv, 3);
                 if (gri != null)
                 {
-                    var handitme = player.Inventory.HandItemStack;
+                    var handitme = player.Inventory.GetHandItemStack();
                     if (handitme == null
                        )
                     {

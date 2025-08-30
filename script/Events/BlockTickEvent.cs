@@ -10,7 +10,7 @@ namespace horizoncraft.script.Events
     public class BlockTickEvent : WorldEvent
     {
         public Blockdata Blockdata;
-
+        public Chunk Chunk;
         public Vector3I Globalpos;
         public Vector3I LocalPos;
 
@@ -132,7 +132,7 @@ namespace horizoncraft.script.Events
         /// <summary>检查方块材质属性是否为Cube且不为null,成功则执行action</summary>
         public bool CheckIsCube(Blockdata blockdata)
         {
-            if (blockdata != null && blockdata.BlockMeta.CUBE)
+            if (blockdata != null && blockdata.BlockMeta.Cube)
             {
                 return true;
             }

@@ -115,7 +115,7 @@ namespace horizoncraft.script
 
         public override void _Ready()
         {
-            _ = Materials.blockmetas;
+            _ = Materials.BlockMetas;
             PlayerSnapshot_ps = GD.Load<PackedScene>("res://tscn/PlayerSnapshot.tscn");
             PSTilemapLayerChunk = GD.Load<PackedScene>("res://tscn/TileMapLayerChunk.tscn");
             player = GetNode<Player>("Player");
@@ -185,7 +185,6 @@ namespace horizoncraft.script
                 textureRect.Modulate = GetSkyChange(t);
                 DirectionalLight2D.Energy = 1 - GetLightChange(t) / 255f;
                 DirectionalLight2D.RotationDegrees = (1 - t) * 360f + 180f;
-                //Math.Clamp(t * 360f + 180f,90,270);
             }
 
             if (RequeueFreeze > 0) RequeueFreeze -= delta;
@@ -224,6 +223,7 @@ namespace horizoncraft.script
                         player.Visible = false;
                         player.Visible = false;
                     }
+
                     iws.UpdateLoadChunkCoords();
                 }
             }
@@ -243,25 +243,15 @@ namespace horizoncraft.script
                     tmly.QueueFree();
                 }
             }
-            
-            // for (int i = 0; i < tileMapLayerChunks.Count; i++)
-            // {
-            //     TileMapLayerChunk tmly = tileMapLayerChunks[i];
-            //     if (!VisibleChunks.ContainsKey(tmly.chunk.coord))
-            //     {
-            //         RemoveChild(tmly);
-            //         tileMapLayerChunks.RemoveAt(i);
-            //         tmly.QueueFree();
-            //     }
-            // }
 
             foreach (var key in VisibleChunks.Keys)
             {
                 AddTileMap(VisibleChunks[key]);
             }
+
             CilentTicked?.Invoke();
             SyncPlayerSnapshot();
-
+            BlockInterFaceHandle();
             sw.Stop();
             tick_use_time = sw.ElapsedMilliseconds;
         }
@@ -294,6 +284,7 @@ namespace horizoncraft.script
                         }
                     }
                 }
+
             //删除不可见玩家对象
             if (WorldService is WorldClientService && player.playerData != null)
             {
@@ -327,6 +318,40 @@ namespace horizoncraft.script
                         p.QueueFree();
                     }
                 }
+        }
+
+
+        public void BlockInterFaceHandle()
+        {
+            if (player?.playerData == null) return;
+
+            Blockdata CurrentBlock =
+                WorldService?.GetBlock(new Vector3I(player.playerData.Coord.X, player.playerData.Coord.Y, 1));
+            if (CurrentBlock != null)
+            {
+                string tag = CurrentBlock.GetTag("enter_action");
+                if (tag != null)
+                {
+                    if (tag == "no-fall")
+                    {
+                        player.playerData.Fly.Value = true;
+                        player.playerData.Resistance.Value = 0.5f;
+                        return;
+                    }
+                }
+
+                //防止卡墙里
+                if (CurrentBlock.BlockMeta.Collide && player.playerData.Mode == 0)
+                {
+                    player.Position += new Vector2(0, -17);
+                }
+            }
+
+            if (player.playerData.Mode == 0)
+            {
+                player.playerData.Fly.Value = false;
+                player.playerData.Resistance.Value = 1f;
+            }
         }
 
 

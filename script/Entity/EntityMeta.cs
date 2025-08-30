@@ -26,14 +26,15 @@ namespace horizoncraft.script.Entity
         {
             EntityNode entityNode = get_entity_node(packedScene) as EntityNode;
             entityNode.ID = id;
+            entityNode.Data.Uuid = Guid.NewGuid().ToString();
             return entityNode;
         }
         public virtual Entitydata GetData(Vector2 vector2)
         {
             return new Entitydata()
             {
-                id = id,
-                position = new(vector2.X, vector2.Y)
+                Id = id,
+                Position = new(vector2.X, vector2.Y)
             };
         }
     }

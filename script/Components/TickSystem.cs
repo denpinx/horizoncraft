@@ -7,7 +7,7 @@ namespace horizoncraft.script.Components
 {
     public class TickSystem : IComponentSystem
     {
-        public void Execute(WorldEvent worldEvent, Component component)
+        public bool Execute(WorldEvent worldEvent, Component component)
         {
             if (component is TickComponent tc)
             {
@@ -23,6 +23,8 @@ namespace horizoncraft.script.Components
             }
             else if (component is InventoryComponent ic)
                 ProcessTick(worldEvent as BlockTickEvent, ic);
+
+            return true;
         }
 
         public virtual void SetComponentValue(PlayerData player,Component component, Dictionary<string, string> value)

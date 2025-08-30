@@ -41,6 +41,13 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
             GD.PrintErr($"[客户端] 连接失败！");
             Connect = false;
         };
+        world.Multiplayer.ServerDisconnected += () =>
+        {
+            World.worldMode = World.WorldMode.Single;
+            world.GetTree().ChangeSceneToFile("res://tscn/Menu/MainMenu.tscn");
+            GD.Print("【客户端】服务器断开");
+        };
+        
         var peer = new ENetMultiplayerPeer();
         peer.CreateClient("localhost", Port);
         world.Multiplayer.MultiplayerPeer = peer;
@@ -74,6 +81,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
                 Chunk chunk = Chunks[coord];
                 OffloadChunkQueue[coord] = chunk;
                 Chunks.TryRemove(coord, out _);
+                OnChunkUnLoading(this, chunk);
             }
             else
             {
@@ -233,7 +241,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         if (!Connect) return;
         else
         {
-            world.RpcId(1, "SetBlock", coord.X, coord.Y, coord.Z, meta.ID, state);
+            world.RpcId(1, "SetBlock", coord.X, coord.Y, coord.Z, meta.Id, state);
         }
 
         base.SetBlock(coord, meta, replaceAir, state);
@@ -251,25 +259,29 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
                     for (int i = 0; i < sync.chunks.Count; i++)
                     {
                         ChunkSnapshot cup = sync.chunks[i];
-                        var coord = new Vector2I(cup.x, cup.y);
+                        var coord = new Vector2I(cup.X, cup.Y);
                         if (Chunks.ContainsKey(coord))
                         {
-                            if (Chunks[coord].version <= cup.version)
+                            if (Chunks[coord].version <= cup.Version)
                             {
-                                Chunks[coord].version = cup.version;
+                                Chunks[coord].version = cup.Version;
                                 for (int j = 0; j < cup.list.Count; j++)
                                 {
                                     var item = cup.list[j];
                                     var block = Chunks[coord].GetBlock(item.x, item.y, item.z);
                                     block.SetMeta(item.id);
-                                    block.STATE = item.state;
+                                    block.State = item.state;
                                 }
                             }
                             else
                             {
-                                GD.Print($"异常同步！新版本{cup.version} : 旧版本{Chunks[coord].version}");
+                                GD.Print($"异常同步！新版本{cup.Version} : 旧版本{Chunks[coord].version}");
                             }
                         }
+
+                        foreach (var entitydata in cup.Entiydatas)
+                            EntityManage.UpdataEntitys(entitydata.Uuid,entitydata);
+                        
                     }
                 }
 

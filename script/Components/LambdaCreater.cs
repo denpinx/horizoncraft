@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using horizoncraft.script.Components.Item;
 using Dict = System.Collections.Generic.Dictionary<string, object>;
 
 namespace horizoncraft.script.Components
@@ -9,7 +10,7 @@ namespace horizoncraft.script.Components
     public class LambdaCreater
     {
         public static readonly Dictionary<string, Func<Dict, Component>> _factories = new();
-
+        
         static LambdaCreater()
         {
             Register<TickComponent>();
@@ -19,6 +20,7 @@ namespace horizoncraft.script.Components
             Register<PhysicsComponent>();
             Register<InventoryComponent>();
             Register<FurnaceComponent>();
+            Register<ItemDurableComponent>();
         }
 
         public static void Register<T>() where T : Component, new()

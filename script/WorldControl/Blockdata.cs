@@ -1,14 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Threading.Tasks;
-using Godot;
-using Godot.Collections;
 using horizoncraft.script.Components;
-using horizoncraft.script.Inventory;
 using MemoryPack;
 
 namespace horizoncraft.script.WorldControl
@@ -16,11 +8,17 @@ namespace horizoncraft.script.WorldControl
     [MemoryPackable]
     public partial class Blockdata
     {
+        /// <summary>组件属性</summary>
         public List<Component> components = new();
-        public int ID;
-        public int STATE = 0;
-        
-        public int Light = 0;
+
+        /// <summary>方块id</summary>
+        public int Id;
+
+        /// <summary>方块状态</summary>
+        public int State;
+
+        /// <summary>方块光照值</summary>
+        public int Light;
 
         [MemoryPackIgnore] private BlockMeta _blockMeta;
 
@@ -29,29 +27,23 @@ namespace horizoncraft.script.WorldControl
         {
             get
             {
-                if (_blockMeta == null)
-                {
-                    _blockMeta = Materials.Valueof(ID);
-                }
-
+                _blockMeta ??= Materials.Valueof(Id);
                 return _blockMeta;
             }
-            set { _blockMeta = value; }
+            private set => _blockMeta = value;
         }
 
         public T GetComponent<T>() where T : Component
         {
-            for (int i = 0; i < components.Count; i++)
-                if (components[i] is T t)
-                    return t;
+            var result = components.Find(cmp => cmp is T);
+            if (result != null) return result as T;
             return null;
         }
 
         public T GetComponent<T>(string name) where T : Component
         {
-            for (int i = 0; i < components.Count; i++)
-                if (components[i].Name == name)
-                    return (T)components[i];
+            var result = components.Find(cmp => cmp is T && cmp.Name == name);
+            if (result != null) return result as T;
             return null;
         }
 
@@ -65,48 +57,44 @@ namespace horizoncraft.script.WorldControl
         {
         }
 
-        public void SetMeta(int id)
-        {
-            SetMeta(Materials.Valueof(id));
-        }
+        public void SetMeta(int id) => SetMeta(Materials.Valueof(id));
 
-        public void SetMeta(string name)
-        {
-            SetMeta(Materials.Valueof(name));
-        }
+
+        public void SetMeta(string name) => SetMeta(Materials.Valueof(name));
+
 
         public void SetMeta(BlockMeta meta)
         {
-            this.BlockMeta = meta;
-            this.ID = meta.ID;
+            BlockMeta = meta;
+            Id = meta.Id;
             components.Clear();
             foreach (Func<Component> cmp in meta.Components)
                 components.Add(cmp());
         }
 
-        public bool IsMeta(String ID)
+        public bool IsMeta(string name)
         {
-            return BlockMeta.ID == Materials.Valueof(ID).ID;
+            return BlockMeta.Id == Materials.Valueof(name).Id;
         }
 
         public BlockTileSet GetBlockTileSet()
         {
             if (BlockMeta.blockTileDatas.Count == 0) return null;
-            if (BlockMeta.Tiletype == "tile")
-                return BlockMeta.GetBlockTileSet(STATE);
-            if (BlockMeta.Tiletype == "atlas")
+            if (BlockMeta.TileType == "tile")
+                return BlockMeta.GetBlockTileSet(State);
+            if (BlockMeta.TileType == "atlas")
                 return BlockMeta.GetBlockTileSet(0);
-            if (BlockMeta.Tiletype == "terrain")
-                return BlockMeta.GetBlockTileSet(STATE);
+            if (BlockMeta.TileType == "terrain")
+                return BlockMeta.GetBlockTileSet(State);
             return null;
         }
 
         public int GetTileSize()
         {
             if (BlockMeta.blockTileDatas.Count == 0) return -1;
-            if (BlockMeta.Tiletype == "tile")
-                return BlockMeta.GetBlockTileSet(STATE).tile_size;
-            if (BlockMeta.Tiletype == "atlas")
+            if (BlockMeta.TileType == "tile")
+                return BlockMeta.GetBlockTileSet(State).tile_size;
+            if (BlockMeta.TileType == "atlas")
                 return BlockMeta.GetBlockTileSet(0).tile_count;
             return -1;
         }
@@ -115,8 +103,12 @@ namespace horizoncraft.script.WorldControl
         {
             var v = BlockMeta.GetTag(tagname);
             if (v == null) return false;
-            if (v == value) return true;
-            return false;
+            return v == value;
+        }
+
+        public string GetTag(string tagname)
+        {
+            return BlockMeta.GetTag(tagname);
         }
 
         public void SetLight(int light)

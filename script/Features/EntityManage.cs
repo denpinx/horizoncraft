@@ -16,8 +16,8 @@ namespace horizoncraft.script.Features
     {
         public static bool Enable = false;
         static WorldBase _worldManage;
-        public static ConcurrentBag<Node2D> waitEntitys = new();
-        public static List<Node2D> entitys = new();
+        public static ConcurrentDictionary<string, Node2D> waitEntitys = new();
+        public static System.Collections.Generic.Dictionary<string, Node2D> entitys = new();
 
         static EntityManage()
         {
@@ -29,8 +29,13 @@ namespace horizoncraft.script.Features
             {
                 waitEntitys.Clear();
                 entitys.Clear();
-                _worldManage.OnChunkLoaded = null;
-                _worldManage.OnChunkUnLoading = null;
+                GD.Print("切换场景，重新订阅");
+            }
+            else
+            {
+                Player.GetInformation.Add(() => $"已加载生物：{entitys.Count}");
+                Player.GetInformation.Add(() => $"待加载生物：{waitEntitys.Count}");
+                Player.GetInformation.Add(() => $"当前场景类型：{_worldManage.GetType().ToString()}");
             }
 
             Enable = true;
@@ -39,19 +44,26 @@ namespace horizoncraft.script.Features
             _worldManage.OnChunkUnLoading += OnWorldUnLoading;
             _worldManage.world.CilentTicked += CilentTicked;
             //chunkManageSql.world.TileMapRemove += GetEntity;
-            //UI调试信息注册
-            Player.GetInformation.Add(() => $"已加载生物：{entitys.Count}");
-            Player.GetInformation.Add(() => $"待加载生物：{waitEntitys.Count}");
+        }
+
+        public static EntityNode CreateEntity(Entitydata data, string uuid = null)
+        {
+            uuid ??= Guid.NewGuid().ToString();
+            if (data.Uuid == "") data.Uuid = uuid;
+
+            EntityMeta entityMeta = Materials.GetEntityMeta(data.Id);
+            EntityNode entity = entityMeta.GetEntityNode();
+            entity.Data = data;
+            waitEntitys.TryAdd(data.Uuid, entity);
+            return entity;
         }
 
         public static void OnWorldLoaded(WorldBase worldManage, Chunk chunk)
         {
             foreach (Entitydata data in chunk.entities)
             {
-                EntityMeta entityMeta = Materials.GetEntityMeta(data.id);
-                EntityNode entity = entityMeta.GetEntityNode();
-                entity.Data = data;
-                waitEntitys.Add(entity);
+                var entity = CreateEntity(data);
+                waitEntitys.TryAdd(data.Uuid, entity);
             }
 
             if (chunk.entities.Count > 0) GD.Print("[加载]实体：" + chunk.entities.Count);
@@ -62,70 +74,92 @@ namespace horizoncraft.script.Features
 
         public static void GetEntity(Chunk chunk)
         {
-            List<Node2D> rml = new();
-            //chunk.entities.Clear();
-            for (int i = entitys.Count - 1; i >= 0; i--)
+            GD.Print($"[EntityManage] {chunk.coord}");
+            foreach (var uuid in entitys.Keys)
             {
-                EntityNode entity = entitys[i] as EntityNode;
+                EntityNode entity = entitys[uuid] as EntityNode;
                 if (entity != null && entity.Data.ChunkCoord == chunk.coord)
                 {
                     chunk.entities.Add(entity.Data);
                     _worldManage.world.RemoveChild(entity);
-                    rml.Add(entity);
+                    if (entitys.Remove(uuid, out _))
+                        entity.QueueFree();
                 }
             }
 
-            for (int i = 0; i < rml.Count; i++)
+            //删除待加载的实体
+            foreach (var uuid in waitEntitys.Keys)
             {
-                entitys.Remove(rml[i]);
-                rml[i].QueueFree();
-            }
-
-            for (int i = waitEntitys.Count - 1; i >= 0; i--)
-            {
-                Node2D node2D;
-                if (waitEntitys.TryTake(out node2D))
+                var entity = waitEntitys[uuid] as EntityNode;
+                if (entity != null && entity.Data.ChunkCoord == chunk.coord)
                 {
-                    var entity = node2D as EntityNode;
-                    if (entity != null && entity.Data.ChunkCoord == chunk.coord)
-                    {
-                        chunk.entities.Add(entity.Data);
-                        entity.QueueFree();
-                    }
-                    else
-                    {
-                        waitEntitys.Add(node2D);
-                    }
+                    chunk.entities.Add(entity.Data);
+                    entity.QueueFree();
                 }
             }
 
             if (chunk.entities.Count > 0) GD.Print("保存实体：" + chunk.entities.Count);
         }
 
-        public static void CilentTicked()
+        public static List<Entitydata> GetMovedEntity(Vector2I coord)
         {
-            List<Node2D> es = new List<Node2D>();
-            for (int i = 0; i < waitEntitys.Count; i++)
+            List<Entitydata> result = new();
+            foreach (var uuid in entitys.Keys)
             {
-                Node2D entity;
-                if (waitEntitys.TryTake(out entity))
+                EntityNode entity = entitys[uuid] as EntityNode;
+                if (entity != null && entity.Data.ChunkCoord == coord)
                 {
-                    EntityNode entityNode = entity as EntityNode;
-                    if (_worldManage.world.HasTileMap(entityNode.Data.ChunkCoord))
+                    if (entity.Moveed)
                     {
-                        entitys.Add(entity);
-                        if (entity.GetParent() == null)
-                            _worldManage.world.AddChild(entity);
-                        entityNode.world = _worldManage.world;
-                    }
-                    else
-                    {
-                        es.Add(entity);
+                        result.Add(entity.Data);
                     }
                 }
             }
 
-            foreach (Node2D n2d in es) waitEntitys.Add(n2d);
+            return result;
+        }
+
+        public static void CilentTicked()
+        {
+            foreach (var uuid in waitEntitys.Keys)
+            {
+                var entity = waitEntitys[uuid] as EntityNode;
+                //如果当前区块已经被加载且有tilemap存在
+                if (_worldManage.world.HasTileMap(entity.Data.ChunkCoord))
+                {
+                    if (!entitys.ContainsKey(uuid))
+                    {
+                        entitys.Add(uuid, entity);
+                        if (entity.GetParent() == null)
+                            _worldManage.world.AddChild(entity);
+                        entity.world = _worldManage.world;
+                        waitEntitys.Remove(uuid, out _);
+                    }
+                }
+            }
+        }
+
+        public static void UpdataEntitys(string uuid, Entitydata data)
+        {
+            Node2D entity;
+            entitys.TryGetValue(uuid, out entity);
+            if (entity != null)
+            {
+                (entity as EntityNode).Data = data;
+            }
+            else
+            {
+                entity = CreateEntity(data, uuid);
+                waitEntitys.TryAdd(uuid, entity);
+            }
+        }
+
+        public static EntityNode GetEntity(string uuid)
+        {
+            Node2D entity;
+            entitys.TryGetValue(uuid, out entity);
+            if (entity != null) return (EntityNode)entity;
+            return null;
         }
     }
 }

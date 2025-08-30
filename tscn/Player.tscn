@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dlka0sc4kl0vb"]
+[gd_scene load_steps=10 format=3 uid="uid://dlka0sc4kl0vb"]
 
 [ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="1_qob58"]
 [ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/Player.cs" id="1_uuqip"]
@@ -8,6 +8,15 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rnaqb"]
 size = Vector2(15, 15)
+
+[sub_resource type="LabelSettings" id="LabelSettings_hdrus"]
+shadow_size = 0
+
+[sub_resource type="LabelSettings" id="LabelSettings_gqu4d"]
+font_size = 32
+
+[sub_resource type="LabelSettings" id="LabelSettings_emu1f"]
+font_size = 32
 
 [node name="Player" type="CharacterBody2D"]
 top_level = true
@@ -35,11 +44,13 @@ wait_time = 0.05
 autostart = true
 
 [node name="Label_PlayerName" type="Label" parent="."]
-offset_left = -25.0
-offset_top = -65.0
-offset_right = 34.0
-offset_bottom = -42.0
+offset_left = -15.0
+offset_top = -38.0
+offset_right = 44.0
+offset_bottom = -15.0
+scale = Vector2(0.5, 0.5)
 text = "[player]"
+label_settings = SubResource("LabelSettings_hdrus")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 2
@@ -57,7 +68,6 @@ size_flags_vertical = 0
 mouse_filter = 1
 
 [node name="Label_DEBUG_Left" type="Label" parent="CanvasLayer/Control"]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -69,9 +79,9 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
 text = "调试信息左"
+label_settings = SubResource("LabelSettings_gqu4d")
 
 [node name="Label_DEBUG_Right" type="Label" parent="CanvasLayer/Control"]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -83,6 +93,7 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
 text = "调试信息右"
+label_settings = SubResource("LabelSettings_emu1f")
 horizontal_alignment = 2
 
 [node name="HotBar" parent="CanvasLayer" instance=ExtResource("4_kghmo")]
@@ -95,4 +106,4 @@ target_position = Vector2(128, 0)
 position = Vector2(-20, -191)
 texture = ExtResource("5_gqu4d")
 centered = false
-hframes = 9
+hframes = 10

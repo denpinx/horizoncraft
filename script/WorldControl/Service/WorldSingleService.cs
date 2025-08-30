@@ -71,6 +71,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
                 Chunk chunk = Chunks[coord];
                 OffloadChunkQueue[coord] = chunk;
                 Chunks.TryRemove(coord, out _);
+                OnChunkUnLoading(this, chunk);
             }
             else
             {
@@ -168,6 +169,8 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
             Players[player.Name] = player;
             GD.Print($"[{TickTimes}] 加载玩家数据:({Player.Profile.Name})");
             LoadingPlayers.Clear();
+            
+            OnPlayerJoinGame?.Invoke(player);
         }
         else
         {
@@ -178,6 +181,9 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
             Players[Player.Profile.Name] = player;
             GD.Print($"[{TickTimes}] 新建玩家数据:({Player.Profile.Name})");
             LoadingPlayers.Clear();
+            
+            OnPlayerFirstJoinGame?.Invoke(player);
+            SearchSpawnPoint(player);
         }
 
         playerdata = null;

@@ -18,6 +18,9 @@ public partial class PlayerData
     //连接id
     public int PeerId;
 
+    public ConfigSet<float> Resistance = new() { Value = 1f, Default = 1f };
+    public ConfigSet<bool> Fly = new() { Value = false, Default = false };
+
     //玩家名
     public String Name;
 

@@ -23,7 +23,6 @@ window/size/window_width_override=960
 window/size/window_height_override=540
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
-window/vsync/vsync_mode=0
 
 [dotnet]
 
@@ -135,5 +134,6 @@ e={
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
+textures/default_filters/use_nearest_mipmap_filter=true
 2d/snap/snap_2d_transforms_to_pixel=true
 2d/snap/snap_2d_vertices_to_pixel=true

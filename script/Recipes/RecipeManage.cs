@@ -18,6 +18,7 @@ public class RecipeManage
         var gri = gr.recipes.Find(gri => gri.Match(items));
         return gri;
     }
+
     public static GridRecipeItem GetRecipe(InventoryBase inventory, int RecipeSize, int start_index = 0)
     {
         ItemStack[,] PrimeItems = new ItemStack[RecipeSize, RecipeSize];
@@ -137,12 +138,12 @@ public class RecipeManage
                 var itemname = mask[key.ToString()];
                 if (itemname == "air") cost[x, y] = null;
                 else
-                    cost[x, y] = Materials.Dictionary_itemmetas[itemname].GetItemStack();
+                    cost[x, y] = Materials.Dictionary_ItemMetas[itemname].GetItemStack();
             }
         }
 
         item.Cost = cost;
-        item.Result = Materials.Dictionary_itemmetas[result_name].GetItemStack();
+        item.Result = Materials.Dictionary_ItemMetas[result_name].GetItemStack();
         item.Result.Amount = result_count;
         return item;
     }
@@ -158,7 +159,7 @@ public class RecipeManage
         foreach (var costInfo_ in CostList)
         {
             var costInfo = (List<object>)costInfo_;
-            var itemstack = Materials.Dictionary_itemmetas[(string)costInfo[0]].GetItemStack();
+            var itemstack = Materials.Dictionary_ItemMetas[(string)costInfo[0]].GetItemStack();
             itemstack.Amount = (int)costInfo[1];
             item.Cost.Add(itemstack);
 
@@ -168,7 +169,7 @@ public class RecipeManage
         foreach (var resultInfo_ in ResultList)
         {
             var resultInfo = (List<object>)resultInfo_;
-            var itemstack = Materials.Dictionary_itemmetas[(string)resultInfo[0]].GetItemStack();
+            var itemstack = Materials.Dictionary_ItemMetas[(string)resultInfo[0]].GetItemStack();
             itemstack.Amount = (int)resultInfo[1];
             item.Result.Add(itemstack);
         }
@@ -179,10 +180,9 @@ public class RecipeManage
     private static GridRecipe ParseGridFile(Dictionary<string, object> dict)
     {
         var recipe = new GridRecipe();
-        if (dict.ContainsKey("tag"))
-        {
-            recipe.Tag = (string)dict["tag"];
-        }
+        if (dict.TryGetValue("tag", out object value))
+            recipe.Tag = (string)value;
+
 
         var list = (List<object>)dict["recipes"];
         foreach (var recipeItem in list)
@@ -194,16 +194,9 @@ public class RecipeManage
     private static Recipe ParseProcessRecipeFile(Dictionary<string, object> dict)
     {
         var recipe = new Recipe();
-        if (dict.ContainsKey("tag"))
-        {
-            recipe.Type = Recipe.RecipeType.Precess;
-            recipe.Tag = (string)dict["tag"];
-        }
-        else
-        {
-            recipe.Type = Recipe.RecipeType.CraftTable;
-            recipe.Tag = "Player";
-        }
+        if (dict.TryGetValue("tag", out var value))
+            recipe.Tag = (string)value;
+
 
         var list = (List<object>)dict["recipes"];
         foreach (var recipeItem in list)
@@ -252,8 +245,8 @@ public class RecipeManage
         }
 
         DirAccess dir = DirAccess.Open("Config/recipes");
-        var InPathFiles = dir.GetFiles();
-        foreach (var filename in InPathFiles)
+        var inPathFiles = dir.GetFiles();
+        foreach (var filename in inPathFiles)
         {
             if (!filename.EndsWith(".json")) continue;
             ParseFile(filename);
@@ -263,19 +256,16 @@ public class RecipeManage
 
     public static Recipe GetRecipe(string tag)
     {
-        var Recipe = ProcessRecipes.Find(r => r.Tag == tag);
-        if (Recipe == null) GD.PrintErr($"[RecipeManage] 配方{tag} 不存在!");
-
-        return Recipe;
+        var recipe = ProcessRecipes.Find(r => r.Tag == tag);
+        if (recipe == null) GD.PrintErr($"[RecipeManage] 配方{tag} 不存在!");
+        return recipe;
     }
 
     public static RecipeItem GetRecipeItem(string tag, Func<RecipeItem, bool> mathAction)
     {
-        var Recipe = GetRecipe(tag);
-        if (Recipe == null) return null;
-        foreach (var item in Recipe.recipes)
-            if (mathAction(item))
-                return item;
-        return null;
+        var recipe = GetRecipe(tag);
+        if (recipe == null) return null;
+        var result = recipe.recipes.Find(rcp => mathAction(rcp));
+        return result;
     }
 }

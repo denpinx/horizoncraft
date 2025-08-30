@@ -20,24 +20,23 @@ namespace horizoncraft.script
     public class Materials
     {
         public static TileSet tileSet;
-        public static List<BlockMeta> blockmetas = new();
-        public static List<ItemMeta> itemmetas = new();
-        public static Dictionary<string, ItemMeta> Dictionary_itemmetas = new();
+        public static List<BlockMeta> BlockMetas = new();
+        public static List<ItemMeta> ItemMetas = new();
+        public static Dictionary<string, ItemMeta> Dictionary_ItemMetas = new();
 
-
-        public static Dictionary<string, BlockMeta> Dictionary_blockmetas = new();
-        public static List<EntityMeta> entityMetas = new List<EntityMeta>();
+        public static Dictionary<string, BlockMeta> Dictionary_BlockMetas = new();
+        public static List<EntityMeta> EntityMetas = new List<EntityMeta>();
 
         public static EntityMeta RegEntityMeta(EntityMeta meta)
         {
-            meta.id = entityMetas.Count;
-            entityMetas.Add(meta);
+            meta.id = EntityMetas.Count;
+            EntityMetas.Add(meta);
             return meta;
         }
 
         public static EntityMeta GetEntityMeta(String name)
         {
-            foreach (EntityMeta em in entityMetas)
+            foreach (EntityMeta em in EntityMetas)
             {
                 if (em.NAME == name)
                 {
@@ -50,7 +49,7 @@ namespace horizoncraft.script
 
         public static EntityMeta GetEntityMeta(int id)
         {
-            foreach (EntityMeta em in entityMetas)
+            foreach (EntityMeta em in EntityMetas)
             {
                 if (em.id == id)
                 {
@@ -63,19 +62,19 @@ namespace horizoncraft.script
 
         public static ItemMeta RegItemMeta(ItemMeta meta)
         {
-            meta.Id = itemmetas.Count;
-            if (Dictionary_itemmetas.ContainsKey(meta.Name))
+            meta.Id = ItemMetas.Count;
+            if (Dictionary_ItemMetas.ContainsKey(meta.Name))
             {
                 GD.PrintErr($"{meta.Name} already exists");
-                var blockmeta = Dictionary_itemmetas[meta.Name].BlockMeta;
-                Dictionary_itemmetas[meta.Name] = meta;
+                var blockmeta = Dictionary_ItemMetas[meta.Name].BlockMeta;
+                Dictionary_ItemMetas[meta.Name] = meta;
                 meta.BlockMeta = blockmeta;
                 blockmeta.ItemMeta = meta;
             }
             else
             {
-                itemmetas.Add(meta);
-                Dictionary_itemmetas.Add(meta.Name, meta);
+                ItemMetas.Add(meta);
+                Dictionary_ItemMetas.Add(meta.Name, meta);
             }
 
             GD.Print($"[注册物品]{meta.Id} >{meta.Name}");
@@ -84,31 +83,31 @@ namespace horizoncraft.script
 
         public static BlockMeta RegBlockMeta(BlockMeta meta)
         {
-            meta.ID = blockmetas.Count;
-            blockmetas.Add(meta);
-            Dictionary_blockmetas.Add(meta.NAME, meta);
-            GD.Print($"[注册方块]{meta.ID} >{meta.NAME}");
+            meta.Id = BlockMetas.Count;
+            BlockMetas.Add(meta);
+            Dictionary_BlockMetas.Add(meta.Name, meta);
+            GD.Print($"[注册方块]{meta.Id} >{meta.Name}");
 
-            if (meta.NAME != "air")
+            if (meta.Name != "air")
             {
-                if (!Dictionary_itemmetas.ContainsKey(meta.NAME))
+                if (!Dictionary_ItemMetas.ContainsKey(meta.Name))
                 {
                     ItemMeta itemMeta = new ItemMeta()
                     {
-                        Name = meta.NAME,
+                        Name = meta.Name,
                         HasBlock = true
                     };
                     GD.Print($"[方块注册物品]{itemMeta.Name}");
-                    itemMeta.Itemset.TextureNames.Add(meta.NAME);
+                    itemMeta.Itemset.TextureNames.Add(meta.Name);
                     RegItemMeta(itemMeta);
                     itemMeta.BlockMeta = meta;
                     meta.ItemMeta = itemMeta;
                 }
                 else
                 {
-                    GD.Print($"[更新方块物品信息]{Dictionary_itemmetas[meta.NAME].Name}");
-                    Dictionary_itemmetas[meta.NAME].BlockMeta = meta;
-                    meta.ItemMeta = Dictionary_itemmetas[meta.NAME];
+                    GD.Print($"[更新方块物品信息]{Dictionary_ItemMetas[meta.Name].Name}");
+                    Dictionary_ItemMetas[meta.Name].BlockMeta = meta;
+                    meta.ItemMeta = Dictionary_ItemMetas[meta.Name];
                 }
             }
 
@@ -117,13 +116,13 @@ namespace horizoncraft.script
 
         public static BlockMeta Valueof(string name)
         {
-            return Dictionary_blockmetas[name];
+            return Dictionary_BlockMetas[name];
         }
 
         public static BlockMeta Valueof(int id)
         {
-            if (id > blockmetas.Count) GD.PrintErr($"[错误1] {id} BlockMeta 不存在！");
-            return blockmetas[id];
+            if (id > BlockMetas.Count) GD.PrintErr($"[错误1] {id} BlockMeta 不存在！");
+            return BlockMetas[id];
         }
 
         static Materials()
@@ -132,11 +131,13 @@ namespace horizoncraft.script
             RegBlockMeta(
                 new BlockMeta()
                 {
-                    NAME = "air",
-                    ID = -1,
-                    CUBE = false,
+                    Name = "air",
+                    Id = -1,
+                    Cube = false,
+                    Collide = false
                 }
             );
+
             LoadItemConfigs();
             LoadBlockConfigs();
             ProcessEntity();
@@ -169,6 +170,15 @@ namespace horizoncraft.script
                     Name = item_name,
                 };
                 var item_dict = (Dictionary<string, object>)dict[item_name];
+                if (item_dict.ContainsKey("components"))
+                {
+                    foreach (string cmp_name in ((Dictionary<string, object>)item_dict["components"]).Keys)
+                    {
+                        Dictionary<string, object> cmp_dict =
+                            (Dictionary<string, object>)((Dictionary<string, object>)item_dict["components"])[cmp_name];
+                        itemMeta.Components.Add(LambdaCreater.CreateLambda(cmp_name, cmp_dict));
+                    }
+                }
                 if (item_dict.ContainsKey("tags"))
                 {
                     var dict_attr = (Dictionary<string, object>)item_dict["tags"];
@@ -176,6 +186,10 @@ namespace horizoncraft.script
                         itemMeta.Tags.Add(v.Key, (string)v.Value);
                 }
 
+                if (item_dict.ContainsKey("max"))
+                {
+                    itemMeta.MaxAmount = (int)item_dict["max"];
+                }
 
                 if (item_dict.ContainsKey("state"))
                 {
@@ -223,12 +237,12 @@ namespace horizoncraft.script
 
                 var blockmeta = new BlockMeta()
                 {
-                    NAME = item_name,
+                    Name = item_name,
                     Components = components
                 };
                 if (config.ContainsKey("tiletype"))
                 {
-                    blockmeta.Tiletype = (string)config["tiletype"];
+                    blockmeta.TileType = (string)config["tiletype"];
                 }
 
                 if (config.ContainsKey("light"))
@@ -239,7 +253,7 @@ namespace horizoncraft.script
                 if (config.ContainsKey("rigidity"))
                 {
                     blockmeta.Rigidity = (float)Convert.ToDouble(config["rigidity"]);
-                    GD.Print($"{blockmeta.NAME} rgdt : {blockmeta.Rigidity}");
+                    GD.Print($"{blockmeta.Name} rgdt : {blockmeta.Rigidity}");
                 }
 
                 if (config.ContainsKey("tags"))
@@ -290,7 +304,7 @@ namespace horizoncraft.script
                         //没有定义就用默认格式
                         else
                         {
-                            tile.texture_name = $"{blockmeta.NAME}_{state_name}";
+                            tile.texture_name = $"{blockmeta.Name}_{state_name}";
                         }
 
                         if (sdict.ContainsKey("scene"))
@@ -311,13 +325,13 @@ namespace horizoncraft.script
                     blockmeta.blockTileDatas.Add(new BlockTileSet()
                     {
                         state = 0,
-                        texture_name = blockmeta.NAME
+                        texture_name = blockmeta.Name
                     });
                 }
 
 
-                if (config.ContainsKey("cube")) blockmeta.CUBE = (bool)config["cube"];
-                if (config.ContainsKey("collide")) blockmeta.COLLIDE = (bool)config["collide"];
+                if (config.ContainsKey("cube")) blockmeta.Cube = (bool)config["cube"];
+                if (config.ContainsKey("collide")) blockmeta.Collide = (bool)config["collide"];
                 RegBlockMeta(blockmeta);
             }
         }
@@ -327,9 +341,9 @@ namespace horizoncraft.script
             var default_image = ResourceLoader.Load<Texture2D>(
                 $"res://texture/item/default.png");
 
-            for (int i = 0; i < itemmetas.Count; i++)
+            for (int i = 0; i < ItemMetas.Count; i++)
             {
-                ItemMeta meta = itemmetas[i];
+                ItemMeta meta = ItemMetas[i];
                 for (int j = 0; j < meta.Itemset.TextureNames.Count; j++)
                 {
                     var dir = $"res://texture/item/{meta.Itemset.TextureNames[j]}.png";
@@ -369,7 +383,7 @@ namespace horizoncraft.script
 
         public static TileSet CreateTileSet()
         {
-            _ = blockmetas;
+            _ = BlockMetas;
 
             if (tileSet != null) return tileSet;
             else tileSet = new TileSet();
@@ -377,10 +391,10 @@ namespace horizoncraft.script
 
             tileSet.AddPhysicsLayer();
             tileSet.AddOcclusionLayer();
-            for (int i = 0; i < blockmetas.Count; i++)
+            for (int i = 0; i < BlockMetas.Count; i++)
             {
-                BlockMeta meta = blockmetas[i];
-                if (meta.NAME == "air") continue;
+                BlockMeta meta = BlockMetas[i];
+                if (meta.Name == "air") continue;
                 for (int state_index = 0; state_index < meta.blockTileDatas.Count; state_index++)
                 {
                     BlockTileSet blockTileSet = meta.blockTileDatas[state_index];
@@ -393,7 +407,7 @@ namespace horizoncraft.script
                         blockTileSet.tile_count = 1;
                         blockTileSet.tile_size = 1;
                         GD.Print(
-                            $"创建场景集合 {meta.NAME},{blockTileSet.tile_id},{blockTileSet.scene} id:{blockTileSet.id}");
+                            $"创建场景集合 {meta.Name},{blockTileSet.tile_id},{blockTileSet.scene} id:{blockTileSet.id}");
                     }
                     else
                     {
@@ -414,7 +428,7 @@ namespace horizoncraft.script
                             atlasSource.CreateTile(id);
                             var tileData = atlasSource.GetTileData(id, 0);
 
-                            if (meta.COLLIDE)
+                            if (meta.Collide)
                             {
                                 var half = 16 / 2.0f;
                                 Vector2[] polygon = new Vector2[]

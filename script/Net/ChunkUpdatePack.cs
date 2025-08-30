@@ -8,7 +8,7 @@ namespace horizoncraft.script.Net;
 /// 增量同步
 /// </summary>
 [MemoryPackable]
-public partial class ChunkUpdataPack
+public partial class ChunkUpdatePack
 {
     public int x;
     public int y;

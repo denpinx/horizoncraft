@@ -1,6 +1,7 @@
 using System;
 using MemoryPack;
 using System.Collections.Generic;
+using horizoncraft.script.Components.Item;
 
 namespace horizoncraft.script.Components
 {
@@ -13,15 +14,9 @@ namespace horizoncraft.script.Components
     [MemoryPackUnion(4, typeof(ItemComponent))]
     [MemoryPackUnion(5, typeof(InventoryComponent))]
     [MemoryPackUnion(6, typeof(FurnaceComponent))]
+    [MemoryPackUnion(7, typeof(ItemDurableComponent))]
     public abstract partial class Component
     {
-        public enum TickType
-        {
-            None, //
-            Timer, //计时器
-        }
-
         public string Name;
-        public virtual TickType Type { get; set; } = TickType.Timer;
     }
 }

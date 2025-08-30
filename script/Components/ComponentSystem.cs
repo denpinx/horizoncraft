@@ -10,7 +10,7 @@ namespace horizoncraft.script.Components
     //Function Only
     public interface IComponentSystem
     {
-        void Execute(WorldEvent worldEvent, Component component);
+        bool Execute(WorldEvent worldEvent, Component component);
 
         void SetComponentValue(PlayerData player,Component component, Dictionary<string, string> value);
     }

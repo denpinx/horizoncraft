@@ -130,6 +130,8 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                 Chunk chunk = Chunks[coord];
                 OffloadChunkQueue[coord] = chunk;
                 Chunks.TryRemove(coord, out _);
+
+                OnChunkUnLoading(this, chunk);
             }
             else //已存在,取消加载
             {
@@ -197,6 +199,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                             player.Name = name;
                             Players[player.Name] = player;
                             GD.Print($"[{TickTimes}] 加载玩家数据:({name})");
+                            OnPlayerJoinGame?.Invoke(player);
                         }
                         else
                         {
@@ -213,6 +216,9 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                                 if (!LoadingPlayers.Contains(name))
                                     LoadingPlayers.Enqueue(name);
                             }
+
+                            OnPlayerFirstJoinGame?.Invoke(player);
+                            SearchSpawnPoint(player);
                         }
                     }
                 }
@@ -340,8 +346,8 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                 PlayerData pd1 = playerset.Value;
                 //按距离同步
                 if (
-                    Math.Abs(chunk.x - pd1.ChunkCoord.X) <= TileMapHorizon &&
-                    Math.Abs(chunk.y - pd1.ChunkCoord.Y) <= TileMapHorizon
+                    Math.Abs(chunk.X - pd1.ChunkCoord.X) <= TileMapHorizon &&
+                    Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= TileMapHorizon
                 )
                 {
                     if (pd1.Name != Player.Profile.Name)
@@ -506,14 +512,19 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         foreach (Vector2I coord in Chunks.Keys)
         {
             Chunk chunk = Chunks[coord];
+            ChunkSnapshot cs = null;
+            bool IsUpdate = false;
             if (chunk.UpdateList.Count > 0)
             {
-                ChunkSnapshot cs = new()
+                IsUpdate = true;
+                cs = new()
                 {
-                    version = TickTimes,
-                    x = coord.X,
-                    y = coord.Y,
+                    Version = TickTimes,
+                    X = coord.X,
+                    Y = coord.Y,
                 };
+
+
                 foreach (var v in chunk.UpdateList)
                 {
                     cs.list.Add(new BlockSnapshot()
@@ -521,11 +532,24 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                         x = (byte)v.X,
                         y = (byte)v.Y,
                         z = (byte)v.Z,
-                        id = (short)chunk.GetBlock(v.X, v.Y, v.Z).ID,
-                        state = (byte)chunk.GetBlock(v.X, v.Y, v.Z).STATE
+                        id = (short)chunk.GetBlock(v.X, v.Y, v.Z).Id,
+                        state = (byte)chunk.GetBlock(v.X, v.Y, v.Z).State
                     });
                 }
 
+                snapshot.chunks.Add(cs);
+            }
+
+            if (cs == null && !IsUpdate)
+            {
+                cs = new()
+                {
+                    Version = TickTimes,
+                    X = coord.X,
+                    Y = coord.Y,
+                };
+                var result = EntityManage.GetMovedEntity(coord);
+                if (result.Count > 0) cs.Entiydatas = result;
                 snapshot.chunks.Add(cs);
             }
         }

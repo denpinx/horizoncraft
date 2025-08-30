@@ -17,20 +17,20 @@ public class FluidSystem : TickSystem
         }
         else if (e.CheckMeta(e.BottomBlock, blockMeta))
         {
-            e.BottomBlock.STATE = 0;
+            e.BottomBlock.State = 0;
         }
         else
         {
-            if (e.CheckMeta(e.LeftBlock, Materials.Valueof("air")) && e.Blockdata.STATE < 7)
+            if (e.CheckMeta(e.LeftBlock, Materials.Valueof("air")) && e.Blockdata.State < 7)
             {
-                e.SetLeftBlock(blockMeta, e.Blockdata.STATE + 1);
+                e.SetLeftBlock(blockMeta, e.Blockdata.State + 1);
                 e.LeftBlock.GetComponent<FluidComponent>("FluidComponent").mobility = true;
                 return;
             }
 
-            if (e.CheckMeta(e.RightBlock, Materials.Valueof("air")) && e.Blockdata.STATE < 7)
+            if (e.CheckMeta(e.RightBlock, Materials.Valueof("air")) && e.Blockdata.State < 7)
             {
-                e.SetRightBlock(blockMeta, e.Blockdata.STATE + 1);
+                e.SetRightBlock(blockMeta, e.Blockdata.State + 1);
                 e.RightBlock.GetComponent<FluidComponent>("FluidComponent").mobility = true;
                 return;
             }
@@ -41,7 +41,7 @@ public class FluidSystem : TickSystem
         {
             if (fc.mobility)
             {
-                if (e.Blockdata.STATE == 0)
+                if (e.Blockdata.State == 0)
                 {
                     e.Blockdata.SetMeta("air");
                     return;
@@ -49,11 +49,11 @@ public class FluidSystem : TickSystem
                 else
                 {
                     if ((!e.CheckMeta(e.LeftBlock, blockMeta) || (e.CheckMeta(e.LeftBlock, blockMeta) &&
-                                                                  e.LeftBlock.STATE > e.Blockdata.STATE &&
-                                                                  e.LeftBlock.STATE > 0)) &&
+                                                                  e.LeftBlock.State > e.Blockdata.State &&
+                                                                  e.LeftBlock.State > 0)) &&
                         (!e.CheckMeta(e.RightBlock, blockMeta) || (e.CheckMeta(e.RightBlock, blockMeta) &&
-                                                                   e.RightBlock.STATE > e.Blockdata.STATE &
-                                                                   e.RightBlock.STATE > 0))
+                                                                   e.RightBlock.State > e.Blockdata.State &
+                                                                   e.RightBlock.State > 0))
                        )
                     {
                         e.Blockdata.SetMeta("air");
@@ -62,17 +62,17 @@ public class FluidSystem : TickSystem
 
 
                     if (e.LeftBlock != null && e.CheckMeta(e.LeftBlock, blockMeta) &&
-                        e.LeftBlock.STATE < e.Blockdata.STATE - 2 &&
-                        e.Blockdata.STATE <= 7)
+                        e.LeftBlock.State < e.Blockdata.State - 2 &&
+                        e.Blockdata.State <= 7)
                     {
-                        e.Blockdata.STATE = e.LeftBlock.STATE + 1;
+                        e.Blockdata.State = e.LeftBlock.State + 1;
                     }
 
                     if (e.RightBlock != null && e.CheckMeta(e.RightBlock, blockMeta) &&
-                        e.RightBlock.STATE < e.Blockdata.STATE - 2 &&
-                        e.Blockdata.STATE <= 7)
+                        e.RightBlock.State < e.Blockdata.State - 2 &&
+                        e.Blockdata.State <= 7)
                     {
-                        e.Blockdata.STATE = e.RightBlock.STATE + 1;
+                        e.Blockdata.State = e.RightBlock.State + 1;
                     }
                 }
             }

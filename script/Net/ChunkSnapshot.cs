@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using horizoncraft.script.Entity;
 using MemoryPack;
 
 namespace horizoncraft.script.Net;
@@ -6,8 +7,9 @@ namespace horizoncraft.script.Net;
 [MemoryPackable]
 public partial class ChunkSnapshot
 {
-    public long version;
-    public int x;
-    public int y;
-    public List<BlockSnapshot> list = new List<BlockSnapshot>();
+    public long Version;
+    public int X;
+    public int Y;
+    public List<BlockSnapshot> list = new();
+    public List<Entitydata> Entiydatas = new();
 }

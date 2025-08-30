@@ -25,7 +25,6 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Label" type="Label" parent="."]
-visible = false
 offset_left = -19.0
 offset_top = -33.0
 offset_right = 21.0

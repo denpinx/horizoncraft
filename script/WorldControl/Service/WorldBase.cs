@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Components;
+using horizoncraft.script.Events;
 using horizoncraft.script.Features;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
@@ -53,6 +54,12 @@ public class WorldBase
     public Action<WorldBase, Chunk> OnChunkLoaded;
 
     public Action<WorldBase, Chunk> OnChunkUnLoading;
+
+    //玩家第一次加入游戏
+    public Action<PlayerData> OnPlayerFirstJoinGame;
+
+    //玩家加入游戏
+    public Action<PlayerData> OnPlayerJoinGame;
 
     //
     public WorldProfile Profile;
@@ -192,10 +199,10 @@ public class WorldBase
         if (block != null && u != null && d != null && l != null && r != null)
         {
             if (
-                !u.IsMeta("air") &&
-                !d.IsMeta("air") &&
-                !l.IsMeta("air") &&
-                !r.IsMeta("air")
+                u.BlockMeta.Cube &&
+                d.BlockMeta.Cube &&
+                l.BlockMeta.Cube &&
+                r.BlockMeta.Cube
             )
             {
                 return true;
@@ -302,7 +309,7 @@ public class WorldBase
     {
         if (inventory == null) return false;
         if (playerdata == null) return false;
-        var handitem = playerdata.Inventory.HandItemStack;
+        var handitem = playerdata.Inventory.GetHandItemStack();
         inventory.update = true;
         var targetitem = inventory.GetItem(index);
         if (targetitem != null && handitem != null && targetitem.Id == handitem.Id)
@@ -413,7 +420,7 @@ public class WorldBase
         {
             while (gri != null)
             {
-                var handitme = player.Inventory.HandItemStack;
+                var handitme = player.Inventory.GetHandItemStack();
                 if (handitme == null
                    )
                 {
@@ -441,7 +448,7 @@ public class WorldBase
         }
         else if (gri != null)
         {
-            var handitme = player.Inventory.HandItemStack;
+            var handitme = player.Inventory.GetHandItemStack();
             if (handitme == null
                )
             {
@@ -487,7 +494,7 @@ public class WorldBase
                 if (block.Light < light)
                     block.Light = light;
                 // 遇到完整方块衰减光线
-                if (block.BlockMeta.CUBE) light -= 2;
+                if (block.BlockMeta.Cube) light -= 2;
                 else light -= 1;
             }
         }
@@ -506,7 +513,7 @@ public class WorldBase
             return;
         }
 
-        if (block.BlockMeta.CUBE) value -= 2;
+        if (block.BlockMeta.Cube) value -= 2;
         else value -= 1;
 
         DfsUpdateLight(coord - Vector3I.Left, value);
@@ -591,7 +598,7 @@ public class WorldBase
     }
 
 
-    public virtual bool PlaceBlock(PlayerData player, Vector3I pos)
+    public virtual bool PlaceBlock(PlayerData player, Vector3I pos, bool coercive = false, bool Iscollide = false)
     {
         var pos0 = new Vector3I(pos.X, pos.Y, 0);
         var pos1 = new Vector3I(pos.X, pos.Y, 1);
@@ -602,17 +609,26 @@ public class WorldBase
 
         Vector3I finalpos;
         Blockdata finalblock;
-
-        if (block1.IsMeta("air"))
+        if (coercive)
         {
             finalblock = block1;
             finalpos = pos0;
         }
         else
         {
-            finalblock = block2;
-            finalpos = pos1;
+            if (block1.IsMeta("air"))
+            {
+                finalblock = block1;
+                finalpos = pos0;
+            }
+            else
+            {
+                finalblock = block2;
+                finalpos = pos1;
+                if (Iscollide) return false;
+            }
         }
+
 
         if (!finalblock.IsMeta("air")) return false;
 
@@ -629,20 +645,36 @@ public class WorldBase
 
     public virtual bool BreakBlock(PlayerData player, Vector3I pos)
     {
-        var fblock = world.WorldService.GetBlock(pos);
+        var targetblock = world.WorldService.GetBlock(pos);
 
 
         if (player.Mode == 0)
         {
-            if (world.WorldService.CheckIsCloseBlock(pos) || fblock == null || fblock.IsMeta("air")) return false;
-            var item = fblock.BlockMeta?.ItemMeta?.GetItemStack();
+            if (world.WorldService.CheckIsCloseBlock(pos) || targetblock == null || targetblock.IsMeta("air")) return false;
+            var item = targetblock.BlockMeta?.ItemMeta?.GetItemStack();
             if (item != null)
             {
+                var handItem = player.Inventory.GetItem(player.Inventory.HandSlot);
+                if (handItem != null && handItem.Components.Count > 0)
+                {
+                    var Event = new BreakBlockEvent()
+                    {
+                        World = world,
+                        Blockdata = targetblock,
+                        WorldService = this,
+                        Player = player,
+                        ItemStack = handItem,
+                        Index = player.Inventory.HandSlot,
+                    };
+                    ComponentManager.ExecuteComponents(Event, handItem);
+                }
+
+
                 player.Inventory.TryAddItem(item);
             }
             else
             {
-                GD.PrintErr($"物品不存在！ :{fblock.BlockMeta.NAME}");
+                GD.PrintErr($"物品不存在！ :{targetblock.BlockMeta.Name}");
             }
         }
 
@@ -681,6 +713,16 @@ public class WorldBase
 
         world.WorldService.OpenBlockView(blockinv.InventoryName, finalpos.X, finalpos.Y, finalpos.Z);
         return true;
+    }
+
+    public void SearchSpawnPoint(PlayerData player)
+    {
+        int ChunkX = Random.Shared.Next(-16, 16);
+        var map = WorldGenerator.GetHighMap(ChunkX);
+        int randx = Random.Shared.Next(0, Chunk.Size);
+        int y = map[randx, 1];
+        player.Position = new(ChunkX * Chunk.Size * 16 + randx * 16, y * 16);
+        GD.Print($"寻找到复活点：{player.Position}");
     }
 
     public virtual void CloseView()

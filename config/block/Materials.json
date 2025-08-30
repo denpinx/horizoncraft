@@ -7,6 +7,9 @@
         "BlockName": "grass",
         "Max": 20
       }
+    },
+    "tags": {
+      "type": "shovel"
     }
   },
   "grass": {
@@ -17,12 +20,19 @@
         "BlockName": "dirt",
         "Max": 20
       }
+    },
+    "tags": {
+      "type": "shovel"
     }
+  },
+  "cobblestone": {
+    "rigidity": 2
   },
   "stone": {
     "rigidity": 2,
     "tiletype": "terrain",
     "tags": {
+      "type": "pickaxe",
       "link": "stone"
     }
   },
@@ -46,6 +56,9 @@
       "horizontal": {
         "texture": "oak_log_horizontal"
       }
+    },
+    "tags": {
+      "type": "axe"
     }
   },
   "water": {
@@ -59,6 +72,9 @@
         "BlockName": "water",
         "Max": 5
       }
+    },
+    "tags": {
+      "enter_action": "no-fall"
     }
   },
   "sand": {
@@ -70,6 +86,9 @@
         "Max": 5,
         "Current": 0
       }
+    },
+    "tags": {
+      "type": "shovel"
     }
   },
   "wooden_storage_box": {
@@ -80,6 +99,9 @@
         "Size": 36,
         "InventoryName": "StorageBoxInv"
       }
+    },
+    "tags": {
+      "type": "axe"
     }
   },
   "oak_leaves": {
@@ -89,18 +111,31 @@
     "rigidity": 0.5
   },
   "snow": {
-    "rigidity": 0.2
+    "rigidity": 0.2,
+    "tags": {
+      "type": "shovel"
+    }
   },
   "iceblock": {
-    "rigidity": 0.5
+    "rigidity": 0.5,
+    "tags": {
+      "type": "pickaxe"
+    }
   },
   "ladder": {
     "rigidity": 0.5,
     "collide": false,
-    "cube": false
+    "cube": false,
+    "tags": {
+      "enter_action": "no-fall",
+      "type": "axe"
+    }
   },
   "brickblock": {
-    "rigidity": 2
+    "rigidity": 2,
+    "tags": {
+      "type": "pickaxe"
+    }
   },
   "rose": {
     "rigidity": 0.1,
@@ -115,6 +150,9 @@
         "Size": 9,
         "InventoryName": "CraftingTableInventory"
       }
+    },
+    "tags": {
+      "type": "axe"
     }
   },
   "furnace": {
@@ -144,6 +182,9 @@
         "Size": 3,
         "InventoryName": "FurnaceInv"
       }
+    },
+    "tags": {
+      "type": "pickaxe"
     }
   },
   "logistics_pipeline": {
@@ -152,6 +193,7 @@
     "cube": false,
     "tiletype": "terrain",
     "tags": {
+      "type": "any",
       "link": "net"
     }
   },
@@ -161,6 +203,7 @@
     "cube": false,
     "tiletype": "terrain",
     "tags": {
+      "type": "any",
       "link": "net"
     }
   },
@@ -173,18 +216,21 @@
       }
     },
     "tags": {
+      "type": "any",
       "link": "net"
     }
   },
   "output_block": {
     "rigidity": 0.5,
     "tags": {
+      "type": "any",
       "link": "net"
     }
   },
   "interface_block": {
     "rigidity": 0.5,
     "tags": {
+      "type": "any",
       "link": "net"
     }
   },

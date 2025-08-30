@@ -59,12 +59,12 @@ public class FurnaceSystem : TickSystem
 
         if (furnace.Fuel > 0)
         {
-            evnet.Blockdata.STATE = 1;
+            evnet.Blockdata.State = 1;
             furnace.Fuel--;
         }
         else
         {
-            evnet.Blockdata.STATE = 0;
+            evnet.Blockdata.State = 0;
         }
 
 

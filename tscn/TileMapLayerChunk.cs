@@ -15,7 +15,7 @@ public partial class TileMapLayerChunk : Node2D
     TileMapLayer tileMapLayer_shadow;
     DebugView debugView;
     //[Export] private float perspectiveOffsetFactor = 0.1f;
-    
+
     private long time;
 
     public override void _Ready()
@@ -26,7 +26,6 @@ public partial class TileMapLayerChunk : Node2D
         debugView = GetNode<DebugView>("DebugView");
         tileMapLayer_font.TileSet = Materials.CreateTileSet();
         tileMapLayer_back.TileSet = Materials.CreateTileSet();
-        
     }
 
 
@@ -36,12 +35,18 @@ public partial class TileMapLayerChunk : Node2D
         {
             QueueFree();
         }
-        
+
+
+        // TODO 问题: Z = 0 时,背景的方块(z=0)只有被第一次放置时才会更新terrain,之后放置的方块不会自动更新
         if (chunk.update_tilemap)
         {
-            debugView.time = time++;
-            debugView.chunk = chunk;
-            debugView.QueueRedraw();
+            if (debugView.Visible)
+            {
+                debugView.time = time++;
+                debugView.chunk = chunk;
+                debugView.QueueRedraw();
+            }
+
             for (int z = 0; z < Chunk.SizeZ && z < 2; z++)
             {
                 for (int x = 0; x < Chunk.Size; x++)
@@ -53,7 +58,6 @@ public partial class TileMapLayerChunk : Node2D
                         Blockdata block_back = chunk.GetBlock(x, y, 0);
                         Blockdata block_font = chunk.GetBlock(x, y, 1);
 
-                        //前景图方块不可见，后面也不可见
                         if (block_font.Light == 0)
                         {
                             if (tileMapLayer_shadow.GetCellAtlasCoords(pos) != Vector2I.Zero)
@@ -70,34 +74,36 @@ public partial class TileMapLayerChunk : Node2D
                         var bts = block.GetBlockTileSet();
                         if (bts != null) tile_id = bts.tile_id;
 
-                        int tile_size = block.GetTileSize();
+
                         Vector2I coord = new(0, 0);
-                        if (block.BlockMeta.Tiletype == "tile")
+                        if (block.BlockMeta.TileType == "tile")
                         {
+                            int tile_size = block.GetTileSize();
                             coord = new(x % tile_size, y % tile_size);
                         }
 
-                        if (block.BlockMeta.Tiletype == "atlas")
+                        if (block.BlockMeta.TileType == "atlas")
                         {
-                            coord = new(block.STATE, 0);
+                            coord = new(block.State, 0);
                         }
 
-                        if (block.BlockMeta.Tiletype == "terrain")
+
+                        if (block.BlockMeta.TileType == "terrain")
                         {
                             var tag = block.BlockMeta.GetTag("link");
                             var global = new Vector3I(chunk.X * Chunk.Size + x, chunk.Y * Chunk.Size + y, z);
                             coord = player.world.WorldService.GetTerrain(global, "link", tag);
                         }
 
-                        if (z == 0 && !block_font.BlockMeta.CUBE)
+                        if (z == 0 && !block_font.BlockMeta.Cube)
                         {
                             if (bts != null && bts.scene)
                             {
                                 if (tileMapLayer_back.GetCellSourceId(pos) != tile_id)
                                     tileMapLayer_back.SetCell(pos, tile_id, Vector2I.Zero, bts.id);
                             }
-
-                            else if (tileMapLayer_back.GetCellSourceId(pos) != tile_id)
+                            else if (tileMapLayer_back.GetCellAtlasCoords(pos) != coord ||
+                                     tileMapLayer_back.GetCellSourceId(pos) != tile_id)
                                 tileMapLayer_back.SetCell(new(x, y), tile_id, coord);
                         }
                         else
