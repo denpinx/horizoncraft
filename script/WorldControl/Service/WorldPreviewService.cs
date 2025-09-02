@@ -20,7 +20,7 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
     public bool Init()
     {
         if (world == null) return false;
-        EntityManage.Init(this);
+        //EntityManage.Init(this);
         world.timer.Timeout += Tick;
         world.player.OnMoveToChunk += UpdateLoadChunkCoords;
         GD.Print($"[{TickTimes}] 开启预览模式");
@@ -73,7 +73,7 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
             Chunk chunk = new(coord.X, coord.Y);
             Chunks[coord] = chunk;
             WorldGenerator.Generator(chunk);
-            OnChunkLoaded?.Invoke(this, chunk);
+            OnChunkLoaded?.Invoke(chunk);
         }
 
         LoadChunkQueue.Clear();
@@ -112,7 +112,7 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
             Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
         }
-
+        OnTicked?.Invoke();
         UpdateLights();
         UpdataTileMap();
         stopwatch.Stop();

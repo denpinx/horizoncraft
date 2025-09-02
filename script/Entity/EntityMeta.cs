@@ -12,6 +12,7 @@ namespace horizoncraft.script.Entity
     public class EntityMeta
     {
         public delegate Node2D GetEntityNodelegate(PackedScene packedScene);
+
         public GetEntityNodelegate get_entity_node;
         public PackedScene packedScene = new();
         public string NAME;
@@ -22,20 +23,21 @@ namespace horizoncraft.script.Entity
             packedScene = GD.Load<PackedScene>(scenepath);
             this.NAME = name;
         }
-        public EntityNode GetEntityNode()
+
+        public IEntityNode GetEntityNode()
         {
-            EntityNode entityNode = get_entity_node(packedScene) as EntityNode;
-            entityNode.ID = id;
-            entityNode.Data.Uuid = Guid.NewGuid().ToString();
-            return entityNode;
-        }
-        public virtual Entitydata GetData(Vector2 vector2)
-        {
-            return new Entitydata()
+            if (get_entity_node == null)
             {
-                Id = id,
-                Position = new(vector2.X, vector2.Y)
-            };
+                //GD.Print("null get entity_node");
+            }
+            else
+            {
+                //GD.Print("not null get entity_node");
+            }
+            
+            IEntityNode entityNode = get_entity_node(packedScene) as IEntityNode; 
+            entityNode.Id = id;
+            return entityNode;
         }
     }
 }

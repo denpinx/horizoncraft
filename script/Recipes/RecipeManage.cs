@@ -5,6 +5,10 @@ using horizoncraft.script.Inventory;
 
 namespace horizoncraft.script.Recipes;
 
+/// <summary>
+/// 支持把不同目录的json文件，的相同配方类型给自动合并，一个json既支持只写一个，多个json也可以对同一个类型添加
+/// 本质上每个json文件都是对某个配方类型的追加，不会重复。
+/// </summary>
 public class RecipeManage
 {
     private static List<Recipe> ProcessRecipes = new List<Recipe>();
@@ -207,7 +211,7 @@ public class RecipeManage
 
     private static void ParseFile(string filename)
     {
-        var path = "Config/recipes/" + filename;
+        var path = filename;
         if (!FileAccess.FileExists(path))
         {
             GD.PrintErr($"[RecipeManage]] {path} 不存在！");
@@ -238,18 +242,18 @@ public class RecipeManage
 
     static RecipeManage()
     {
-        if (!DirAccess.DirExistsAbsolute("Config/recipes"))
+        if (!DirAccess.DirExistsAbsolute("config/recipes"))
         {
             GD.PrintErr("[RecipeManage] 初始化失败! 配方目录不存在!");
             return;
         }
 
-        DirAccess dir = DirAccess.Open("Config/recipes");
-        var inPathFiles = dir.GetFiles();
-        foreach (var filename in inPathFiles)
+        var list = new List<string>();
+        GetAllFiles("config/recipes", list);
+        foreach (var file in list)
         {
-            if (!filename.EndsWith(".json")) continue;
-            ParseFile(filename);
+            if (!file.EndsWith(".json")) continue;
+            ParseFile(file);
         }
     }
 
@@ -267,5 +271,36 @@ public class RecipeManage
         if (recipe == null) return null;
         var result = recipe.recipes.Find(rcp => mathAction(rcp));
         return result;
+    }
+
+    private static void GetAllFiles(string path, List<string> filelist)
+    {
+        DirAccess dir = DirAccess.Open(path);
+        if (dir == null)
+        {
+            GD.PrintErr($"[GetAllFiles] 无法打开{path}");
+            return;
+        }
+
+        dir.ListDirBegin();
+        var filename = dir.GetNext();
+        while (filename != "")
+        {
+            if (filename == "." || filename == "..")
+                continue;
+            string deep_path = path + "/" + filename;
+            if (dir.CurrentIsDir())
+            {
+                GetAllFiles(deep_path, filelist);
+            }
+            else
+            {
+                filelist.Add(deep_path);
+            }
+
+            filename = dir.GetNext();
+        }
+
+        dir.ListDirEnd();
     }
 }

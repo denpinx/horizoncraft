@@ -54,20 +54,36 @@ namespace horizoncraft.script
         
         public int BreakLevel = 0;
 
+        /// <summary>掉落物</summary>
+        public LootTable LootTable;
+
         // TODO 待实现
         /// <summary>方块的大小,这里不是指像素大小，而是一个方块究竟占多少格子，如果1*1就占1个格子，如果是2*2就占4个格子</summary>
         public Vector2I GridSize;
 
         /// <summary>对应的物品配置 </summary>
         public ItemMeta ItemMeta = null;
-
-        //为什么把遮罩放这里，而不是放组件属性里: 组件属性不支持数组等复杂类型的初始化
+        
         /// <summary>物品输入遮罩 </summary>
         public HashSet<int> InputMask = new();
 
         /// <summary>物品输出遮罩 </summary>
         public HashSet<int> OutputMask = new();
 
+        
+        
+        //
+        public List<LootItemSnapshot> _LootItemSnapshots_ = new();
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         /// <summary>获取方块实列</summary>
         public Blockdata CreateBlockData()
         {

@@ -1,0 +1,60 @@
+{
+  "wooden_storage_box": {
+    "rigidity": 0.5,
+    "components": {
+      "InventoryComponent": {
+        "Name": "BoxComponent",
+        "Size": 36,
+        "InventoryName": "StorageBoxInv"
+      }
+    },
+    "tags": {
+      "type": "axe"
+    }
+  },
+  "workbench": {
+    "rigidity": 0.5,
+    "components": {
+      "InventoryComponent": {
+        "Name": "WorkBenchComponent",
+        "Size": 9,
+        "InventoryName": "CraftingTableInventory"
+      }
+    },
+    "tags": {
+      "type": "axe"
+    }
+  },
+  "furnace": {
+    "rigidity": 0.5,
+    "mask": {
+      "input": [
+        0,
+        1
+      ],
+      "output": [
+        2
+      ]
+    },
+    "state": {
+      "normal": {
+        "texture": "furnace"
+      },
+      "working": {
+        "texture": "res://config/block_tscn/furnace_1.tscn",
+        "scene": true
+      }
+    },
+    "components": {
+      "FurnaceComponent": {
+        "Name": "FurnaceComponent",
+        "Max": 1,
+        "Size": 3,
+        "InventoryName": "FurnaceInv"
+      }
+    },
+    "tags": {
+      "type": "pickaxe"
+    }
+  }
+}

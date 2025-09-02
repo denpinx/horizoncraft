@@ -14,6 +14,7 @@ using horizoncraft.script.Events;
 using Array = Godot.Collections.Array;
 using MemoryPack;
 using horizoncraft.script.Components;
+using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Net;
 using HorizonCraft.script.WorldControl.Service;
 using Vector2 = System.Numerics.Vector2;
@@ -54,7 +55,8 @@ namespace horizoncraft.script.WorldControl
         }
 
         //加载完区块后释放到世界中，卸载区块时再从世界中捕获
-        public List<Entitydata> entities = new();
+        public List<EntityData> Entitys = new();
+        
         public Blockdata[,,] data = new Blockdata[Size, Size, SizeZ];
         public int SpawnCostTime;
 
@@ -86,7 +88,7 @@ namespace horizoncraft.script.WorldControl
             return data[x, y, z];
         }
 
-        public void SetBlock(int x, int y, int z, BlockMeta meta, int state = 0)
+        public Blockdata SetBlock(int x, int y, int z, BlockMeta meta, int state = 0)
         {
             var pos = new Vector3(x, y, z);
             var posv2 = new Vector2(x, y);
@@ -120,9 +122,10 @@ namespace horizoncraft.script.WorldControl
             data[x, y, z].State = state;
             UpdateList_buffer.Add(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z));
             update_tilemap = true;
+            return data[x, y, z];
         }
 
-        public void SetBlock(int x, int y, int z, Blockdata blockdata, int state = 0)
+        public Blockdata SetBlock(int x, int y, int z, Blockdata blockdata, int state = 0)
         {
             var pos = new Vector3(x, y, z);
             if (blockdata.BlockMeta.Components.Count > 0)
@@ -139,6 +142,7 @@ namespace horizoncraft.script.WorldControl
             data[x, y, z].State = state;
             UpdateList_buffer.Add(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z));
             update_tilemap = true;
+            return data[x, y, z];
         }
 
         //新版，无法预期运行
@@ -178,11 +182,21 @@ namespace horizoncraft.script.WorldControl
                 if (block.components.Count != 0)
                 {
                     blockTickEvnet.Blockdata = block;
-                    blockTickEvnet.Globalpos = coord;
+                    blockTickEvnet.GlobalePos = coord;
                     blockTickEvnet.LocalPos = local;
                     id = block.Id;
                     state = block.State;
-                    ComponentManager.ExecuteComponents(blockTickEvnet, block);
+                    try
+                    {
+                        ComponentManager.ExecuteComponents(blockTickEvnet, block);
+                        blockTickEvnet.Reset();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
+
                     if (state != block.State || id != block.Id)
                     {
                         update_tilemap = true;
@@ -196,6 +210,7 @@ namespace horizoncraft.script.WorldControl
                 }
             }
         }
+
         public void FillLight(int value)
         {
             for (int x = 0; x < Chunk.Size; x++)
@@ -204,6 +219,7 @@ namespace horizoncraft.script.WorldControl
                 data[x, y, 1].Light = value;
             }
         }
+
         public void ClearLight()
         {
             for (int x = 0; x < Chunk.Size; x++)

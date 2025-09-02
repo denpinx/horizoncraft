@@ -4,6 +4,8 @@ using System.Linq;
 using Godot;
 using Godot.Collections;
 using horizoncraft.script.Components;
+using horizoncraft.script.Entity;
+using horizoncraft.script.Features;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using HorizonCraft.script.WorldControl.Service;
@@ -55,5 +57,34 @@ public partial class World
         {
             WorldService.Chunks[pos].update_server = true;
         }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void ReceiveEntityPack(byte[] bytes)
+    {
+        EntityPack pack = ByteTool.FromBytes<EntityPack>(bytes);
+        foreach (var entity in pack.Entitys)
+        {
+            WorldService.EntityService.ReceiveEntityPack(pack);
+        }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void ResetEntityOwned(byte[] bytes)
+    {
+        var pack = ByteTool.FromBytes<UUIDPack>(bytes);
+        WorldService.EntityService.ResetEntityOwned(pack);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void RemoveEntityData(string uuid)
+    {
+        WorldService.EntityService.RemoveEntityData(uuid);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void AddEntityData(byte[] bytes)
+    {
+        WorldService.EntityService.AddEntityData(ByteTool.FromBytes<EntityData>(bytes));
     }
 }

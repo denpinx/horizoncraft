@@ -10,7 +10,7 @@ namespace horizoncraft.script.Components
     public class LambdaCreater
     {
         public static readonly Dictionary<string, Func<Dict, Component>> _factories = new();
-        
+
         static LambdaCreater()
         {
             Register<TickComponent>();

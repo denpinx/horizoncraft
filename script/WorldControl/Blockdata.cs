@@ -21,6 +21,7 @@ namespace horizoncraft.script.WorldControl
         public int Light;
 
         [MemoryPackIgnore] private BlockMeta _blockMeta;
+        [MemoryPackIgnore] private Component _lastcomponent;
 
         [MemoryPackIgnore]
         public BlockMeta BlockMeta
@@ -35,8 +36,14 @@ namespace horizoncraft.script.WorldControl
 
         public T GetComponent<T>() where T : Component
         {
+            if (_lastcomponent != null && _lastcomponent is T) return _lastcomponent as T;
             var result = components.Find(cmp => cmp is T);
-            if (result != null) return result as T;
+            if (result != null)
+            {
+                _lastcomponent = result;
+                return result as T;
+            }
+
             return null;
         }
 

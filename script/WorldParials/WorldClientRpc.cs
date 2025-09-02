@@ -2,6 +2,7 @@ using System.IO;
 using System.IO.Compression;
 using Godot;
 using horizoncraft.script.Components;
+using horizoncraft.script.Features;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
@@ -25,7 +26,10 @@ public partial class World
     {
         ChunkPack sync = ByteTool.FromBytes<ChunkPack>(data);
         for (int i = 0; i < sync.Chunks.Count; i++)
+        {
             WorldService.Chunks[sync.Chunks[i].coord] = sync.Chunks[i];
+            WorldService.EntityService.ReleaseChunkEntity(sync.Chunks[i]);
+        }
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
@@ -60,7 +64,6 @@ public partial class World
             }
             else
             {
-                
             }
         }
 
@@ -132,7 +135,6 @@ public partial class World
         player.playerData.Inventory = inv;
         if (player.ShowView != null)
         {
-            
         }
     }
 }

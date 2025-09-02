@@ -19,6 +19,7 @@ public partial class PlayerData
     public int PeerId;
 
     public ConfigSet<float> Resistance = new() { Value = 1f, Default = 1f };
+    public ConfigSet<float> MoveSpeed = new() { Value = 16 * 5f, Default = 16 * 5f };
     public ConfigSet<bool> Fly = new() { Value = false, Default = false };
 
     //玩家名
@@ -26,7 +27,8 @@ public partial class PlayerData
 
     //位置
     public Vector2 Position;
-
+    //面朝方向
+    public bool FaceLeft = false;
     //是否打开容器，这里相当于是是否订阅
     public bool OpeningBlockInventory = false;
 
@@ -38,7 +40,7 @@ public partial class PlayerData
 
     //
     public int Mode = 0;
-
+    
 
     [MemoryPackIgnore] public Player player;
 

@@ -12,8 +12,10 @@ using horizoncraft.script.Events;
 using Dictionary = System.Collections.Generic.Dictionary<string, object>;
 using System.Data.Common;
 using System.Text.Json.Serialization;
+using System.Xml;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.WorldControl;
+using ItemEntity = HorizonCraft.tscn.Entity.ItemEntity;
 
 namespace horizoncraft.script
 {
@@ -22,42 +24,19 @@ namespace horizoncraft.script
         public static TileSet tileSet;
         public static List<BlockMeta> BlockMetas = new();
         public static List<ItemMeta> ItemMetas = new();
-        public static Dictionary<string, ItemMeta> Dictionary_ItemMetas = new();
 
+        public static Dictionary<string, ItemMeta> Dictionary_ItemMetas = new();
         public static Dictionary<string, BlockMeta> Dictionary_BlockMetas = new();
-        public static List<EntityMeta> EntityMetas = new List<EntityMeta>();
+
+        public static List<EntityMeta> EntityMetas = new();
+        public static Dictionary<string, EntityMeta> DictionaryEntityMetas = new();
 
         public static EntityMeta RegEntityMeta(EntityMeta meta)
         {
             meta.id = EntityMetas.Count;
             EntityMetas.Add(meta);
+            DictionaryEntityMetas.Add(meta.NAME, meta);
             return meta;
-        }
-
-        public static EntityMeta GetEntityMeta(String name)
-        {
-            foreach (EntityMeta em in EntityMetas)
-            {
-                if (em.NAME == name)
-                {
-                    return em;
-                }
-            }
-
-            return null;
-        }
-
-        public static EntityMeta GetEntityMeta(int id)
-        {
-            foreach (EntityMeta em in EntityMetas)
-            {
-                if (em.id == id)
-                {
-                    return em;
-                }
-            }
-
-            return null;
         }
 
         public static ItemMeta RegItemMeta(ItemMeta meta)
@@ -138,11 +117,12 @@ namespace horizoncraft.script
                 }
             );
 
-            LoadItemConfigs();
-            LoadBlockConfigs();
+            LoadAllItemConfigs();
+            LoadAllBlockConfigs();
             ProcessEntity();
             CreateTileSet();
             ProcessTextures();
+            Posttreatment();
         }
 
         private static void ProcessEntity()
@@ -151,15 +131,52 @@ namespace horizoncraft.script
             {
                 get_entity_node = (PackedScene packedScene) => (Node2D)packedScene.Instantiate<ItemEntity>()
             });
-            RegEntityMeta(new EntityMeta("tree", "res://tscn/Entity/TreeEntity.tscn")
-            {
-                get_entity_node = (PackedScene packedScene) => (Node2D)packedScene.Instantiate<TreeEntity>()
-            });
         }
 
-        private static void LoadItemConfigs()
+        /// <summary>
+        /// 后处理
+        /// </summary>
+        private static void Posttreatment()
         {
-            var fileAccess = FileAccess.Open("res://config/item/Materials.json", FileAccess.ModeFlags.Read);
+            for (int i = 0; i < BlockMetas.Count; i++)
+            {
+                var meta = BlockMetas[i];
+                var lootTable = new LootTable();
+                foreach (var ls in meta._LootItemSnapshots_)
+                {
+                    var loot_item = new LootItem();
+                    if (Dictionary_ItemMetas.TryGetValue(ls.Name, out var itemmeta))
+                        loot_item.Item = itemmeta.GetItemStack();
+                    loot_item.AmountChances = ls.AmountChances;
+
+                    GD.Print($"[后处理] 添加战利品 {ls.Name},战利品数{ls.AmountChances.Count}");
+                }
+
+                meta.LootTable = lootTable;
+            }
+        }
+
+        /// <summary>
+        /// 加载所有物品配置
+        /// </summary>
+        private static void LoadAllItemConfigs()
+        {
+            var list = new List<string>();
+            GetAllFiles("config/item", list);
+            foreach (var fn in list)
+            {
+                if (!fn.EndsWith(".json")) continue;
+                LoadItemConfigs(fn);
+            }
+        }
+
+        /// <summary>
+        /// 加载指定地址的物品配置
+        /// </summary>
+        /// <param name="dir"></param>
+        private static void LoadItemConfigs(string dir)
+        {
+            var fileAccess = FileAccess.Open(dir, FileAccess.ModeFlags.Read);
             var jsonText = fileAccess.GetAsText();
             fileAccess.Close();
             var dict = JsonCleaner.FromJson(jsonText);
@@ -179,6 +196,7 @@ namespace horizoncraft.script
                         itemMeta.Components.Add(LambdaCreater.CreateLambda(cmp_name, cmp_dict));
                     }
                 }
+
                 if (item_dict.ContainsKey("tags"))
                 {
                     var dict_attr = (Dictionary<string, object>)item_dict["tags"];
@@ -215,9 +233,27 @@ namespace horizoncraft.script
             }
         }
 
-        private static void LoadBlockConfigs()
+        /// <summary>
+        /// 加载所有方块配置
+        /// </summary>
+        private static void LoadAllBlockConfigs()
         {
-            FileAccess fileAccess = FileAccess.Open("res://config/block/Materials.json", FileAccess.ModeFlags.Read);
+            var list = new List<string>();
+            GetAllFiles("config/block", list);
+            foreach (var fn in list)
+            {
+                if (!fn.EndsWith(".json")) continue;
+                LoadBlockConfigs(fn);
+            }
+        }
+
+        /// <summary>
+        /// 加载指定的方块配置
+        /// </summary>
+        /// <param name="dir"></param>
+        private static void LoadBlockConfigs(string dir)
+        {
+            FileAccess fileAccess = FileAccess.Open(dir, FileAccess.ModeFlags.Read);
             string jsonText = fileAccess.GetAsText();
             fileAccess.Close();
             var dict = JsonCleaner.FromJson(jsonText);
@@ -261,6 +297,73 @@ namespace horizoncraft.script
                     var dict_attr = (Dictionary<string, object>)config["tags"];
                     foreach (var v in dict_attr)
                         blockmeta.Tags.Add(v.Key, (string)v.Value);
+                }
+
+                if (config.ContainsKey("loot"))
+                {
+                    var loot_list = (List<object>)config["loot"];
+                    foreach (var v in loot_list)
+                    {
+                        var loot_dict = (Dictionary<string, object>)v;
+                        var item = new LootItemSnapshot();
+
+                        if (loot_dict.ContainsKey("name")) item.Name = (string)loot_dict["name"];
+                        else item.Name = blockmeta.Name;
+
+                        if (loot_dict.ContainsKey("drop-chance"))
+                        {
+                            item.DropChance = (float)Convert.ToDouble(loot_dict["drop-chance"]);
+                        }
+                        else
+                        {
+                            item.DropChance = 1f;
+                        }
+
+                        if (loot_dict.ContainsKey("amount-chance"))
+                        {
+                            var amount_chance = (List<object>)loot_dict["amount-chance"];
+                            foreach (var ac in amount_chance)
+                            {
+                                var acitem = (Dictionary<string, object>)ac;
+                                var AmountChance = new AmountChance();
+                                if (acitem.ContainsKey("amount")) AmountChance.Amount = (int)acitem["amount"];
+                                else AmountChance.Amount = 1;
+
+                                if (acitem.ContainsKey("chance"))
+                                    AmountChance.Chance = (float)Convert.ToDouble(acitem["chance"]);
+                                else AmountChance.Chance = 1;
+                                item.AmountChances.Add(AmountChance);
+                            }
+                        }
+                        else
+                        {
+                            var AmountChance = new AmountChance()
+                            {
+                                Amount = 1,
+                                Chance = 1
+                            };
+                            item.AmountChances.Add(AmountChance);
+                        }
+
+                        blockmeta._LootItemSnapshots_.Add(item);
+                    }
+                }
+                else
+                {
+                    var loot_item = new LootItemSnapshot()
+                    {
+                        Name = blockmeta.Name,
+                        DropChance = 1f,
+                        AmountChances = new List<AmountChance>()
+                        {
+                            new AmountChance()
+                            {
+                                Amount = 1,
+                                Chance = 1
+                            }
+                        }
+                    };
+                    blockmeta._LootItemSnapshots_.Add(loot_item);
                 }
 
                 if (config.ContainsKey("mask"))
@@ -336,6 +439,9 @@ namespace horizoncraft.script
             }
         }
 
+        /// <summary>
+        /// 加载贴图
+        /// </summary>
         public static void ProcessTextures()
         {
             var default_image = ResourceLoader.Load<Texture2D>(
@@ -381,6 +487,10 @@ namespace horizoncraft.script
             }
         }
 
+        /// <summary>
+        /// 创建 TileSet
+        /// </summary>
+        /// <returns></returns>
         public static TileSet CreateTileSet()
         {
             _ = BlockMetas;
@@ -391,6 +501,9 @@ namespace horizoncraft.script
 
             tileSet.AddPhysicsLayer();
             tileSet.AddOcclusionLayer();
+            tileSet.AddTerrainSet();
+
+            tileSet.SetTerrainSetMode(0, TileSet.TerrainMode.Sides);
             for (int i = 0; i < BlockMetas.Count; i++)
             {
                 BlockMeta meta = BlockMetas[i];
@@ -398,6 +511,7 @@ namespace horizoncraft.script
                 for (int state_index = 0; state_index < meta.blockTileDatas.Count; state_index++)
                 {
                     BlockTileSet blockTileSet = meta.blockTileDatas[state_index];
+
                     if (blockTileSet.scene)
                     {
                         var ts = new TileSetScenesCollectionSource();
@@ -416,11 +530,14 @@ namespace horizoncraft.script
                         int tilesX = image.GetWidth() / 16;
                         int tilesY = image.GetHeight() / 16;
                         var atlasSource = new TileSetAtlasSource();
+                        //
                         blockTileSet.tile_id = tileSet.AddSource(atlasSource);
 
                         atlasSource.Texture = image;
                         atlasSource.TextureRegionSize = new Vector2I(16, 16);
                         GD.Print($"创建图集{blockTileSet.tile_id}");
+
+                        int mask = 0;
                         for (int y = 0; y < tilesY; y++)
                         for (int x = 0; x < tilesX; x++)
                         {
@@ -446,6 +563,8 @@ namespace horizoncraft.script
                                     Polygon = polygon
                                 });
                             }
+
+                            mask++;
                         }
 
                         blockTileSet.tile_size = tilesX;
@@ -455,6 +574,42 @@ namespace horizoncraft.script
             }
 
             return tileSet;
+        }
+
+        /// <summary>
+        /// 加载目录下的所有文件
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="filelist"></param>
+        private static void GetAllFiles(string path, List<string> filelist)
+        {
+            DirAccess dir = DirAccess.Open(path);
+            if (dir == null)
+            {
+                GD.PrintErr($"[GetAllFiles] 无法打开{path}");
+                return;
+            }
+
+            dir.ListDirBegin();
+            var filename = dir.GetNext();
+            while (filename != "")
+            {
+                if (filename == "." || filename == "..")
+                    continue;
+                string deep_path = path + "/" + filename;
+                if (dir.CurrentIsDir())
+                {
+                    GetAllFiles(deep_path, filelist);
+                }
+                else
+                {
+                    filelist.Add(deep_path);
+                }
+
+                filename = dir.GetNext();
+            }
+
+            dir.ListDirEnd();
         }
     }
 }

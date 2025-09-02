@@ -35,9 +35,7 @@ public partial class TileMapLayerChunk : Node2D
         {
             QueueFree();
         }
-
-
-        // TODO 问题: Z = 0 时,背景的方块(z=0)只有被第一次放置时才会更新terrain,之后放置的方块不会自动更新
+        
         if (chunk.update_tilemap)
         {
             if (debugView.Visible)

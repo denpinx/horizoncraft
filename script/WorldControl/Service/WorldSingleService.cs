@@ -28,7 +28,6 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
     public bool Init()
     {
         if (world == null) return false;
-        EntityManage.Init(this);
         world.timer.Timeout += Tick;
         world.player.OnMoveToChunk += UpdateLoadChunkCoords;
         sqliteConnection = SqliteTool.InitSqlite();
@@ -71,7 +70,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
                 Chunk chunk = Chunks[coord];
                 OffloadChunkQueue[coord] = chunk;
                 Chunks.TryRemove(coord, out _);
-                OnChunkUnLoading(this, chunk);
+                OnChunkUnLoading(chunk);
             }
             else
             {
@@ -118,7 +117,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
                         GD.PrintErr("异常区块重构！");
                     }
 
-                    OnChunkLoaded?.Invoke(this, chunk);
+                    OnChunkLoaded?.Invoke(chunk);
                 }
                 else
                 {
@@ -128,7 +127,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
                     if (work.Type != "NONE")
                         work.Execute(chunk);
                     WorldGenerator.Generator(chunk);
-                    OnChunkLoaded?.Invoke(this, chunk);
+                    OnChunkLoaded?.Invoke(chunk);
                 }
 
                 //UpdataChunkLight(chunk);
@@ -243,6 +242,9 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
             Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
         }
+        
+        OnTicked?.Invoke();
+        
         UpdateLights();
         UpdataTileMap();
         

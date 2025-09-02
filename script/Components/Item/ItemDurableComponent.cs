@@ -7,10 +7,12 @@ namespace horizoncraft.script.Components.Item;
 public partial class ItemDurableComponent : ItemComponent
 {
     public int Max;
+    public int Value;
+
     public int ToolLevel;
 
-    public int Value;
     public int Efficiency;
+
     // List<string> Tag;
     // "ore|wood|others"
     public string Tag;
@@ -37,6 +39,7 @@ public partial class ItemDurableComponent : ItemComponent
             if (Tag == null) return ["any"];
             _tag_ = Tag.Contains('|') ? Tag.Split('|') : [Tag];
         }
+
         return _tag_;
     }
 

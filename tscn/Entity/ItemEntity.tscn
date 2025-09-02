@@ -1,31 +1,103 @@
-[gd_scene load_steps=4 format=3 uid="uid://ra1x70iinpju"]
+[gd_scene load_steps=9 format=3 uid="uid://ra1x70iinpju"]
 
 [ext_resource type="Script" uid="uid://cylpnlj5cq74" path="res://tscn/Entity/ItemEntity.cs" id="1_8uma2"]
-[ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="2_uhlw5"]
+[ext_resource type="Texture2D" uid="uid://g0gvs2hg0plc" path="res://texture/item/brickblock.png" id="2_hdubk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_i6xc1"]
-size = Vector2(16, 16)
+size = Vector2(12, 11)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hdubk"]
+radius = 12.0
+
+[sub_resource type="Animation" id="Animation_mbpqo"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureRect:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-6, -6)]
+}
+
+[sub_resource type="Animation" id="Animation_hdubk"]
+resource_name = "ide"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureRect:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.7, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(-6, -6), Vector2(-6, -2), Vector2(-6, -8), Vector2(-6, -6)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_j7fuk"]
+_data = {
+&"RESET": SubResource("Animation_mbpqo"),
+&"ide": SubResource("Animation_hdubk")
+}
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mbpqo"]
+radius = 64.0
 
 [node name="ItemEntity" type="RigidBody2D"]
 top_level = true
+z_index = 9
 collision_layer = 3
+gravity_scale = 0.5
+can_sleep = false
 lock_rotation = true
+continuous_cd = 1
 script = ExtResource("1_8uma2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -0.5)
 shape = SubResource("RectangleShape2D_i6xc1")
 
 [node name="TextureRect" type="TextureRect" parent="."]
-offset_left = -8.0
-offset_top = -8.0
-offset_right = 8.0
-offset_bottom = 8.0
-texture = ExtResource("2_uhlw5")
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -6.0
+offset_top = -6.0
+offset_right = 6.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(6, 6)
+texture = ExtResource("2_hdubk")
 expand_mode = 1
-stretch_mode = 5
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_hdubk")
 
 [node name="Label" type="Label" parent="."]
-offset_left = -19.0
-offset_top = -33.0
-offset_right = 21.0
-offset_bottom = -10.0
+offset_left = 6.0
+offset_top = -6.0
+offset_right = 46.0
+offset_bottom = 17.0
+scale = Vector2(0.6, 0.6)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_j7fuk")
+}
+speed_scale = 0.5
+
+[node name="Area2D_Far" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D_Far"]
+shape = SubResource("CircleShape2D_mbpqo")

@@ -1,0 +1,83 @@
+{
+  "cobblestone": {
+    "rigidity": 2
+  },
+  "stone": {
+    "rigidity": 2,
+    "tiletype": "terrain",
+    "tags": {
+      "type": "pickaxe",
+      "link": "stone"
+    },
+    "loot": [
+      {
+        "name": "cobblestone",
+        "drop-chance": 1,
+        "amount-chance": [
+          {
+            "amount": 1,
+            "chance": 1
+          }
+        ]
+      }
+    ]
+  },
+  "oak_log": {
+    "rigidity": 1,
+    "state": {
+      "normal": {
+        "texture": "oak_log"
+      },
+      "horizontal": {
+        "texture": "oak_log_horizontal"
+      }
+    },
+    "tags": {
+      "type": "axe"
+    }
+  },
+  "oak_leaves": {
+    "rigidity": 0.2
+  },
+  "oak_plank": {
+    "rigidity": 0.5
+  },
+  "snow": {
+    "rigidity": 0.2,
+    "tags": {
+      "type": "shovel"
+    }
+  },
+  "iceblock": {
+    "rigidity": 0.5,
+    "tags": {
+      "type": "pickaxe"
+    }
+  },
+  "ladder": {
+    "rigidity": 0.5,
+    "collide": false,
+    "cube": false,
+    "tags": {
+      "enter_action": "no-fall",
+      "type": "axe"
+    }
+  },
+  "brickblock": {
+    "rigidity": 2,
+    "tags": {
+      "type": "pickaxe"
+    }
+  },
+  "rose": {
+    "rigidity": 0.1,
+    "collide": false,
+    "cube": false
+  },
+  "light": {
+    "rigidity": 0.1,
+    "collide": false,
+    "cube": false,
+    "light": true
+  }
+}

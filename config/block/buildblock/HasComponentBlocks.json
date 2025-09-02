@@ -1,0 +1,69 @@
+{
+  "dirt": {
+    "rigidity": 0.4,
+    "components": {
+      "ExpandComponent": {
+        "Name": "BlockSpread",
+        "BlockName": "grass",
+        "Max": 20
+      }
+    },
+    "tags": {
+      "type": "shovel"
+    }
+  },
+  "grass": {
+    "rigidity": 0.5,
+    "components": {
+      "ExpandComponent": {
+        "Name": "BlockCover",
+        "BlockName": "dirt",
+        "Max": 20
+      }
+    },
+    "tags": {
+      "type": "shovel"
+    }
+  },
+  "bush": {
+    "rigidity": 0.1,
+    "collide": false,
+    "cube": false,
+    "components": {
+      "TickComponent": {
+        "Name": "BottomCheck",
+        "Max": 20
+      }
+    }
+  },
+  "water": {
+    "rigidity": 1,
+    "collide": false,
+    "cube": false,
+    "tiletype": "atlas",
+    "components": {
+      "FluidComponent": {
+        "Name": "FluidComponent",
+        "BlockName": "water",
+        "Max": 5
+      }
+    },
+    "tags": {
+      "enter_action": "no-fall"
+    }
+  },
+  "sand": {
+    "rigidity": 0.5,
+    "components": {
+      "PhysicsComponent": {
+        "Name": "PhysicsComponent",
+        "BlockName": "sand",
+        "Max": 2,
+        "Current": 0
+      }
+    },
+    "tags": {
+      "type": "shovel"
+    }
+  }
+}

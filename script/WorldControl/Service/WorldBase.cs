@@ -51,9 +51,22 @@ public class WorldBase
         new Vector2I(1, 1), //全部相同15
     };
 
-    public Action<WorldBase, Chunk> OnChunkLoaded;
+    /// <summary>
+    /// 区块加载事件
+    /// 异步加载
+    /// </summary>
+    public Action<Chunk> OnChunkLoaded;
 
-    public Action<WorldBase, Chunk> OnChunkUnLoading;
+    /// <summary>
+    /// 区块卸载事件
+    /// 在主线程上执行
+    /// </summary>
+    public Action<Chunk> OnChunkUnLoading;
+
+    /// <summary>
+    /// 在 tick更新后触发
+    /// </summary>
+    public Action OnTicked;
 
     //玩家第一次加入游戏
     public Action<PlayerData> OnPlayerFirstJoinGame;
@@ -63,6 +76,10 @@ public class WorldBase
 
     //
     public WorldProfile Profile;
+
+    public EntityService EntityService;
+
+
     public bool Connect = false;
     public bool ServerOn = false;
     public long DayTimeMax = 20 * 60;
@@ -109,40 +126,38 @@ public class WorldBase
 
     public WorldBase()
     {
+        EntityService = new EntityService(this);
     }
 
-    public virtual void SetBlock(Vector3I coord, Blockdata blockdata)
+    public virtual Blockdata SetBlock(Vector3I coord, Blockdata blockdata)
     {
         Vector2I ChunkCoord = World.MathFloor(coord, Chunk.Size);
         Vector2I LocalCoord = World.Remainder(coord, Chunk.Size);
-        if (Chunks.ContainsKey(ChunkCoord))
-        {
-            Chunk chunk = Chunks[ChunkCoord];
-            chunk.SetBlock(LocalCoord.X, LocalCoord.Y, coord.Z, blockdata);
-        }
+        if (Chunks.TryGetValue(ChunkCoord, out var chunk))
+            return chunk.SetBlock(LocalCoord.X, LocalCoord.Y, coord.Z, blockdata);
+        return null;
     }
 
-    public virtual void SetBlock(Vector3I coord, BlockMeta meta, bool replaceAir = false, int state = 0)
+    public virtual Blockdata SetBlock(Vector3I coord, BlockMeta meta, bool replaceAir = false, int state = 0)
     {
         Vector2I ChunkCoord = World.MathFloor(coord, Chunk.Size);
         Vector2I LocalCoord = World.Remainder(coord, Chunk.Size);
-        if (Chunks.ContainsKey(ChunkCoord))
+        if (Chunks.TryGetValue(ChunkCoord, out Chunk chunk))
         {
-            Chunk chunk = Chunks[ChunkCoord];
             var block = chunk.GetBlock(LocalCoord.X, LocalCoord.Y, coord.Z);
             if (replaceAir)
             {
                 if (block.IsMeta("air"))
-                    chunk.SetBlock(LocalCoord.X, LocalCoord.Y, coord.Z, meta, state);
+                    return chunk.SetBlock(LocalCoord.X, LocalCoord.Y, coord.Z, meta, state);
             }
             else
-                chunk.SetBlock(LocalCoord.X, LocalCoord.Y, coord.Z, meta, state);
+                return chunk.SetBlock(LocalCoord.X, LocalCoord.Y, coord.Z, meta, state);
         }
         else
         {
-            if (LoadChunkQueue.ContainsKey(ChunkCoord))
+            if (LoadChunkQueue.TryGetValue(ChunkCoord, out WorkBase work))
             {
-                if (LoadChunkQueue[ChunkCoord].Type == "NONE")
+                if (work.Type == "NONE")
                 {
                     SetBlockWork sbw = new SetBlockWork()
                     {
@@ -154,7 +169,7 @@ public class WorldBase
                 }
                 else
                 {
-                    SetBlockWork stw = (SetBlockWork)LoadChunkQueue[ChunkCoord];
+                    SetBlockWork stw = (SetBlockWork)work;
                     stw.ExclList.Add((new Vector3I(LocalCoord.X, LocalCoord.Y, coord.Z), meta, state));
                 }
             }
@@ -169,6 +184,8 @@ public class WorldBase
                 LoadChunkQueue[ChunkCoord] = sbw;
             }
         }
+
+        return null;
     }
 
     public Vector2I GetTerrain(Vector3I pos, string tagname, string value)
@@ -216,14 +233,10 @@ public class WorldBase
     {
         Vector2I ChunkCoord = World.MathFloor(coord, Chunk.Size);
         Vector2I LocalCoord = World.Remainder(coord, Chunk.Size);
-        if (Chunks.ContainsKey(ChunkCoord))
+        if (Chunks.TryGetValue(ChunkCoord, out var chunk))
         {
-            Chunk chunk = Chunks[ChunkCoord];
             if (update)
-            {
                 chunk.UpdateList_buffer.Add(new Vector3I(LocalCoord.X, LocalCoord.Y, coord.Z));
-            }
-
             return chunk.GetBlock(LocalCoord.X, LocalCoord.Y, coord.Z);
         }
         else
@@ -650,7 +663,8 @@ public class WorldBase
 
         if (player.Mode == 0)
         {
-            if (world.WorldService.CheckIsCloseBlock(pos) || targetblock == null || targetblock.IsMeta("air")) return false;
+            if (world.WorldService.CheckIsCloseBlock(pos) || targetblock == null || targetblock.IsMeta("air"))
+                return false;
             var item = targetblock.BlockMeta?.ItemMeta?.GetItemStack();
             if (item != null)
             {

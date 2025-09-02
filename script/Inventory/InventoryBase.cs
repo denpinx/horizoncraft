@@ -24,7 +24,7 @@ public abstract partial class InventoryBase
         this.Size = size;
         Items = new ItemStack[Size];
     }
-    
+
     public int GetEmpyIndex(int start = 0)
     {
         for (int i = start; i < Size; i++)

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Components;
+using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Features;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
@@ -25,7 +26,6 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
     public bool Init()
     {
         if (world == null) return false;
-        EntityManage.Init(this);
         world.player.OnMoveToChunk += UpdateLoadChunkCoords;
         world.timer.Timeout += Tick;
         GD.Print($"[{TickTimes}] 连接服务器");
@@ -47,7 +47,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
             world.GetTree().ChangeSceneToFile("res://tscn/Menu/MainMenu.tscn");
             GD.Print("【客户端】服务器断开");
         };
-        
+
         var peer = new ENetMultiplayerPeer();
         peer.CreateClient("localhost", Port);
         world.Multiplayer.MultiplayerPeer = peer;
@@ -81,7 +81,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
                 Chunk chunk = Chunks[coord];
                 OffloadChunkQueue[coord] = chunk;
                 Chunks.TryRemove(coord, out _);
-                OnChunkUnLoading(this, chunk);
+                OnChunkUnLoading(chunk);
             }
             else
             {
@@ -158,6 +158,8 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         if (world.player.playerData != null) SavePlayer(world.player.playerData);
         ProcessDataRecive();
         UpdateLoadChunkCoords();
+
+        OnTicked?.Invoke();
 
         UpdateLights();
         UpdataTileMap();
@@ -236,15 +238,15 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         //world.RpcId(1, "InvokePlayerFunc", Player.Profile.Name, "close_inventory");
     }
 
-    public override void SetBlock(Vector3I coord, BlockMeta meta, bool replaceAir = false, int state = 0)
+    public override Blockdata SetBlock(Vector3I coord, BlockMeta meta, bool replaceAir = false, int state = 0)
     {
-        if (!Connect) return;
+        if (!Connect) return null;
         else
         {
             world.RpcId(1, "SetBlock", coord.X, coord.Y, coord.Z, meta.Id, state);
         }
 
-        base.SetBlock(coord, meta, replaceAir, state);
+        return base.SetBlock(coord, meta, replaceAir, state);
     }
 
     public void ProcessDataRecive()
@@ -275,13 +277,12 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
                             }
                             else
                             {
-                                GD.Print($"异常同步！新版本{cup.Version} : 旧版本{Chunks[coord].version}");
+                                //GD.Print($"异常同步！新版本{cup.Version} : 旧版本{Chunks[coord].version}");
                             }
                         }
 
-                        foreach (var entitydata in cup.Entiydatas)
-                            EntityManage.UpdataEntitys(entitydata.Uuid,entitydata);
-                        
+                        foreach (var entity in cup.Entiydatas)
+                            EntityService.AddEntityData(entity);
                     }
                 }
 
@@ -294,8 +295,8 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
         world.RpcId(1, "SetOpenBlockComponent", playerData.Name, ByteTool.ToBytes(data));
     }
 
-    public override void CraftGridRecipeItem(PlayerData player,bool all)
+    public override void CraftGridRecipeItem(PlayerData player, bool all)
     {
-        world.RpcId(1, "CraftGridRecipeItem", player.Name,all);
+        world.RpcId(1, "CraftGridRecipeItem", player.Name, all);
     }
 }

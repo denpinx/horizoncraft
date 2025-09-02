@@ -11,15 +11,15 @@ public class BlockSpreadSystem : TickSystem
     {
         var ec = cmp as ExpandComponent;
         var meta = Materials.Valueof(ec.BlockName);
-        if (e.CheckIsCube(e.TopBlock)) return;
-        if (e.CheckMeta(e.LeftBlock, meta) && _Random.Next(0, 5) < 1)
+        if (e.CheckIsCube(e.GetTopBlock())) return;
+        if (e.CheckMeta(e.GetLeftBlock(), meta) && _Random.Next(0, 5) < 1)
         {
-            e.SetBlockMeta = meta;
+            e.SetBlock(meta);
         }
 
-        if (e.CheckMeta(e.RightBlock, meta) && _Random.Next(0, 5) < 1)
+        if (e.CheckMeta(e.GetRightBlock(), meta) && _Random.Next(0, 5) < 1)
         {
-            e.SetBlockMeta = meta;
+            e.SetBlock(meta);
         }
     }
 }

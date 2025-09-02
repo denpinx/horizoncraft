@@ -22,6 +22,26 @@
     <Compile Remove="script\Net\RemoteFunctionItem.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="config\recipes\Craft\Block\" />
+    <Folder Include="config\recipes\Process\" />
+    <Folder Include="config\packscene\" />
     <Folder Include="script\Interface\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="config\block\buildblock\HasComponentBlocks.json" />
+    <Content Include="config\block\buildblock\NoComponentBlocks.json" />
+    <Content Include="config\block\functionBlock\InventoryBlock.json" />
+    <Content Include="config\block\Materials.json" />
+    <Content Include="config\block_tscn\furnace_0.tscn" />
+    <Content Include="config\block_tscn\furnace_1.tscn" />
+    <Content Include="config\block_tscn\furnace_1.tscn31451182426.tmp" />
+    <Content Include="config\entity\entitys.json" />
+    <Content Include="config\item\block\blocks.json" />
+    <Content Include="config\item\Ingots.json" />
+    <Content Include="config\item\Materials.json" />
+    <Content Include="config\item\Tools.json" />
+    <Content Include="config\recipes\Craft\Tool\IronPickAxe.json" />
+    <Content Include="config\recipes\furnace.json" />
+    <Content Include="config\recipes\player.json" />
   </ItemGroup>
 </Project>

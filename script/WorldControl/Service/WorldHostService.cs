@@ -34,11 +34,17 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
     public Vector2 SyncChunkTime = new Vector2();
     public Vector2 SyncPlayerTime = new Vector2();
 
-
     public SqliteConnection sqliteConnection;
+
+    //事件
+
+    /// <summary>
+    /// 
+    /// </summary>
 
     //线程管理,确保服务端后处理都在线程内完成，不阻塞主线程
     private Task ProcessUnloadChunkTask;
+
     private Task ProcessLoadingChunkTask;
     private Task SyncChunkTask;
 
@@ -52,7 +58,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
     public bool Init()
     {
         if (world == null) return false;
-        EntityManage.Init(this);
+        //EntityManage.Init(this);
         world.timer.Timeout += Tick;
         world.player.OnMoveToChunk += UpdateLoadChunkCoords;
 
@@ -131,7 +137,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                 OffloadChunkQueue[coord] = chunk;
                 Chunks.TryRemove(coord, out _);
 
-                OnChunkUnLoading(this, chunk);
+                OnChunkUnLoading(chunk);
             }
             else //已存在,取消加载
             {
@@ -163,7 +169,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                         GD.PrintErr("异常区块重构！");
                     }
 
-                    OnChunkLoaded?.Invoke(this, chunk);
+                    OnChunkLoaded?.Invoke(chunk);
                 }
                 else
                 {
@@ -173,7 +179,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     if (work.Type != "NONE")
                         work.Execute(chunk);
                     WorldGenerator.Generator(chunk);
-                    OnChunkLoaded?.Invoke(this, chunk);
+                    OnChunkLoaded?.Invoke(chunk);
                 }
 
                 coord = LoadChunkQueue.Keys.FirstOrDefault();
@@ -210,15 +216,10 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                             if (Players.TryAdd(name, player))
                             {
                                 GD.Print($"[{TickTimes}] 新建玩家数据:({name})");
+                                OnPlayerFirstJoinGame?.Invoke(player);
+                                SearchSpawnPoint(player);
                             }
-                            else
-                            {
-                                if (!LoadingPlayers.Contains(name))
-                                    LoadingPlayers.Enqueue(name);
-                            }
-
-                            OnPlayerFirstJoinGame?.Invoke(player);
-                            SearchSpawnPoint(player);
+                            
                         }
                     }
                 }
@@ -355,6 +356,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                         if (!syncmap_updata.ContainsKey(pd1.PeerId))
                             syncmap_updata[pd1.PeerId] = new WorldSnapshot();
                         syncmap_updata[pd1.PeerId].chunks.Add(chunk);
+                        chunk.ResetEmptyOwned(pd1.Name); //更新实体的从属
                     }
                 }
             }
@@ -381,6 +383,9 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                             }
                             else
                             {
+                                var result = EntityService.GetEntityByChunk(chunk.coord);
+                                chunk.Entitys = result;
+
                                 syncmap[pd1.PeerId] = new ChunkPack()
                                 {
                                     Chunks = new()
@@ -406,6 +411,8 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         {
             ChunkUpdataPacks.Enqueue((key, ByteTool.ToBytes<WorldSnapshot>(syncmap_updata[key])));
         }
+
+
         //})), null);
 
         if (!ChunkPacks.IsEmpty)
@@ -548,12 +555,18 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     X = coord.X,
                     Y = coord.Y,
                 };
-                var result = EntityManage.GetMovedEntity(coord);
-                if (result.Count > 0) cs.Entiydatas = result;
+                var result = EntityService.GetChunkMovedEntity(coord);
+                if (result.Count > 0)
+                {
+                    GD.Print($"【服务端】获取了 {result.Count} 个实体更新");
+                    cs.Entiydatas = result;
+                }
+
                 snapshot.chunks.Add(cs);
             }
         }
 
+        OnTicked?.Invoke();
 
         UpdateLights();
         UpdataTileMap();

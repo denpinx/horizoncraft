@@ -11,13 +11,13 @@ public class LogisticsInputSystem : TickSystem
     {
         HashSet<Vector3I> finded = new HashSet<Vector3I>();
 
-        var formblock = GetInventoryBlock(e, e.Globalpos, true);
+        var formblock = GetInventoryBlock(e, e.GlobalePos, true);
         if (formblock == null) return;
 
         var input_inv = formblock.GetComponent<InventoryComponent>();
         if (input_inv == null) return;
 
-        var result = FindInputBlock(e, finded, e.Globalpos);
+        var result = FindInputBlock(e, finded, e.GlobalePos);
         if (result == null) return;
 
         var (index, item) = input_inv.TryTakeItem(formblock.BlockMeta, 1, false);
