@@ -10,7 +10,6 @@ using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Config;
 using horizoncraft.script.Entity;
-using horizoncraft.script.Features;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Service;
@@ -84,6 +83,13 @@ public partial class Player : CharacterBody2D
     {
         if (!Inputable) return;
 
+        if (playerData != null)
+        {
+            if (playerData.FaceLeft) sprite2D_body.SetScale(new Vector2(1, 1));
+            else sprite2D_body.SetScale(new Vector2(-1, 1));
+        }
+
+
         Vector2I Mousecoord = new(
             (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
@@ -94,9 +100,9 @@ public partial class Player : CharacterBody2D
             var pos = Mousecoord;
 
             if (pos.X > playerData.Coord.X)
-                sprite2D_body.Scale = new Vector2(-1, 1);
-            else if (pos.X < playerData.Coord.X)
-                sprite2D_body.Scale = new Vector2(1, 1);
+                playerData.FaceLeft = false;
+            if (pos.X < playerData.Coord.X)
+                playerData.FaceLeft = true;
 
 
             var pos0 = new Vector3I(pos.X, pos.Y, 0);
@@ -351,8 +357,8 @@ public partial class Player : CharacterBody2D
                 velocity.X = Mathf.MoveToward(Velocity.X, 0, playerData.MoveSpeed.Value);
             }
 
-            if (velocity.X > 0) sprite2D_body.Scale = new Vector2(-1, 1);
-            else if (velocity.X < 0) sprite2D_body.Scale = new Vector2(1, 1);
+            if (velocity.X > 0) playerData.FaceLeft = false;
+            else if (velocity.X < 0) playerData.FaceLeft = true;
 
             Velocity = velocity * playerData.Resistance.Value;
             MoveAndSlide();
@@ -370,8 +376,8 @@ public partial class Player : CharacterBody2D
                 camera2d.Zoom = new(0.25f, 0.25f);
             Vector2 direction = Input.GetVector("move_left", "move_right", "move_up", "move_down");
             if (direction != Vector2.Zero) AnyMove = true;
-            if (direction.X > 0) sprite2D_body.Scale = new Vector2(-1, 1);
-            else if (direction.X < 0) sprite2D_body.Scale = new Vector2(1, 1);
+            if (direction.X > 0) playerData.FaceLeft = false;
+            else if (direction.X < 0) playerData.FaceLeft = true;
             Position += direction * 64;
         }
 

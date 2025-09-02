@@ -5,7 +5,6 @@ using Godot;
 using Godot.Collections;
 using horizoncraft.script.Components;
 using horizoncraft.script.Entity;
-using horizoncraft.script.Features;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using HorizonCraft.script.WorldControl.Service;
@@ -63,10 +62,7 @@ public partial class World
     public void ReceiveEntityPack(byte[] bytes)
     {
         EntityPack pack = ByteTool.FromBytes<EntityPack>(bytes);
-        foreach (var entity in pack.Entitys)
-        {
-            WorldService.EntityService.ReceiveEntityPack(pack);
-        }
+        WorldService.EntityService.ReceiveEntityPack(pack);
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]

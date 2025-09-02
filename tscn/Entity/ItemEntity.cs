@@ -3,7 +3,6 @@ using horizoncraft.script;
 using horizoncraft.script.Components;
 using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Entity;
-using horizoncraft.script.Features;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.WorldControl.Service;
 using HorizonCraft.script.WorldControl.Service;
@@ -80,7 +79,7 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
 
             if (target?.ItemStack == null)
             {
-                EntityManage.RemoveAtUUid(itemEntity.Entity.Uuid);
+                World.WorldService.EntityService.RemoveEntityData(itemEntity.Entity.Uuid);
                 return;
             }
             else
@@ -95,7 +94,7 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
                             if (space >= target.ItemStack.Amount)
                             {
                                 self.ItemStack.Amount += target.ItemStack.Amount;
-                                EntityManage.RemoveAtUUid(itemEntity.Entity.Uuid);
+                                World.WorldService.EntityService.RemoveEntityData(itemEntity.Entity.Uuid);
                                 return;
                             }
                             else

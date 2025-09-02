@@ -2,7 +2,6 @@ using System.IO;
 using System.IO.Compression;
 using Godot;
 using horizoncraft.script.Components;
-using horizoncraft.script.Features;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
@@ -70,6 +69,10 @@ public partial class World
         WorldService.Players[playerData.Name] = playerData;
     }
 
+    /// <summary>
+    /// 同步来自服务端的玩家更新包
+    /// </summary>
+    /// <param name="data"></param>
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void RecivePlayerDatas(byte[] data)
     {
@@ -86,7 +89,8 @@ public partial class World
             }
 
             var pd = WorldService.Players[player.Name];
-            pd.Position = new Vector2(player.x, player.y);
+            pd.Position = new Vector2(player.X, player.Y);
+            pd.FaceLeft = player.FaceLeft;
         }
 
         //player.playerData = playerPack.SelfData;

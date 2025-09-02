@@ -6,7 +6,6 @@ using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Components;
 using horizoncraft.script.Events;
-using horizoncraft.script.Features;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.Recipes;

@@ -14,7 +14,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script.Features;
 using horizoncraft.script.WorldControl.work;
 using MemoryPack;
 using Microsoft.Data.Sqlite;
@@ -219,7 +218,6 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                                 OnPlayerFirstJoinGame?.Invoke(player);
                                 SearchSpawnPoint(player);
                             }
-                            
                         }
                     }
                 }
@@ -280,7 +278,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                         if (pd1.Name != Player.Profile.Name)
                         {
                             if (!packs.ContainsKey(pd1.PeerId)) packs.Add(pd1.PeerId, new PlayerPack());
-                            packs[pd1.PeerId].players.Add(PlayerdataSnapshot.ToSnapshot(pd2));
+                            packs[pd1.PeerId].players.Add(new PlayerdataSnapshot(pd2));
                         }
                     }
                 }
@@ -321,6 +319,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                 }
             }
         }
+        
 
         stopwatch.Stop();
         SyncPlayerTime.X = stopwatch.ElapsedMilliseconds;

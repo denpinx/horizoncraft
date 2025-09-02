@@ -33,7 +33,8 @@ public partial class World
         if (WorldService is { } worldBase)
         {
             PlayerdataSnapshot playerData = ByteTool.FromBytes<PlayerdataSnapshot>(bytes);
-            worldBase.Players[name].Position = new System.Numerics.Vector2(playerData.x, playerData.y);
+            worldBase.Players[name].FaceLeft = playerData.FaceLeft;
+            worldBase.Players[name].Position = new System.Numerics.Vector2(playerData.X, playerData.Y);
         }
     }
 

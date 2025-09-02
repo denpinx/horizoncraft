@@ -7,7 +7,6 @@ using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Components;
 using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Features;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
@@ -133,13 +132,14 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
             return;
         }
 
-        var player = PlayerdataSnapshot.ToSnapshot(playerData);
+        var player = new PlayerdataSnapshot(playerData);
 
-        if (LastFarmeData == null || LastFarmeData.Position != playerData.Position)
+        if (LastFarmeData == null || LastFarmeData.Position != playerData.Position ||
+            LastFarmeData.FaceLeft != playerData.FaceLeft)
             world.RpcId(1, "UpdataPlayer", playerData.Name, ByteTool.ToBytes<PlayerdataSnapshot>(player));
         if (LastFarmeData == null) LastFarmeData = new PlayerData();
         LastFarmeData.Position = playerData.Position;
-
+        LastFarmeData.FaceLeft = playerData.FaceLeft;
         //world.RpcId(1, "UpdataPlayer", playerData.Name, ByteTool.ToBytes<PlayerdataSnapshot>(player));
     }
 

@@ -7,16 +7,26 @@ namespace horizoncraft.script.Net;
 public partial class PlayerdataSnapshot
 {
     public String Name;
-    public float x;
-    public float y;
-    
-    public static PlayerdataSnapshot ToSnapshot(PlayerData pd)
+    public float X;
+    public float Y;
+    public bool FaceLeft = false;
+    public int HandItemId;
+
+    [MemoryPackConstructor]
+    public PlayerdataSnapshot()
     {
-        return new PlayerdataSnapshot()
+    }
+
+    public PlayerdataSnapshot(PlayerData playerData)
+    {
+        Name = playerData.Name;
+        X = playerData.Position.X;
+        Y = playerData.Position.Y;
+        FaceLeft = playerData.FaceLeft;
+        var item = playerData.Inventory.GetHandItemStack();
+        if (item != null)
         {
-            Name = pd.Name,
-            x = pd.Position.X,
-            y = pd.Position.Y,
-        };
+            HandItemId = item.Id;
+        }
     }
 }

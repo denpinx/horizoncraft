@@ -227,10 +227,22 @@ public class EntityService
                 WorldService.world.AddChild(node.GetNode());
             }
 
-            //上传由自己代理的实体
-            if (EntityDatas[uuid].Owned == Player.Profile.Name)
+            var Entity = EntityDatas[uuid];
+            if (!WorldService.world.HasTileMap(Entity.ChunkCoord))
             {
-                entityPack.Entitys.Add(EntityDatas[uuid]);
+                if (EntityNodes.ContainsKey(uuid))
+                {
+                    var node = EntityNodes[uuid];
+                    EntityNodes.Remove(uuid);
+                    node.GetNode().QueueFree();
+                }
+            }
+
+            //上传由自己代理的实体
+            if (Entity.Owned == Player.Profile.Name&&Entity.Update)
+            {
+                entityPack.Entitys.Add(Entity);
+                Entity.Update = false;
             }
         }
 
@@ -242,7 +254,7 @@ public class EntityService
         //删除不存在的节点
         foreach (var uuid in EntityNodes.Keys.ToArray())
         {
-            if (!EntityNodes.ContainsKey(uuid))
+            if (!EntityDatas.ContainsKey(uuid))
             {
                 var entity = EntityNodes[uuid];
                 EntityNodes.Remove(uuid);
@@ -279,7 +291,7 @@ public class EntityService
 
             //剥夺所属权
             var Entity = EntityDatas[uuid];
-            if (!WorldService.world.HasTileMap(Entity.Coord))
+            if (!WorldService.world.HasTileMap(Entity.ChunkCoord))
             {
                 if (Entity.Owned == Player.Profile.Name)
                 {
@@ -294,6 +306,13 @@ public class EntityService
                         Entity.Owned = "";
                         Entity.Update = true;
                     }
+                }
+
+                if (EntityNodes.ContainsKey(uuid))
+                {
+                    var node = EntityNodes[uuid];
+                    EntityNodes.Remove(uuid);
+                    node.GetNode().QueueFree();
                 }
             }
         }
@@ -335,7 +354,9 @@ public class EntityService
     public void ReceiveEntityPack(EntityPack entityPack)
     {
         foreach (var entity in entityPack.Entitys)
+        {
             EntityDatas.AddOrUpdate(entity.Uuid, entity, (key, old) => entity);
+        }
     }
 
     /// <summary>
