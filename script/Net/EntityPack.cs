@@ -8,5 +8,6 @@ namespace horizoncraft.script.Net;
 [MemoryPackable]
 public partial class EntityPack
 {
-    public List<EntityData> Entitys = new();
+    public string From;
+    public List<EntityDataSnapShot> Entitys = new();
 }

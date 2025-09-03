@@ -6,5 +6,5 @@ namespace horizoncraft.script.Net;
 [MemoryPackable]
 public partial class PlayerPack
 {
-    public List<PlayerdataSnapshot> players = new();
+    public List<PlayerDataSnapshot> players = new();
 }

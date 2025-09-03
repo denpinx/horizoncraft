@@ -11,6 +11,8 @@ namespace horizoncraft.script.WorldControl.Tool;
 
 public static class SqliteTool
 {
+    private static bool IsEnableWAL;
+
     public static SqliteConnection InitSqlite()
     {
         try
@@ -34,7 +36,11 @@ public static class SqliteTool
                 $"Data Source=save/{World.world_name}/data.db"
             );
             sqliteConnection.Open();
-
+            if (!IsEnableWAL)
+            {
+                if (sqliteConnection.EnableWAL())
+                    IsEnableWAL = true;
+            }
             sqliteConnection.InitTable_WorldProfile();
             sqliteConnection.InitTable_World();
             sqliteConnection.InitTable_Player();
@@ -98,6 +104,7 @@ public static class SqliteTool
             return count > 0;
         }
     }
+
     public static bool CheckPlayerExists(this SqliteConnection sqliteConnection, string name)
     {
         string query = "SELECT COUNT(*) FROM Player WHERE name = @Name";
@@ -195,7 +202,7 @@ public static class SqliteTool
 
     public static void InitTable_World(this SqliteConnection sqliteConnection)
     {
-        GD.Print($"InitTable_World()");
+        //GD.Print($"InitTable_World()");
         string createTableQuery =
             $"CREATE TABLE IF NOT EXISTS World ("
             + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -210,7 +217,7 @@ public static class SqliteTool
 
     public static void InitTable_Player(this SqliteConnection sqliteConnection)
     {
-        GD.Print($"InitTable_Player()");
+        //GD.Print($"InitTable_Player()");
         const string createTableQuery =
             $"CREATE TABLE IF NOT EXISTS Player ("
             + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -224,7 +231,7 @@ public static class SqliteTool
 
     public static void InitTable_WorldProfile(this SqliteConnection sqliteConnection)
     {
-        GD.Print($"InitTable_WorldProfile()");
+        //GD.Print($"InitTable_WorldProfile()");
         const string createTableQuery =
             $"CREATE TABLE IF NOT EXISTS WorldProfile ("
             + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -232,5 +239,14 @@ public static class SqliteTool
             + "byte BLOB "
             + ")";
         new SqliteCommand(createTableQuery, sqliteConnection).ExecuteNonQuery();
+    }
+
+    public static bool EnableWAL(this SqliteConnection sqliteConnection)
+    {
+        using (var cmd = new SqliteCommand("PRAGMA journal_mode = WAL;", sqliteConnection))
+        {
+            var result = cmd.ExecuteScalar()?.ToString().ToLower();
+            return (result == "wal");
+        }
     }
 }

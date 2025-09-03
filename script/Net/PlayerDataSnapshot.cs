@@ -1,10 +1,11 @@
 using System;
+using Godot;
 using MemoryPack;
 
 namespace horizoncraft.script.Net;
 
 [MemoryPackable]
-public partial class PlayerdataSnapshot
+public partial class PlayerDataSnapshot
 {
     public String Name;
     public float X;
@@ -13,11 +14,11 @@ public partial class PlayerdataSnapshot
     public int HandItemId;
 
     [MemoryPackConstructor]
-    public PlayerdataSnapshot()
+    public PlayerDataSnapshot()
     {
     }
 
-    public PlayerdataSnapshot(PlayerData playerData)
+    public PlayerDataSnapshot(PlayerData playerData)
     {
         Name = playerData.Name;
         X = playerData.Position.X;
@@ -28,5 +29,10 @@ public partial class PlayerdataSnapshot
         {
             HandItemId = item.Id;
         }
+    }
+
+    public System.Numerics.Vector2 GetVector2()
+    {
+        return new(X, Y);
     }
 }

@@ -61,12 +61,9 @@ public partial class World
                     player.Position = playerData.Position_v2;
                 }
             }
-            else
-            {
-            }
         }
-
-        WorldService.Players[playerData.Name] = playerData;
+        
+        WorldService.PlayerService.Players.AddOrUpdate(playerData.Name, playerData, (key, value) => playerData);
     }
 
     /// <summary>
@@ -80,17 +77,7 @@ public partial class World
         for (int i = 0; i < playerPack.players.Count; i++)
         {
             var player = playerPack.players[i];
-            if (!WorldService.Players.ContainsKey(player.Name))
-            {
-                WorldService.Players.TryAdd(player.Name, new PlayerData()
-                {
-                    Name = player.Name,
-                });
-            }
-
-            var pd = WorldService.Players[player.Name];
-            pd.Position = new Vector2(player.X, player.Y);
-            pd.FaceLeft = player.FaceLeft;
+            WorldService.PlayerService.UpdatePlayer(player);
         }
 
         //player.playerData = playerPack.SelfData;

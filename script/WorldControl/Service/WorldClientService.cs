@@ -113,7 +113,7 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
             return true;
         }
 
-        if (Players.TryGetValue(name, out playerdata))
+        if (PlayerService.Players.TryGetValue(name, out playerdata))
         {
             return true;
         }
@@ -132,11 +132,11 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
             return;
         }
 
-        var player = new PlayerdataSnapshot(playerData);
+        var player = new PlayerDataSnapshot(playerData);
 
         if (LastFarmeData == null || LastFarmeData.Position != playerData.Position ||
             LastFarmeData.FaceLeft != playerData.FaceLeft)
-            world.RpcId(1, "UpdataPlayer", playerData.Name, ByteTool.ToBytes<PlayerdataSnapshot>(player));
+            world.RpcId(1, "UpdataPlayer", playerData.Name, ByteTool.ToBytes<PlayerDataSnapshot>(player));
         if (LastFarmeData == null) LastFarmeData = new PlayerData();
         LastFarmeData.Position = playerData.Position;
         LastFarmeData.FaceLeft = playerData.FaceLeft;
@@ -273,6 +273,11 @@ public class WorldClientService : WorldBase, IWorldService, IWorldTickable, IWor
                                     var block = Chunks[coord].GetBlock(item.x, item.y, item.z);
                                     block.SetMeta(item.id);
                                     block.State = item.state;
+                                }
+
+                                foreach (var entity in cup.Entiydatas)
+                                {
+                                    EntityService.AddEntityData(entity);
                                 }
                             }
                             else

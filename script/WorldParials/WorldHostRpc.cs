@@ -35,11 +35,11 @@ public partial class World
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void SetOpenBlockComponent(string name, byte[] bytes)
     {
-        if (!WorldService.Players.ContainsKey(name)) return;
-
-        var player = WorldService.Players[name];
-        var scd = ByteTool.FromBytes<SetComponentData>(bytes);
-        WorldService.SetOpenBlockComponent(player, scd);
+        if (WorldService.PlayerService.Players.TryGetValue(name, out var playerData))
+        {
+            var scd = ByteTool.FromBytes<SetComponentData>(bytes);
+            WorldService.SetOpenBlockComponent(playerData, scd);
+        }
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
@@ -76,11 +76,21 @@ public partial class World
     public void RemoveEntityData(string uuid)
     {
         WorldService.EntityService.RemoveEntityData(uuid);
+    }    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void RemoveEntityDataOwned(string uuid)
+    {
+        WorldService.EntityService.RemoveEntityDataOwned(uuid);
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void AddEntityData(byte[] bytes)
     {
         WorldService.EntityService.AddEntityData(ByteTool.FromBytes<EntityData>(bytes));
+    }
+    
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void UpdateEntityData(byte[] bytes)
+    {
+        WorldService.EntityService.UpdateEntityData(ByteTool.FromBytes<EntityDataSnapShot>(bytes));
     }
 }

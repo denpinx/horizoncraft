@@ -16,6 +16,9 @@ using Vector2 = System.Numerics.Vector2;
 
 namespace HorizonCraft.script.WorldControl.Service;
 
+/// <summary>
+/// TODO 当前的WorldBase太重了，接下来将拆分成多个Service的组合，分别是 PlayerService,BlockService,InventoryService,EntityService(已实装)
+/// </summary>
 public class WorldBase
 {
     public enum LightModeEnum
@@ -77,6 +80,7 @@ public class WorldBase
     public WorldProfile Profile;
 
     public EntityService EntityService;
+    public PlayerService PlayerService;
 
 
     public bool Connect = false;
@@ -97,22 +101,10 @@ public class WorldBase
     /// 已加载区块
     /// </summary>
     public ConcurrentDictionary<Vector2I, Chunk> Chunks = new();
-
-    /// <summary>
-    /// 已加载玩家
-    /// </summary>
-    public ConcurrentDictionary<string, PlayerData> Players = new();
-
-    /// <summary>
-    /// 待卸载区块
-    /// </summary>
+    
+    
     public ConcurrentDictionary<Vector2I, Chunk> OffloadChunkQueue = new();
-
-    /// <summary>
-    /// 待加载玩家
-    /// </summary>
-    public ConcurrentQueue<string> LoadingPlayers = new();
-
+    
     /// <summary>
     /// 待加载区块
     /// </summary>
@@ -126,6 +118,7 @@ public class WorldBase
     public WorldBase()
     {
         EntityService = new EntityService(this);
+        PlayerService = new PlayerService(this);
     }
 
     public virtual Blockdata SetBlock(Vector3I coord, Blockdata blockdata)
@@ -269,11 +262,11 @@ public class WorldBase
                             UnloadCount[coord] += 1;
                         else UnloadCount[coord] = 1;
 
-                        if (UnloadCount[coord] == 40)
+                        if (UnloadCount[coord] == 5)
                         {
                             if (Connect)
                             {
-                                world.RpcId(1, "UpdateChunk", X, Y);
+                                world.RpcId(1, nameof(world.UpdateChunk), X, Y);
                             }
                         }
                     }
@@ -593,7 +586,7 @@ public class WorldBase
             UpdataChunkLight(chunk);
         }
 
-        foreach (var sts in Players)
+        foreach (var sts in PlayerService.Players)
         {
             var player = sts.Value;
             if (LightMode == LightModeEnum.DFSMode)

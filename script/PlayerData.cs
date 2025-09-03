@@ -16,19 +16,26 @@ namespace horizoncraft.script;
 public partial class PlayerData
 {
     //连接id
-    public int PeerId;
+    public int PeerId = 0;
 
     public ConfigSet<float> Resistance = new() { Value = 1f, Default = 1f };
     public ConfigSet<float> MoveSpeed = new() { Value = 16 * 5f, Default = 16 * 5f };
     public ConfigSet<bool> Fly = new() { Value = false, Default = false };
+
+
+    public int RemoveCount = 0;
+    
+    public bool Moved = false;
 
     //玩家名
     public String Name;
 
     //位置
     public Vector2 Position;
+
     //面朝方向
     public bool FaceLeft = false;
+
     //是否打开容器，这里相当于是是否订阅
     public bool OpeningBlockInventory = false;
 
@@ -40,7 +47,7 @@ public partial class PlayerData
 
     //
     public int Mode = 0;
-    
+
 
     [MemoryPackIgnore] public Player player;
 

@@ -35,8 +35,7 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
         if (world == null) return;
         if (world.player.playerData == null) return;
         LoadChunkQueue.Clear();
-
-        GD.Print("移动");
+        
         Vector2I CenterCoord = world.player.playerData.ChunkCoord;
         for (int X = CenterCoord.X - LoadHorizon; X <= CenterCoord.X + LoadHorizon; X++)
         {
@@ -85,6 +84,7 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
     public bool GetPlayer(string name, out PlayerData playerdata)
     {
         playerdata = new PlayerData() { Name = name };
+        PlayerService.Players.TryAdd(name, playerdata);
         return true;
     }
 
@@ -104,6 +104,7 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
     {
         TickTimes++;
         stopwatch.Restart();
+        UpdateLoadChunkCoords();
         ProcessChunkLoadQueue();
 
         foreach (Vector2I coord in Chunks.Keys)
@@ -111,6 +112,7 @@ public class WorldPreviewService : WorldBase, IWorldService, IWorldTickable
             Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
         }
+
         OnTicked?.Invoke();
         UpdateLights();
         UpdataTileMap();

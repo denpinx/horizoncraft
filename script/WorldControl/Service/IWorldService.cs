@@ -25,7 +25,6 @@ public interface IWorldService
     /// <summary>
     /// 处理玩家加载队列
     /// </summary>
-    public void ProcessPlayerLoadQueue();
 
 
     /// <summary>

@@ -22,6 +22,8 @@ using Microsoft.Data.Sqlite;
 /// 多人游戏，主机模式
 /// 拥有全部功能
 /// </summary>
+/// 
+// TODO 当前的WorldBase太重了，接下来将拆分成多个Service的组合，分别是 PlayerService,BlockService,InventoryService,EntityService(已实装)
 public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWorldTickable
 {
     //配置
@@ -52,24 +54,22 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
     private ConcurrentQueue<(int, byte[])> ChunkUpdataPacks = new();
     private ConcurrentQueue<(int, byte[])> PlayerPacks = new();
 
-    private WorldSnapshot snapshot = new WorldSnapshot();
+    private WorldSnapshot _worldSnapshot = new WorldSnapshot();
 
     public bool Init()
     {
         if (world == null) return false;
-        //EntityManage.Init(this);
         world.timer.Timeout += Tick;
-        world.player.OnMoveToChunk += UpdateLoadChunkCoords;
 
         GD.Print($"[{TickTimes}] 开启服务器");
 
         world.Multiplayer.PeerDisconnected += (id) =>
         {
-            foreach (var ps in Players)
+            foreach (var ps in PlayerService.Players)
             {
                 if (ps.Value.PeerId == id)
                 {
-                    if (Players.TryRemove(ps.Key, out _))
+                    if (PlayerService.Players.TryRemove(ps.Key, out _))
                     {
                         GD.Print($"[{TickTimes}] 玩家断开连接");
                     }
@@ -95,6 +95,9 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         return true;
     }
 
+    /// <summary>
+    /// 处理区块卸载队列
+    /// </summary>
     public void ProcessChunkUnloadQueue()
     {
         if (OffloadChunkQueue.IsEmpty) return;
@@ -109,13 +112,15 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
             }), null);
     }
 
+    /// <summary>
+    /// 计算区块加载范围
+    /// </summary>
     public void UpdateLoadChunkCoords()
     {
         if (!ServerOn) return;
         LoadChunkQueue.Clear();
-        foreach (var player in Players)
+        foreach (var player in PlayerService.Players)
         {
-            //SavePlayer(player.Value);
             Vector2I CenterCoord = player.Value.ChunkCoord;
             for (int X = CenterCoord.X - TileMapHorizon; X <= CenterCoord.X + TileMapHorizon; X++)
             {
@@ -126,7 +131,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                 }
             }
         }
-
+    
         foreach (Vector2I coord in Chunks.Keys)
         {
             //当前区块不在所有玩家视野内,则保存卸载
@@ -145,6 +150,9 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         }
     }
 
+    /// <summary>
+    /// 异步处理区块加载队列
+    /// </summary>
     public void ProcessChunkLoadQueue()
     {
         if (world == null) return;
@@ -186,45 +194,13 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         })), null);
     }
 
-    public void ProcessPlayerLoadQueue()
-    {
-        if (!ServerOn) return;
-        if (LoadingPlayers.Count > 0)
-        {
-            new Task(() =>
-            {
-                for (int i = LoadingPlayers.Count - 1; i >= 0; i--)
-                {
-                    string name;
-                    if (LoadingPlayers.TryDequeue(out name))
-                    {
-                        if (sqliteConnection.CheckPlayerExists(name))
-                        {
-                            PlayerData player = sqliteConnection.GetPlayerByteData(name);
-                            player.Name = name;
-                            Players[player.Name] = player;
-                            GD.Print($"[{TickTimes}] 加载玩家数据:({name})");
-                            OnPlayerJoinGame?.Invoke(player);
-                        }
-                        else
-                        {
-                            PlayerData player = new PlayerData()
-                            {
-                                Name = name
-                            };
-                            if (Players.TryAdd(name, player))
-                            {
-                                GD.Print($"[{TickTimes}] 新建玩家数据:({name})");
-                                OnPlayerFirstJoinGame?.Invoke(player);
-                                SearchSpawnPoint(player);
-                            }
-                        }
-                    }
-                }
-            }).Start();
-        }
-    }
 
+    /// <summary>
+    /// 获取玩家信息
+    /// </summary>
+    /// <param name="name">玩家名</param>
+    /// <param name="playerData">玩家信息</param>
+    /// <returns></returns>
     public bool GetPlayer(string name, out PlayerData playerData)
     {
         if (!ServerOn)
@@ -233,27 +209,29 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
             return false;
         }
 
-        if (name == Player.Profile.Name && world.player.playerData != null)
-        {
-            playerData = world.player.playerData;
-            return true;
-        }
+        // if (name == Player.Profile.Name && world.player.playerData != null)
+        // {
+        //     playerData = world.player.playerData;
+        //     return true;
+        // }
 
-        if (Players.TryGetValue(name, out playerData))
+        if (PlayerService.GetPlayerOrLoad(name, out playerData))
         {
-            GD.Print($"[{TickTimes}] GetPlayer({name}) Done");
             return true;
-        }
-
-        if (!LoadingPlayers.Contains(name))
-        {
-            LoadingPlayers.Enqueue(name);
         }
 
         playerData = null;
         return false;
     }
 
+    public void SavePlayer(PlayerData playerData)
+    {
+        PlayerService.SavePlayer(playerData);
+    }
+
+    /// <summary>
+    /// 同步玩家
+    /// </summary>
     public void SyncPlayers()
     {
         if (!ServerOn) return;
@@ -261,44 +239,39 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         stopwatch.Restart();
 
         Dictionary<long, PlayerPack> packs = new();
-        foreach (var Fs in Players)
+        foreach (var Fs in PlayerService.Players)
         {
-            foreach (var Ts in Players)
+            PlayerData player = Fs.Value;
+            if (player.Name == Player.Profile.Name) continue;
+            var List = PlayerService.GetPlayersByRange(player, TileMapHorizon);
+            foreach (var target in List)
             {
-                if (Fs.Key != Ts.Key)
+                if (target.Moved)
                 {
-                    PlayerData pd1 = Fs.Value;
-                    PlayerData pd2 = Ts.Value;
-
-                    if (
-                        Math.Abs((pd1.ChunkCoord.X - pd2.ChunkCoord.X)) <= TileMapHorizon &&
-                        Math.Abs((pd1.ChunkCoord.Y - pd2.ChunkCoord.Y)) <= TileMapHorizon
-                    )
-                    {
-                        if (pd1.Name != Player.Profile.Name)
-                        {
-                            if (!packs.ContainsKey(pd1.PeerId)) packs.Add(pd1.PeerId, new PlayerPack());
-                            packs[pd1.PeerId].players.Add(new PlayerdataSnapshot(pd2));
-                        }
-                    }
+                    if (!packs.ContainsKey(player.PeerId)) packs.Add(player.PeerId, new PlayerPack());
+                    packs[player.PeerId].players.Add(new PlayerDataSnapshot(target));
                 }
             }
         }
 
+        //重置
+        foreach (var playerData in PlayerService.Players.Values) playerData.Moved = false;
+
         foreach (var sets in packs)
         {
-            world.RpcId(sets.Key, "RecivePlayerDatas", ByteTool.ToBytes<PlayerPack>(sets.Value));
+            world.RpcId(sets.Key, nameof(world.RecivePlayerDatas), ByteTool.ToBytes<PlayerPack>(sets.Value));
         }
 
 
-        foreach (var player in Players.Values)
+        foreach (var player in PlayerService.Players.Values)
         {
             if (player.Name != Player.Profile.Name)
             {
                 if (player.Inventory.update)
                 {
                     player.Inventory.update = false;
-                    world.RpcId(player.PeerId, "RecivePlayerInv", ByteTool.ToBytes<PlayerInventory>(player.Inventory));
+                    world.RpcId(player.PeerId, nameof(world.RecivePlayerInv),
+                        ByteTool.ToBytes<PlayerInventory>(player.Inventory));
                 }
 
                 if (player.OpeningBlockInventory)
@@ -308,7 +281,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     var blockdata = GetBlock(pos);
                     if (blockdata != null && blockdata.GetComponent<InventoryComponent>() != null)
                     {
-                        world.RpcId(player.PeerId, "ReciveOpenBlockData",
+                        world.RpcId(player.PeerId, nameof(world.ReciveOpenBlockData),
                             ByteTool.ToBytes<Blockdata>(blockdata),
                             ByteTool.ToBytes<PlayerInventory>(player.Inventory));
                     }
@@ -319,29 +292,30 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                 }
             }
         }
-        
+
 
         stopwatch.Stop();
         SyncPlayerTime.X = stopwatch.ElapsedMilliseconds;
         if (SyncPlayerTime.X > SyncPlayerTime.Y) SyncPlayerTime.Y = SyncPlayerTime.X;
     }
 
-    //同步区块
-    //异步处理序列化,最终在主线程同步
+    /// <summary>
+    /// 同步区块
+    /// </summary>
     public void SyncChunks()
     {
         if (!ServerOn) return;
 
         stopwatch.Restart();
-        // Interlocked.CompareExchange(ref SyncChunkTask, Task.Run((() =>
-        // {
-        Dictionary<int, ChunkPack> syncmap = new();
-        Dictionary<int, WorldSnapshot> syncmap_updata = new();
-        foreach (var chunk in snapshot.chunks)
-        {
-            //更新区块
+        //全量更新
+        Dictionary<int, ChunkPack> wholeChunkUpdate = new();
+        //差异更新
+        Dictionary<int, WorldSnapshot> diffUpdate = new();
 
-            foreach (var playerset in Players)
+        //差异更新
+        foreach (var chunk in _worldSnapshot.chunks)
+        {
+            foreach (var playerset in PlayerService.Players)
             {
                 PlayerData pd1 = playerset.Value;
                 //按距离同步
@@ -350,22 +324,21 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= TileMapHorizon
                 )
                 {
-                    if (pd1.Name != Player.Profile.Name)
-                    {
-                        if (!syncmap_updata.ContainsKey(pd1.PeerId))
-                            syncmap_updata[pd1.PeerId] = new WorldSnapshot();
-                        syncmap_updata[pd1.PeerId].chunks.Add(chunk);
-                        chunk.ResetEmptyOwned(pd1.Name); //更新实体的从属
-                    }
+                    if (!diffUpdate.ContainsKey(pd1.PeerId))
+                        diffUpdate[pd1.PeerId] = new WorldSnapshot();
+                    diffUpdate[pd1.PeerId].chunks.Add(chunk);
+                    chunk.ResetEmptyOwned(pd1.Name); //更新实体的从属
                 }
             }
         }
 
-        //脏标记
+        //全量更新
         foreach (var chunk in Chunks.Values)
             if (chunk.update_server)
             {
-                foreach (var playerset in Players)
+                //下一帧同步这个区块内的玩家
+                PlayerService.ResetPlayerMoveStateByChunk(chunk.coord);
+                foreach (var playerset in PlayerService.Players)
                 {
                     PlayerData pd1 = playerset.Value;
                     //按距离同步
@@ -376,16 +349,16 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     {
                         if (pd1.Name != Player.Profile.Name)
                         {
-                            if (syncmap.ContainsKey(pd1.PeerId))
+                            if (wholeChunkUpdate.ContainsKey(pd1.PeerId))
                             {
-                                syncmap[pd1.PeerId].Chunks.Add(chunk);
+                                wholeChunkUpdate[pd1.PeerId].Chunks.Add(chunk);
                             }
                             else
                             {
                                 var result = EntityService.GetEntityByChunk(chunk.coord);
                                 chunk.Entitys = result;
 
-                                syncmap[pd1.PeerId] = new ChunkPack()
+                                wholeChunkUpdate[pd1.PeerId] = new ChunkPack()
                                 {
                                     Chunks = new()
                                     {
@@ -401,14 +374,15 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
             }
 
 
-        foreach (var key in syncmap.Keys)
+        foreach (var key in wholeChunkUpdate.Keys)
         {
-            ChunkPacks.Enqueue((key, ByteTool.ToBytes<ChunkPack>(syncmap[key])));
+            ChunkPacks.Enqueue((key, ByteTool.ToBytes<ChunkPack>(wholeChunkUpdate[key])));
         }
 
-        foreach (var key in syncmap_updata.Keys)
+        foreach (var key in diffUpdate.Keys)
         {
-            ChunkUpdataPacks.Enqueue((key, ByteTool.ToBytes<WorldSnapshot>(syncmap_updata[key])));
+            if (key != 0)
+                ChunkUpdataPacks.Enqueue((key, ByteTool.ToBytes<WorldSnapshot>(diffUpdate[key])));
         }
 
 
@@ -418,7 +392,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         {
             foreach (var variabl in ChunkPacks)
             {
-                world.RpcId(variabl.Item1, "ReciveChunkPack", variabl.Item2);
+                world.RpcId(variabl.Item1, nameof(world.ReciveChunkPack), variabl.Item2);
             }
 
             ChunkPacks.Clear();
@@ -428,7 +402,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
         {
             foreach (var variabl in ChunkUpdataPacks)
             {
-                world.RpcId(variabl.Item1, "ReciveChunkUpdatePack", variabl.Item2);
+                world.RpcId(variabl.Item1, nameof(world.ReciveChunkUpdatePack), variabl.Item2);
             }
 
             ChunkUpdataPacks.Clear();
@@ -450,21 +424,20 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
             ComponentManager.SetBlockComponentData(playerData, block, data);
     }
 
+    /// <summary>
+    /// 当玩家加入游戏时同步时间
+    /// </summary>
+    /// <param name="peer_id"></param>
     public void OnPlayerJoin(long peer_id)
     {
         if (!ServerOn) return;
-        world.RpcId(peer_id, "ReciveWorldTime", TickTimes);
+        world.RpcId(peer_id, nameof(world.ReciveWorldTime), TickTimes);
     }
 
-    public void SavePlayer(PlayerData playerData)
-    {
-        if (!ServerOn) return;
-        if (sqliteConnection.CheckPlayerExists(playerData.Name))
-            sqliteConnection.UpdatePlayerByteData(playerData.Name, playerData);
-        else
-            sqliteConnection.InsertPlayerByteValue(playerData.Name, playerData);
-    }
-
+    /// <summary>
+    /// 保存世界文档
+    /// </summary>
+    /// <param name="worldProfile"></param>
     public void SaveWorldProfile(WorldProfile worldProfile)
     {
         if (!ServerOn) return;
@@ -474,6 +447,10 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
             sqliteConnection.InsertWorldProfileByteValue("WorldProfile", worldProfile);
     }
 
+    /// <summary>
+    /// 保存所有区块
+    /// </summary>
+    /// <param name="chunk"></param>
     public void SaveChunk(Chunk chunk)
     {
         if (!ServerOn) return;
@@ -483,32 +460,37 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
             sqliteConnection.InsertChunkByteValue(chunk.X, chunk.Y, chunk);
     }
 
+    /// <summary>
+    /// 执行所有存档操作
+    /// </summary>
     public void Save()
     {
         if (!ServerOn) return;
         foreach (var chunkset in Chunks)
             SaveChunk(chunkset.Value);
 
-        foreach (var playerset in Players)
-            SavePlayer(playerset.Value);
+        PlayerService.SavePlayers();
         Profile.Time = TickTimes;
         SaveWorldProfile(Profile);
     }
 
+    /// <summary>
+    /// 时刻更新
+    /// 20Tick/s
+    /// </summary>
     public void Tick()
     {
         TickTimes++;
         if (!ServerOn) return;
 
         stopwatch.Restart();
-
+        UpdateLoadChunkCoords();
         SyncPlayers();
         SyncChunks();
         ProcessChunkLoadQueue();
-        ProcessPlayerLoadQueue();
         ProcessChunkUnloadQueue();
 
-        snapshot.chunks.Clear();
+        _worldSnapshot.chunks.Clear();
         foreach (Vector2I coord in Chunks.Keys)
         {
             Chunk chunk = Chunks[coord];
@@ -543,7 +525,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     });
                 }
 
-                snapshot.chunks.Add(cs);
+                _worldSnapshot.chunks.Add(cs);
             }
 
             if (cs == null && !IsUpdate)
@@ -561,7 +543,7 @@ public class WorldHostService : WorldBase, IWorldService, IWorldHostService, IWo
                     cs.Entiydatas = result;
                 }
 
-                snapshot.chunks.Add(cs);
+                _worldSnapshot.chunks.Add(cs);
             }
         }
 

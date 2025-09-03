@@ -148,42 +148,16 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
             return false;
         }
 
-        if (name == Player.Profile.Name && world.player.playerData != null)
+        // if (name == Player.Profile.Name && world.player.playerData != null)
+        // {
+        //     playerdata = world.player.playerData;
+        //     return true;
+        // }
+
+        if (PlayerService.GetPlayerOrLoad(name, out playerdata))
         {
-            playerdata = world.player.playerData;
             return true;
         }
-
-        if (Players.TryGetValue(name, out playerdata))
-        {
-            GD.Print($"[{TickTimes}] GetPlayer({name}) Done");
-            return true;
-        }
-
-        if (sqliteConnection.CheckPlayerExists(Player.Profile.Name))
-        {
-            PlayerData player = sqliteConnection.GetPlayerByteData(Player.Profile.Name);
-            player.Name = Player.Profile.Name;
-            Players[player.Name] = player;
-            GD.Print($"[{TickTimes}] 加载玩家数据:({Player.Profile.Name})");
-            LoadingPlayers.Clear();
-            
-            OnPlayerJoinGame?.Invoke(player);
-        }
-        else
-        {
-            PlayerData player = new PlayerData()
-            {
-                Name = Player.Profile.Name
-            };
-            Players[Player.Profile.Name] = player;
-            GD.Print($"[{TickTimes}] 新建玩家数据:({Player.Profile.Name})");
-            LoadingPlayers.Clear();
-            
-            OnPlayerFirstJoinGame?.Invoke(player);
-            SearchSpawnPoint(player);
-        }
-
         playerdata = null;
         return false;
     }
@@ -221,7 +195,7 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
         foreach (var chunkset in Chunks)
             SaveChunk(chunkset.Value);
 
-        foreach (var playerset in Players)
+        foreach (var playerset in PlayerService.Players)
             SavePlayer(playerset.Value);
         Profile.Time = TickTimes;
         SaveWorldProfile(Profile);
@@ -241,14 +215,13 @@ public class WorldSingleService : WorldBase, IWorldService, IWorldTickable
             Chunk chunk = Chunks[coord];
             chunk.Tick(this, world);
         }
-        
+
         OnTicked?.Invoke();
-        
+
         UpdateLights();
         UpdataTileMap();
-        
-        
-        
+
+
         stopwatch.Stop();
         TickConsuming = stopwatch.ElapsedMilliseconds;
     }

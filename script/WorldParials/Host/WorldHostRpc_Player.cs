@@ -32,9 +32,8 @@ public partial class World
         ;
         if (WorldService is { } worldBase)
         {
-            PlayerdataSnapshot playerData = ByteTool.FromBytes<PlayerdataSnapshot>(bytes);
-            worldBase.Players[name].FaceLeft = playerData.FaceLeft;
-            worldBase.Players[name].Position = new System.Numerics.Vector2(playerData.X, playerData.Y);
+            PlayerDataSnapshot playerData = ByteTool.FromBytes<PlayerDataSnapshot>(bytes);
+            WorldService.PlayerService.UpdatePlayer(playerData);
         }
     }
 
@@ -49,66 +48,70 @@ public partial class World
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void PickBlockInvItem(string player, int index, int ActionType)
     {
-        if (!WorldService.Players.ContainsKey(player)) return;
-        var playerdata = WorldService.Players[player];
-        if (playerdata.OpeningBlockInventory)
+        if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))
         {
-            var pos = playerdata.OpenInventory;
-            var inv = WorldService.GetBlock(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z))
-                ?.GetComponent<InventoryComponent>()?.GetInventory();
-            if (inv == null) return;
-            WorldService.PickItem(playerdata, inv, index, ActionType);
+            if (playerData.OpeningBlockInventory)
+            {
+                var pos = playerData.OpenInventory;
+                var inv = WorldService.GetBlock(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z))
+                    ?.GetComponent<InventoryComponent>()?.GetInventory();
+                if (inv == null) return;
+                WorldService.PickItem(playerData, inv, index, ActionType);
+            }
         }
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void OpenPlayerInv(string player)
     {
-        if (!WorldService.Players.ContainsKey(player)) return;
-        var playerdata = WorldService.Players[player];
-        if (playerdata == null) return;
-        playerdata.OpeningBlockInventory = true;
+        if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))
+            playerData.OpeningBlockInventory = true;
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void OpenBlockInv(string player, int x, int y, int z)
     {
-        if (!WorldService.Players.ContainsKey(player)) return;
-        var playerdata = WorldService.Players[player];
-        playerdata.OpeningBlockInventory = true;
-        playerdata.OpenInventory = new System.Numerics.Vector3(x, y, z);
+        if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))
+        {
+            playerData.OpeningBlockInventory = true;
+            playerData.OpenInventory = new System.Numerics.Vector3(x, y, z);
+        }
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void CloseBlockInv(string player)
     {
-        if (!WorldService.Players.ContainsKey(player)) return;
-        var playerdata = WorldService.Players[player];
-        playerdata.OpeningBlockInventory = false;
+        if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))
+        {
+            playerData.OpeningBlockInventory = false;
+        }
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void PickInvItem(string player, int index, int ActionType)
     {
-        if (!WorldService.Players.ContainsKey(player)) return;
-        var playerdata = WorldService.Players[player];
-        WorldService.PickItem(playerdata, playerdata.Inventory, index, ActionType);
-        playerdata.Inventory.update = true;
+        if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))
+        {
+            WorldService.PickItem(playerData, playerData.Inventory, index, ActionType);
+            playerData.Inventory.update = true;
+        }
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void SetHandSlot(string player, int slot)
     {
-        if (!WorldService.Players.ContainsKey(player)) return;
-        var playerdata = WorldService.Players[player];
-        playerdata.Inventory.HandSlot = (short)slot;
+        if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))
+        {
+            playerData.Inventory.HandSlot = (short)slot;
+        }
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void CraftGridRecipeItem(string player,bool all)
+    public void CraftGridRecipeItem(string player, bool all)
     {
-        if (!WorldService.Players.ContainsKey(player)) return;
-        var playerdata = WorldService.Players[player];
-        WorldService.CraftGridRecipeItem(playerdata,all);
+        if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))
+        {
+            WorldService.CraftGridRecipeItem(playerData, all);
+        }
     }
 }

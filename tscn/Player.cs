@@ -230,6 +230,9 @@ public partial class Player : CharacterBody2D
         if (playerData == null) return;
         if (playerData.Name != Player.Profile.Name) return;
 
+        if (world == null) return;
+        if (!world.HasTileMap(playerData.ChunkCoord)) return;
+
 
         Vector2I Mcoord = World.MathFloor((Vector2I)GetGlobalMousePosition(), 16);
         Cursor.GlobalPosition = Mcoord * 16;
@@ -251,13 +254,19 @@ public partial class Player : CharacterBody2D
         }
 
         //更新自身数据
-        playerData.Position = new System.Numerics.Vector2(Position.X, Position.Y);
+        var pos = new System.Numerics.Vector2(Position.X, Position.Y);
+        if (playerData.Position != pos) playerData.Moved = true;
+        playerData.Position = pos;
         Label_PlayerName.Text = playerData.Name;
 
-        if (world.WorldService is WorldHostService whs && world.WorldService is WorldBase _worldBase_)
+        if (world.WorldService is WorldHostService)
         {
-            if (_worldBase_.Players.ContainsKey(playerData.Name))
-                _worldBase_.Players[playerData.Name].Position = playerData.Position;
+            if (world.WorldService.PlayerService.Players.TryGetValue(playerData.Name, out var data))
+            {
+                data.Position = playerData.Position;
+                data.Moved = playerData.Moved;
+                data.FaceLeft = playerData.FaceLeft;
+            }
         }
 
         //防止加载地形的时候卡墙里

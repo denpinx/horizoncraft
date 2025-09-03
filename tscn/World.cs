@@ -51,7 +51,6 @@ namespace horizoncraft.script
         public WorldBase WorldService;
         public PackedScene PSTilemapLayerChunk;
         public List<TileMapLayerChunk> tileMapLayerChunks = new();
-        public System.Collections.Generic.Dictionary<string, PlayerSnapshot> PlayerNodes = new();
         public System.Collections.Generic.Dictionary<Vector2I, Chunk> VisibleChunks = new();
 
         //Node
@@ -250,74 +249,9 @@ namespace horizoncraft.script
             }
 
             CilentTicked?.Invoke();
-            SyncPlayerSnapshot();
             BlockInterFaceHandle();
             sw.Stop();
             tick_use_time = sw.ElapsedMilliseconds;
-        }
-
-
-        public void SyncPlayerSnapshot()
-        {
-            if (WorldService is not WorldPreviewService)
-                foreach (var Kvp in WorldService.Players)
-                {
-                    //添加玩家节点
-                    if (!PlayerNodes.ContainsKey(Kvp.Key))
-                    {
-                        if (Kvp.Key != Player.Profile.Name)
-                        {
-                            PlayerSnapshot player = PlayerSnapshot_ps.Instantiate<PlayerSnapshot>();
-                            PlayerNodes.Add(Kvp.Key, player);
-                            AddChild(player);
-                        }
-                    }
-                    else
-                    {
-                        //更新玩家节点
-                        PlayerNodes[Kvp.Key].SetData(Kvp.Value);
-                        if (Kvp.Key != Player.Profile.Name)
-                        {
-                            PlayerNodes[Kvp.Key].Position = Kvp.Value.Position_v2;
-                            //Tween tween = GetTree().CreateTween();
-                            //tween.TweenProperty(PlayerNodes[Kvp.Key], "position", Kvp.Value.Position_v2, 0.05f);
-                        }
-                    }
-                }
-
-            //删除不可见玩家对象
-            if (WorldService is WorldClientService && player.playerData != null)
-            {
-                foreach (var Kvp in WorldService.Players)
-                {
-                    //删除玩家节点
-                    if (Kvp.Key != Player.Profile.Name)
-                    {
-                        PlayerData playerData = Kvp.Value;
-                        if (
-                            Math.Abs(playerData.ChunkCoord.X - player.playerData.ChunkCoord.X) >
-                            WorldService.LoadHorizon ||
-                            Math.Abs(playerData.ChunkCoord.Y - player.playerData.ChunkCoord.Y) >
-                            WorldService.LoadHorizon
-                        )
-                        {
-                            WorldService.Players.TryRemove(Kvp.Key, out _);
-                        }
-                    }
-                }
-            }
-
-            if (WorldService is WorldClientService or WorldHostService)
-                foreach (var kvp in PlayerNodes)
-                {
-                    if (!WorldService.Players.ContainsKey(kvp.Key))
-                    {
-                        var p = kvp.Value;
-                        RemoveChild(p);
-                        PlayerNodes.Remove(kvp.Key);
-                        p.QueueFree();
-                    }
-                }
         }
 
 
