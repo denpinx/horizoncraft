@@ -1,7 +1,9 @@
 using Godot;
 using horizoncraft.script.Components;
 using horizoncraft.script.Events.player;
+using horizoncraft.script.Inventory;
 using HorizonCraft.script.Services.world;
+using horizoncraft.script.WorldControl;
 
 namespace horizoncraft.script.rpc;
 
@@ -19,6 +21,7 @@ public partial class PlayerInventoryServiceNode : Node
 
     public PlayerInventoryServiceNode(World world)
     {
+        this.Name = nameof(PlayerInventoryServiceNode);
         World = world;
     }
 
@@ -45,14 +48,20 @@ public partial class PlayerInventoryServiceNode : Node
             }
         }
     }
-    
+
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void OpenBlockInv(string player, int x, int y, int z)
     {
         if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))
         {
-            playerData.OpeningBlockInventory = true;
-            playerData.OpenInventory = new System.Numerics.Vector3(x, y, z);
+            BlockInventory blockInventory = WorldService.ChunkService.GetBlock(new Vector3I(x, y, z))
+                ?.GetComponent<InventoryComponent>()?.GetInventory();
+            if (blockInventory != null)
+            {
+                blockInventory.update = true;
+                playerData.OpeningBlockInventory = true;
+                playerData.OpenInventory = new System.Numerics.Vector3(x, y, z);
+            }
         }
     }
 

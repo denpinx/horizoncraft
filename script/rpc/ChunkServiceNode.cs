@@ -20,6 +20,7 @@ public partial class ChunkServiceNode : Node
 
     public ChunkServiceNode(World world)
     {
+        this.Name = nameof(ChunkServiceNode);
         World = world;
     }
 
@@ -66,7 +67,7 @@ public partial class ChunkServiceNode : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void ReciveBlockData(byte[] data, int x, int y, int z)
     {
-        Blockdata block = ByteTool.FromBytes<Blockdata>(data);
+        BlockData block = ByteTool.FromBytes<BlockData>(data);
         WorldService.ChunkService.SetBlock(new Vector3I(x, y, z), block);
         if (World.PlayerNode.ShowView != null &&
             World.PlayerNode.playerData.OpenInventory == new System.Numerics.Vector3(x, y, z))
@@ -81,13 +82,13 @@ public partial class ChunkServiceNode : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void ReciveLookingBlockData(byte[] data, byte[] playerinv)
     {
-        Blockdata blockdata = ByteTool.FromBytes<Blockdata>(data);
+        BlockData blockData = ByteTool.FromBytes<BlockData>(data);
         PlayerInventory inv = ByteTool.FromBytes<PlayerInventory>(playerinv);
         World.PlayerNode.playerData.Inventory = inv;
 
         if (World.PlayerNode.ShowView != null)
         {
-            World.PlayerNode.ShowView.TargetBlock = blockdata;
+            World.PlayerNode.ShowView.TargetBlock = blockData;
         }
         else
         {
@@ -96,7 +97,7 @@ public partial class ChunkServiceNode : Node
             {
                 world = World,
                 Player = World.PlayerNode.playerData,
-                ViewName = blockdata.GetComponent<InventoryComponent>().InventoryName
+                ViewName = blockData.GetComponent<InventoryComponent>().InventoryName
             };
             World.Service.PlayerService.Events.ReciveLookingBlockData(opbv);
         }

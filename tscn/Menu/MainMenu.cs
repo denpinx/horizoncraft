@@ -32,20 +32,27 @@ public partial class MainMenu : horizoncraft.script.World
         ButtonConnect = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/Button_Connect");
         TextEdit = GetNode<TextEdit>("GuiCanvasLayer/TextEdit");
 
+        var worldScene = GD.Load<PackedScene>("res://tscn/world.tscn");
         ButtonSingle.Pressed += () =>
         {
             worldMode = WorldMode.Single;
-            GetTree().ChangeSceneToFile("res://tscn/world.tscn");
+            worldScene.SetName("单机模式");
+            GetTree().ChangeSceneToPacked(worldScene);
+            //GetTree().ChangeSceneToFile("res://tscn/world.tscn");
         };
         ButtonHost.Pressed += () =>
         {
             worldMode = WorldMode.MultiplayerHost;
-            GetTree().ChangeSceneToFile("res://tscn/world.tscn");
+            worldScene.SetName("主机模式");
+            GetTree().ChangeSceneToPacked(worldScene);
+            //GetTree().ChangeSceneToFile("res://tscn/world.tscn");
         };
         ButtonConnect.Pressed += () =>
         {
             worldMode = WorldMode.MultiplayerClient;
-            GetTree().ChangeSceneToFile("res://tscn/world.tscn");
+            worldScene.SetName("客户端模式");
+            GetTree().ChangeSceneToPacked(worldScene);
+            //GetTree().ChangeSceneToFile("res://tscn/world.tscn");
         };
         TextEdit.Text = PlayerNode.Profile.Name;
         TextEdit.TextChanged += () =>

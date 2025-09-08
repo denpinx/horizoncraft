@@ -41,16 +41,16 @@ public class ComponentManager
         return true;
     }
 
-    public static bool ExecuteComponents(WorldEvent worldEvent, Blockdata blockdata)
+    public static bool ExecuteComponents(WorldEvent worldEvent, BlockData blockData)
     {
-        int start_id = blockdata.Id;
-        for (int i = 0; i < blockdata.components.Count; i++)
+        int start_id = blockData.Id;
+        for (int i = 0; i < blockData.components.Count; i++)
         {
-            Component component = blockdata.components[i];
+            Component component = blockData.components[i];
             if (component == null)
             {
                 GD.PrintErr("组件被异常删除!");
-                blockdata.components.RemoveAt(i);
+                blockData.components.RemoveAt(i);
                 return false;
             }
 
@@ -62,23 +62,23 @@ public class ComponentManager
             }
 
             //方块类型和状态可能已经被组件给修改了，blockdata.componets的状态已经成为未知状态了,之后就不用继续运行
-            if (blockdata.Id != start_id)
+            if (blockData.Id != start_id)
                 return false;
         }
 
         return true;
     }
 
-    public static void SetBlockComponentData(PlayerData player, Blockdata blockdata,
+    public static void SetBlockComponentData(PlayerData player, BlockData blockData,
         SetComponentData setComponentData)
     {
-        for (int i = 0; i < blockdata.components.Count; i++)
+        for (int i = 0; i < blockData.components.Count; i++)
         {
-            Component component = blockdata.components[i];
+            Component component = blockData.components[i];
             if (component == null)
             {
                 GD.PrintErr("组件被异常删除!");
-                blockdata.components.RemoveAt(i);
+                blockData.components.RemoveAt(i);
                 return;
             }
 

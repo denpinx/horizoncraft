@@ -11,6 +11,10 @@ using horizoncraft.script.WorldControl.Tool;
 
 namespace HorizonCraft.script.Services.chunk;
 
+/// <summary>
+/// 区块服务基类
+/// 默认实现了所有方法
+/// </summary>
 public partial class ChunkServiceBase : IDisposable
 {
     private readonly Vector2I[] _terrainCoord =
@@ -66,6 +70,9 @@ public partial class ChunkServiceBase : IDisposable
 
     #region 虚方法和抽象方法
 
+    /// <summary>
+    /// 区块时刻，默认实现光照更新和Tick处理
+    /// </summary>
     public virtual void Ticking()
     {
         foreach (var chunk in Chunks.Values)
@@ -77,15 +84,15 @@ public partial class ChunkServiceBase : IDisposable
     }
 
     /// <summary>
-    /// 加载并返回区块
+    /// 加载并返回区块，这个不能在这个函数内往Chunks添加加载的区块，只能返回,因为这里是个异步方法
     /// </summary>
     /// <param name="pos"></param>
     /// <returns></returns>
-    public virtual Chunk LoadChunk(Vector2I pos)
+    public virtual async Task<Chunk> LoadChunk(Vector2I pos)
     {
         try
         {
-            using (var conn = SqliteTool.InitSqlite())
+            using (var conn = SqliteTool.InitSqlite(_world.Name))
             {
                 if (conn.CheckChunkExists(pos.X, pos.Y))
                 {
@@ -109,11 +116,15 @@ public partial class ChunkServiceBase : IDisposable
         return null;
     }
 
+    /// <summary>
+    /// 保存区块，决定区块该不该被保存
+    /// </summary>
+    /// <param name="chunk"></param>
     public virtual void SaveChunk(Chunk chunk)
     {
         try
         {
-            using (var conn = SqliteTool.InitSqlite())
+            using (var conn = SqliteTool.InitSqlite(_world.WorldName))
             {
                 if (conn.CheckChunkExists(chunk.X, chunk.Y))
                     conn.UpdateChunkByteData(chunk.X, chunk.Y, chunk);
@@ -127,6 +138,9 @@ public partial class ChunkServiceBase : IDisposable
         }
     }
 
+    /// <summary>
+    /// 保存所有
+    /// </summary>
     public virtual void SaveAll()
     {
         foreach (var chunkset in Chunks)
@@ -137,6 +151,9 @@ public partial class ChunkServiceBase : IDisposable
 
     #region 内部实现
 
+    /// <summary>
+    /// 处理区块加载的线程
+    /// </summary>
     private async Task ProcessChunkLoadThread()
     {
         while (!_tokenSource.Token.IsCancellationRequested)
@@ -144,19 +161,26 @@ public partial class ChunkServiceBase : IDisposable
             try
             {
                 //常规区块加载任务，自动加载玩家半径内的区块
+                //异步加载
                 var rangeChunks = GetAllLoadRangeChunks();
+                var tasks = new List<Task<Chunk>>();
                 foreach (var chunkpos in rangeChunks)
                 {
                     if (!Chunks.ContainsKey(chunkpos))
                     {
-                        var chunk = LoadChunk(chunkpos);
-                        if (Chunks.TryAdd(chunkpos, chunk))
-                        {
-                            OnChunkLoaded?.Invoke(chunk);
-                            GD.Print($"loadchunk at {chunkpos}");
-                        }
+                        tasks.Add(LoadChunk(chunkpos));
                     }
                 }
+
+                //同步处理
+                if (tasks.Count > 0)
+                {
+                    Chunk[] chunks = await Task.WhenAll(tasks);
+                    foreach (var chunk in chunks)
+                        if (Chunks.TryAdd(chunk.coord, chunk))
+                            OnChunkLoaded?.Invoke(chunk);
+                }
+
 
                 //区块卸载,数据去重
                 foreach (var chunkpos in Chunks.Keys.ToArray())
@@ -190,6 +214,10 @@ public partial class ChunkServiceBase : IDisposable
 
     #region 外部工具
 
+    /// <summary>
+    /// 获取所有玩家所需加载的区块集合
+    /// </summary>
+    /// <returns></returns>
     public HashSet<Vector2I> GetAllLoadRangeChunks()
     {
         HashSet<Vector2I> loadqueue = new HashSet<Vector2I>();
@@ -201,19 +229,29 @@ public partial class ChunkServiceBase : IDisposable
         return loadqueue;
     }
 
-    public void GetLoadRangeChunks(Vector2I centerCoord, HashSet<Vector2I> loadqueue)
+    /// <summary>
+    /// 获取视距内所需加载的区块坐标
+    /// </summary>
+    /// <param name="centerCoord">中心坐标</param>
+    /// <param name="coords"></param>
+    public void GetLoadRangeChunks(Vector2I centerCoord, HashSet<Vector2I> coords)
     {
         for (int X = centerCoord.X - _loadrange; X <= centerCoord.X + _loadrange; X++)
         {
             for (int Y = centerCoord.Y - _loadrange; Y <= centerCoord.Y + _loadrange; Y++)
             {
                 Vector2I coord = new Vector2I(X, Y);
-                if (!loadqueue.Contains(coord))
-                    loadqueue.Add(coord);
+                if (!coords.Contains(coord))
+                    coords.Add(coord);
             }
         }
     }
 
+    /// <summary>
+    /// 判断一个方块周围是否被完全包围
+    /// </summary>
+    /// <param name="pos">坐标</param>
+    /// <returns></returns>
     public bool CheckIsCloseBlock(Vector3I pos)
     {
         var block = GetBlock(pos);
@@ -237,52 +275,76 @@ public partial class ChunkServiceBase : IDisposable
         return false;
     }
 
-
-    public Blockdata GetBlock(Vector3I pos)
+    /// <summary>
+    /// 获取方块
+    /// </summary>
+    /// <param name="globalPosition">全局坐标</param>
+    /// <returns></returns>
+    public BlockData GetBlock(Vector3I globalPosition)
     {
-        var coord = World.MathFloor(new Vector2I((int)pos.X, (int)pos.Y), Chunk.Size);
+        var coord = World.MathFloor(new Vector2I((int)globalPosition.X, (int)globalPosition.Y), Chunk.Size);
         if (Chunks.TryGetValue(coord, out var chunk))
         {
-            Vector2I LocalCoord = World.Remainder(pos, Chunk.Size);
-            return chunk.GetBlock(LocalCoord.X, LocalCoord.Y, pos.Z);
+            Vector2I LocalCoord = World.Remainder(globalPosition, Chunk.Size);
+            return chunk.GetBlock(LocalCoord.X, LocalCoord.Y, globalPosition.Z);
         }
 
         return null;
     }
 
-    public Blockdata SetBlock(Vector3I pos, Blockdata blockdata)
+    /// <summary>
+    /// 设置方块
+    /// </summary>
+    /// <param name="globalPosition">全局坐标</param>
+    /// <param name="blockData">方块数据</param>
+    /// <returns>返回设置后的方块本身</returns>
+    public BlockData SetBlock(Vector3I globalPosition, BlockData blockData)
     {
-        var coord = World.MathFloor(new Vector2I((int)pos.X, (int)pos.Y), Chunk.Size);
+        var coord = World.MathFloor(new Vector2I((int)globalPosition.X, (int)globalPosition.Y), Chunk.Size);
         if (Chunks.TryGetValue(coord, out var chunk))
         {
-            Vector2I LocalCoord = World.Remainder(pos, Chunk.Size);
-            return chunk.SetBlock(LocalCoord.X, LocalCoord.Y, pos.Z, blockdata);
+            Vector2I LocalCoord = World.Remainder(globalPosition, Chunk.Size);
+            return chunk.SetBlock(LocalCoord.X, LocalCoord.Y, globalPosition.Z, blockData);
         }
 
         return null;
     }
 
-    public Blockdata SetBlock(Vector3I pos, BlockMeta meta, int state = 0)
+    /// <summary>
+    /// 设置方块
+    /// </summary>
+    /// <param name="globalPosition">全局坐标</param>
+    /// <param name="meta">方块元数据</param>
+    /// <param name="state">方块状态</param>
+    /// <returns>设置后的方块</returns>
+    public BlockData SetBlock(Vector3I globalPosition, BlockMeta meta, int state = 0)
     {
-        var coord = World.MathFloor(new Vector2I((int)pos.X, (int)pos.Y), Chunk.Size);
+        var coord = World.MathFloor(new Vector2I((int)globalPosition.X, (int)globalPosition.Y), Chunk.Size);
         if (Chunks.TryGetValue(coord, out var chunk))
         {
-            Vector2I LocalCoord = World.Remainder(pos, Chunk.Size);
-            return chunk.SetBlock(LocalCoord.X, LocalCoord.Y, pos.Z, meta, state);
+            Vector2I localPosition = World.Remainder(globalPosition, Chunk.Size);
+            return chunk.SetBlock(localPosition.X, localPosition.Y, globalPosition.Z, meta, state);
         }
 
         return null;
     }
 
-    public Vector2I GetTerrain(Vector3I pos, string tagname, string value)
+    /// <summary>
+    /// 获取地形集坐标
+    /// </summary>
+    /// <param name="globalPosition">方块全局坐标</param>
+    /// <param name="tagname">匹配标签名</param>
+    /// <param name="value">匹配标签值</param>
+    /// <returns></returns>
+    public Vector2I GetTerrain(Vector3I globalPosition, string tagname, string value)
     {
-        var block = GetBlock(pos);
+        var block = GetBlock(globalPosition);
         if (block == null) return new Vector2I(1, 1);
 
-        var up = GetBlock(pos + Vector3I.Down);
-        var down = GetBlock(pos + Vector3I.Up);
-        var left = GetBlock(pos + Vector3I.Left);
-        var right = GetBlock(pos + Vector3I.Right);
+        var up = GetBlock(globalPosition + Vector3I.Down);
+        var down = GetBlock(globalPosition + Vector3I.Up);
+        var left = GetBlock(globalPosition + Vector3I.Left);
+        var right = GetBlock(globalPosition + Vector3I.Right);
 
         int state = 0;
         if (up != null && up.CheckTag(tagname, value)) state |= 1;
@@ -291,8 +353,12 @@ public partial class ChunkServiceBase : IDisposable
         if (right != null && right.CheckTag(tagname, value)) state |= 8;
         return _terrainCoord[state];
     }
-
-
+    /// <summary>
+    /// 基于光线投射的光照更新
+    /// </summary>
+    /// <param name="coord">全局坐标</param>
+    /// <param name="value">起始光照值</param>
+    /// <param name="detail">精细度</param>
     public void RayCastLights(Vector3I coord, int value, int detail = 16)
     {
         var angle_step = detail;
@@ -318,7 +384,11 @@ public partial class ChunkServiceBase : IDisposable
             }
         }
     }
-
+    /// <summary>
+    /// 基于DFS的光照更新
+    /// </summary>
+    /// <param name="coord">全局坐标</param>
+    /// <param name="value">起始光照值</param>
     public void DfsUpdateLight(Vector3I coord, int value)
     {
         if (value <= 0) return;
@@ -340,8 +410,10 @@ public partial class ChunkServiceBase : IDisposable
         DfsUpdateLight(coord - Vector3I.Up, value);
         DfsUpdateLight(coord - Vector3I.Down, value);
     }
-
-    //更新单个区块的所有光源
+    /// <summary>
+    /// 更新单个区块的光源
+    /// </summary>
+    /// <param name="chunk">区块</param>
     public void UpdataChunkLight(Chunk chunk)
     {
         if (LightMode == LightModeEnum.None)
@@ -383,8 +455,9 @@ public partial class ChunkServiceBase : IDisposable
             }
         }
     }
-
-    //主机玩家的光照
+    /// <summary>
+    /// 只更新主控玩家加载范围内的光照
+    /// </summary>
     public void UpdateLights()
     {
         var player = _world.PlayerNode.playerData;
@@ -414,7 +487,9 @@ public partial class ChunkServiceBase : IDisposable
     }
 
     #endregion
-
+    /// <summary>
+    /// 释放资源
+    /// </summary>
     public void Dispose()
     {
         _tokenSource.Cancel();

@@ -16,22 +16,33 @@ public class HostPlayerService : PlayerServiceBase
         world.timer.Timeout += Ticking;
     }
 
-    public void Ticking()
+    public override void Ticking()
     {
+        base.Ticking();
         SyncPlayers();
     }
 
     public void SyncPlayers()
+    {
+        SyncPlayerDatas();
+        SyncPlayerInventory();
+    }
+
+    /// <summary>
+    /// 同步玩家位置
+    /// </summary>
+    private void SyncPlayerDatas()
     {
         Dictionary<long, PlayerPack> packs = new();
         foreach (var Fs in Players)
         {
             PlayerData player = Fs.Value;
             if (player.Name == PlayerNode.Profile.Name) continue;
+
             var List = GetPlayersByRange(player, world.Service.ChunkService._loadrange);
             foreach (var target in List)
             {
-                //if (target.Moved)
+                if (target.Update)
                 {
                     if (!packs.ContainsKey(player.PeerId)) packs.Add(player.PeerId, new PlayerPack());
                     packs[player.PeerId].players.Add(new PlayerDataSnapshot(target));
@@ -39,9 +50,8 @@ public class HostPlayerService : PlayerServiceBase
             }
         }
 
-        //重置
+        //重置更新标签
         foreach (var playerData in Players.Values) playerData.Update = false;
-
         foreach (var sets in packs)
         {
             world.Service.PlayerServiceNode.RpcId(sets.Key,
@@ -49,8 +59,13 @@ public class HostPlayerService : PlayerServiceBase
                 ByteTool.ToBytes<PlayerPack>(sets.Value)
             );
         }
+    }
 
-
+    /// <summary>
+    /// 同步玩家的物品栏，以及玩家打开的方块物品栏
+    /// </summary>
+    private void SyncPlayerInventory()
+    {
         foreach (var player in Players.Values)
         {
             if (player.Name != PlayerNode.Profile.Name)
@@ -71,17 +86,37 @@ public class HostPlayerService : PlayerServiceBase
                         (int)player.OpenInventory.Z);
                     var blockdata = world.Service.ChunkService.GetBlock(pos);
                     var inv = blockdata?.GetComponent<InventoryComponent>();
-                    if (blockdata != null && inv != null && inv.GetInventory().update)
+                    if (blockdata != null && inv != null)
                     {
-                        world.Service.ChunkServiceNode.RpcId(player.PeerId,
-                            nameof(ChunkServiceNode.ReciveLookingBlockData),
-                            ByteTool.ToBytes<Blockdata>(blockdata),
-                            ByteTool.ToBytes<PlayerInventory>(player.Inventory));
+                        if (inv.GetInventory().update)
+                            world.Service.ChunkServiceNode.RpcId(player.PeerId,
+                                nameof(ChunkServiceNode.ReciveLookingBlockData),
+                                ByteTool.ToBytes<BlockData>(blockdata),
+                                ByteTool.ToBytes<PlayerInventory>(player.Inventory));
                     }
                     else
                     {
-                        player.OpeningBlockInventory = player.OpeningBlockInventory = false;
+                        player.OpeningBlockInventory = false;
                     }
+                }
+            }
+        }
+
+        //必须要先在处理完其他所有玩家的打开的方块容器再重置标签，因为一个容器可能被多个人查看
+        foreach (var player in Players.Values)
+        {
+            if (player.OpeningBlockInventory)
+            {
+                var pos = new Vector3I(
+                    (int)player.OpenInventory.X,
+                    (int)player.OpenInventory.Y,
+                    (int)player.OpenInventory.Z
+                );
+                var blockdata = world.Service.ChunkService.GetBlock(pos);
+                var inv = blockdata?.GetComponent<InventoryComponent>();
+                if (blockdata != null && inv != null && inv.GetInventory().update)
+                {
+                    inv.GetInventory().update = false;
                 }
             }
         }

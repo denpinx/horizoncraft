@@ -72,31 +72,21 @@ public class HostChunkService : ChunkServiceBase
                     {
                         if (pd1.Name != PlayerNode.Profile.Name)
                         {
-                            if (wholeChunkUpdate.ContainsKey(pd1.PeerId))
-                            {
-                                wholeChunkUpdate[pd1.PeerId].Chunks.Add(chunk);
-                            }
-                            else
+                            if (!wholeChunkUpdate.ContainsKey(pd1.PeerId))
                             {
                                 var result = _world.Service.EntityService.GetEntityByChunk(chunk.coord);
                                 chunk.Entitys = result;
-
-                                wholeChunkUpdate[pd1.PeerId] = new ChunkPack()
-                                {
-                                    Chunks = new()
-                                    {
-                                        chunk
-                                    }
-                                };
+                                wholeChunkUpdate[pd1.PeerId] = new ChunkPack();
                             }
+
+                            wholeChunkUpdate[pd1.PeerId].Chunks.Add(chunk);
                         }
                     }
                 }
-
-                chunk.update_server = false;
             }
-
-
+        
+        foreach (var chunk in Chunks.Values)
+            chunk.update_server = false;
         foreach (var key in wholeChunkUpdate.Keys)
         {
             var bytes = ByteTool.ToBytes<ChunkPack>(wholeChunkUpdate[key]);
@@ -113,9 +103,10 @@ public class HostChunkService : ChunkServiceBase
                 _world.Service.ChunkServiceNode.RpcId(key,
                     nameof(ChunkServiceNode.ReciveChunkUpdatePack),
                     bytes);
-                WorldSnapshot.chunks.Clear();
             }
         }
+
+        WorldSnapshot.chunks.Clear();
     }
 
     public void CalculateDifference()

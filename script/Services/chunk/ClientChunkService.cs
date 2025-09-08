@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.rpc;
@@ -15,7 +16,7 @@ public class ClientChunkService : ChunkServiceBase
     {
     }
 
-    public override Chunk LoadChunk(Vector2I pos)
+    public override async Task<Chunk> LoadChunk(Vector2I pos)
     {
         if (RegetList.TryGetValue(pos, out int i))
         {

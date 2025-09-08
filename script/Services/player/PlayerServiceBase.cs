@@ -66,7 +66,7 @@ public abstract class PlayerServiceBase
     {
         try
         {
-            using (var conn = SqliteTool.InitSqlite())
+            using (var conn = SqliteTool.InitSqlite(world.WorldName))
             {
                 if (conn.CheckPlayerExists(name))
                 {
@@ -101,7 +101,7 @@ public abstract class PlayerServiceBase
 
     public virtual void SavePlayer(PlayerData player)
     {
-        using (var conn = SqliteTool.InitSqlite())
+        using (var conn = SqliteTool.InitSqlite(world.WorldName))
         {
             if (conn.CheckPlayerExists(player.Name))
                 conn.UpdatePlayerByteData(player.Name, player);
@@ -112,7 +112,7 @@ public abstract class PlayerServiceBase
 
     public virtual void SaveAll()
     {
-        using (var conn = SqliteTool.InitSqlite())
+        using (var conn = SqliteTool.InitSqlite(world.WorldName))
         {
             foreach (var player in Players.Values)
             {
@@ -154,7 +154,6 @@ public abstract class PlayerServiceBase
                 PlayerSnapshot node = PlayerSnapshot_ps.Instantiate<PlayerSnapshot>();
                 PlayerNodes.Add(player.Name, node);
                 world.AddChild(node);
-                //TODO 如果报错了就删掉下面这一行
                 node.SetData(player);
             }
         }

@@ -13,17 +13,14 @@ public class HostWorldService : WorldServiceBase
     private WorldProfile Profile;
     public static int Port = 9999;
     public static int MaxPlayer = 10;
-
+    
     public HostWorldService(World world) : base(world)
     {
-
-        
-        
         world.Multiplayer.PeerDisconnected += OnPlayerExit;
         var enet = new ENetMultiplayerPeer();
         enet.CreateServer(Port, MaxPlayer);
         world.Multiplayer.MultiplayerPeer = enet;
-        using (var conn = SqliteTool.InitSqlite())
+        using (var conn = SqliteTool.InitSqlite(world.WorldName))
         {
             if (conn.CheckWorldProfileExists("WorldProfile"))
             {

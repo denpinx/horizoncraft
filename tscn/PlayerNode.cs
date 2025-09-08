@@ -121,7 +121,7 @@ public partial class PlayerNode : CharacterBody2D
             }
 
             Vector3I finalpos;
-            Blockdata InterfaceBlock;
+            BlockData InterfaceBlock;
             if (Input.IsKeyPressed(Key.Shift))
             {
                 finalpos = pos1;

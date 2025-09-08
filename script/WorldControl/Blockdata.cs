@@ -6,7 +6,7 @@ using MemoryPack;
 namespace horizoncraft.script.WorldControl
 {
     [MemoryPackable]
-    public partial class Blockdata
+    public partial class BlockData
     {
         /// <summary>组件属性</summary>
         public List<Component> components = new();
@@ -54,13 +54,13 @@ namespace horizoncraft.script.WorldControl
             return null;
         }
 
-        public Blockdata(BlockMeta meta)
+        public BlockData(BlockMeta meta)
         {
             SetMeta(meta);
         }
 
         [MemoryPackConstructor]
-        public Blockdata()
+        public BlockData()
         {
         }
 

@@ -85,9 +85,9 @@ namespace horizoncraft.script
         
         
         /// <summary>获取方块实列</summary>
-        public Blockdata CreateBlockData()
+        public BlockData CreateBlockData()
         {
-            return new Blockdata(this);
+            return new BlockData(this);
         }
 
         /// <summary>

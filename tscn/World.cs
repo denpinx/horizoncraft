@@ -14,7 +14,9 @@ using Timer = Godot.Timer;
 
 namespace horizoncraft.script
 {
-    //已完成第三次重构
+    //第一次重构:策略模式，但是功能聚合
+    //第二次重构:功能组合，代理模式
+    //第三次重构:世界服务策略模式，通过功能服务组合，功能服务也是不同策略模式的实现。
     public partial class World : Node2D
     {
         public enum WorldMode
@@ -25,7 +27,10 @@ namespace horizoncraft.script
             MultiplayerHost //联机服主机模式,拥有全部内容
         }
 
-        public static string WorldName = "world";
+        public string WorldName
+        {
+            get => Name;
+        }
         public static WorldMode worldMode = WorldMode.Single;
         public WorldServiceBase Service;
         public long tick_use_time = 0;
@@ -76,7 +81,7 @@ namespace horizoncraft.script
 
             if (worldMode == WorldMode.Preview)
                 Service = new PreviewWorldService(this);
-            
+
             Service.InitializeServices();
         }
 
@@ -114,7 +119,7 @@ namespace horizoncraft.script
             UpdateTileMap();
             CilentTicked?.Invoke();
             BlockInterFaceHandle();
-            
+
             sw.Stop();
             tick_use_time = sw.ElapsedMilliseconds;
         }
@@ -191,12 +196,12 @@ namespace horizoncraft.script
             }
         }
 
-
+        //TODO 这个功能还不知道怎么移植到服务类中去，目前只能在客户端即时生效如果用网络的话，可能会出现客户端玩家在因为延迟在天上飞的情况，还待研究
         public void BlockInterFaceHandle()
         {
             if (PlayerNode?.playerData == null) return;
 
-            Blockdata CurrentBlock =
+            BlockData CurrentBlock =
                 Service.ChunkService.GetBlock(new Vector3I(PlayerNode.playerData.Coord.X, PlayerNode.playerData.Coord.Y,
                     1));
             if (CurrentBlock != null)

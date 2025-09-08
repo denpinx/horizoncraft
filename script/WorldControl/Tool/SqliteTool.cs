@@ -13,7 +13,7 @@ public static class SqliteTool
 {
     private static bool IsEnableWAL;
 
-    public static SqliteConnection InitSqlite()
+    public static SqliteConnection InitSqlite(string worldName)
     {
         try
         {
@@ -25,15 +25,15 @@ public static class SqliteTool
                     GD.PrintErr($"创建 save 文件夹失败，错误码: {err}");
             }
 
-            if (!DirAccess.DirExistsAbsolute($"save/{World.WorldName}"))
+            if (!DirAccess.DirExistsAbsolute($"save/{worldName}"))
             {
-                Error err = DirAccess.MakeDirAbsolute($"save/{World.WorldName}");
+                Error err = DirAccess.MakeDirAbsolute($"save/{worldName}");
                 if (err != Error.Ok)
-                    GD.PrintErr($"创建 save{World.WorldName} 文件夹失败，错误码: {err}");
+                    GD.PrintErr($"创建 save{worldName} 文件夹失败，错误码: {err}");
             }
 
             sqliteConnection = new SqliteConnection(
-                $"Data Source=save/{World.WorldName}/data.db"
+                $"Data Source=save/{worldName}/data.db"
             );
             sqliteConnection.Open();
             if (!IsEnableWAL)
@@ -41,6 +41,7 @@ public static class SqliteTool
                 if (sqliteConnection.EnableWAL())
                     IsEnableWAL = true;
             }
+
             sqliteConnection.InitTable_WorldProfile();
             sqliteConnection.InitTable_World();
             sqliteConnection.InitTable_Player();

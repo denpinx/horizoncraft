@@ -23,16 +23,16 @@ public class FluidSystem : TickSystem
         }
         else
         {
-            if (e.CheckMeta(e.GetLeftBlock(), Materials.Valueof("air")) && e.Blockdata.State < FluidLenght - 1)
+            if (e.CheckMeta(e.GetLeftBlock(), Materials.Valueof("air")) && e.BlockData.State < FluidLenght - 1)
             {
-                e.SetLeftBlock(blockMeta, e.Blockdata.State + 1);
+                e.SetLeftBlock(blockMeta, e.BlockData.State + 1);
                 e.GetLeftBlock().GetComponent<FluidComponent>("FluidComponent").mobility = true;
                 return;
             }
 
-            if (e.CheckMeta(e.GetRightBlock(), Materials.Valueof("air")) && e.Blockdata.State < FluidLenght - 1)
+            if (e.CheckMeta(e.GetRightBlock(), Materials.Valueof("air")) && e.BlockData.State < FluidLenght - 1)
             {
-                e.SetRightBlock(blockMeta, e.Blockdata.State + 1);
+                e.SetRightBlock(blockMeta, e.BlockData.State + 1);
                 e.GetRightBlock().GetComponent<FluidComponent>("FluidComponent").mobility = true;
                 return;
             }
@@ -43,38 +43,38 @@ public class FluidSystem : TickSystem
         {
             if (fc.mobility)
             {
-                if (e.Blockdata.State == 0)
+                if (e.BlockData.State == 0)
                 {
-                    e.Blockdata.SetMeta("air");
+                    e.BlockData.SetMeta("air");
                     return;
                 }
                 else
                 {
                     if ((!e.CheckMeta(e.GetLeftBlock(), blockMeta) || (e.CheckMeta(e.GetLeftBlock(), blockMeta) &&
-                                                                       e.GetLeftBlock().State > e.Blockdata.State &&
+                                                                       e.GetLeftBlock().State > e.BlockData.State &&
                                                                        e.GetLeftBlock().State > 0)) &&
                         (!e.CheckMeta(e.GetRightBlock(), blockMeta) || (e.CheckMeta(e.GetRightBlock(), blockMeta) &&
-                                                                        e.GetRightBlock().State > e.Blockdata.State &
+                                                                        e.GetRightBlock().State > e.BlockData.State &
                                                                         e.GetRightBlock().State > 0))
                        )
                     {
-                        e.Blockdata.SetMeta("air");
+                        e.BlockData.SetMeta("air");
                         return;
                     }
 
 
                     if (e.GetLeftBlock() != null && e.CheckMeta(e.GetLeftBlock(), blockMeta) &&
-                        e.GetLeftBlock().State < e.Blockdata.State - 2 &&
-                        e.Blockdata.State <= FluidLenght - 1)
+                        e.GetLeftBlock().State < e.BlockData.State - 2 &&
+                        e.BlockData.State <= FluidLenght - 1)
                     {
-                        e.Blockdata.State = e.GetLeftBlock().State + 1;
+                        e.BlockData.State = e.GetLeftBlock().State + 1;
                     }
 
                     if (e.GetRightBlock() != null && e.CheckMeta(e.GetRightBlock(), blockMeta) &&
-                        e.GetRightBlock().State < e.Blockdata.State - 2 &&
-                        e.Blockdata.State <= FluidLenght - 1)
+                        e.GetRightBlock().State < e.BlockData.State - 2 &&
+                        e.BlockData.State <= FluidLenght - 1)
                     {
-                        e.Blockdata.State = e.GetRightBlock().State + 1;
+                        e.BlockData.State = e.GetRightBlock().State + 1;
                     }
                 }
             }

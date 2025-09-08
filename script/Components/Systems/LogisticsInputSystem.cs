@@ -29,7 +29,7 @@ public class LogisticsInputSystem : TickSystem
             input_inv.GetInventory().ReduceItemAmount(index, 1);
     }
 
-    public Blockdata FindInputBlock(BlockTickEvent e, HashSet<Vector3I> finded, Vector3I pos)
+    public BlockData FindInputBlock(BlockTickEvent e, HashSet<Vector3I> finded, Vector3I pos)
     {
         if (finded.Contains(pos) || finded.Count > 128) return null;
 
@@ -61,7 +61,7 @@ public class LogisticsInputSystem : TickSystem
         return null;
     }
 
-    public Blockdata GetInventoryBlock(BlockTickEvent e, Vector3I pos, bool hasitem = false)
+    public BlockData GetInventoryBlock(BlockTickEvent e, Vector3I pos, bool hasitem = false)
     {
         {
             var block = e.Service.ChunkService.GetBlock(pos + Vector3I.Up);

@@ -203,7 +203,7 @@ public class PlayerEvents
         if (block1 == null || block2 == null) return false;
 
         Vector3I finalpos;
-        Blockdata finalblock;
+        BlockData finalblock;
         if (e.coercive)
         {
             finalblock = block1;
@@ -277,7 +277,7 @@ public class PlayerEvents
         if (block1 == null || block2 == null) return false;
 
         Vector3I finalpos;
-        Blockdata InterfaceBlock;
+        BlockData InterfaceBlock;
         if (!block2.IsMeta("air"))
         {
             finalpos = pos1;

@@ -68,7 +68,7 @@ public class PlayerBreakblockEvent : PlayerEvent
     public ItemStack GetItemStack()
         => Player.Inventory.GetHandItemStack();
 
-    public Blockdata GetBlockData()
+    public BlockData GetBlockData()
         => ChunkService.GetBlock(Position);
 
     public ItemStack DropItem;

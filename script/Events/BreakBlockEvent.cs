@@ -11,7 +11,7 @@ namespace horizoncraft.script.Events
     public class BreakBlockEvent : WorldEvent
     {
         //传入
-        public Blockdata Blockdata;
+        public BlockData BlockData;
         public ItemStack ItemStack;
         public int Index;
         //传出

@@ -59,7 +59,7 @@ namespace horizoncraft.script.WorldControl
         //加载完区块后释放到世界中，卸载区块时再从世界中捕获
         public List<EntityData> Entitys = new();
         
-        public Blockdata[,,] data = new Blockdata[Size, Size, SizeZ];
+        public BlockData[,,] data = new BlockData[Size, Size, SizeZ];
         public int SpawnCostTime;
 
         public int LoadCostTime;
@@ -85,12 +85,12 @@ namespace horizoncraft.script.WorldControl
             }
         }
 
-        public Blockdata GetBlock(int x, int y, int z)
+        public BlockData GetBlock(int x, int y, int z)
         {
             return data[x, y, z];
         }
 
-        public Blockdata SetBlock(int x, int y, int z, BlockMeta meta, int state = 0)
+        public BlockData SetBlock(int x, int y, int z, BlockMeta meta, int state = 0)
         {
             var pos = new Vector3(x, y, z);
             var posv2 = new Vector2(x, y);
@@ -127,10 +127,10 @@ namespace horizoncraft.script.WorldControl
             return data[x, y, z];
         }
 
-        public Blockdata SetBlock(int x, int y, int z, Blockdata blockdata, int state = 0)
+        public BlockData SetBlock(int x, int y, int z, BlockData blockData, int state = 0)
         {
             var pos = new Vector3(x, y, z);
-            if (blockdata.BlockMeta.Components.Count > 0)
+            if (blockData.BlockMeta.Components.Count > 0)
             {
                 if (!TickList.Contains(pos))
                 {
@@ -140,7 +140,7 @@ namespace horizoncraft.script.WorldControl
             else if (data[x, y, z].BlockMeta.Components.Count > 0)
                 TickList.Remove(pos);
 
-            data[x, y, z] = blockdata;
+            data[x, y, z] = blockData;
             data[x, y, z].State = state;
             UpdateList_buffer.Add(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z));
             update_tilemap = true;
@@ -182,7 +182,7 @@ namespace horizoncraft.script.WorldControl
                 var block = GetBlock(local.X, local.Y, local.Z);
                 if (block.components.Count != 0)
                 {
-                    blockTickEvnet.Blockdata = block;
+                    blockTickEvnet.BlockData = block;
                     blockTickEvnet.GlobalePos = coord;
                     blockTickEvnet.LocalPos = local;
                     id = block.Id;

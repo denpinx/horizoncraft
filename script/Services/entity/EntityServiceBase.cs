@@ -22,6 +22,7 @@ public class EntityServiceBase
     public EntityServiceBase(World world)
     {
         World = world;
+        world.timer.Timeout += Ticking;
         world.Service.ChunkService.OnChunkLoaded += OnChunkLoad;
         world.Service.ChunkService.OnChunkSaving+=ExtractEntitiesFromChunk;
         PlayerNode.GetInformation[nameof(EntityServiceBase)] =
@@ -29,7 +30,12 @@ public class EntityServiceBase
                   $"渲染实体:{EntityNodes.Count}";
     }
 
-
+    public virtual void Ticking()
+    {
+        ProcessEntityNode();
+        ProcessEntityNodeUpdate();
+    }
+    
     public virtual void OnChunkLoad(Chunk chunk)
     {
         ReleaseChunkEntity(chunk);
