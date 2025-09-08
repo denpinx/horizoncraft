@@ -4,8 +4,7 @@ using horizoncraft.script.Components;
 using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Inventory;
-using horizoncraft.script.WorldControl.Service;
-using HorizonCraft.script.WorldControl.Service;
+using HorizonCraft.script.Services.world;
 
 namespace HorizonCraft.tscn.Entity;
 
@@ -26,8 +25,8 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
 
     //自身属性
     double _cooldown_ = 0.5f;
-    Player _player_;
-    Player _far_player_;
+    PlayerNode _playerNode;
+    PlayerNode _farPlayerNode;
 
     public override void _Ready()
     {
@@ -48,25 +47,25 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
 
     public void FarPlayerEnter(Node2D node)
     {
-        if (node is Player player)
+        if (node is PlayerNode player)
         {
-            _far_player_ = player;
+            _farPlayerNode = player;
         }
     }
 
     public void FarPlayerExit(Node2D node)
     {
-        if (node is Player player)
+        if (node is PlayerNode player)
         {
-            _far_player_ = null;
+            _farPlayerNode = null;
         }
     }
 
     public void OnEnter(Node2D node)
     {
-        if (node is Player player)
+        if (node is PlayerNode player)
         {
-            _player_ = player;
+            _playerNode = player;
             return;
         }
 
@@ -79,7 +78,7 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
 
             if (target?.ItemStack == null)
             {
-                World.WorldService.EntityService.RemoveEntityData(itemEntity.Entity.Uuid);
+                World.Service.EntityService.RemoveEntityData(itemEntity.Entity.Uuid);
                 return;
             }
             else
@@ -94,7 +93,7 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
                             if (space >= target.ItemStack.Amount)
                             {
                                 self.ItemStack.Amount += target.ItemStack.Amount;
-                                World.WorldService.EntityService.RemoveEntityData(itemEntity.Entity.Uuid);
+                                World.Service.EntityService.RemoveEntityData(itemEntity.Entity.Uuid);
                                 return;
                             }
                             else
@@ -110,9 +109,9 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
 
     public void OnExit(Node2D node)
     {
-        if (node is Player)
+        if (node is PlayerNode)
         {
-            _player_ = null;
+            _playerNode = null;
         }
     }
 
@@ -127,20 +126,20 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
         if (_cooldown_ > 0) _cooldown_ -= delta;
         else _cooldown_ = 0;
 
-        if (_cooldown_ == 0 && _player_ != null)
+        if (_cooldown_ == 0 && _playerNode != null)
         {
             var cmp = Entity.GetComponent<ItemEntityComponent>();
-            if (cmp != null && _player_.playerData.Inventory.TryAddItem(cmp.ItemStack))
+            if (cmp != null && _playerNode.playerData.Inventory.TryAddItem(cmp.ItemStack))
             {
-                World.WorldService.EntityService.RemoveEntityData(Entity.Uuid);
+                World.Service.EntityService.RemoveEntityData(Entity.Uuid);
                 return;
             }
         }
 
 
-        if (_far_player_ != null)
+        if (_farPlayerNode != null)
         {
-            Vector2 direction = (_far_player_.GlobalPosition - GlobalPosition).Normalized();
+            Vector2 direction = (_farPlayerNode.GlobalPosition - GlobalPosition).Normalized();
 
             Vector2 attractVelocity = direction * 40f;
             Vector2 newVelocity = LinearVelocity;
@@ -153,17 +152,17 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
         if (selfcmp == null) return;
 
         if (
-            World.WorldService is WorldHostService || //服务端
-            World.WorldService is WorldSingleService || //单机
-            Entity.Owned == Player.Profile.Name //该实体的更新责任在当前玩家手中
+            World.Service is HostWorldService || //服务端
+            World.Service is SingleWorldService || //单机
+            Entity.Owned == PlayerNode.Profile.Name //该实体的更新责任在当前玩家手中
         )
         {
             Entity.Position.X = GlobalPosition.X;
             Entity.Position.Y = GlobalPosition.Y;
         }
-        else if (World.WorldService is WorldClientService)
+        else if (World.Service is ClientWorldService)
         {
-            if (Entity.Owned != Player.Profile.Name)
+            if (Entity.Owned != PlayerNode.Profile.Name)
             {
                 GlobalPosition = new Vector2(Entity.Position.X, Entity.Position.Y);
             }

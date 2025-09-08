@@ -15,6 +15,12 @@ namespace horizoncraft.script;
 [MemoryPackable]
 public partial class PlayerData
 {
+    [MemoryPackAllowSerialize] private Vector2 _position;
+    [MemoryPackAllowSerialize] private bool _faceLeft;
+    [MemoryPackAllowSerialize] private bool _openingBlockInventory;
+
+    [MemoryPackAllowSerialize] private int _mode;
+
     //连接id
     public int PeerId = 0;
 
@@ -24,20 +30,47 @@ public partial class PlayerData
 
 
     public int RemoveCount = 0;
-    
-    public bool Moved = false;
+
+    public bool Update = false;
 
     //玩家名
     public String Name;
 
     //位置
-    public Vector2 Position;
+    public Vector2 Position
+    {
+        get => _position;
+        set
+        {
+            if (_position != value)
+                Update = true;
+            _position = value;
+        }
+    }
 
     //面朝方向
-    public bool FaceLeft = false;
+    public bool FaceLeft
+    {
+        get => _faceLeft;
+        set
+        {
+            if (_faceLeft != value)
+                Update = true;
+            _faceLeft = value;
+        }
+    }
 
     //是否打开容器，这里相当于是是否订阅
-    public bool OpeningBlockInventory = false;
+    public bool OpeningBlockInventory
+    {
+        get => _openingBlockInventory;
+        set
+        {
+            if (_openingBlockInventory != value)
+                Update = true;
+            _openingBlockInventory = value;
+        }
+    }
 
     //当前打开容器的坐标
     public Vector3 OpenInventory;
@@ -46,10 +79,19 @@ public partial class PlayerData
     public PlayerInventory Inventory = new();
 
     //
-    public int Mode = 0;
+    public int Mode
+    {
+        get => _mode;
+        set
+        {
+            if (_mode != value)
+                Update = true;
+            _mode = value;
+        }
+    }
 
 
-    [MemoryPackIgnore] public Player player;
+    [MemoryPackIgnore] public PlayerNode PlayerNode;
 
     [MemoryPackIgnore]
     public Vector2I Coord

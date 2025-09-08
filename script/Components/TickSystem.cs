@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using horizoncraft.script.Components.Systems;
 using horizoncraft.script.Events;
+using horizoncraft.script.Events.player;
 using horizoncraft.script.Inventory;
 
 namespace horizoncraft.script.Components
@@ -24,6 +25,11 @@ namespace horizoncraft.script.Components
             else if (component is InventoryComponent ic)
                 ProcessTick(worldEvent as BlockTickEvent, ic);
 
+            return true;
+        }
+
+        public bool Execute(PlayerEvent playerEvent, Component component)
+        {
             return true;
         }
 

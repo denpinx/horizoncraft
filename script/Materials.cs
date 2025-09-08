@@ -413,7 +413,6 @@ namespace horizoncraft.script
                         if (sdict.ContainsKey("scene"))
                         {
                             tile.scene = (bool)sdict["scene"];
-                            GD.Print($"{tile.texture_name} halight at {tile.scene}");
                         }
 
                         blockTileSets.Add(tile);

@@ -31,67 +31,67 @@ namespace horizoncraft.script.Events
         /// <summary>获取下方方块</summary>
         public Blockdata GetBottomBlock()
         {
-            _bottomBlock ??= WorldService.GetBlock(GlobalePos + Vector3I.Up);
+            _bottomBlock ??= Service.ChunkService.GetBlock(GlobalePos + Vector3I.Up);
             return _bottomBlock;
         }
 
         public Blockdata SetBottomBlock(BlockMeta meta, int state=0) =>
-            _bottomBlock = WorldService.SetBlock(GlobalePos + Vector3I.Up, meta, false, state);
+            _bottomBlock = Service.ChunkService.SetBlock(GlobalePos + Vector3I.Up, meta, state);
 
         /// <summary>获取上方方块</summary>
         public Blockdata GetTopBlock()
         {
-            _topBlock ??= WorldService.GetBlock(GlobalePos + Vector3I.Down);
+            _topBlock ??= Service.ChunkService.GetBlock(GlobalePos + Vector3I.Down);
             return _topBlock;
         }
 
         /// <summary>设置顶部方块</summary>
         public Blockdata SetTopBlock(BlockMeta meta, int state=0) =>
-            _topBlock = WorldService.SetBlock(GlobalePos + Vector3I.Down, meta, false, state);
+            _topBlock = Service.ChunkService.SetBlock(GlobalePos + Vector3I.Down, meta, state);
 
         /// <summary>获取左边方块</summary>
         public Blockdata GetLeftBlock()
         {
-            _leftBlock ??= WorldService.GetBlock(GlobalePos + Vector3I.Left);
+            _leftBlock ??= Service.ChunkService.GetBlock(GlobalePos + Vector3I.Left);
             return _leftBlock;
         }
 
         /// <summary>设置左边方块</summary>
         public Blockdata SetLeftBlock(BlockMeta meta, int state=0) =>
-            _leftBlock = WorldService.SetBlock(GlobalePos + Vector3I.Left, meta, false, state);
+            _leftBlock = Service.ChunkService.SetBlock(GlobalePos + Vector3I.Left, meta, state);
 
         /// <summary>获取右边方块</summary>
         public Blockdata GetRightBlock()
         {
-            _rightBlock ??= WorldService.GetBlock(GlobalePos + Vector3I.Right);
+            _rightBlock ??= Service.ChunkService.GetBlock(GlobalePos + Vector3I.Right);
             return _rightBlock;
         }
 
         /// <summary>设置右边方块</summary>
         public Blockdata SetRightBlock(BlockMeta meta, int state=0) =>
-            _rightBlock = WorldService.SetBlock(GlobalePos + Vector3I.Right, meta, false, state);
+            _rightBlock = Service.ChunkService.SetBlock(GlobalePos + Vector3I.Right, meta, state);
 
         /// <summary>获取前景方块</summary>
         public Blockdata GetFrontBlock()
         {
-            _frontBlock ??= WorldService.GetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 1));
+            _frontBlock ??= Service.ChunkService.GetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 1));
             return _frontBlock;
         }
 
         /// <summary>设置前景方块</summary>
         public Blockdata SetFrontBlock(BlockMeta meta, int state=0) =>
-            _frontBlock = WorldService.SetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 1), meta, false, state);
+            _frontBlock =Service.ChunkService.SetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 1), meta, state);
 
         /// <summary>获取背景方块</summary>
         public Blockdata GetBackBlock()
         {
-            _backBlock ??= WorldService.GetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 0));
+            _backBlock ??= Service.ChunkService.GetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 0));
             return _backBlock;
         }
 
         /// <summary>设置背景方块</summary>
         public Blockdata SetBackBlock(BlockMeta meta, int state=0) =>
-            _backBlock = WorldService.SetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 0), meta, false, state);
+            _backBlock = Service.ChunkService.SetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 0), meta, state);
 
 
         /// <summary>检查方块是否为指定元数据且不为null</summary>

@@ -1,0 +1,424 @@
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Godot;
+using horizoncraft.script;
+using horizoncraft.script.WorldControl;
+using horizoncraft.script.WorldControl.Tool;
+
+namespace HorizonCraft.script.Services.chunk;
+
+public partial class ChunkServiceBase : IDisposable
+{
+    private readonly Vector2I[] _terrainCoord =
+    [
+        new Vector2I(3, 3), //无0
+        new Vector2I(3, 2), //下1
+        new Vector2I(3, 0), //上2
+        new Vector2I(3, 1), //上下3
+        new Vector2I(2, 3), //右4
+        new Vector2I(2, 2), //左上10
+        new Vector2I(2, 0), //右上6
+        new Vector2I(2, 1), //上下左11
+        new Vector2I(0, 3), //左8
+        new Vector2I(0, 2), //左下9
+        new Vector2I(0, 0), //右下相同5
+        new Vector2I(0, 1), //上下右7
+        new Vector2I(1, 3), //左右12
+        new Vector2I(1, 2), //上左右13
+        new Vector2I(1, 0), //下左右
+        new Vector2I(1, 1) //全部相同15
+    ];
+
+    public enum LightModeEnum
+    {
+        None,
+        RayCastMode,
+        DFSMode
+    }
+
+    public LightModeEnum LightMode = LightModeEnum.DFSMode;
+
+    private int LightSize = 8;
+    private int SkyLight = 8;
+    public Action<Chunk> OnChunkLoaded;
+    public Action<Chunk> OnChunkSaving;
+    public ConcurrentDictionary<Vector2I, Chunk> Chunks = new();
+    protected World _world;
+    public int _loadrange = 1;
+    private CancellationTokenSource _tokenSource;
+    private Task _processLoadTask;
+
+
+    public ChunkServiceBase(World world)
+    {
+        this._world = world;
+        world.timer.Timeout += Ticking;
+        PlayerNode.GetInformation[nameof(ChunkServiceBase)] =
+            () => $"加载区块:{Chunks.Count}";
+
+        _tokenSource = new CancellationTokenSource();
+        _processLoadTask = Task.Run(ProcessChunkLoadThread, _tokenSource.Token);
+    }
+
+    #region 虚方法和抽象方法
+
+    public virtual void Ticking()
+    {
+        foreach (var chunk in Chunks.Values)
+        {
+            chunk.Tick(this._world.Service, this._world);
+        }
+
+        UpdateLights();
+    }
+
+    /// <summary>
+    /// 加载并返回区块
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
+    public virtual Chunk LoadChunk(Vector2I pos)
+    {
+        try
+        {
+            using (var conn = SqliteTool.InitSqlite())
+            {
+                if (conn.CheckChunkExists(pos.X, pos.Y))
+                {
+                    var chunk = conn.GetChunkByteData(pos.X, pos.Y);
+                    return chunk;
+                }
+                else
+                {
+                    var chunk = new Chunk(pos.X, pos.Y);
+                    Chunks[pos] = chunk;
+                    WorldGenerator.Generator(chunk);
+                    return chunk;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        return null;
+    }
+
+    public virtual void SaveChunk(Chunk chunk)
+    {
+        try
+        {
+            using (var conn = SqliteTool.InitSqlite())
+            {
+                if (conn.CheckChunkExists(chunk.X, chunk.Y))
+                    conn.UpdateChunkByteData(chunk.X, chunk.Y, chunk);
+                else
+                    conn.InsertChunkByteValue(chunk.X, chunk.Y, chunk);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
+    public virtual void SaveAll()
+    {
+        foreach (var chunkset in Chunks)
+            SaveChunk(chunkset.Value);
+    }
+
+    #endregion
+
+    #region 内部实现
+
+    private async Task ProcessChunkLoadThread()
+    {
+        while (!_tokenSource.Token.IsCancellationRequested)
+        {
+            try
+            {
+                //常规区块加载任务，自动加载玩家半径内的区块
+                var rangeChunks = GetAllLoadRangeChunks();
+                foreach (var chunkpos in rangeChunks)
+                {
+                    if (!Chunks.ContainsKey(chunkpos))
+                    {
+                        var chunk = LoadChunk(chunkpos);
+                        if (Chunks.TryAdd(chunkpos, chunk))
+                        {
+                            OnChunkLoaded?.Invoke(chunk);
+                            GD.Print($"loadchunk at {chunkpos}");
+                        }
+                    }
+                }
+
+                //区块卸载,数据去重
+                foreach (var chunkpos in Chunks.Keys.ToArray())
+                {
+                    if (!rangeChunks.Contains(chunkpos))
+                    {
+                        var chunk = Chunks[chunkpos];
+                        //延迟卸载，防止玩家故意卡在两个区块之间
+                        if (chunk.RemoveCount++ > 20)
+                        {
+                            chunk.RemoveCount = 0;
+                            OnChunkSaving?.Invoke(chunk);
+                            SaveChunk(chunk);
+                            Chunks.Remove(chunkpos, out _);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                continue;
+            }
+
+
+            await Task.Delay(50, _tokenSource.Token);
+        }
+    }
+
+    #endregion
+
+    #region 外部工具
+
+    public HashSet<Vector2I> GetAllLoadRangeChunks()
+    {
+        HashSet<Vector2I> loadqueue = new HashSet<Vector2I>();
+        foreach (var player in _world.Service.PlayerService.Players.Values)
+        {
+            GetLoadRangeChunks(player.ChunkCoord, loadqueue);
+        }
+
+        return loadqueue;
+    }
+
+    public void GetLoadRangeChunks(Vector2I centerCoord, HashSet<Vector2I> loadqueue)
+    {
+        for (int X = centerCoord.X - _loadrange; X <= centerCoord.X + _loadrange; X++)
+        {
+            for (int Y = centerCoord.Y - _loadrange; Y <= centerCoord.Y + _loadrange; Y++)
+            {
+                Vector2I coord = new Vector2I(X, Y);
+                if (!loadqueue.Contains(coord))
+                    loadqueue.Add(coord);
+            }
+        }
+    }
+
+    public bool CheckIsCloseBlock(Vector3I pos)
+    {
+        var block = GetBlock(pos);
+        var u = GetBlock(pos + Vector3I.Down);
+        var d = GetBlock(pos + Vector3I.Up);
+        var l = GetBlock(pos + Vector3I.Left);
+        var r = GetBlock(pos + Vector3I.Right);
+        if (block != null && u != null && d != null && l != null && r != null)
+        {
+            if (
+                u.BlockMeta.Cube &&
+                d.BlockMeta.Cube &&
+                l.BlockMeta.Cube &&
+                r.BlockMeta.Cube
+            )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    public Blockdata GetBlock(Vector3I pos)
+    {
+        var coord = World.MathFloor(new Vector2I((int)pos.X, (int)pos.Y), Chunk.Size);
+        if (Chunks.TryGetValue(coord, out var chunk))
+        {
+            Vector2I LocalCoord = World.Remainder(pos, Chunk.Size);
+            return chunk.GetBlock(LocalCoord.X, LocalCoord.Y, pos.Z);
+        }
+
+        return null;
+    }
+
+    public Blockdata SetBlock(Vector3I pos, Blockdata blockdata)
+    {
+        var coord = World.MathFloor(new Vector2I((int)pos.X, (int)pos.Y), Chunk.Size);
+        if (Chunks.TryGetValue(coord, out var chunk))
+        {
+            Vector2I LocalCoord = World.Remainder(pos, Chunk.Size);
+            return chunk.SetBlock(LocalCoord.X, LocalCoord.Y, pos.Z, blockdata);
+        }
+
+        return null;
+    }
+
+    public Blockdata SetBlock(Vector3I pos, BlockMeta meta, int state = 0)
+    {
+        var coord = World.MathFloor(new Vector2I((int)pos.X, (int)pos.Y), Chunk.Size);
+        if (Chunks.TryGetValue(coord, out var chunk))
+        {
+            Vector2I LocalCoord = World.Remainder(pos, Chunk.Size);
+            return chunk.SetBlock(LocalCoord.X, LocalCoord.Y, pos.Z, meta, state);
+        }
+
+        return null;
+    }
+
+    public Vector2I GetTerrain(Vector3I pos, string tagname, string value)
+    {
+        var block = GetBlock(pos);
+        if (block == null) return new Vector2I(1, 1);
+
+        var up = GetBlock(pos + Vector3I.Down);
+        var down = GetBlock(pos + Vector3I.Up);
+        var left = GetBlock(pos + Vector3I.Left);
+        var right = GetBlock(pos + Vector3I.Right);
+
+        int state = 0;
+        if (up != null && up.CheckTag(tagname, value)) state |= 1;
+        if (down != null && down.CheckTag(tagname, value)) state |= 2;
+        if (left != null && left.CheckTag(tagname, value)) state |= 4;
+        if (right != null && right.CheckTag(tagname, value)) state |= 8;
+        return _terrainCoord[state];
+    }
+
+
+    public void RayCastLights(Vector3I coord, int value, int detail = 16)
+    {
+        var angle_step = detail;
+        float angleIncrement = 2 * Mathf.Pi / angle_step;
+
+        for (int angle = 0; angle < angle_step; angle++)
+        {
+            var currentAngle = angle * angleIncrement;
+            var direction = new Godot.Vector2(Mathf.Cos(currentAngle), Mathf.Sin(currentAngle));
+            int light = value - 1;
+            for (var step = 1; step < value; step++)
+            {
+                if (light < 0) break;
+                var offset = direction * step;
+                var CurrentPos = coord + new Vector3I((int)offset.X, (int)offset.Y, 0);
+                var block = GetBlock(CurrentPos);
+                if (block == null) continue;
+                if (block.Light < light)
+                    block.Light = light;
+                // 遇到完整方块衰减光线
+                if (block.BlockMeta.Cube) light -= 2;
+                else light -= 1;
+            }
+        }
+    }
+
+    public void DfsUpdateLight(Vector3I coord, int value)
+    {
+        if (value <= 0) return;
+
+        var block = GetBlock(coord);
+        if (block == null) return;
+        if (block.Light < value)
+            block.Light = value;
+        else
+        {
+            return;
+        }
+
+        if (block.BlockMeta.Cube) value -= 2;
+        else value -= 1;
+
+        DfsUpdateLight(coord - Vector3I.Left, value);
+        DfsUpdateLight(coord - Vector3I.Right, value);
+        DfsUpdateLight(coord - Vector3I.Up, value);
+        DfsUpdateLight(coord - Vector3I.Down, value);
+    }
+
+    //更新单个区块的所有光源
+    public void UpdataChunkLight(Chunk chunk)
+    {
+        if (LightMode == LightModeEnum.None)
+        {
+            return;
+        }
+
+
+        var highmap = chunk.HighMap;
+        if (highmap == null)
+            chunk.HighMap = WorldGenerator.GetHighMap(chunk.X);
+
+        for (int x = 0; x < Chunk.Size; x++)
+        {
+            for (int y = 0; y < Chunk.Size; y++)
+            {
+                var gx = chunk.X * Chunk.Size + x;
+                var gy = chunk.Y * Chunk.Size + y;
+                var num = highmap[x, 1] - gy;
+                if (num > 0) chunk.GetBlock(x, y, 1).SetLight(SkyLight);
+                if (num == 0)
+                {
+                    if (LightMode == LightModeEnum.RayCastMode) RayCastLights(new Vector3I(gx, gy, 1), LightSize);
+                    if (LightMode == LightModeEnum.DFSMode) DfsUpdateLight(new Vector3I(gx, gy, 1), LightSize);
+                }
+            }
+        }
+
+        if (chunk.LightList.Count > 0)
+        {
+            foreach (var point in chunk.LightList)
+            {
+                var light = new Vector2I(chunk.X * Chunk.Size + (int)point.X,
+                    chunk.Y * Chunk.Size + (int)point.Y);
+                if (LightMode == LightModeEnum.DFSMode)
+                    DfsUpdateLight(new Vector3I((int)light.X, (int)light.Y, 1), LightSize);
+                if (LightMode == LightModeEnum.RayCastMode)
+                    RayCastLights(new Vector3I((int)light.X, (int)light.Y, 1), LightSize);
+            }
+        }
+    }
+
+    //主机玩家的光照
+    public void UpdateLights()
+    {
+        var player = _world.PlayerNode.playerData;
+        if (player == null) return;
+        HashSet<Vector2I> poss = new HashSet<Vector2I>();
+        GetLoadRangeChunks(player.ChunkCoord, poss);
+
+        foreach (var sts in Chunks)
+        {
+            var chunk = sts.Value;
+            if (poss.Contains(chunk.coord))
+                sts.Value.ClearLight();
+        }
+
+
+        foreach (var sts in Chunks)
+        {
+            var chunk = sts.Value;
+            if (poss.Contains(chunk.coord))
+                UpdataChunkLight(chunk);
+        }
+
+        if (LightMode == LightModeEnum.DFSMode)
+            DfsUpdateLight(new Vector3I(player.Coord.X, player.Coord.Y, 1), LightSize / 2);
+        if (LightMode == LightModeEnum.RayCastMode)
+            RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), LightSize / 2, 32);
+    }
+
+    #endregion
+
+    public void Dispose()
+    {
+        _tokenSource.Cancel();
+        _processLoadTask?.Wait(1000);
+        _processLoadTask.Dispose();
+    }
+}

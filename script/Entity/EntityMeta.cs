@@ -26,15 +26,6 @@ namespace horizoncraft.script.Entity
 
         public IEntityNode GetEntityNode()
         {
-            if (get_entity_node == null)
-            {
-                //GD.Print("null get entity_node");
-            }
-            else
-            {
-                //GD.Print("not null get entity_node");
-            }
-            
             IEntityNode entityNode = get_entity_node(packedScene) as IEntityNode; 
             entityNode.Id = id;
             return entityNode;

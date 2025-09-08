@@ -5,8 +5,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.Components;
+using HorizonCraft.script.Services.world;
 using horizoncraft.script.WorldControl;
-using HorizonCraft.script.WorldControl.Service;
 
 namespace horizoncraft.script.Events
 {
@@ -14,6 +14,6 @@ namespace horizoncraft.script.Events
     {
         public PlayerData Player;
         public World World;
-        public WorldBase WorldService;
+        public WorldServiceBase Service;
     }
 }

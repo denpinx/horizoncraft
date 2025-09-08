@@ -20,12 +20,14 @@
   <ItemGroup>
     <Compile Remove="script\Inventory\InventorySet.cs" />
     <Compile Remove="script\Net\RemoteFunctionItem.cs" />
+    <Compile Remove="script\WorldControl\Service\ChunkService.cs" />
+    <Compile Remove="script\WorldControl\Service\EntityService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\recipes\Craft\Block\" />
     <Folder Include="config\recipes\Process\" />
     <Folder Include="config\packscene\" />
-    <Folder Include="script\Interface\" />
+    <Folder Include="script\WorldParials\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="config\block\buildblock\HasComponentBlocks.json" />

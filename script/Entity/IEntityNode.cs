@@ -1,10 +1,4 @@
-using System.Diagnostics;
 using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.WorldControl.Service;
-using HorizonCraft.script.WorldControl.Service;
-
 namespace horizoncraft.script.Entity;
 
 /// <summary>

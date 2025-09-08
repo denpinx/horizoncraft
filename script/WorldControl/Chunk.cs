@@ -16,7 +16,7 @@ using MemoryPack;
 using horizoncraft.script.Components;
 using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Net;
-using HorizonCraft.script.WorldControl.Service;
+using HorizonCraft.script.Services.world;
 using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
 
@@ -34,9 +34,11 @@ namespace horizoncraft.script.WorldControl
         public int[,] HighMap = new int[Size, SizeZ];
         public string BiomeType = "";
         public string BiomeName = "";
+
+        public int RemoveCount = 0;
+        
         public List<Vector3> TickList = new();
         public List<Vector2> LightList = new();
-
         [MemoryPackIgnore] public List<Vector3I> UpdateList = new(32);
         [MemoryPackIgnore] public List<Vector3I> UpdateList_buffer = new();
 
@@ -145,8 +147,7 @@ namespace horizoncraft.script.WorldControl
             return data[x, y, z];
         }
 
-        //新版，无法预期运行
-        public void Tick(WorldBase WorldService, World world)
+      public void Tick(WorldServiceBase WorldService, World world)
         {
             version = WorldService.TickTimes;
 
@@ -161,7 +162,7 @@ namespace horizoncraft.script.WorldControl
             BlockTickEvent blockTickEvnet = new()
             {
                 World = world,
-                WorldService = WorldService,
+                Service = WorldService,
                 Chunk = this,
             };
             var coord = new Godot.Vector3I(0, 0, 0);
@@ -210,7 +211,6 @@ namespace horizoncraft.script.WorldControl
                 }
             }
         }
-
         public void FillLight(int value)
         {
             for (int x = 0; x < Chunk.Size; x++)

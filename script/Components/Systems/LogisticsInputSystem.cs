@@ -33,7 +33,7 @@ public class LogisticsInputSystem : TickSystem
     {
         if (finded.Contains(pos) || finded.Count > 128) return null;
 
-        var block = e.WorldService.GetBlock(pos);
+        var block = e.Service.ChunkService.GetBlock(pos);
         if (block == null || !block.CheckTag("link", "net")) return null;
         if (block.IsMeta("output_block"))
         {
@@ -64,7 +64,7 @@ public class LogisticsInputSystem : TickSystem
     public Blockdata GetInventoryBlock(BlockTickEvent e, Vector3I pos, bool hasitem = false)
     {
         {
-            var block = e.WorldService.GetBlock(pos + Vector3I.Up);
+            var block = e.Service.ChunkService.GetBlock(pos + Vector3I.Up);
             if (block != null)
             {
                 var cmp = block.GetComponent<InventoryComponent>();
@@ -79,7 +79,7 @@ public class LogisticsInputSystem : TickSystem
             }
         }
         {
-            var block = e.WorldService.GetBlock(pos + Vector3I.Down);
+            var block = e.Service.ChunkService.GetBlock(pos + Vector3I.Down);
             if (block != null)
             {
                 var cmp = block.GetComponent<InventoryComponent>();
@@ -94,7 +94,7 @@ public class LogisticsInputSystem : TickSystem
             }
         }
         {
-            var block = e.WorldService.GetBlock(pos + Vector3I.Left);
+            var block = e.Service.ChunkService.GetBlock(pos + Vector3I.Left);
             if (block != null)
             {
                 var cmp = block.GetComponent<InventoryComponent>();
@@ -109,7 +109,7 @@ public class LogisticsInputSystem : TickSystem
             }
         }
         {
-            var block = e.WorldService.GetBlock(pos + Vector3I.Right);
+            var block = e.Service.ChunkService.GetBlock(pos + Vector3I.Right);
             if (block != null)
             {
                 var cmp = block.GetComponent<InventoryComponent>();

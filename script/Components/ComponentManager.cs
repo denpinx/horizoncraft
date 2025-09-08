@@ -4,6 +4,7 @@ using Godot;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Components.Systems;
 using horizoncraft.script.Events;
+using horizoncraft.script.Events.player;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
@@ -14,7 +15,7 @@ public class ComponentManager
 {
     static Dictionary<string, ComponentAndSystem> ComponentSets = new();
 
-    public static bool ExecuteComponents(WorldEvent worldEvent, ItemStack itemStack)
+    public static bool ExecuteComponents(PlayerEvent playerEvent, ItemStack itemStack)
     {
         int start_id = itemStack.Id;
         for (int i = 0; i < itemStack.Components.Count; i++)
@@ -30,7 +31,7 @@ public class ComponentManager
             if (ComponentSets.ContainsKey(component.Name))
             {
                 //如果有任意一个组件取消了事件，之后的组件都不执行了
-                var s = ComponentSets[component.Name].system.Execute(worldEvent, component);
+                var s = ComponentSets[component.Name].system.Execute(playerEvent, component);
                 if (!s) return false;
             }
             if (itemStack.Id != start_id)

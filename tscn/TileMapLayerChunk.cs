@@ -9,7 +9,7 @@ public partial class TileMapLayerChunk : Node2D
 {
     [Export] public bool DEBUG = true;
     public Chunk chunk;
-    public Player player;
+    public PlayerNode PlayerNode;
     TileMapLayer tileMapLayer_font;
     TileMapLayer tileMapLayer_back;
     TileMapLayer tileMapLayer_shadow;
@@ -31,11 +31,11 @@ public partial class TileMapLayerChunk : Node2D
 
     public override void _Process(double delta)
     {
-        if (chunk == null || GetParent() == null)
+        if (chunk == null && GetParent() == null)
         {
             QueueFree();
         }
-        
+
         if (chunk.update_tilemap)
         {
             if (debugView.Visible)
@@ -90,7 +90,7 @@ public partial class TileMapLayerChunk : Node2D
                         {
                             var tag = block.BlockMeta.GetTag("link");
                             var global = new Vector3I(chunk.X * Chunk.Size + x, chunk.Y * Chunk.Size + y, z);
-                            coord = player.world.WorldService.GetTerrain(global, "link", tag);
+                            coord = PlayerNode.world.Service.ChunkService.GetTerrain(global, "link", tag);
                         }
 
                         if (z == 0 && !block_font.BlockMeta.Cube)

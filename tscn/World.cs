@@ -4,27 +4,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Transactions;
 using Godot;
-using Godot.Collections;
-using horizoncraft.script;
-using horizoncraft.script.Components;
-using horizoncraft.script.Entity;
+using horizoncraft.script.Config;
+using HorizonCraft.script.Services.world;
 using horizoncraft.script.WorldControl;
-using horizoncraft.script.WorldControl.Service;
-using HorizonCraft.script.WorldControl.Service;
 using Microsoft.Data.Sqlite;
 using Array = Godot.Collections.Array;
 using Timer = Godot.Timer;
 
 namespace horizoncraft.script
 {
+    //已完成第三次重构
     public partial class World : Node2D
     {
-        //
         public enum WorldMode
         {
             Preview, //预览模式,仅生成世界,不保存,不加载
@@ -33,33 +25,100 @@ namespace horizoncraft.script
             MultiplayerHost //联机服主机模式,拥有全部内容
         }
 
+        public static string WorldName = "world";
         public static WorldMode worldMode = WorldMode.Single;
-
-        //
-        public PackedScene PlayerSnapshot_ps;
-
-        //事件
-        public Action CilentTicked;
-        public Action<Chunk> TileMapRemove;
-
-        public Action<Chunk> TileMapAdd;
-
-        //
-        public static string world_name = "world";
+        public WorldServiceBase Service;
         public long tick_use_time = 0;
-        public SqliteConnection connection;
-        public WorldBase WorldService;
-        public PackedScene PSTilemapLayerChunk;
         public List<TileMapLayerChunk> tileMapLayerChunks = new();
-        public System.Collections.Generic.Dictionary<Vector2I, Chunk> VisibleChunks = new();
+        public Dictionary<Vector2I, Chunk> VisibleChunks = new();
+        public Action CilentTicked;
+
+
+        private PackedScene PSTilemapLayerChunk;
 
         //Node
-        public Player player;
+        public PlayerNode PlayerNode;
         public Timer timer;
         public TextureRect textureRect;
         public DirectionalLight2D DirectionalLight2D;
         public ColorRect colorRect;
         public double RequeueFreeze = 0;
+
+
+        public override void _Ready()
+        {
+            _ = Materials.BlockMetas;
+            PSTilemapLayerChunk =
+                GD.Load<PackedScene>("res://tscn/TileMapLayerChunk.tscn");
+            textureRect =
+                GetNode<TextureRect>("CanvasLayer_Back/TextureRect_Sky");
+            DirectionalLight2D =
+                GetNode<DirectionalLight2D>("DirectionalLight2D");
+            colorRect =
+                GetNode<ColorRect>("CanvasLayer/ColorRect_Top");
+            PlayerNode =
+                GetNode<PlayerNode>("Player");
+            timer =
+                GetNode<Timer>("Timer_Tick");
+
+            timer.Timeout += ClientTick;
+            PlayerNode.world = this;
+
+            if (worldMode == WorldMode.Single)
+                Service = new SingleWorldService(this);
+
+            if (worldMode == WorldMode.MultiplayerHost)
+                Service = new HostWorldService(this);
+
+            if (worldMode == WorldMode.MultiplayerClient)
+                Service = new ClientWorldService(this);
+
+
+            if (worldMode == WorldMode.Preview)
+                Service = new PreviewWorldService(this);
+            
+            Service.InitializeServices();
+        }
+
+        public override void _ExitTree()
+        {
+            Service.ChunkService.SaveAll();
+            Service.PlayerService.SaveAll();
+        }
+
+        public override void _Process(double delta)
+        {
+            if (RequeueFreeze > 0) RequeueFreeze -= delta;
+            else RequeueFreeze = 0;
+            if (PlayerNode.playerData == null && RequeueFreeze == 0)
+            {
+                if (Service.PlayerService.GetPlayerOrLoad(PlayerNode.Profile.Name, out var data))
+                {
+                    PlayerNode.playerData = data;
+                    PlayerNode.Position = data.Position_v2;
+                    GD.Print($"玩家获取成功{data.Name}{data.Coord}");
+                }
+                else
+                {
+                    GD.Print("玩家获取失败");
+                    RequeueFreeze = 0.5;
+                }
+            }
+        }
+
+        public void ClientTick()
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            UpdateTileMap();
+            CilentTicked?.Invoke();
+            BlockInterFaceHandle();
+            
+            sw.Stop();
+            tick_use_time = sw.ElapsedMilliseconds;
+        }
+
 
         public bool HasTileMap(Vector2I coord)
         {
@@ -74,23 +133,7 @@ namespace horizoncraft.script
             return false;
         }
 
-        public void RemoveTileMap(Vector2I coord)
-        {
-            for (int i = 0; i < tileMapLayerChunks.Count; i++)
-            {
-                if (tileMapLayerChunks[i].chunk.coord == coord)
-                {
-                    TileMapRemove?.Invoke(tileMapLayerChunks[i].chunk);
-
-                    tileMapLayerChunks[i].QueueFree();
-                    tileMapLayerChunks.RemoveAt(i);
-
-                    break;
-                }
-            }
-        }
-
-        public void AddTileMap(Chunk chunk)
+        private void AddTileMap(Chunk chunk)
         {
             for (int i = 0; i < tileMapLayerChunks.Count; i++)
             {
@@ -106,133 +149,14 @@ namespace horizoncraft.script
             tmly.chunk = chunk;
             tmly.GlobalPosition = chunk.coord * Chunk.Size * 16;
             tmly.Visible = true;
-            tmly.player = player;
+            tmly.PlayerNode = PlayerNode;
             tileMapLayerChunks.Add(tmly);
             AddChild(tmly);
-            TileMapAdd?.Invoke(chunk);
         }
 
-        public override void _Ready()
+        public void UpdateTileMap()
         {
-            _ = Materials.BlockMetas;
-            PlayerSnapshot_ps = GD.Load<PackedScene>("res://tscn/PlayerSnapshot.tscn");
-            PSTilemapLayerChunk = GD.Load<PackedScene>("res://tscn/TileMapLayerChunk.tscn");
-            player = GetNode<Player>("Player");
-            timer = GetNode<Timer>("Timer_Tick");
-            textureRect = GetNode<TextureRect>("CanvasLayer_Back/TextureRect_Sky");
-            colorRect = GetNode<ColorRect>("CanvasLayer/ColorRect_Top");
-            DirectionalLight2D = GetNode<DirectionalLight2D>("DirectionalLight2D");
-            timer.Timeout += ClientTick;
-            player.world = this;
-
-            if (worldMode == WorldMode.Single)
-            {
-                WorldSingleService wsw = new WorldSingleService();
-                WorldService = wsw;
-                wsw.world = this;
-                wsw.Init();
-                wsw.UpdateLoadChunkCoords();
-
-                player.Inputable = true;
-                player.MoreInfo = true;
-            }
-
-            if (worldMode == WorldMode.MultiplayerHost)
-            {
-                WorldHostService whs = new WorldHostService();
-                WorldService = whs;
-                whs.world = this;
-                whs.Init();
-                whs.UpdateLoadChunkCoords();
-            }
-
-            if (worldMode == WorldMode.MultiplayerClient)
-            {
-                WorldClientService wcs = new WorldClientService();
-                WorldService = wcs;
-                wcs.world = this;
-                wcs.Init();
-                wcs.UpdateLoadChunkCoords();
-            }
-
-            if (worldMode == WorldMode.Preview)
-            {
-                WorldPreviewService wps = new WorldPreviewService();
-                WorldService = wps;
-                wps.world = this;
-                wps.Init();
-                wps.UpdateLoadChunkCoords();
-                player.playerData = new PlayerData() { Name = Player.Profile.Name };
-                player.Inputable = false;
-                player.Visible = false;
-                player.MoreInfo = false;
-            }
-        }
-
-        public override void _ExitTree()
-        {
-            if (WorldService is IWorldService IWS)
-                IWS.Save();
-        }
-
-        public override void _Process(double delta)
-        {
-            if (WorldService != null && colorRect != null)
-            {
-                float t = WorldService.GetTimeProgress();
-                colorRect.Color = Color.Color8(0, 0, 0, GetLightChange(t));
-                textureRect.Modulate = GetSkyChange(t);
-                DirectionalLight2D.Energy = 1 - GetLightChange(t) / 255f;
-                DirectionalLight2D.RotationDegrees = (1 - t) * 360f + 180f;
-            }
-
-            if (RequeueFreeze > 0) RequeueFreeze -= delta;
-            if (player.playerData == null)
-            {
-                if (WorldService is WorldHostService whs)
-                {
-                    PlayerData pd;
-                    if (whs.GetPlayer(Player.Profile.Name, out pd))
-                    {
-                        player.playerData = pd;
-                        player.Position = pd.Position_v2;
-                        GD.Print("[服务端]初始化玩家成功");
-                    }
-                }
-                else if (WorldService is WorldPreviewService pws)
-                {
-                    player.playerData = new PlayerData() { Name = "Player" };
-                }
-                else if (WorldService is WorldClientService wcs && WorldService.Connect)
-                {
-                    if (RequeueFreeze <= 0)
-                    {
-                        RpcId(1, "GetPlayer", Player.Profile.Name, Multiplayer.GetUniqueId());
-                        RequeueFreeze = 2;
-                    }
-                }
-                else if (WorldService is IWorldService iws &&
-                         iws.GetPlayer(Player.Profile.Name, out player.playerData) &&
-                         player.playerData != null)
-                {
-                    player.playerData.player = player;
-                    player.Position = new(player.playerData.Position.X, player.playerData.Position.Y);
-                    if (worldMode == WorldMode.Preview)
-                    {
-                        player.Visible = false;
-                        player.Visible = false;
-                    }
-
-                    iws.UpdateLoadChunkCoords();
-                }
-            }
-        }
-
-        public void ClientTick()
-        {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
+            if (PlayerNode.playerData == null) return;
             foreach (var tmly in tileMapLayerChunks.ToArray())
             {
                 if (!VisibleChunks.ContainsKey(tmly.chunk.coord))
@@ -248,19 +172,33 @@ namespace horizoncraft.script
                 AddTileMap(VisibleChunks[key]);
             }
 
-            CilentTicked?.Invoke();
-            BlockInterFaceHandle();
-            sw.Stop();
-            tick_use_time = sw.ElapsedMilliseconds;
+            HashSet<Vector2I> poss = new HashSet<Vector2I>();
+            Service.ChunkService.GetLoadRangeChunks(PlayerNode.playerData.ChunkCoord, poss);
+            //更新
+            foreach (var pos in poss)
+            {
+                if (Service.ChunkService.Chunks.TryGetValue(pos, out var chunk))
+                {
+                    VisibleChunks[pos] = chunk;
+                }
+            }
+
+            //去重卸载
+            foreach (Vector2I coord in VisibleChunks.Keys.ToArray())
+            {
+                if (!poss.Contains(coord))
+                    VisibleChunks.Remove(coord, out _);
+            }
         }
 
 
         public void BlockInterFaceHandle()
         {
-            if (player?.playerData == null) return;
+            if (PlayerNode?.playerData == null) return;
 
             Blockdata CurrentBlock =
-                WorldService?.GetBlock(new Vector3I(player.playerData.Coord.X, player.playerData.Coord.Y, 1));
+                Service.ChunkService.GetBlock(new Vector3I(PlayerNode.playerData.Coord.X, PlayerNode.playerData.Coord.Y,
+                    1));
             if (CurrentBlock != null)
             {
                 string tag = CurrentBlock.GetTag("enter_action");
@@ -268,26 +206,25 @@ namespace horizoncraft.script
                 {
                     if (tag == "no-fall")
                     {
-                        player.playerData.Fly.Value = true;
-                        player.playerData.Resistance.Value = 0.5f;
+                        PlayerNode.playerData.Fly.Value = true;
+                        PlayerNode.playerData.Resistance.Value = 0.5f;
                         return;
                     }
                 }
 
                 //防止卡墙里
-                if (CurrentBlock.BlockMeta.Collide && player.playerData.Mode == 0)
+                if (CurrentBlock.BlockMeta.Collide && PlayerNode.playerData.Mode == 0)
                 {
-                    player.Position += new Vector2(0, -17);
+                    PlayerNode.Position += new Vector2(0, -17);
                 }
             }
 
-            if (player.playerData.Mode == 0)
+            if (PlayerNode.playerData.Mode == 0)
             {
-                player.playerData.Fly.Value = false;
-                player.playerData.Resistance.Value = 1f;
+                PlayerNode.playerData.Fly.Value = false;
+                PlayerNode.playerData.Resistance.Value = 1f;
             }
         }
-
 
         public byte GetLightChange(float t)
         {
@@ -346,14 +283,6 @@ namespace horizoncraft.script
         }
 
 
-        public static Vector2I MathFloor(Vector3I V3I, int chunkSize)
-        {
-            return new Vector2I(
-                (int)Mathf.Floor((float)V3I.X / chunkSize),
-                (int)Mathf.Floor((float)V3I.Y / chunkSize)
-            );
-        }
-
         public static Vector2I MathFloor(Vector2I V2I, int chunkSize)
         {
             return new Vector2I(
@@ -362,22 +291,12 @@ namespace horizoncraft.script
             );
         }
 
-        public static int MathFloor(int integer, int chunkSize)
-        {
-            return (int)Mathf.Floor((float)integer / chunkSize);
-        }
-
         public static Vector2I Remainder(Vector3I V3I, int chunkSize)
         {
             return new Vector2I(
                 (V3I.X % chunkSize + chunkSize) % chunkSize,
                 (V3I.Y % chunkSize + chunkSize) % chunkSize
             );
-        }
-
-        public static int Remainder(int integer, int chunkSize)
-        {
-            return (integer % chunkSize + chunkSize) % chunkSize;
         }
     }
 }

@@ -25,15 +25,15 @@ public static class SqliteTool
                     GD.PrintErr($"创建 save 文件夹失败，错误码: {err}");
             }
 
-            if (!DirAccess.DirExistsAbsolute($"save/{World.world_name}"))
+            if (!DirAccess.DirExistsAbsolute($"save/{World.WorldName}"))
             {
-                Error err = DirAccess.MakeDirAbsolute($"save/{World.world_name}");
+                Error err = DirAccess.MakeDirAbsolute($"save/{World.WorldName}");
                 if (err != Error.Ok)
-                    GD.PrintErr($"创建 save{World.world_name} 文件夹失败，错误码: {err}");
+                    GD.PrintErr($"创建 save{World.WorldName} 文件夹失败，错误码: {err}");
             }
 
             sqliteConnection = new SqliteConnection(
-                $"Data Source=save/{World.world_name}/data.db"
+                $"Data Source=save/{World.WorldName}/data.db"
             );
             sqliteConnection.Open();
             if (!IsEnableWAL)

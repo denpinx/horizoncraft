@@ -1,7 +1,7 @@
 [gd_scene load_steps=26 format=3 uid="uid://dlka0sc4kl0vb"]
 
+[ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/PlayerNode.cs" id="1_knoa1"]
 [ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="1_qob58"]
-[ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/Player.cs" id="1_uuqip"]
 [ext_resource type="Script" uid="uid://c4uuiue21aw2o" path="res://tscn/Camera2d.cs" id="3_vvow5"]
 [ext_resource type="PackedScene" uid="uid://cakto4xqnoeua" path="res://tscn/Menu/HotBar.tscn" id="4_kghmo"]
 [ext_resource type="Script" uid="uid://d1fcknwxu8kry" path="res://tscn/DEBUG_INFO.cs" id="4_knoa1"]
@@ -245,7 +245,7 @@ _data = {
 [node name="Player" type="CharacterBody2D"]
 top_level = true
 z_index = 10
-script = ExtResource("1_uuqip")
+script = ExtResource("1_knoa1")
 metadata/_edit_vertical_guides_ = [575.0]
 
 [node name="Camera2D" type="Camera2D" parent="."]

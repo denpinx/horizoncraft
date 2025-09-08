@@ -10,15 +10,17 @@ using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Config;
 using horizoncraft.script.Entity;
+using horizoncraft.script.Events;
+using horizoncraft.script.Events.player;
 using horizoncraft.script.Inventory;
+using horizoncraft.script.rpc;
+using HorizonCraft.script.Services.world;
 using horizoncraft.script.WorldControl;
-using horizoncraft.script.WorldControl.Service;
-using HorizonCraft.script.WorldControl.Service;
 using Vector3 = System.Numerics.Vector3;
 
 namespace horizoncraft.script;
 
-public partial class Player : CharacterBody2D
+public partial class PlayerNode : CharacterBody2D
 {
     private const bool TEST_MODE = true;
     public static LocalProfile Profile;
@@ -81,7 +83,10 @@ public partial class Player : CharacterBody2D
 
     public override void _Process(double delta)
     {
-        if (!Inputable) return;
+        if (!Inputable)
+        {
+            return;
+        }
 
         if (playerData != null)
         {
@@ -107,8 +112,8 @@ public partial class Player : CharacterBody2D
 
             var pos0 = new Vector3I(pos.X, pos.Y, 0);
             var pos1 = new Vector3I(pos.X, pos.Y, 1);
-            var block1 = world.WorldService.GetBlock(pos0);
-            var block2 = world.WorldService.GetBlock(pos1);
+            var block1 = world.Service.ChunkService.GetBlock(pos0);
+            var block2 = world.Service.ChunkService.GetBlock(pos1);
             if (block1 == null || block2 == null)
             {
                 BreakProcess.Reset();
@@ -145,7 +150,13 @@ public partial class Player : CharacterBody2D
 
             if (BreakProcess.ProcessTime >= BreakProcess.FinalTime)
             {
-                world.WorldService.BreakBlock(playerData, BreakProcess.Position);
+                var bbe = new PlayerBreakblockEvent()
+                {
+                    world = world,
+                    Player = playerData,
+                    Position = BreakProcess.Position,
+                };
+                world.Service.PlayerService.Events.BreakBlock(bbe);
                 BreakProcess.ProcessTime = 0;
                 BreakProcess.FinalTime = 2;
             }
@@ -157,7 +168,7 @@ public partial class Player : CharacterBody2D
             }
             else
             {
-                if (!world.WorldService.CheckIsCloseBlock(finalpos))
+                if (!world.Service.ChunkService.CheckIsCloseBlock(finalpos))
                 {
                     var meta = InterfaceBlock.BlockMeta;
                     float efficiency = 1f;
@@ -203,13 +214,24 @@ public partial class Player : CharacterBody2D
 
 
             if (
-                world.WorldService.PlaceBlock(playerData, targetpos, coercive,
-                    IsInRange(targetpos.X * 16, targetpos.Y * 16)))
+                world.Service.PlayerService.Events.PlaceBlock(new()
+                {
+                    world = world,
+                    Player = playerData,
+                    Position = targetpos,
+                    coercive = coercive,
+                    IsCollide = IsInRange(targetpos.X * 16, targetpos.Y * 16)
+                }))
             {
             }
             else
             {
-                world.WorldService.InterfaceBlock(playerData, targetpos);
+                world.Service.PlayerService.Events.InterfaceBlock(new InterfaceBlockEvent()
+                {
+                    world = world,
+                    Player = playerData,
+                    Position = targetpos,
+                });
             }
         }
 
@@ -225,13 +247,18 @@ public partial class Player : CharacterBody2D
         }
     }
 
+
     public override void _PhysicsProcess(double delta)
     {
         if (playerData == null) return;
-        if (playerData.Name != Player.Profile.Name) return;
+        if (playerData.Name != PlayerNode.Profile.Name) return;
 
         if (world == null) return;
-        if (!world.HasTileMap(playerData.ChunkCoord)) return;
+        if (!world.HasTileMap(playerData.ChunkCoord))
+        {
+            GD.Print("禁止移动");
+            return;
+        }
 
 
         Vector2I Mcoord = World.MathFloor((Vector2I)GetGlobalMousePosition(), 16);
@@ -247,30 +274,25 @@ public partial class Player : CharacterBody2D
             (int)Mathf.Floor(Position.X / (16 * Chunk.Size)),
             (int)Mathf.Floor(Position.Y / (16 * Chunk.Size))
         );
-        if (ChunkCoord != playerData.ChunkCoord)
-        {
-            if (OnMoveToChunk != null)
-                OnMoveToChunk.Invoke();
-        }
 
         //更新自身数据
         var pos = new System.Numerics.Vector2(Position.X, Position.Y);
-        if (playerData.Position != pos) playerData.Moved = true;
+        if (playerData.Position != pos) playerData.Update = true;
         playerData.Position = pos;
         Label_PlayerName.Text = playerData.Name;
 
-        if (world.WorldService is WorldHostService)
+        //if (world.WorldService is WorldHostService)
+        //{
+        if (world.Service.PlayerService.Players.TryGetValue(playerData.Name, out var data))
         {
-            if (world.WorldService.PlayerService.Players.TryGetValue(playerData.Name, out var data))
-            {
-                data.Position = playerData.Position;
-                data.Moved = playerData.Moved;
-                data.FaceLeft = playerData.FaceLeft;
-            }
+            data.Position = playerData.Position;
+            data.Update = playerData.Update;
+            data.FaceLeft = playerData.FaceLeft;
         }
+        //}
 
         //防止加载地形的时候卡墙里
-        if (world == null || !world.WorldService.Chunks.ContainsKey(ChunkCoord))
+        if (world == null || !world.Service.ChunkService.Chunks.ContainsKey(ChunkCoord))
         {
             Stop = true;
         }
@@ -293,8 +315,12 @@ public partial class Player : CharacterBody2D
                 if (Input.IsKeyPressed(i + Key.Key0))
                 {
                     playerData.Inventory.HandSlot = (byte)(i - 1);
-                    if (world.WorldService is WorldClientService wcs)
-                        world.RpcId(1, "SetHandSlot", playerData.Name, playerData.Inventory.HandSlot);
+                    if (world.Service is ClientWorldService wcs)
+                        world.Service.PlayerInventoryServiceNode.RpcId(
+                            1,
+                            nameof(PlayerInventoryServiceNode.SetHandSlot),
+                            playerData.Name, playerData.Inventory.HandSlot
+                        );
                     if (BreakProcess.ProcessTime > 0)
                         BreakProcess.ProcessTime = 0;
                 }
@@ -304,8 +330,12 @@ public partial class Player : CharacterBody2D
             {
                 playerData.Inventory.HandSlot -= 1;
                 if (playerData.Inventory.HandSlot < 0) playerData.Inventory.HandSlot = 8;
-                if (world.WorldService is WorldClientService wcs)
-                    world.RpcId(1, "SetHandSlot", playerData.Name, playerData.Inventory.HandSlot);
+                if (world.Service is ClientWorldService wcs)
+                    world.Service.PlayerInventoryServiceNode.RpcId(
+                        1,
+                        nameof(PlayerInventoryServiceNode.SetHandSlot),
+                        playerData.Name, playerData.Inventory.HandSlot
+                    );
                 if (BreakProcess.ProcessTime > 0)
                     BreakProcess.ProcessTime = 0;
             }
@@ -314,8 +344,12 @@ public partial class Player : CharacterBody2D
             {
                 playerData.Inventory.HandSlot += 1;
                 if (playerData.Inventory.HandSlot > 8) playerData.Inventory.HandSlot = 0;
-                if (world.WorldService is WorldClientService wcs)
-                    world.RpcId(1, "SetHandSlot", playerData.Name, playerData.Inventory.HandSlot);
+                if (world.Service is ClientWorldService wcs)
+                    world.Service.PlayerInventoryServiceNode.RpcId(
+                        1,
+                        nameof(PlayerInventoryServiceNode.SetHandSlot),
+                        playerData.Name, playerData.Inventory.HandSlot
+                    );
                 if (BreakProcess.ProcessTime > 0)
                     BreakProcess.ProcessTime = 0;
             }
@@ -324,19 +358,14 @@ public partial class Player : CharacterBody2D
             {
                 if (ShowView != null)
                 {
-                    if (world.WorldService is WorldClientService wcs)
-                    {
-                        world.RpcId(1, "CloseBlockInv", Player.Profile.Name);
-                    }
-
-                    world.player.playerData.OpeningBlockInventory = false;
-
+                    world.Service.PlayerService.Events.CloseInventory(world.Service,playerData.Name);
+                    world.PlayerNode.playerData.OpeningBlockInventory = false;
                     RemoveChild(ShowView);
                     ShowView = null;
                 }
                 else
                 {
-                    world.WorldService.OpenView("PlayerInventory");
+                    world.Service.PlayerService.Events.OpenInventory(world,"PlayerInventory");
                 }
             }
         }
@@ -415,7 +444,7 @@ public partial class Player : CharacterBody2D
                 var data = new EntityData()
                 {
                     Name = "item_entity",
-                    Owned = Player.Profile.Name,
+                    Owned = PlayerNode.Profile.Name,
                     Position = new(GetGlobalMousePosition().X, GetGlobalMousePosition().Y),
                     Components = new List<Component>()
                     {
@@ -425,7 +454,7 @@ public partial class Player : CharacterBody2D
                         }
                     }
                 };
-                world.WorldService.EntityService.AddEntityData(data);
+                world.Service.EntityService.AddEntityData(data);
             }
 
             if (Input.IsActionJustPressed("F1") && Inputable)
@@ -470,11 +499,10 @@ public partial class Player : CharacterBody2D
         Timer_Tick = GetNode<Timer>("Timer_Tick");
         hotBar = GetNode<HotBar>("CanvasLayer/HotBar");
         if (playerData != null)
-            playerData.player = this;
-        hotBar.Player = this;
+            playerData.PlayerNode = this;
+        hotBar.PlayerNode = this;
         ;
     }
-
 
     public bool IsInRange(int x, int y, float w = 16f, float h = 16f)
     {

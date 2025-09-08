@@ -1,24 +1,25 @@
 using Godot;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Events;
+using horizoncraft.script.Events.player;
 
 namespace horizoncraft.script.Components.Systems;
 
 public class ItemDurableSystem : ItemComponentSystem
 {
-    public override bool OnBreakBlock(BreakBlockEvent bbe, ItemComponent itemComponent)
+    public override bool OnBreakBlock(PlayerBreakblockEvent bbe, ItemComponent itemComponent)
     {
         var durable = itemComponent as ItemDurableComponent;
         GD.Print($"[方块挖掘] 当前耐久{durable.Value}/{durable.Max}");
-        if (bbe.Blockdata.BlockMeta.BreakLevel <= durable.ToolLevel)
+        if (bbe.GetBlockData().BlockMeta.BreakLevel <= durable.ToolLevel)
         {
             //正常掉落
-            bbe.DropItemStack = bbe.Blockdata.BlockMeta.ItemMeta.GetItemStack();
+            bbe.DropItem = bbe.GetBlockData().BlockMeta.ItemMeta.GetItemStack();
         }
         else
         {
             //无掉落物
-            bbe.DropItemStack = null;
+            bbe.DropItem = null;
         }
 
         durable.Value -= 1;
@@ -28,7 +29,7 @@ public class ItemDurableSystem : ItemComponentSystem
         if (durable.Value <= 0)
         {
             durable.Value = durable.Max;
-            bbe.ItemStack.Amount -= 1;
+            bbe.GetItemStack().Amount -= 1;
         }
 
         return true;

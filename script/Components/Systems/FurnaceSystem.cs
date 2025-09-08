@@ -75,7 +75,6 @@ public class FurnaceSystem : TickSystem
                 if (str != null)
                 {
                     furnace.GetInventory().ReduceItemAmount(1);
-                    GD.Print($"加油！{str}");
                     int f = str.ToInt();
                     furnace.Fuel += f;
                     furnace.FuelMax = f;
