@@ -1,19 +1,19 @@
 using System.Collections.Generic;
 using Godot;
+using horizoncraft.script;
 using horizoncraft.script.Components;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.rpc;
-using HorizonCraft.script.Services.player;
 using horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script.NewProxy.player;
+namespace HorizonCraft.script.Services.player;
 
 public class HostPlayerService : PlayerServiceBase
 {
     public HostPlayerService(World world) : base(world)
     {
-        world.timer.Timeout += Ticking;
+        
     }
 
     public override void Ticking()
@@ -39,7 +39,7 @@ public class HostPlayerService : PlayerServiceBase
             PlayerData player = Fs.Value;
             if (player.Name == PlayerNode.Profile.Name) continue;
 
-            var List = GetPlayersByRange(player, world.Service.ChunkService._loadrange);
+            var List = GetPlayersByRange(player, World.Service.ChunkService._loadrange);
             foreach (var target in List)
             {
                 if (target.Update)
@@ -54,7 +54,7 @@ public class HostPlayerService : PlayerServiceBase
         foreach (var playerData in Players.Values) playerData.Update = false;
         foreach (var sets in packs)
         {
-            world.Service.PlayerServiceNode.RpcId(sets.Key,
+            World.Service.PlayerServiceNode.RpcId(sets.Key,
                 nameof(PlayerServiceNode.ReceivePlayerDatas),
                 ByteTool.ToBytes<PlayerPack>(sets.Value)
             );
@@ -73,7 +73,7 @@ public class HostPlayerService : PlayerServiceBase
                 if (player.Inventory.update)
                 {
                     player.Inventory.update = false;
-                    world.Service.PlayerServiceNode.RpcId(
+                    World.Service.PlayerServiceNode.RpcId(
                         player.PeerId,
                         nameof(PlayerServiceNode.ReceivePlayerInv),
                         ByteTool.ToBytes<PlayerInventory>(player.Inventory)
@@ -84,12 +84,12 @@ public class HostPlayerService : PlayerServiceBase
                 {
                     var pos = new Vector3I((int)player.OpenInventory.X, (int)player.OpenInventory.Y,
                         (int)player.OpenInventory.Z);
-                    var blockdata = world.Service.ChunkService.GetBlock(pos);
+                    var blockdata = World.Service.ChunkService.GetBlock(pos);
                     var inv = blockdata?.GetComponent<InventoryComponent>();
                     if (blockdata != null && inv != null)
                     {
                         if (inv.GetInventory().update)
-                            world.Service.ChunkServiceNode.RpcId(player.PeerId,
+                            World.Service.ChunkServiceNode.RpcId(player.PeerId,
                                 nameof(ChunkServiceNode.ReciveLookingBlockData),
                                 ByteTool.ToBytes<BlockData>(blockdata),
                                 ByteTool.ToBytes<PlayerInventory>(player.Inventory));
@@ -112,7 +112,7 @@ public class HostPlayerService : PlayerServiceBase
                     (int)player.OpenInventory.Y,
                     (int)player.OpenInventory.Z
                 );
-                var blockdata = world.Service.ChunkService.GetBlock(pos);
+                var blockdata = World.Service.ChunkService.GetBlock(pos);
                 var inv = blockdata?.GetComponent<InventoryComponent>();
                 if (blockdata != null && inv != null && inv.GetInventory().update)
                 {

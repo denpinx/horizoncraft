@@ -1,8 +1,10 @@
+using System;
 using Godot;
 using Godot.NativeInterop;
 using horizoncraft.script.Net;
 using horizoncraft.script.Services.Events;
 using HorizonCraft.script.Services.player;
+using HorizonCraft.script.Services.world;
 
 namespace horizoncraft.script.NewProxy.player;
 
@@ -18,13 +20,13 @@ public class ClientPlayerService : PlayerServiceBase
     public override void Ticking()
     {
         base.Ticking();
-        var player = world.PlayerNode.playerData;
+        var player = World.PlayerNode.playerData;
         if (player != null)
         {
             if (LastPosition != player.Position_v2i)
             {
                 var snap = new PlayerDataSnapshot(player);
-                world.Service.PlayerServiceNode.RpcId(1,
+                World.Service.PlayerServiceNode.RpcId(1,
                     nameof(PlayerServiceNode.UpdataPlayer),
                     player.PlayerNode.Name,
                     ByteTool.ToBytes(snap));
@@ -42,9 +44,9 @@ public class ClientPlayerService : PlayerServiceBase
             return true;
         }
 
-        if (world.Multiplayer.MultiplayerPeer != null)
-            world.Service.PlayerServiceNode.RpcId(1,
-                nameof(PlayerServiceNode.GetPlayer), name, world.Multiplayer.GetUniqueId()
+        if (ClientWorldService.Connected)
+            World.Service.PlayerServiceNode.RpcId(1,
+                nameof(PlayerServiceNode.GetPlayer), name, World.Multiplayer.GetUniqueId()
             );
         playerData = null;
         return false;

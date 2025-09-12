@@ -9,7 +9,7 @@ namespace horizoncraft.script.WorldControl
 {
     public class LandBiome : BaseBiome
     {
-        public virtual int GetHigh(FastNoiseLite noise, int x, int z)
+        public virtual int GetHigh(Random random,FastNoiseLite noise, int x, int z)
         {
             return 0;
         }

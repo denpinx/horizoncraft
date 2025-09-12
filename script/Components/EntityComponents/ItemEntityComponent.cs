@@ -7,4 +7,9 @@ namespace horizoncraft.script.Components.EntityComponents;
 public partial class ItemEntityComponent : EntityComponent
 {
     public ItemStack ItemStack;
+
+    public ItemEntityComponent()
+    {
+        Name = "ItemEntityComponent";
+    }
 }

@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script;
+using horizoncraft.script.Expand;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Tool;
 
@@ -51,7 +52,7 @@ public partial class ChunkServiceBase : IDisposable
     public Action<Chunk> OnChunkLoaded;
     public Action<Chunk> OnChunkSaving;
     public ConcurrentDictionary<Vector2I, Chunk> Chunks = new();
-    protected World _world;
+    protected World World;
     public int _loadrange = 1;
     private CancellationTokenSource _tokenSource;
     private Task _processLoadTask;
@@ -59,7 +60,7 @@ public partial class ChunkServiceBase : IDisposable
 
     public ChunkServiceBase(World world)
     {
-        this._world = world;
+        this.World = world;
         world.timer.Timeout += Ticking;
         PlayerNode.GetInformation[nameof(ChunkServiceBase)] =
             () => $"加载区块:{Chunks.Count}";
@@ -77,7 +78,7 @@ public partial class ChunkServiceBase : IDisposable
     {
         foreach (var chunk in Chunks.Values)
         {
-            chunk.Tick(this._world.Service, this._world);
+            chunk.Tick(this.World.Service, this.World);
         }
 
         UpdateLights();
@@ -92,7 +93,7 @@ public partial class ChunkServiceBase : IDisposable
     {
         try
         {
-            using (var conn = SqliteTool.InitSqlite(_world.Name))
+            using (var conn = SqliteTool.InitSqlite(World.WorldName))
             {
                 if (conn.CheckChunkExists(pos.X, pos.Y))
                 {
@@ -124,7 +125,7 @@ public partial class ChunkServiceBase : IDisposable
     {
         try
         {
-            using (var conn = SqliteTool.InitSqlite(_world.WorldName))
+            using (var conn = SqliteTool.InitSqlite(World.WorldName))
             {
                 if (conn.CheckChunkExists(chunk.X, chunk.Y))
                     conn.UpdateChunkByteData(chunk.X, chunk.Y, chunk);
@@ -221,7 +222,7 @@ public partial class ChunkServiceBase : IDisposable
     public HashSet<Vector2I> GetAllLoadRangeChunks()
     {
         HashSet<Vector2I> loadqueue = new HashSet<Vector2I>();
-        foreach (var player in _world.Service.PlayerService.Players.Values)
+        foreach (var player in World.Service.PlayerService.Players.Values)
         {
             GetLoadRangeChunks(player.ChunkCoord, loadqueue);
         }
@@ -282,10 +283,10 @@ public partial class ChunkServiceBase : IDisposable
     /// <returns></returns>
     public BlockData GetBlock(Vector3I globalPosition)
     {
-        var coord = World.MathFloor(new Vector2I((int)globalPosition.X, (int)globalPosition.Y), Chunk.Size);
+        var coord = globalPosition.MathFloor(Chunk.Size);
         if (Chunks.TryGetValue(coord, out var chunk))
         {
-            Vector2I LocalCoord = World.Remainder(globalPosition, Chunk.Size);
+            Vector2I LocalCoord = globalPosition.Remainder(Chunk.Size);
             return chunk.GetBlock(LocalCoord.X, LocalCoord.Y, globalPosition.Z);
         }
 
@@ -300,10 +301,10 @@ public partial class ChunkServiceBase : IDisposable
     /// <returns>返回设置后的方块本身</returns>
     public BlockData SetBlock(Vector3I globalPosition, BlockData blockData)
     {
-        var coord = World.MathFloor(new Vector2I((int)globalPosition.X, (int)globalPosition.Y), Chunk.Size);
+        var coord = globalPosition.MathFloor(Chunk.Size);
         if (Chunks.TryGetValue(coord, out var chunk))
         {
-            Vector2I LocalCoord = World.Remainder(globalPosition, Chunk.Size);
+            Vector2I LocalCoord = globalPosition.Remainder(Chunk.Size);
             return chunk.SetBlock(LocalCoord.X, LocalCoord.Y, globalPosition.Z, blockData);
         }
 
@@ -319,7 +320,7 @@ public partial class ChunkServiceBase : IDisposable
     /// <returns>设置后的方块</returns>
     public BlockData SetBlock(Vector3I globalPosition, BlockMeta meta, int state = 0)
     {
-        var coord = World.MathFloor(new Vector2I((int)globalPosition.X, (int)globalPosition.Y), Chunk.Size);
+        var coord = globalPosition.MathFloor(Chunk.Size);
         if (Chunks.TryGetValue(coord, out var chunk))
         {
             Vector2I localPosition = World.Remainder(globalPosition, Chunk.Size);
@@ -353,6 +354,7 @@ public partial class ChunkServiceBase : IDisposable
         if (right != null && right.CheckTag(tagname, value)) state |= 8;
         return _terrainCoord[state];
     }
+
     /// <summary>
     /// 基于光线投射的光照更新
     /// </summary>
@@ -384,6 +386,7 @@ public partial class ChunkServiceBase : IDisposable
             }
         }
     }
+
     /// <summary>
     /// 基于DFS的光照更新
     /// </summary>
@@ -410,6 +413,7 @@ public partial class ChunkServiceBase : IDisposable
         DfsUpdateLight(coord - Vector3I.Up, value);
         DfsUpdateLight(coord - Vector3I.Down, value);
     }
+
     /// <summary>
     /// 更新单个区块的光源
     /// </summary>
@@ -455,12 +459,13 @@ public partial class ChunkServiceBase : IDisposable
             }
         }
     }
+
     /// <summary>
     /// 只更新主控玩家加载范围内的光照
     /// </summary>
     public void UpdateLights()
     {
-        var player = _world.PlayerNode.playerData;
+        var player = World.PlayerNode.playerData;
         if (player == null) return;
         HashSet<Vector2I> poss = new HashSet<Vector2I>();
         GetLoadRangeChunks(player.ChunkCoord, poss);
@@ -487,11 +492,13 @@ public partial class ChunkServiceBase : IDisposable
     }
 
     #endregion
+
     /// <summary>
     /// 释放资源
     /// </summary>
     public void Dispose()
     {
+        World.timer.Timeout -= Ticking;
         _tokenSource.Cancel();
         _processLoadTask?.Wait(1000);
         _processLoadTask.Dispose();

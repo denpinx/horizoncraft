@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Components.Systems;
+using horizoncraft.script.Entity;
 using horizoncraft.script.Events;
 using horizoncraft.script.Events.player;
+using horizoncraft.script.Events.SystemEvents;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
+using HorizonCraft.script.Services.world;
 using horizoncraft.script.WorldControl;
 
 namespace horizoncraft.script.Components;
@@ -14,6 +18,21 @@ namespace horizoncraft.script.Components;
 public class ComponentManager
 {
     static Dictionary<string, ComponentAndSystem> ComponentSets = new();
+
+    public static bool ExecuteComponents(EntitySystemEvent ese)
+    {
+        foreach (var com in ese.EntityData.Components)
+        {
+            if (ComponentSets.TryGetValue(com.Name, out var value))
+            {
+                ese.EntityComponent = com as EntityComponent;
+                var result = value.system.ExecuteEntityComponent(ese);
+                if (!result) return false;
+            }
+        }
+
+        return true;
+    }
 
     public static bool ExecuteComponents(PlayerEvent playerEvent, ItemStack itemStack)
     {
@@ -28,12 +47,14 @@ public class ComponentManager
                 itemStack.Components.RemoveAt(i);
                 return false;
             }
+
             if (ComponentSets.ContainsKey(component.Name))
             {
                 //如果有任意一个组件取消了事件，之后的组件都不执行了
                 var s = ComponentSets[component.Name].system.Execute(playerEvent, component);
                 if (!s) return false;
             }
+
             if (itemStack.Id != start_id)
                 return false;
         }
@@ -116,5 +137,6 @@ public class ComponentManager
         Register("LogisticsInputComponent", () => new TickComponent(), new LogisticsInputSystem());
         Register("WorkBenchComponent", () => new InventoryComponent(), new WorkBenchSystem());
         Register("ItemDurableComponent", () => new ItemDurableComponent(), new ItemDurableSystem());
+        Register("ItemEntityComponent", () => new ItemEntityComponent(), new ItemEntitySystem());
     }
 }

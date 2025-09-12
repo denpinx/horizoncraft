@@ -7,27 +7,28 @@ using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Events;
+using horizoncraft.script.Expand;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Tool;
 
 namespace HorizonCraft.script.Services.player;
 
-public abstract class PlayerServiceBase
+public abstract class PlayerServiceBase : IDisposable
 {
     public PlayerEvents Events;
     public ConcurrentDictionary<string, PlayerData> Players = new();
     public Dictionary<string, PlayerSnapshot> PlayerNodes = new();
     private ConcurrentQueue<string> _loadingqueue = new();
     private const int ProcessDleay = 100;
-    protected World world;
+    protected World World;
     private PackedScene PlayerSnapshot_ps;
     private CancellationTokenSource _tokenSource;
     private Task _processTask;
 
     public PlayerServiceBase(World world)
     {
-        this.world = world;
+        this.World = world;
         world.timer.Timeout += Ticking;
         PlayerNode.GetInformation[nameof(PlayerServiceBase)] =
             () => $"在线玩家:{Players.Count}";
@@ -37,13 +38,13 @@ public abstract class PlayerServiceBase
         _processTask = Task.Run(ProcessPlayerLoadThread, _tokenSource.Token);
     }
 
-
     #region 外部实现
 
     public virtual void Ticking()
     {
         PrecessNodeSync();
     }
+
     public virtual bool GetPlayerOrLoad(string name, out PlayerData playerData)
     {
         if (Players.TryGetValue(name, out var player))
@@ -66,7 +67,7 @@ public abstract class PlayerServiceBase
     {
         try
         {
-            using (var conn = SqliteTool.InitSqlite(world.WorldName))
+            using (var conn = SqliteTool.InitSqlite(World.WorldName))
             {
                 if (conn.CheckPlayerExists(name))
                 {
@@ -101,7 +102,7 @@ public abstract class PlayerServiceBase
 
     public virtual void SavePlayer(PlayerData player)
     {
-        using (var conn = SqliteTool.InitSqlite(world.WorldName))
+        using (var conn = SqliteTool.InitSqlite(World.WorldName))
         {
             if (conn.CheckPlayerExists(player.Name))
                 conn.UpdatePlayerByteData(player.Name, player);
@@ -112,7 +113,7 @@ public abstract class PlayerServiceBase
 
     public virtual void SaveAll()
     {
-        using (var conn = SqliteTool.InitSqlite(world.WorldName))
+        using (var conn = SqliteTool.InitSqlite(World.WorldName))
         {
             foreach (var player in Players.Values)
             {
@@ -129,6 +130,26 @@ public abstract class PlayerServiceBase
 
     #region 内部实现
 
+    /// <summary>
+    /// 获取半径内的第一个玩家
+    /// </summary>
+    /// <param name="position">全局坐标</param>
+    /// <param name="range">像素范围</param>
+    /// <returns></returns>
+    public PlayerData GetPlayerInRange(Vector2I position, int range)
+    {
+        foreach (var player in Players.Values)
+        {
+            var pos = (player.Position.ToVector2I() - position).Abs();
+            if (pos.X < range && pos.Y < range)
+            {
+                return player;
+            }
+        }
+
+        return null;
+    }
+
     public void PrecessNodeSync()
     {
         foreach (var name in Players.Keys.ToArray())
@@ -138,7 +159,7 @@ public abstract class PlayerServiceBase
 
                 PlayerNodes[player.Name].SetData(player);
 
-            else if (!world.Service.ChunkService.Chunks.ContainsKey(player.ChunkCoord))
+            else if (!World.Service.ChunkService.Chunks.ContainsKey(player.ChunkCoord))
             {
                 if (player.RemoveCount++ > 40 && player.Name != PlayerNode.Profile.Name)
                 {
@@ -153,7 +174,7 @@ public abstract class PlayerServiceBase
             {
                 PlayerSnapshot node = PlayerSnapshot_ps.Instantiate<PlayerSnapshot>();
                 PlayerNodes.Add(player.Name, node);
-                world.AddChild(node);
+                World.AddChild(node);
                 node.SetData(player);
             }
         }
@@ -170,7 +191,7 @@ public abstract class PlayerServiceBase
             else
             {
                 var player = Players[name];
-                if (!world.HasTileMap(player.ChunkCoord))
+                if (!World.HasTileMap(player.ChunkCoord))
                 {
                     var node = PlayerNodes[name];
                     PlayerNodes.Remove(name);
@@ -250,4 +271,12 @@ public abstract class PlayerServiceBase
     }
 
     #endregion
+
+    public void Dispose()
+    {
+        PlayerSnapshot_ps?.Dispose();
+        _tokenSource?.Dispose();
+        _processTask?.Dispose();
+        World.timer.Timeout -= Ticking;
+    }
 }

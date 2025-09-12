@@ -12,9 +12,9 @@ public class MountainsBiome : LandBiome
         color = Color.Color8(222, 222, 222);
     }
 
-    public override int GetHigh(FastNoiseLite noise, int x, int z)
+    public override int GetHigh(Random random, FastNoiseLite noise, int x, int z)
     {
-        return -Math.Abs(-128 - (int)(noise.GetNoise2D(x * Chunk.Size, z) * 32));
+        return random.Next(-128, -64);
     }
 
     public override void GeneratorTerrain(BiomeTerrainContext context)

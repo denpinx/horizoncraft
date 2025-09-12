@@ -38,7 +38,7 @@ public class HostChunkService : ChunkServiceBase
         //差异更新
         foreach (var chunk in WorldSnapshot.chunks)
         {
-            foreach (var playerset in _world.Service.PlayerService.Players)
+            foreach (var playerset in World.Service.PlayerService.Players)
             {
                 PlayerData pd1 = playerset.Value;
                 //按距离同步
@@ -55,13 +55,25 @@ public class HostChunkService : ChunkServiceBase
             }
         }
 
+        foreach (var player in World.Service.PlayerService.Players.Values) player.EntityUuidPack.Uuids.Clear();
         //全量更新
         foreach (var chunk in Chunks.Values)
+        {
+            //这里更新的是，玩家客户端应该加载的所有实体名单
+            foreach (var player in World.Service.PlayerService.Players.Values)
+            {
+                var result = World.Service.EntityService.GetEntityByChunk(chunk.coord);
+                foreach (var entity in result)
+                {
+                    player.EntityUuidPack.Uuids.Add(entity.Uuid);
+                }
+            }
+
             if (chunk.update_server)
             {
                 //下一帧同步这个区块内的玩家
-                _world.Service.PlayerService.ResetPlayerMoveStateByChunk(chunk.coord);
-                foreach (var playerset in _world.Service.PlayerService.Players)
+                World.Service.PlayerService.ResetPlayerMoveStateByChunk(chunk.coord);
+                foreach (var playerset in World.Service.PlayerService.Players)
                 {
                     PlayerData pd1 = playerset.Value;
                     //按距离同步
@@ -74,7 +86,7 @@ public class HostChunkService : ChunkServiceBase
                         {
                             if (!wholeChunkUpdate.ContainsKey(pd1.PeerId))
                             {
-                                var result = _world.Service.EntityService.GetEntityByChunk(chunk.coord);
+                                var result = World.Service.EntityService.GetEntityByChunk(chunk.coord);
                                 chunk.Entitys = result;
                                 wholeChunkUpdate[pd1.PeerId] = new ChunkPack();
                             }
@@ -84,13 +96,14 @@ public class HostChunkService : ChunkServiceBase
                     }
                 }
             }
-        
+        }
+
         foreach (var chunk in Chunks.Values)
             chunk.update_server = false;
         foreach (var key in wholeChunkUpdate.Keys)
         {
             var bytes = ByteTool.ToBytes<ChunkPack>(wholeChunkUpdate[key]);
-            _world.Service.ChunkServiceNode.RpcId(key,
+            World.Service.ChunkServiceNode.RpcId(key,
                 nameof(ChunkServiceNode.ReciveChunkPack),
                 bytes);
         }
@@ -100,9 +113,25 @@ public class HostChunkService : ChunkServiceBase
             if (key != 0)
             {
                 var bytes = ByteTool.ToBytes<WorldSnapshot>(diffUpdate[key]);
-                _world.Service.ChunkServiceNode.RpcId(key,
+                World.Service.ChunkServiceNode.RpcId(key,
                     nameof(ChunkServiceNode.ReciveChunkUpdatePack),
                     bytes);
+            }
+        }
+
+        //确保服务端的实体被删除后，客户端也能够知道
+        foreach (var player in World.Service.PlayerService.Players.Values)
+        {
+            if (player.PeerId != 0 && player.EntityUuidPack.Uuids.Count > 0)
+            {
+                if (!player.LastFarmeEntityUuidPack.Equals(player.EntityUuidPack))
+                {
+                    World.Service.EntityServiceNode.RpcId(player.PeerId,
+                        nameof(EntityServiceNode.ReciveAllNeedEntityUuid),
+                        ByteTool.ToBytes(player.EntityUuidPack));
+                }
+                player.LastFarmeEntityUuidPack = player.EntityUuidPack;
+                player.EntityUuidPack = new EntityUuidPack();
             }
         }
 
@@ -118,7 +147,7 @@ public class HostChunkService : ChunkServiceBase
             {
                 cs = new()
                 {
-                    Version = _world.Service.TickTimes,
+                    Version = World.Service.TickTimes,
                     X = chunk.coord.X,
                     Y = chunk.coord.Y,
                 };
@@ -142,11 +171,11 @@ public class HostChunkService : ChunkServiceBase
             {
                 cs = new()
                 {
-                    Version = _world.Service.TickTimes,
+                    Version = World.Service.TickTimes,
                     X = chunk.coord.X,
                     Y = chunk.coord.Y,
                 };
-                var result = _world.Service.EntityService.GetChunkMovedEntity(chunk.coord);
+                var result = World.Service.EntityService.GetChunkMovedEntity(chunk.coord);
                 if (result.Count > 0)
                 {
                     GD.Print($"【服务端】获取了 {result.Count} 个实体更新");

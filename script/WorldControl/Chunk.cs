@@ -228,5 +228,15 @@ namespace horizoncraft.script.WorldControl
                 data[x, y, 1].Light = 0;
             }
         }
+
+        public HashSet<string> GetAllEntitys()
+        {
+            HashSet<string> result = new HashSet<string>();
+            foreach (var entity in Entitys)
+            {
+                result.Add(entity.Name);
+            }
+            return result;
+        }
     }
 }

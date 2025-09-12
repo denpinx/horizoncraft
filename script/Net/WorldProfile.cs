@@ -6,4 +6,8 @@ namespace horizoncraft.script.Net;
 public partial class WorldProfile
 {
     public long Time;
+    public string WorldName;
+    public string CreateDate;
+    public string LoadDate;
+    public long WorldSeed;
 }

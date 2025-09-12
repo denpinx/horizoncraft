@@ -1,5 +1,6 @@
 using Godot;
 using horizoncraft.script;
+using horizoncraft.script.Entity;
 using horizoncraft.script.NewProxy.player;
 using HorizonCraft.script.Services.chunk;
 using HorizonCraft.script.Services.entity;
@@ -16,6 +17,7 @@ public class SingleWorldService : WorldServiceBase
 
     public override void InitializeServices()
     {
+        EntityBehavior = new EntityBehaviorBase();
         ChunkService = new SingleChunkService(World);
         PlayerService = new SinglePlayerService(World);
         EntityService = new HostEntityService(World);

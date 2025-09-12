@@ -42,4 +42,22 @@ public partial class ItemStack
         if (result != null) return result as T;
         return null;
     }
+
+    public ItemStack TryStackItem(ItemStack item)
+    {
+        if(item.Id!=Id) return item;
+        int space = GetItemMeta().MaxAmount - Amount;
+        if (space >= item.Amount)
+        {
+            Amount+=item.Amount;
+            item.Amount = 0;
+            return item;
+        }
+        else
+        {
+            Amount += space;
+            item.Amount -= space;
+            return item;
+        }
+    }
 }

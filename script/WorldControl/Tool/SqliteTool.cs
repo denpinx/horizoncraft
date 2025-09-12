@@ -12,11 +12,24 @@ namespace horizoncraft.script.WorldControl.Tool;
 public static class SqliteTool
 {
     private static bool IsEnableWAL;
+    private static string LastWalWorld = "";
 
     public static SqliteConnection InitSqlite(string worldName)
     {
         try
         {
+            if (worldName == "")
+            {
+                GD.PrintErr($"{worldName} is empy!");
+            }
+            
+            if (worldName != LastWalWorld)
+            {
+                IsEnableWAL = false;
+            }
+            LastWalWorld = worldName;
+
+
             SqliteConnection sqliteConnection;
             if (!DirAccess.DirExistsAbsolute($"save"))
             {
@@ -36,6 +49,7 @@ public static class SqliteTool
                 $"Data Source=save/{worldName}/data.db"
             );
             sqliteConnection.Open();
+
             if (!IsEnableWAL)
             {
                 if (sqliteConnection.EnableWAL())
@@ -248,6 +262,34 @@ public static class SqliteTool
         {
             var result = cmd.ExecuteScalar()?.ToString().ToLower();
             return (result == "wal");
+        }
+    }
+
+    public static void SafeCloseWAL(this SqliteConnection conn)
+    {
+        if (conn?.State != System.Data.ConnectionState.Open) return;
+        IsEnableWAL = false;
+        LastWalWorld = "";
+        
+        try
+        {
+            using (var cmd = new SqliteCommand("PRAGMA wal_checkpoint;", conn))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            using (var cmd = new SqliteCommand("PRAGMA journal_mode=DELETE;", conn))
+            {
+                cmd.ExecuteScalar(); // 必须读取结果
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"WAL 清理失败: {ex.Message}");
+        }
+        finally
+        {
+            conn.Close();
+            conn.Dispose();
         }
     }
 }

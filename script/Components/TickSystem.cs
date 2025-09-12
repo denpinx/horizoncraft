@@ -1,8 +1,12 @@
 using System.Collections.Generic;
+using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Systems;
+using horizoncraft.script.Entity;
 using horizoncraft.script.Events;
 using horizoncraft.script.Events.player;
+using horizoncraft.script.Events.SystemEvents;
 using horizoncraft.script.Inventory;
+using HorizonCraft.script.Services.world;
 
 namespace horizoncraft.script.Components
 {
@@ -33,15 +37,38 @@ namespace horizoncraft.script.Components
             return true;
         }
 
-        public virtual void SetComponentValue(PlayerData player,Component component, Dictionary<string, string> value)
+        public bool ExecuteEntityComponent(EntitySystemEvent ese)
+        {
+            foreach (var cmp in ese.EntityData.Components)
+            {
+                if (cmp is EntityComponent)
+                {
+                    var e = new EntityTickEvent()
+                    {
+                        UUID = ese.EntityData.Uuid,
+                        WorldService = ese.Service,
+                        EntityData = ese.EntityData,
+                        EntityComponent = (EntityComponent)cmp,
+                    };
+                    Tick(e);
+                }
+            }
+            return false;
+        }
+
+        public virtual void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)
         {
         }
 
-        public virtual void Ticking(BlockTickEvent evnet, Component component)
+        public virtual void Ticking(BlockTickEvent blockTickEvent, Component component)
         {
         }
 
-        public virtual void ProcessTick(BlockTickEvent evnet, InventoryComponent component)
+        public virtual void ProcessTick(BlockTickEvent blockTickEvent, InventoryComponent component)
+        {
+        }
+
+        public virtual void Tick(EntityTickEvent e)
         {
         }
     }

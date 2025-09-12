@@ -12,6 +12,7 @@ using horizoncraft.script.Config;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Events;
 using horizoncraft.script.Events.player;
+using horizoncraft.script.Expand;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.rpc;
 using HorizonCraft.script.Services.world;
@@ -23,216 +24,67 @@ namespace horizoncraft.script;
 public partial class PlayerNode : CharacterBody2D
 {
     private const bool TEST_MODE = true;
-    public static LocalProfile Profile;
     public static System.Collections.Generic.Dictionary<string, Func<string>> GetInformation = new();
+    public static LocalProfile Profile;
 
+    public PlayerBreakProcess BreakProcess = new PlayerBreakProcess();
+    public const float JumpVelocity = -200.0f;
     public Action OnMoveToChunk;
     public PlayerData playerData;
-
-    public World world;
-
-    //public const float Speed = 300.0f;
-    public const float JumpVelocity = -200.0f;
     public bool Inputable = true;
     public bool MoreInfo = false;
-    //[Export] public bool fly = true;
-
     public bool Stop = false;
+    public World world;
+
 
     //
-    Camera2D camera2d;
-    public Timer Timer_Tick;
-    Label Label_DEBUG_Left;
-    Label Label_DEBUG_Right;
-    Label Label_PlayerName;
-    CollisionShape2D collisionShape2D;
-    AnimationPlayer animationPlayer_move;
     AnimationPlayer animationPlayer_other;
-    Sprite2D sprite2D_body;
+    AnimationPlayer animationPlayer_move;
+    CollisionShape2D collisionShape2D;
+    public CanvasLayer OvrCanvasLayer;
     public InventoryNode ShowView;
+    public RayCast2D RayCast;
+    public Timer Timer_Tick;
+    Label Label_DEBUG_Right;
+    Label Label_DEBUG_Left;
+    Label Label_PlayerName;
+    Sprite2D sprite2D_body;
     public Sprite2D Cursor;
     public HotBar hotBar;
-    public RayCast2D RayCast;
+    Camera2D camera2d;
     //
-
-    PlayerBreakProcess BreakProcess = new PlayerBreakProcess();
 
 
     private bool LastFramIsLeft = false;
     private bool LastFramIsRight = false;
 
-    private Vector2I LastFramPosition;
-
-    public override void _Input(InputEvent @event)
-    {
-        if (!Inputable) return;
-        // List<Vector2I> interpolatePos = new();
-        // if (LastFramIsLeft || LastFramIsRight)
-        // {
-        //     var v1 = LastFramPosition - Mousecoord;
-        //     var v2 = v1.Abs();
-        //     var v3 = (Vector2)LastFramPosition;
-        //     var v4 = (Vector2)Mousecoord;
-        //     var t = (int)MathF.Max(v2.X, v2.Y);
-        //     for (int i = 0; i < t; i++)
-        //     {
-        //         interpolatePos.Add((Vector2I)v3.Lerp(v4, (float)i / (float)t));
-        //     }
-        // }
-    }
+    //private Vector2I LastFramPosition;
 
     public override void _Process(double delta)
     {
-        if (!Inputable)
-        {
-            return;
-        }
+        if (!Inputable || playerData == null) return;
+        if (playerData.FaceLeft) sprite2D_body.SetScale(new Vector2(1, 1));
+        else sprite2D_body.SetScale(new Vector2(-1, 1));
 
-        if (playerData != null)
-        {
-            if (playerData.FaceLeft) sprite2D_body.SetScale(new Vector2(1, 1));
-            else sprite2D_body.SetScale(new Vector2(-1, 1));
-        }
-
-
-        Vector2I Mousecoord = new(
+        Vector2I coord = new(
             (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
         );
 
-        if (Input.IsActionPressed("breakblock") && playerData != null && ShowView == null)
+        if (Input.IsActionPressed("breakblock") && playerData != null && ShowView == null &&
+            OvrCanvasLayer.GetChildCount() == 0)
         {
-            var pos = Mousecoord;
-
-            if (pos.X > playerData.Coord.X)
-                playerData.FaceLeft = false;
-            if (pos.X < playerData.Coord.X)
-                playerData.FaceLeft = true;
-
-
-            var pos0 = new Vector3I(pos.X, pos.Y, 0);
-            var pos1 = new Vector3I(pos.X, pos.Y, 1);
-            var block1 = world.Service.ChunkService.GetBlock(pos0);
-            var block2 = world.Service.ChunkService.GetBlock(pos1);
-            if (block1 == null || block2 == null)
-            {
-                BreakProcess.Reset();
-                return;
-            }
-
-            Vector3I finalpos;
-            BlockData InterfaceBlock;
-            if (Input.IsKeyPressed(Key.Shift))
-            {
-                finalpos = pos1;
-                InterfaceBlock = block2;
-            }
-            else
-            {
-                if (!block2.IsMeta("air"))
-                {
-                    finalpos = pos1;
-                    InterfaceBlock = block2;
-                }
-                else
-                {
-                    finalpos = pos0;
-                    InterfaceBlock = block1;
-                }
-            }
-
-
-            if (InterfaceBlock.IsMeta("air"))
-            {
-                BreakProcess.Reset();
-                return;
-            }
-
-            if (BreakProcess.ProcessTime >= BreakProcess.FinalTime)
-            {
-                var bbe = new PlayerBreakblockEvent()
-                {
-                    world = world,
-                    Player = playerData,
-                    Position = BreakProcess.Position,
-                };
-                world.Service.PlayerService.Events.BreakBlock(bbe);
-                BreakProcess.ProcessTime = 0;
-                BreakProcess.FinalTime = 2;
-            }
-            else if (BreakProcess.ProcessTime > 0)
-            {
-                BreakProcess.ProcessTime += (float)delta;
-                if (BreakProcess.Position != finalpos)
-                    BreakProcess.Reset();
-            }
-            else
-            {
-                if (!world.Service.ChunkService.CheckIsCloseBlock(finalpos))
-                {
-                    var meta = InterfaceBlock.BlockMeta;
-                    float efficiency = 1f;
-                    float gap = meta.BreakLevel;
-
-                    var durable = playerData.Inventory.GetItemInHand()?.GetComponent<ItemDurableComponent>();
-                    if (durable != null)
-                    {
-                        string tag = InterfaceBlock.GetTag("type");
-                        if ((tag != null && durable.HasTag(tag)) || durable.HasTag("any"))
-                            efficiency = 1f + durable.Efficiency * 0.25f;
-                        gap = meta.BreakLevel - durable.ToolLevel;
-                    }
-
-                    //工具等级差距过大
-                    if (gap > 1) return;
-
-                    BreakProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity / efficiency;
-                    BreakProcess.Position = finalpos;
-                    BreakProcess.ProcessTime += (float)delta;
-                    if (playerData.Mode == 1) BreakProcess.FinalTime = 0;
-                }
-                else
-                {
-                    Cursor.Frame = 1;
-                }
-            }
+            OnMouseLeftClick(coord, delta);
         }
         else
         {
             if (BreakProcess.ProcessTime > 0) BreakProcess.ProcessTime = 0;
         }
 
-        if (Input.IsActionPressed("placeblock") && playerData != null && ShowView == null)
+        if (Input.IsActionPressed("placeblock") && playerData != null && ShowView == null &&
+            OvrCanvasLayer.GetChildCount() == 0)
         {
-            var targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
-            bool coercive = false;
-            if (Input.IsKeyPressed(Key.Shift))
-            {
-                coercive = true;
-                targetpos = new Vector3I(Mousecoord.X, Mousecoord.Y, 0);
-            }
-
-
-            if (
-                world.Service.PlayerService.Events.PlaceBlock(new()
-                {
-                    world = world,
-                    Player = playerData,
-                    Position = targetpos,
-                    coercive = coercive,
-                    IsCollide = IsInRange(targetpos.X * 16, targetpos.Y * 16)
-                }))
-            {
-            }
-            else
-            {
-                world.Service.PlayerService.Events.InterfaceBlock(new InterfaceBlockEvent()
-                {
-                    world = world,
-                    Player = playerData,
-                    Position = targetpos,
-                });
-            }
+            OnMouseRightClick(coord, delta);
         }
 
 
@@ -241,71 +93,156 @@ public partial class PlayerNode : CharacterBody2D
             if (animationPlayer_other.CurrentAnimation != "break")
                 animationPlayer_other.Play("break");
         }
-        else
-        {
-            animationPlayer_other.Stop();
-        }
+        else animationPlayer_other.Stop();
     }
 
 
     public override void _PhysicsProcess(double delta)
     {
-        if (playerData == null) return;
-        if (playerData.Name != PlayerNode.Profile.Name) return;
+        if (playerData == null || world == null) return;
+        if (!world.HasTileMap(playerData.ChunkCoord)) return;
 
-        if (world == null) return;
-        if (!world.HasTileMap(playerData.ChunkCoord))
-        {
-            GD.Print("禁止移动");
-            return;
-        }
-
-
-        Vector2I Mcoord = World.MathFloor((Vector2I)GetGlobalMousePosition(), 16);
-        Cursor.GlobalPosition = Mcoord * 16;
-
-        float f1 = BreakProcess.ProcessTime / BreakProcess.FinalTime;
-        if (f1 > 1) f1 = 1;
-        if (BreakProcess.ProcessTime > 0)
-            Cursor.Frame = 1 + (int)(8 * f1);
-        else Cursor.Frame = 0;
-
-        Vector2I ChunkCoord = new Vector2I(
-            (int)Mathf.Floor(Position.X / (16 * Chunk.Size)),
-            (int)Mathf.Floor(Position.Y / (16 * Chunk.Size))
-        );
-
-        //更新自身数据
-        var pos = new System.Numerics.Vector2(Position.X, Position.Y);
-        if (playerData.Position != pos) playerData.Update = true;
-        playerData.Position = pos;
-        Label_PlayerName.Text = playerData.Name;
-
-        //if (world.WorldService is WorldHostService)
-        //{
-        if (world.Service.PlayerService.Players.TryGetValue(playerData.Name, out var data))
-        {
-            data.Position = playerData.Position;
-            data.Update = playerData.Update;
-            data.FaceLeft = playerData.FaceLeft;
-        }
-        //}
-
-        //防止加载地形的时候卡墙里
-        if (world == null || !world.Service.ChunkService.Chunks.ContainsKey(ChunkCoord))
-        {
-            Stop = true;
-        }
-        else
-        {
-            if (playerData.Mode == 0)
-                Stop = false;
-        }
-
+        Vector2I chunkCoord = Position.ToVector2I().MathFloor(Chunk.Size);
+        UpdateCursor();
+        UpdatePlayerPosition();
+        AntiOnChunkUnload(chunkCoord);
         InputHandle(delta);
     }
 
-    public void InputHandle(double delta)
+    //鼠标左键
+    private void OnMouseLeftClick(Vector2I coord, double delta)
+    {
+        var pos = coord;
+        if (pos.X > playerData.Coord.X)
+            playerData.FaceLeft = false;
+        if (pos.X < playerData.Coord.X)
+            playerData.FaceLeft = true;
+
+
+        var pos0 = new Vector3I(pos.X, pos.Y, 0);
+        var pos1 = new Vector3I(pos.X, pos.Y, 1);
+        var block1 = world.Service.ChunkService.GetBlock(pos0);
+        var block2 = world.Service.ChunkService.GetBlock(pos1);
+        if (block1 == null || block2 == null)
+        {
+            BreakProcess.Reset();
+            return;
+        }
+
+        Vector3I finalpos;
+        BlockData InterfaceBlock;
+        if (Input.IsKeyPressed(Key.Shift))
+        {
+            finalpos = pos1;
+            InterfaceBlock = block2;
+        }
+        else
+        {
+            if (!block2.IsMeta("air"))
+            {
+                finalpos = pos1;
+                InterfaceBlock = block2;
+            }
+            else
+            {
+                finalpos = pos0;
+                InterfaceBlock = block1;
+            }
+        }
+
+
+        if (InterfaceBlock.IsMeta("air"))
+        {
+            BreakProcess.Reset();
+            return;
+        }
+
+        if (BreakProcess.ProcessTime >= BreakProcess.FinalTime)
+        {
+            var bbe = new PlayerBreakblockEvent()
+            {
+                world = world,
+                Player = playerData,
+                Position = BreakProcess.Position,
+            };
+            world.Service.PlayerService.Events.BreakBlock(bbe);
+            BreakProcess.ProcessTime = 0;
+            BreakProcess.FinalTime = 2;
+        }
+        else if (BreakProcess.ProcessTime > 0)
+        {
+            BreakProcess.ProcessTime += (float)delta;
+            if (BreakProcess.Position != finalpos)
+                BreakProcess.Reset();
+        }
+        else
+        {
+            if (!world.Service.ChunkService.CheckIsCloseBlock(finalpos))
+            {
+                var meta = InterfaceBlock.BlockMeta;
+                float efficiency = 1f;
+                float gap = meta.BreakLevel;
+
+                var durable = playerData.Inventory.GetItemInHand()?.GetComponent<ItemDurableComponent>();
+                if (durable != null)
+                {
+                    string tag = InterfaceBlock.GetTag("type");
+                    if ((tag != null && durable.HasTag(tag)) || durable.HasTag("any"))
+                        efficiency = 1f + durable.Efficiency * 0.25f;
+                    gap = meta.BreakLevel - durable.ToolLevel;
+                }
+
+                //工具等级差距过大
+                if (gap > 1) return;
+
+                BreakProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity / efficiency;
+                BreakProcess.Position = finalpos;
+                BreakProcess.ProcessTime += (float)delta;
+                if (playerData.Mode == 1) BreakProcess.FinalTime = 0;
+            }
+            else
+            {
+                Cursor.Frame = 1;
+            }
+        }
+    }
+
+    //鼠标右键
+    private void OnMouseRightClick(Vector2I coord, double delta)
+    {
+        var targetpos = new Vector3I(coord.X, coord.Y, 0);
+        bool coercive = false;
+        if (Input.IsKeyPressed(Key.Shift))
+        {
+            coercive = true;
+            targetpos = new Vector3I(coord.X, coord.Y, 0);
+        }
+
+
+        if (
+            world.Service.PlayerService.Events.PlaceBlock(new()
+            {
+                world = world,
+                Player = playerData,
+                Position = targetpos,
+                coercive = coercive,
+                IsCollide = IsInRange(targetpos.X * 16, targetpos.Y * 16)
+            }))
+        {
+        }
+        else
+        {
+            world.Service.PlayerService.Events.InterfaceBlock(new InterfaceBlockEvent()
+            {
+                world = world,
+                Player = playerData,
+                Position = targetpos,
+            });
+        }
+    }
+
+    //处理输入
+    private void InputHandle(double delta)
     {
         if (!Inputable) return;
         bool AnyMove = false;
@@ -354,18 +291,42 @@ public partial class PlayerNode : CharacterBody2D
                     BreakProcess.ProcessTime = 0;
             }
 
-            if (Input.IsActionJustPressed("e"))
+            if (Input.IsActionJustPressed("e") && OvrCanvasLayer.GetChildCount() == 0)
             {
                 if (ShowView != null)
                 {
-                    world.Service.PlayerService.Events.CloseInventory(world.Service,playerData.Name);
+                    world.Service.PlayerService.Events.CloseInventory(world.Service, playerData.Name);
                     world.PlayerNode.playerData.OpeningBlockInventory = false;
                     RemoveChild(ShowView);
                     ShowView = null;
                 }
                 else
+                    world.Service.PlayerService.Events.OpenInventory(world, "PlayerInventory");
+            }
+
+            if (Input.IsActionJustPressed("OpenOperatingMenu"))
+            {
+                if (OvrCanvasLayer.GetChildCount() == 0)
                 {
-                    world.Service.PlayerService.Events.OpenInventory(world,"PlayerInventory");
+                    var menu = GD.Load<PackedScene>("res://tscn/Menu/operating_menu.tscn");
+                    OvrCanvasLayer.AddChild(menu.Instantiate<OperatingMenu>());
+
+                    if (ShowView != null)
+                    {
+                        world.Service.PlayerService.Events.CloseInventory(world.Service, playerData.Name);
+                        world.PlayerNode.playerData.OpeningBlockInventory = false;
+                        RemoveChild(ShowView);
+                        ShowView = null;
+                    }
+                }
+                else
+                {
+                    var children = OvrCanvasLayer.GetChildren();
+                    foreach (var child in children)
+                    {
+                        OvrCanvasLayer.RemoveChild(child);
+                        child.QueueFree();
+                    }
                 }
             }
         }
@@ -450,6 +411,7 @@ public partial class PlayerNode : CharacterBody2D
                     {
                         new ItemEntityComponent()
                         {
+                            Name = "ItemEntityComponent",
                             ItemStack = Materials.Dictionary_ItemMetas["grass"].GetItemStack()
                         }
                     }
@@ -484,27 +446,70 @@ public partial class PlayerNode : CharacterBody2D
         }
     }
 
+    //防止卡在未加载区块里面
+    private void AntiOnChunkUnload(Vector2I coord)
+    {
+        if (world == null || !world.Service.ChunkService.Chunks.ContainsKey(coord))
+        {
+            Stop = true;
+        }
+        else if (playerData.Mode == 0)
+            Stop = false;
+    }
+
+    //更新玩家节点位置到Data
+    private void UpdatePlayerPosition()
+    {
+        var pos = new System.Numerics.Vector2(Position.X, Position.Y);
+        if (playerData.LastPosition != pos) playerData.Update = true;
+        playerData.LastPosition = Position.ToSystemVector2();
+        playerData.Position = pos;
+        if (world.Service.PlayerService.Players.TryGetValue(playerData.Name, out var data))
+        {
+            data.Position = playerData.Position;
+            data.Update = playerData.Update;
+            data.FaceLeft = playerData.FaceLeft;
+        }
+    }
+
+    //更新挖掘进度条
+    private void UpdateCursor()
+    {
+        float progress = BreakProcess.ProcessTime / BreakProcess.FinalTime;
+        if (progress > 1) progress = 1;
+        if (BreakProcess.ProcessTime > 0)
+            Cursor.Frame = 1 + (int)(8 * progress);
+        else Cursor.Frame = 0;
+        Cursor.GlobalPosition = new Vector2(BreakProcess.Position.X, BreakProcess.Position.Y) * 16;
+    }
 
     public override void _Ready()
     {
-        sprite2D_body = GetNode<Sprite2D>("Body");
+        var loadingMenu = GetNode<LoadingMenu>("OvrCanvasLayer/LoadingMenu");
+
+        Label_DEBUG_Left = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Left");
+        Label_DEBUG_Right = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Right");
         animationPlayer_move = GetNode<AnimationPlayer>("AnimationPlayer_Move");
         animationPlayer_other = GetNode<AnimationPlayer>("AnimationPlayer_Other");
         collisionShape2D = GetNode<CollisionShape2D>("CollisionShape2D");
-        Cursor = GetNode<Sprite2D>("Cursor");
-        camera2d = GetNode<Camera2D>("Camera2D");
-        Label_DEBUG_Left = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Left");
-        Label_DEBUG_Right = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Right");
+        OvrCanvasLayer = GetNode<CanvasLayer>("OvrCanvasLayer");
         Label_PlayerName = GetNode<Label>("Label_PlayerName");
-        Timer_Tick = GetNode<Timer>("Timer_Tick");
         hotBar = GetNode<HotBar>("CanvasLayer/HotBar");
+        sprite2D_body = GetNode<Sprite2D>("Body");
+        Timer_Tick = GetNode<Timer>("Timer_Tick");
+        camera2d = GetNode<Camera2D>("Camera2D");
+        Cursor = GetNode<Sprite2D>("Cursor");
+
         if (playerData != null)
             playerData.PlayerNode = this;
         hotBar.PlayerNode = this;
-        ;
+        loadingMenu.playerNode = this;
+
+        //Label_PlayerName.Text = Profile.Name;
     }
 
-    public bool IsInRange(int x, int y, float w = 16f, float h = 16f)
+    //检查是否和碰撞箱重叠
+    private bool IsInRange(int x, int y, float w = 16f, float h = 16f)
     {
         var rect1 = collisionShape2D.Shape.GetRect();
         var rect2 = new Rect2(collisionShape2D.GlobalPosition + rect1.Position, rect1.Size);

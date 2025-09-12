@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using horizoncraft.script.Entity;
 using horizoncraft.script.Events;
 using horizoncraft.script.Events.player;
+using horizoncraft.script.Events.SystemEvents;
 using horizoncraft.script.Inventory;
+using HorizonCraft.script.Services.world;
 
 namespace horizoncraft.script.Components.Systems;
 
@@ -30,6 +33,11 @@ public class ItemComponentSystem : IComponentSystem
         }
 
         return true;
+    }
+
+    public bool ExecuteEntityComponent(EntitySystemEvent ese)
+    {
+        return false;
     }
 
     public virtual void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)

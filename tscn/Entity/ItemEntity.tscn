@@ -52,7 +52,7 @@ radius = 64.0
 [node name="ItemEntity" type="RigidBody2D"]
 top_level = true
 z_index = 9
-collision_layer = 3
+collision_layer = 2
 gravity_scale = 0.5
 can_sleep = false
 lock_rotation = true

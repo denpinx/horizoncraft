@@ -16,10 +16,9 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             color = Color.Color8(80, 255, 80);
         }
 
-        public override int GetHigh(FastNoiseLite noise, int x, int z)
+        public override int GetHigh(Random random, FastNoiseLite noise, int x, int z)
         {
-            return -Math.Abs(
-                (int)(noise.GetNoise2D(x * Chunk.Size, z) * 8) - new Random(HashCode.Combine(x, z)).Next(4));
+            return random.Next(-4, 0);
         }
 
         public override void GeneratorTerrain(BiomeTerrainContext context)

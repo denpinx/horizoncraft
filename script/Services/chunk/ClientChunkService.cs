@@ -52,7 +52,7 @@ public class ClientChunkService : ChunkServiceBase
             if (i > 5)
             {
                 RegetList.TryRemove(pos, out i);
-                _world.Service.ChunkServiceNode.RpcId(1,
+                World.Service.ChunkServiceNode.RpcId(1,
                     nameof(ChunkServiceNode.ReGetChunk), pos.X, pos.Y
                 );
                 //GD.Print($"重新加载区块{pos}");

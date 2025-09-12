@@ -1,16 +1,18 @@
+using System;
 using Godot;
 using horizoncraft.script;
+using horizoncraft.script.Entity;
 using horizoncraft.script.Net;
 using horizoncraft.script.NewProxy.player;
 using HorizonCraft.script.Services.chunk;
 using HorizonCraft.script.Services.entity;
+using HorizonCraft.script.Services.player;
 using horizoncraft.script.WorldControl.Tool;
 
 namespace HorizonCraft.script.Services.world;
 
 public class HostWorldService : WorldServiceBase
 {
-    private WorldProfile Profile;
     public static int Port = 9999;
     public static int MaxPlayer = 10;
     
@@ -20,22 +22,11 @@ public class HostWorldService : WorldServiceBase
         var enet = new ENetMultiplayerPeer();
         enet.CreateServer(Port, MaxPlayer);
         world.Multiplayer.MultiplayerPeer = enet;
-        using (var conn = SqliteTool.InitSqlite(world.WorldName))
-        {
-            if (conn.CheckWorldProfileExists("WorldProfile"))
-            {
-                Profile = conn.GetWorldProfileByteData("WorldProfile");
-                TickTimes = (int)Profile.Time;
-            }
-            else
-            {
-                Profile = new WorldProfile();
-            }
-        }
     }
 
     public override void InitializeServices()
     {
+        EntityBehavior = new EntityBehaviorBase();
         ChunkService = new HostChunkService(World);
         PlayerService = new HostPlayerService(World);
         EntityService = new HostEntityService(World);

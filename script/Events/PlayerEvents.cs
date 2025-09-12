@@ -87,7 +87,7 @@ public class PlayerEvents
         {
             world.PlayerNode.RemoveChild(world.PlayerNode.ShowView);
         }
-        
+
         world.PlayerNode.ShowView = InventoryManage.GetInventory<InventoryNode>(viewName);
         world.PlayerNode.ShowView.PlayerNode = world.PlayerNode;
         world.PlayerNode.AddChild(world.PlayerNode.ShowView);
@@ -100,6 +100,7 @@ public class PlayerEvents
         {
             world.PlayerNode.RemoveChild(world.PlayerNode.ShowView);
         }
+
         var block = world.Service.ChunkService.GetBlock(e.Position);
         if (block == null) return false;
         world.PlayerNode.ShowView = InventoryManage.GetInventory<InventoryNode>(e.ViewName);
@@ -116,6 +117,8 @@ public class PlayerEvents
         if (world.PlayerNode.ShowView != null)
         {
             world.PlayerNode.RemoveChild(world.PlayerNode.ShowView);
+            world.PlayerNode.ShowView.QueueFree();
+            world.PlayerNode.ShowView = null;
         }
 
         var block = world.Service.ChunkService.GetBlock(e.Position);
@@ -271,22 +274,21 @@ public class PlayerEvents
     {
         var pos0 = new Vector3I(e.Position.X, e.Position.Y, 0);
         var pos1 = new Vector3I(e.Position.X, e.Position.Y, 1);
-        var block1 = e.ChunkService.GetBlock(pos0);
-        var block2 = e.ChunkService.GetBlock(pos1);
+        var backblock = e.ChunkService.GetBlock(pos0);
+        var fontblock = e.ChunkService.GetBlock(pos1);
 
-        if (block1 == null || block2 == null) return false;
-
+        if (backblock == null || fontblock == null) return false;
         Vector3I finalpos;
         BlockData InterfaceBlock;
-        if (!block2.IsMeta("air"))
+        if (!fontblock.IsMeta("air"))
         {
             finalpos = pos1;
-            InterfaceBlock = block2;
+            InterfaceBlock = fontblock;
         }
         else
         {
             finalpos = pos0;
-            InterfaceBlock = block1;
+            InterfaceBlock = backblock;
         }
 
         if (InterfaceBlock.IsMeta("air")) return false;
@@ -299,7 +301,7 @@ public class PlayerEvents
         {
             Player = e.Player,
             world = e.world,
-            Position = e.Position,
+            Position = finalpos,
             ViewName = blockinv.InventoryName
         };
 

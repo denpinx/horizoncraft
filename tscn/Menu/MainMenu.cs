@@ -3,16 +3,25 @@ using Godot;
 using Godot.Collections;
 using horizoncraft.script;
 using horizoncraft.script.Config;
+using horizoncraft.script.Expand;
+using horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.tscn.Menu;
 
 public partial class MainMenu : horizoncraft.script.World
 {
-    private TextureButton ButtonSingle, ButtonHost, ButtonConnect;
+    private CanvasLayer TopCanvasLayer, GuiCanvasLayer;
+    private TextureButton ButtonSingle, buttonExit, ButtonConnect;
     private TextEdit TextEdit;
+
+    private PackedScene WorldProfilesScene;
 
     public override void _Ready()
     {
+        WorldProfilesScene = GD.Load<PackedScene>("res://tscn/Menu/WorldListMenu.tscn");
+        
+        GuiCanvasLayer = GetNode<CanvasLayer>("GuiCanvasLayer");
+        TopCanvasLayer = GetNode<CanvasLayer>("TopCanvasLayer");
         worldMode = WorldMode.Preview;
         LoadProfile();
 
@@ -27,32 +36,26 @@ public partial class MainMenu : horizoncraft.script.World
         base._Ready();
         PlayerNode.hotBar.Visible = false;
 
-        ButtonSingle = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/Button_Single");
-        ButtonHost = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/Button_Host");
-        ButtonConnect = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/Button_Connect");
+        ButtonSingle = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Single");
+        buttonExit = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/HBoxContainer2/Button_Exit");
+        ButtonConnect = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Connect");
         TextEdit = GetNode<TextEdit>("GuiCanvasLayer/TextEdit");
 
         var worldScene = GD.Load<PackedScene>("res://tscn/world.tscn");
         ButtonSingle.Pressed += () =>
         {
-            worldMode = WorldMode.Single;
-            worldScene.SetName("单机模式");
-            GetTree().ChangeSceneToPacked(worldScene);
-            //GetTree().ChangeSceneToFile("res://tscn/world.tscn");
+            if (TopCanvasLayer.GetChildCount() == 0)
+            {
+                GuiCanvasLayer.Visible = false;
+                TopCanvasLayer.AddChild(WorldProfilesScene.Instantiate());
+            }
         };
-        ButtonHost.Pressed += () =>
-        {
-            worldMode = WorldMode.MultiplayerHost;
-            worldScene.SetName("主机模式");
-            GetTree().ChangeSceneToPacked(worldScene);
-            //GetTree().ChangeSceneToFile("res://tscn/world.tscn");
-        };
+        buttonExit.Pressed += () => { QueueFree(); };
         ButtonConnect.Pressed += () =>
         {
             worldMode = WorldMode.MultiplayerClient;
             worldScene.SetName("客户端模式");
             GetTree().ChangeSceneToPacked(worldScene);
-            //GetTree().ChangeSceneToFile("res://tscn/world.tscn");
         };
         TextEdit.Text = PlayerNode.Profile.Name;
         TextEdit.TextChanged += () =>
@@ -68,6 +71,25 @@ public partial class MainMenu : horizoncraft.script.World
         PlayerNode.Inputable = false;
         base._PhysicsProcess(delta);
         PlayerNode.Position += Vector2.Left * 1;
+
+        if (TopCanvasLayer.GetChildCount() == 0)
+        {
+            if (!GuiCanvasLayer.Visible) GuiCanvasLayer.Visible = true;
+        }
+    }
+
+
+    public override void BlockInterFaceHandle()
+    {
+        if (PlayerNode?.playerData == null) return;
+        if (Service.ChunkService.Chunks.TryGetValue(PlayerNode.playerData.ChunkCoord, out var chunk))
+        {
+            var coord = (PlayerNode.Position.ToVector2I().MathFloor(16)).Remainder(Chunk.Size);
+            var targetpos = new Vector2(PlayerNode.Position.X, chunk.HighMap[coord.X, 0] * 16f);
+            PlayerNode.Position=targetpos;
+            //var tween = GetTree().CreateTween();
+            //tween.TweenProperty(PlayerNode, "position", targetpos, 0.1f);
+        }
     }
 
     public override void _ExitTree()

@@ -54,6 +54,9 @@ public partial class ChunkServiceNode : Node
                 {
                     chunk2.SetBlock(block.x, block.y, block.z, Materials.BlockMetas[block.id], block.state);
                 }
+
+                foreach (var entity in update.Entiydatas)
+                    WorldService.EntityService.AddEntityData(entity);
             }
         }
     }

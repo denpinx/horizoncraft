@@ -36,10 +36,10 @@ namespace horizoncraft.script.WorldControl
             for (int z = 0; z < Chunk.SizeZ; z++)
             {
                 // 获取相邻区块的关键高度点（确保控制点覆盖当前区块）
-                float p0 = GetLandBiome(x - 1).GetHigh(FastNoiseLite, x - 1, z);
-                float p1 = GetLandBiome(x).GetHigh(FastNoiseLite, x, z);
-                float p2 = GetLandBiome(x + 1).GetHigh(FastNoiseLite, x + 1, z);
-                float p3 = GetLandBiome(x + 2).GetHigh(FastNoiseLite, x + 2, z);
+                float p0 = GetLandBiome(x - 1).GetHigh(new Random((int)(World.Seed + x - 1)), FastNoiseLite, x - 1, z);
+                float p1 = GetLandBiome(x).GetHigh(new Random((int)(World.Seed + x)), FastNoiseLite, x, z);
+                float p2 = GetLandBiome(x + 1).GetHigh(new Random((int)(World.Seed + x + 1)), FastNoiseLite, x + 1, z);
+                float p3 = GetLandBiome(x + 2).GetHigh(new Random((int)(World.Seed + x + 2)), FastNoiseLite, x + 2, z);
                 for (int i = 0; i < Chunk.Size; i++)
                 {
                     float t = (float)i / (float)(Chunk.Size - 1);
@@ -145,7 +145,7 @@ namespace horizoncraft.script.WorldControl
         //生成区块
         //不涉及跨区块生成，跨区块方块，通过使用预知获取周围区块的跨区块结构，每个方块都是独立生成
         //区块只生成一次，之后加载不会再重新生成，花点时间可以理解.
-        
+
         //去除stopwatch的误差，单区块平均生成耗时小于1ms
 
         /*
@@ -244,6 +244,7 @@ namespace horizoncraft.script.WorldControl
                     }
                 }
             }
+
             chunk.HighMap = highmap;
             chunk.UpdateList.Clear();
             chunk.update_tilemap = true;

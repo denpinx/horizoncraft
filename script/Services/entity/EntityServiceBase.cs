@@ -1,30 +1,34 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using horizoncraft.script;
+using horizoncraft.script.Components;
 using horizoncraft.script.Entity;
+using horizoncraft.script.Events.SystemEvents;
+using horizoncraft.script.Expand;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Services.entity;
 
-public class EntityServiceBase
+public class EntityServiceBase : IDisposable
 {
     protected World World;
 
     //异步集合
-    public ConcurrentDictionary<string, EntityData> EntityDatas = new();
+    public ConcurrentDictionary<Guid, EntityData> EntityDatas = new();
 
     //主线程同步
-    public Dictionary<string, IEntityNode> EntityNodes = new();
+    public Dictionary<Guid, IEntityNode> EntityNodes = new();
 
     public EntityServiceBase(World world)
     {
         World = world;
         world.timer.Timeout += Ticking;
         world.Service.ChunkService.OnChunkLoaded += OnChunkLoad;
-        world.Service.ChunkService.OnChunkSaving+=ExtractEntitiesFromChunk;
+        world.Service.ChunkService.OnChunkSaving += ExtractEntitiesFromChunk;
         PlayerNode.GetInformation[nameof(EntityServiceBase)] =
             () => $"加载实体:{EntityDatas.Count}" +
                   $"渲染实体:{EntityNodes.Count}";
@@ -34,8 +38,18 @@ public class EntityServiceBase
     {
         ProcessEntityNode();
         ProcessEntityNodeUpdate();
+        foreach (var entity in EntityDatas.Values)
+        {
+            if (entity.Removed) continue;
+            EntitySystemEvent ese = new()
+            {
+                Service = World.Service,
+                EntityData = entity,
+            };
+            ComponentManager.ExecuteComponents(ese);
+        }
     }
-    
+
     public virtual void OnChunkLoad(Chunk chunk)
     {
         ReleaseChunkEntity(chunk);
@@ -49,15 +63,46 @@ public class EntityServiceBase
     }
 
 
-    public List<string> GetUuidByChunk(Vector2I coord)
+    public List<Guid> GetUuidByChunk(Vector2I coord)
     {
-        var list = new List<string>();
+        var list = new List<Guid>();
         foreach (var uuid in EntityDatas.Keys)
         {
             var entity = EntityDatas[uuid];
             if (entity.ChunkCoord == coord)
             {
                 list.Add(entity.Uuid);
+            }
+        }
+
+        return list;
+    }
+
+    public List<EntityData> GetEntityInRangeByName(Vector2I coord, int range, string name)
+    {
+        var list = new List<EntityData>();
+        foreach (var entity in EntityDatas.Values)
+        {
+            if(entity.Name!=name)continue;
+            
+            var pos = (entity.Position.ToVector2I() - coord).Abs();
+            if (pos.X < range && pos.Y < range)
+            {
+                list.Add(entity);
+            }
+        }
+
+        return list;
+    }
+    public List<EntityData> GetEntityInRange(Vector2I coord, int range)
+    {
+        var list = new List<EntityData>();
+        foreach (var entity in EntityDatas.Values)
+        {
+            var pos = (entity.Position.ToVector2I() - coord).Abs();
+            if (pos.X < range && pos.Y < range)
+            {
+                list.Add(entity);
             }
         }
 
@@ -169,7 +214,7 @@ public class EntityServiceBase
         {
             var node = meta.GetEntityNode();
             node.Entity = data;
-            if (data.Uuid == "") data.Uuid = System.Guid.NewGuid().ToString();
+            if (data.Uuid == Guid.Empty) data.Uuid = System.Guid.NewGuid();
             return node;
         }
 
@@ -199,7 +244,7 @@ public class EntityServiceBase
                 {
                     World.Service.EntityServiceNode.RpcId(player.PeerId,
                         nameof(EntityServiceNode.RemoveEntityDataOwned),
-                        entity.Uuid);
+                        entity.Uuid.ToByteArray());
                 }
             }
             else
@@ -224,7 +269,7 @@ public class EntityServiceBase
         {
             World.Service.EntityServiceNode.RpcId(player.PeerId,
                 nameof(EntityServiceNode.RemoveEntityData),
-                entity.Uuid);
+                entity.Uuid.ToString());
         }
     }
 
@@ -232,21 +277,29 @@ public class EntityServiceBase
     {
         //默认是主机玩家
         if (data.Owned == "") data.Owned = PlayerNode.Profile.Name;
-        if (data.Uuid == "") data.Uuid = System.Guid.NewGuid().ToString();
+        if (data.Uuid == Guid.Empty) data.Uuid = System.Guid.NewGuid();
         data.Update = false;
         EntityDatas.AddOrUpdate(data.Uuid, data, (key, old) => data);
     }
 
-    public void RemoveEntityData(string uuid)
+    public void RemoveEntityData(Guid uuid)
     {
-        EntityDatas.TryRemove(uuid, out _);
+        if (EntityDatas.TryRemove(uuid, out var data))
+        {
+            data.Removed = true;
+        }
     }
 
-    public void RemoveEntityDataOwned(string uuid)
+    public void RemoveEntityDataOwned(Guid uuid)
     {
         if (EntityDatas.TryGetValue(uuid, out var entity))
         {
             entity.Owned = "";
         }
+    }
+
+    public void Dispose()
+    {
+        World.timer.Timeout -= Ticking;
     }
 }

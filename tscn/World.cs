@@ -27,10 +27,9 @@ namespace horizoncraft.script
             MultiplayerHost //联机服主机模式,拥有全部内容
         }
 
-        public string WorldName
-        {
-            get => Name;
-        }
+        public static string WorldName="";
+        public static long Seed;
+
         public static WorldMode worldMode = WorldMode.Single;
         public WorldServiceBase Service;
         public long tick_use_time = 0;
@@ -80,7 +79,10 @@ namespace horizoncraft.script
 
 
             if (worldMode == WorldMode.Preview)
+            {
+                Seed = System.Random.Shared.NextInt64();
                 Service = new PreviewWorldService(this);
+            }
 
             Service.InitializeServices();
         }
@@ -93,8 +95,13 @@ namespace horizoncraft.script
 
         public override void _Process(double delta)
         {
+            textureRect.Modulate = GetSkyChange(Service.TickTimes / 1200f);
+
+
             if (RequeueFreeze > 0) RequeueFreeze -= delta;
             else RequeueFreeze = 0;
+
+
             if (PlayerNode.playerData == null && RequeueFreeze == 0)
             {
                 if (Service.PlayerService.GetPlayerOrLoad(PlayerNode.Profile.Name, out var data))
@@ -197,10 +204,10 @@ namespace horizoncraft.script
         }
 
         //TODO 这个功能还不知道怎么移植到服务类中去，目前只能在客户端即时生效如果用网络的话，可能会出现客户端玩家在因为延迟在天上飞的情况，还待研究
-        public void BlockInterFaceHandle()
+        public virtual void BlockInterFaceHandle()
         {
             if (PlayerNode?.playerData == null) return;
-
+            
             BlockData CurrentBlock =
                 Service.ChunkService.GetBlock(new Vector3I(PlayerNode.playerData.Coord.X, PlayerNode.playerData.Coord.Y,
                     1));
@@ -289,6 +296,14 @@ namespace horizoncraft.script
 
 
         public static Vector2I MathFloor(Vector2I V2I, int chunkSize)
+        {
+            return new Vector2I(
+                (int)Mathf.Floor((float)V2I.X / chunkSize),
+                (int)Mathf.Floor((float)V2I.Y / chunkSize)
+            );
+        }
+
+        public static Vector2I MathFloor(Vector3I V2I, int chunkSize)
         {
             return new Vector2I(
                 (int)Mathf.Floor((float)V2I.X / chunkSize),

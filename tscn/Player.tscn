@@ -1,26 +1,31 @@
-[gd_scene load_steps=26 format=3 uid="uid://dlka0sc4kl0vb"]
+[gd_scene load_steps=28 format=3 uid="uid://dlka0sc4kl0vb"]
 
 [ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/PlayerNode.cs" id="1_knoa1"]
 [ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="1_qob58"]
 [ext_resource type="Script" uid="uid://c4uuiue21aw2o" path="res://tscn/Camera2d.cs" id="3_vvow5"]
 [ext_resource type="PackedScene" uid="uid://cakto4xqnoeua" path="res://tscn/Menu/HotBar.tscn" id="4_kghmo"]
 [ext_resource type="Script" uid="uid://d1fcknwxu8kry" path="res://tscn/DEBUG_INFO.cs" id="4_knoa1"]
+[ext_resource type="FontVariation" uid="uid://ce62qf4xrcdme" path="res://texture/ttf/font.tres" id="4_q1haa"]
 [ext_resource type="Texture2D" uid="uid://bij7ptef3igbq" path="res://texture/break_process.png" id="5_gqu4d"]
 [ext_resource type="Texture2D" uid="uid://dc7ccxk2dn3pn" path="res://texture/player.png" id="6_emu1f"]
 [ext_resource type="Script" uid="uid://bjob2f4yubx5t" path="res://tscn/Body.cs" id="7_7twa1"]
 [ext_resource type="Texture2D" uid="uid://yv22qd68ymlw" path="res://texture/item/stone_pickaxe.png" id="9_knoa1"]
+[ext_resource type="PackedScene" uid="uid://c6e02cn0ir7nl" path="res://tscn/Menu/LoadingMenu.tscn" id="11_qpm1p"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rnaqb"]
 size = Vector2(13, 39)
 
 [sub_resource type="LabelSettings" id="LabelSettings_hdrus"]
+font = ExtResource("4_q1haa")
 shadow_size = 0
 
 [sub_resource type="LabelSettings" id="LabelSettings_gqu4d"]
-font_size = 32
+font = ExtResource("4_q1haa")
+font_size = 24
 
 [sub_resource type="LabelSettings" id="LabelSettings_emu1f"]
-font_size = 32
+font = ExtResource("4_q1haa")
+font_size = 24
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hdrus"]
 atlas = ExtResource("6_emu1f")
@@ -245,6 +250,7 @@ _data = {
 [node name="Player" type="CharacterBody2D"]
 top_level = true
 z_index = 10
+collision_layer = 2
 script = ExtResource("1_knoa1")
 metadata/_edit_vertical_guides_ = [575.0]
 
@@ -392,3 +398,8 @@ libraries = {
 libraries = {
 &"": SubResource("AnimationLibrary_q1haa")
 }
+
+[node name="OvrCanvasLayer" type="CanvasLayer" parent="."]
+layer = 11
+
+[node name="LoadingMenu" parent="OvrCanvasLayer" instance=ExtResource("11_qpm1p")]
