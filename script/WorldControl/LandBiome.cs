@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.WorldControl.Context;
+using horizoncraft.script.WorldControl.Struct;
 
 namespace horizoncraft.script.WorldControl
 {
     public class LandBiome : BaseBiome
     {
-        public virtual int GetHigh(Random random,FastNoiseLite noise, int x, int z)
+        public virtual int GetHigh(Random random, FastNoiseLite noise, int x, int z)
         {
             return 0;
         }

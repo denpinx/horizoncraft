@@ -14,7 +14,7 @@ public class MegaOakTreeStruct : StructBuild
         Name = "mega_oak_tree";
     }
 
-    public override BlockStruct DynamicBuild(int x, int y, int z, Random rand)
+    public override BlockStruct DynamicBuild(int x, int y, int z, Random rand,params object[] args)
     {
         var blocks = new BlockStruct();
         Grow(blocks, rand, x, y, z, 25);

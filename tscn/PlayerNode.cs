@@ -40,6 +40,7 @@ public partial class PlayerNode : CharacterBody2D
     //
     AnimationPlayer animationPlayer_other;
     AnimationPlayer animationPlayer_move;
+    private BlockInfoView BlockInfoView;
     CollisionShape2D collisionShape2D;
     public CanvasLayer OvrCanvasLayer;
     public InventoryNode ShowView;
@@ -189,6 +190,10 @@ public partial class PlayerNode : CharacterBody2D
                     string tag = InterfaceBlock.GetTag("type");
                     if ((tag != null && durable.HasTag(tag)) || durable.HasTag("any"))
                         efficiency = 1f + durable.Efficiency * 0.25f;
+                    else
+                    {
+                        GD.Print("not has tag");
+                    }
                     gap = meta.BreakLevel - durable.ToolLevel;
                 }
 
@@ -377,7 +382,7 @@ public partial class PlayerNode : CharacterBody2D
             if (direction != Vector2.Zero) AnyMove = true;
             if (direction.X > 0) playerData.FaceLeft = false;
             else if (direction.X < 0) playerData.FaceLeft = true;
-            Position += direction * 64;
+            Position += direction * 16;
         }
 
 
@@ -475,12 +480,31 @@ public partial class PlayerNode : CharacterBody2D
     //更新挖掘进度条
     private void UpdateCursor()
     {
+        Label_PlayerName.Text = Profile.Name;
+        
+        Vector2I coord = new(
+            (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
+            (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
+        );
+
         float progress = BreakProcess.ProcessTime / BreakProcess.FinalTime;
         if (progress > 1) progress = 1;
         if (BreakProcess.ProcessTime > 0)
             Cursor.Frame = 1 + (int)(8 * progress);
         else Cursor.Frame = 0;
-        Cursor.GlobalPosition = new Vector2(BreakProcess.Position.X, BreakProcess.Position.Y) * 16;
+        Cursor.GlobalPosition = new Vector2(coord.X, coord.Y) * 16;
+
+        var blockBack = world.Service.ChunkService.GetBlock(new Vector3I(coord.X, coord.Y, 0));
+        var BlockFont = world.Service.ChunkService.GetBlock(new Vector3I(coord.X, coord.Y, 1));
+        if (blockBack == null || BlockFont == null) return;
+        if (!BlockFont.IsMeta("air"))
+        {
+            BlockInfoView.SetBlockData(BlockFont);
+        }
+        else
+        {
+            BlockInfoView.SetBlockData(blockBack);
+        }
     }
 
     public override void _Ready()
@@ -499,13 +523,11 @@ public partial class PlayerNode : CharacterBody2D
         Timer_Tick = GetNode<Timer>("Timer_Tick");
         camera2d = GetNode<Camera2D>("Camera2D");
         Cursor = GetNode<Sprite2D>("Cursor");
-
+        BlockInfoView = GetNode<BlockInfoView>("CanvasLayer/BlockInfoView");
         if (playerData != null)
             playerData.PlayerNode = this;
         hotBar.PlayerNode = this;
         loadingMenu.playerNode = this;
-
-        //Label_PlayerName.Text = Profile.Name;
     }
 
     //检查是否和碰撞箱重叠

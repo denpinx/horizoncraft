@@ -1,0 +1,18 @@
+{
+  "type": "craft",
+  "tag": "player",
+  "recipes": [
+    {
+      "cost": [
+        "#"
+      ],
+      "mask": {
+        "#": "oak_log"
+      },
+      "result": [
+        "oak_plank",
+        4
+      ]
+    }
+  ]
+}

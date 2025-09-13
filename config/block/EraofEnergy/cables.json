@@ -1,0 +1,18 @@
+{
+  "insulated_cable": {
+    "rigidity": 0.5,
+    "tiletype": "terrain",
+    "tags": {
+      "type": "any",
+      "link": "energy"
+    },
+    "components": {
+      "EnergyUnitComponent": {
+        "Name": "EnergyCable",
+        "Max": 4,
+        "EnergyUnitMax": 1024,
+        "Rate": 64
+      }
+    }
+  }
+}

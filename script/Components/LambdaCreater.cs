@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using horizoncraft.script.Components.EnergyBlocks;
 using horizoncraft.script.Components.Item;
 using Dict = System.Collections.Generic.Dictionary<string, object>;
 
@@ -21,6 +22,7 @@ namespace horizoncraft.script.Components
             Register<InventoryComponent>();
             Register<FurnaceComponent>();
             Register<ItemDurableComponent>();
+            Register<EnergyUnitComponent>();
         }
 
         public static void Register<T>() where T : Component, new()

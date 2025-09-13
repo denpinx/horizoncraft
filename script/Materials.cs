@@ -15,6 +15,7 @@ using System.Text.Json.Serialization;
 using System.Xml;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.WorldControl;
+using horizoncraft.script.WorldControl.Struct;
 using ItemEntity = HorizonCraft.tscn.Entity.ItemEntity;
 
 namespace horizoncraft.script
@@ -66,6 +67,11 @@ namespace horizoncraft.script
             BlockMetas.Add(meta);
             Dictionary_BlockMetas.Add(meta.Name, meta);
             GD.Print($"[注册方块]{meta.Id} >{meta.Name}");
+
+            if (meta.OreConfig != null)
+            {
+                OreManage.Registry(meta.OreConfig);
+            }
 
             if (meta.Name != "air")
             {
@@ -141,18 +147,18 @@ namespace horizoncraft.script
             for (int i = 0; i < BlockMetas.Count; i++)
             {
                 var meta = BlockMetas[i];
-                var lootTable = new LootTable();
+                meta.LootTable = new LootTable();;
                 foreach (var ls in meta._LootItemSnapshots_)
                 {
                     var loot_item = new LootItem();
                     if (Dictionary_ItemMetas.TryGetValue(ls.Name, out var itemmeta))
                         loot_item.Item = itemmeta.GetItemStack();
+                    loot_item.DropChance = ls.DropChance;
                     loot_item.AmountChances = ls.AmountChances;
-
-                    GD.Print($"[后处理] 添加战利品 {ls.Name},战利品数{ls.AmountChances.Count}");
+                    meta.LootTable.LootItems.Add(loot_item);
+                    GD.Print($"[后处理] 添加战利品 {loot_item.Item.GetItemMeta().Name},战利品数{loot_item.AmountChances.Count}");
                 }
-
-                meta.LootTable = lootTable;
+                
             }
         }
 
@@ -284,6 +290,15 @@ namespace horizoncraft.script
                 if (config.ContainsKey("light"))
                 {
                     blockmeta.Light = (bool)config["light"];
+                }
+
+                if (config.ContainsKey("ore"))
+                {
+                    blockmeta.OreConfig = new OreConfig() { Name = blockmeta.Name };
+                    var dict_ore = (Dictionary<string, object>)config["ore"];
+                    if (dict_ore.ContainsKey("size")) blockmeta.OreConfig.Size = (int)dict_ore["size"];
+                    if (dict_ore.ContainsKey("count")) blockmeta.OreConfig.Count = (int)dict_ore["count"];
+                    if (dict_ore.ContainsKey("deep")) blockmeta.OreConfig.Deep = (int)dict_ore["deep"];
                 }
 
                 if (config.ContainsKey("rigidity"))

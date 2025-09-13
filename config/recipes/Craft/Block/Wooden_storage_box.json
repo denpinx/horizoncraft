@@ -1,0 +1,21 @@
+{
+  "type": "craft",
+  "tag": "player",
+  "recipes": [
+    {
+      "cost": [
+        "###",
+        "#-#",
+        "###"
+      ],
+      "mask": {
+        "-": "air",
+        "#": "oak_plank"
+      },
+      "result": [
+        "wooden_storage_box",
+        1
+      ]
+    }
+  ]
+}

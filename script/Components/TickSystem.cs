@@ -28,7 +28,6 @@ namespace horizoncraft.script.Components
             }
             else if (component is InventoryComponent ic)
                 ProcessTick(worldEvent as BlockTickEvent, ic);
-
             return true;
         }
 
@@ -53,6 +52,7 @@ namespace horizoncraft.script.Components
                     Tick(e);
                 }
             }
+
             return false;
         }
 

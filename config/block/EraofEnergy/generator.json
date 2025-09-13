@@ -1,0 +1,18 @@
+{
+  "solar_generator": {
+    "rigidity": 0.5,
+    "tags": {
+      "type": "any",
+      "link": "energy"
+    },
+    "components": {
+      "EnergyUnitComponent": {
+        "Name": "SolarGenerator",
+        "Max": 4,
+        "Rate": 64,
+        "EnergyUnitMax": 1024,
+        "InputAble": false
+      }
+    }
+  }
+}

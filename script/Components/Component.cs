@@ -1,6 +1,7 @@
 using System;
 using MemoryPack;
 using System.Collections.Generic;
+using horizoncraft.script.Components.EnergyBlocks;
 using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Item;
 
@@ -18,6 +19,7 @@ namespace horizoncraft.script.Components
     [MemoryPackUnion(7, typeof(ItemDurableComponent))]
     [MemoryPackUnion(8, typeof(EntityComponent))]
     [MemoryPackUnion(9, typeof(ItemEntityComponent))]
+    [MemoryPackUnion(10, typeof(EnergyUnitComponent))]
     public abstract partial class Component
     {
         public string Name;

@@ -29,8 +29,9 @@ public class ItemEntitySystem : EntitySystem
             }
         }
 
+        //合并相同实体
         var itemlist =
-            e.WorldService.EntityService.GetEntityInRangeByName(e.EntityData.Position.ToVector2I(), 16, "item_entity");
+            e.WorldService.EntityService.GetEntityInRangeByName(e.EntityData.Position.ToVector2I(), 24, "item_entity");
         if (itemlist == null) return;
 
         foreach (var entity in itemlist)

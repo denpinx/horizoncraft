@@ -5,6 +5,7 @@ using horizoncraft.script.Components;
 using horizoncraft.script.Events;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.WorldControl;
+using horizoncraft.script.WorldControl.Struct;
 using Dictionary = System.Collections.Generic.Dictionary<string, string>;
 
 namespace horizoncraft.script
@@ -54,6 +55,8 @@ namespace horizoncraft.script
         
         public int BreakLevel = 0;
 
+        public OreConfig OreConfig = null;
+        
         /// <summary>掉落物</summary>
         public LootTable LootTable;
 

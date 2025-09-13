@@ -6,13 +6,13 @@
       "process": 20,
       "cost": [
         [
-          "grass",
+          "iron_ore",
           1
         ]
       ],
       "result": [
         [
-          "dirt",
+          "iron_ingot",
           1
         ]
       ]
@@ -21,13 +21,28 @@
       "process": 20,
       "cost": [
         [
-          "dirt",
+          "copper_ore",
           1
         ]
       ],
       "result": [
         [
-          "grass",
+          "copper_ingot",
+          1
+        ]
+      ]
+    },
+    {
+      "process": 20,
+      "cost": [
+        [
+          "tin_ore",
+          1
+        ]
+      ],
+      "result": [
+        [
+          "tin_ingot",
           1
         ]
       ]

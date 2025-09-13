@@ -24,7 +24,10 @@ namespace horizoncraft.script.Events
         private BlockData _frontBlock;
         private BlockData _backBlock;
 
-
+        public void SetUpdate()
+        {
+            Chunk.UpdateList.Add(LocalPos);
+        }
         public void SetBlock(BlockMeta meta, int state = 0) =>
             Chunk.SetBlock(LocalPos.X, LocalPos.Y, LocalPos.Z, meta, state);
 

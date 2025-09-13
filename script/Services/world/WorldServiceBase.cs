@@ -19,8 +19,8 @@ namespace HorizonCraft.script.Services.world;
 /// </summary>
 public abstract class WorldServiceBase : IDisposable
 {
+    const int DayTicks = 20 * 60;
     public WorldProfile Profile;
-
     public int TickTimes;
     public World World;
 
@@ -40,9 +40,10 @@ public abstract class WorldServiceBase : IDisposable
     public EntityServiceNode EntityServiceNode;
 
     public PlayerInventoryServiceNode PlayerInventoryServiceNode;
+
     /// <summary>实体节点行为,定义不同策略下的实体同步行为</summary>
     public EntityBehaviorBase EntityBehavior;
-    
+
     public WorldServiceBase(World world)
     {
         this.World = world;
@@ -95,5 +96,21 @@ public abstract class WorldServiceBase : IDisposable
                 conn.InsertWorldProfileByteValue("WorldProfile", Profile);
             }
         }
+    }
+
+    public bool IsDay()
+    {
+        int h = GetTimeHour();
+        return h is >= 6 and < 20;
+    }
+
+    public int GetTimeHour()
+    {
+        return (int)(((float)TickTimes % (float)DayTicks) / (float)DayTicks * 24f);
+    }
+
+    public int GetTimeDay()
+    {
+        return (int)(((float)TickTimes / (float)DayTicks));
     }
 }

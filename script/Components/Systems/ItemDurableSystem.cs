@@ -2,6 +2,7 @@ using Godot;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Events;
 using horizoncraft.script.Events.player;
+using horizoncraft.script.Inventory;
 
 namespace horizoncraft.script.Components.Systems;
 
@@ -14,12 +15,13 @@ public class ItemDurableSystem : ItemComponentSystem
         if (bbe.GetBlockData().BlockMeta.BreakLevel <= durable.ToolLevel)
         {
             //正常掉落
-            bbe.DropItem = bbe.GetBlockData().BlockMeta.ItemMeta.GetItemStack();
+            bbe.DropLoots = bbe.GetBlockData().BlockMeta.LootTable.TryTakeItem();
+            //bbe.DropItem = bbe.GetBlockData().BlockMeta.ItemMeta.GetItemStack();
         }
         else
         {
             //无掉落物
-            bbe.DropItem = null;
+            //bbe.DropItem = null;
         }
 
         durable.Value -= 1;

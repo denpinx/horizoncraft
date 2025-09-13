@@ -33,7 +33,6 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                 lbsc.BlockStructs.Add(blockStrcut);
             }
         }
-
         public override void GeneratorTerrain(BiomeTerrainContext context)
         {
             int num = context.HighMap[context.LocalX, context.GlobalZ] - context.GlobalY;

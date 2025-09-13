@@ -1,0 +1,17 @@
+{
+  "battery_pack": {
+    "rigidity": 0.5,
+    "tags": {
+      "type": "any",
+      "link": "energy"
+    },
+    "components": {
+      "EnergyUnitComponent": {
+        "Name": "EnergyCable",
+        "Max": 4,
+        "EnergyUnitMax": 10240,
+        "Rate": 64
+      }
+    }
+  }
+}

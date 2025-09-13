@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using Godot;
 using horizoncraft.script.Components;
+using horizoncraft.script.Components.EntityComponents;
+using horizoncraft.script.Entity;
 using horizoncraft.script.Events.player;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
@@ -257,8 +260,30 @@ public class PlayerEvents
                 {
                     ComponentManager.ExecuteComponents(e, handItem);
                 }
+                else
+                {
+                    e.DropLoots.Add(item);
+                }
 
-                e.Player.Inventory.TryAddItem(item);
+                foreach (var dropitem in e.DropLoots)
+                {
+                    //e.Player.Inventory.TryAddItem(dropitem);
+                    var data = new EntityData()
+                    {
+                        Name = "item_entity",
+                        Owned = PlayerNode.Profile.Name,
+                        Position = new(e.Position.X * 16, e.Position.Y * 16),
+                        Components = new List<Component>()
+                        {
+                            new ItemEntityComponent()
+                            {
+                                Name = "ItemEntityComponent",
+                                ItemStack = dropitem,
+                            }
+                        }
+                    };
+                    e.world.Service.EntityService.AddEntityData(data);
+                }
             }
             else
             {

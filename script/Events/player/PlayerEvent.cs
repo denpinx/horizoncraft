@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
@@ -71,7 +72,8 @@ public class PlayerBreakblockEvent : PlayerEvent
     public BlockData GetBlockData()
         => ChunkService.GetBlock(Position);
 
-    public ItemStack DropItem;
+    //public ItemStack DropItem;
+    public List<ItemStack> DropLoots = new ();
 }
 public class InterfaceBlockEvent : PlayerEvent
 {

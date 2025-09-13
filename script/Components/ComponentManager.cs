@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using horizoncraft.script.Components.EnergyBlocks;
 using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Components.Systems;
+using horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Events;
 using horizoncraft.script.Events.player;
@@ -138,5 +140,7 @@ public class ComponentManager
         Register("WorkBenchComponent", () => new InventoryComponent(), new WorkBenchSystem());
         Register("ItemDurableComponent", () => new ItemDurableComponent(), new ItemDurableSystem());
         Register("ItemEntityComponent", () => new ItemEntityComponent(), new ItemEntitySystem());
+        Register("SolarGenerator", () => new EnergyUnitComponent(), new SolarGeneratorSystem());
+        Register("EnergyCable", () => new EnergyUnitComponent(), new EnergyCableSystem());
     }
 }

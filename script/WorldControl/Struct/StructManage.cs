@@ -11,9 +11,9 @@ public class StructManage
     public static List<StructBuild> DynamicStructs = new();
     public static Dictionary<string, StructBuild> Dictionary_DynamicStructs = new();
 
-    public static BlockStruct GetStruct(string name, int x, int y, int z, Random rand)
+    public static BlockStruct GetStruct(string name, int x, int y, int z, Random rand,params object[] args)
     {
-        return Dictionary_DynamicStructs[name].DynamicBuild(x, y, z, rand);
+        return Dictionary_DynamicStructs[name].DynamicBuild(x, y, z, rand,args);
     }
 
     public static void AddStruct(StructBuild structBuild)
@@ -27,6 +27,7 @@ public class StructManage
     {
         AddStruct(new OakTreeStruct());
         AddStruct(new MegaOakTreeStruct());
+        AddStruct(new OreStruct());
     }
 
 

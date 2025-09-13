@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script;
+using horizoncraft.script.Components;
 using horizoncraft.script.Expand;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Tool;
@@ -469,14 +470,15 @@ public partial class ChunkServiceBase : IDisposable
         if (player == null) return;
         HashSet<Vector2I> poss = new HashSet<Vector2I>();
         GetLoadRangeChunks(player.ChunkCoord, poss);
-
+        int light = 0;
+        if (LightMode == LightModeEnum.None) light = 16;
         foreach (var sts in Chunks)
         {
             var chunk = sts.Value;
             if (poss.Contains(chunk.coord))
-                sts.Value.ClearLight();
+                sts.Value.SetLight(light);
         }
-
+        if (LightMode == LightModeEnum.None) return;
 
         foreach (var sts in Chunks)
         {
@@ -485,10 +487,51 @@ public partial class ChunkServiceBase : IDisposable
                 UpdataChunkLight(chunk);
         }
 
+        int Size = LightSize / 2;
+        if (player.Mode == 1) Size = LightSize * 4;
         if (LightMode == LightModeEnum.DFSMode)
-            DfsUpdateLight(new Vector3I(player.Coord.X, player.Coord.Y, 1), LightSize / 2);
+            DfsUpdateLight(new Vector3I(player.Coord.X, player.Coord.Y, 1),Size);
         if (LightMode == LightModeEnum.RayCastMode)
-            RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), LightSize / 2, 32);
+            RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), Size, 32);
+    }
+
+    public List<BlockData> GetBlockAsSameComponent<T>(Vector3I pos) where T : Component
+    {
+        List<BlockData> result = new List<BlockData>();
+        //前后
+        {
+            BlockData block;
+            if (pos.Z == 0)
+                block = GetBlock(new Vector3I(pos.X, pos.Y, 1));
+            else block = GetBlock(new Vector3I(pos.X, pos.Y, 0));
+            if (block?.GetComponent<T>() != null)
+            {
+                result.Add(block);
+            }
+        }
+
+        {
+            BlockData block = GetBlock(pos - Vector3I.Left);
+            if (block?.GetComponent<T>() != null)
+                result.Add(block);
+        }
+        {
+            BlockData block = GetBlock(pos - Vector3I.Right);
+            if (block?.GetComponent<T>() != null)
+                result.Add(block);
+        }
+        {
+            BlockData block = GetBlock(pos - Vector3I.Up);
+            if (block?.GetComponent<T>() != null)
+                result.Add(block);
+        }
+        {
+            BlockData block = GetBlock(pos - Vector3I.Down);
+            if (block?.GetComponent<T>() != null)
+                result.Add(block);
+        }
+
+        return result;
     }
 
     #endregion

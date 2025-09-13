@@ -1,0 +1,22 @@
+{
+  "type": "craft",
+  "tag": "player",
+  "recipes": [
+    {
+      "cost": [
+        "###",
+        "-!-",
+        "-!-"
+      ],
+      "mask": {
+        "-": "air",
+        "!": "stick",
+        "#": "cobblestone"
+      },
+      "result": [
+        "stone_pickaxe",
+        1
+      ]
+    }
+  ]
+}

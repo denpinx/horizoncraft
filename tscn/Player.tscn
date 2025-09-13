@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://dlka0sc4kl0vb"]
+[gd_scene load_steps=30 format=3 uid="uid://dlka0sc4kl0vb"]
 
 [ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/PlayerNode.cs" id="1_knoa1"]
 [ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="1_qob58"]
@@ -8,12 +8,22 @@
 [ext_resource type="FontVariation" uid="uid://ce62qf4xrcdme" path="res://texture/ttf/font.tres" id="4_q1haa"]
 [ext_resource type="Texture2D" uid="uid://bij7ptef3igbq" path="res://texture/break_process.png" id="5_gqu4d"]
 [ext_resource type="Texture2D" uid="uid://dc7ccxk2dn3pn" path="res://texture/player.png" id="6_emu1f"]
+[ext_resource type="PackedScene" uid="uid://dm7wxja8j5axr" path="res://tscn/Gui/BlockInfoView.tscn" id="7_2i02x"]
 [ext_resource type="Script" uid="uid://bjob2f4yubx5t" path="res://tscn/Body.cs" id="7_7twa1"]
 [ext_resource type="Texture2D" uid="uid://yv22qd68ymlw" path="res://texture/item/stone_pickaxe.png" id="9_knoa1"]
 [ext_resource type="PackedScene" uid="uid://c6e02cn0ir7nl" path="res://tscn/Menu/LoadingMenu.tscn" id="11_qpm1p"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rnaqb"]
-size = Vector2(13, 39)
+size = Vector2(13, 31)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2i02x"]
+bg_color = Color(0.6, 0.6, 0.6, 0.403922)
+border_width_left = 2
+border_color = Color(3.85046e-06, 0.726049, 0.88341, 1)
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
 
 [sub_resource type="LabelSettings" id="LabelSettings_hdrus"]
 font = ExtResource("4_q1haa")
@@ -260,9 +270,8 @@ script = ExtResource("3_vvow5")
 metadata/_edit_lock_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, -11.5)
+position = Vector2(-1, -8)
 shape = SubResource("RectangleShape2D_rnaqb")
-metadata/_edit_lock_ = true
 
 [node name="Icon" type="Sprite2D" parent="."]
 visible = false
@@ -276,13 +285,23 @@ wait_time = 0.05
 autostart = true
 
 [node name="Label_PlayerName" type="Label" parent="."]
-offset_left = -15.0
-offset_top = -44.0
-offset_right = 44.0
-offset_bottom = -21.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -12.0
+offset_top = -50.0
+offset_right = 37.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
 scale = Vector2(0.5, 0.5)
-text = "[player]"
+size_flags_horizontal = 3
+size_flags_vertical = 6
+theme_override_styles/normal = SubResource("StyleBoxFlat_2i02x")
+text = "player"
 label_settings = SubResource("LabelSettings_hdrus")
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 2
@@ -332,6 +351,8 @@ label_settings = SubResource("LabelSettings_emu1f")
 horizontal_alignment = 2
 
 [node name="HotBar" parent="CanvasLayer" instance=ExtResource("4_kghmo")]
+
+[node name="BlockInfoView" parent="CanvasLayer" instance=ExtResource("7_2i02x")]
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
 visible = false
@@ -403,3 +424,4 @@ libraries = {
 layer = 11
 
 [node name="LoadingMenu" parent="OvrCanvasLayer" instance=ExtResource("11_qpm1p")]
+visible = false

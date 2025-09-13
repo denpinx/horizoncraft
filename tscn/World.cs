@@ -27,7 +27,7 @@ namespace horizoncraft.script
             MultiplayerHost //联机服主机模式,拥有全部内容
         }
 
-        public static string WorldName="";
+        public static string WorldName = "";
         public static long Seed;
 
         public static WorldMode worldMode = WorldMode.Single;
@@ -95,9 +95,7 @@ namespace horizoncraft.script
 
         public override void _Process(double delta)
         {
-            textureRect.Modulate = GetSkyChange(Service.TickTimes / 1200f);
-
-
+            textureRect.Modulate = GetSkyChange();
             if (RequeueFreeze > 0) RequeueFreeze -= delta;
             else RequeueFreeze = 0;
 
@@ -126,8 +124,10 @@ namespace horizoncraft.script
             UpdateTileMap();
             CilentTicked?.Invoke();
             BlockInterFaceHandle();
-
             sw.Stop();
+
+            Service.TickTimes++;
+
             tick_use_time = sw.ElapsedMilliseconds;
         }
 
@@ -207,7 +207,7 @@ namespace horizoncraft.script
         public virtual void BlockInterFaceHandle()
         {
             if (PlayerNode?.playerData == null) return;
-            
+
             BlockData CurrentBlock =
                 Service.ChunkService.GetBlock(new Vector3I(PlayerNode.playerData.Coord.X, PlayerNode.playerData.Coord.Y,
                     1));
@@ -251,9 +251,9 @@ namespace horizoncraft.script
                 return (byte)(200 * ((hour - 17f) / 3f));
         }
 
-        public Color GetSkyChange(float t)
+        public Color GetSkyChange()
         {
-            float hour = t * 24f;
+            float hour = Service.GetTimeHour();
 
             if (hour >= 0 && hour < 6) // 00:00 - 06:00
             {

@@ -13,5 +13,6 @@ namespace horizoncraft.script.WorldControl.Context
         public List<BlockStruct> BlockStructs;
         public int GlobalX;
         public int GlobalY;
+        public int Altitude;
     }
 }

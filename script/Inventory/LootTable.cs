@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Godot;
+using Godot.NativeInterop;
 
 namespace horizoncraft.script.Inventory;
 
@@ -22,6 +24,7 @@ public class LootTable
         var loots = new List<ItemStack>();
         foreach (LootItem item in LootItems)
         {
+
             var chance = System.Random.Shared.NextSingle();
             if (item.DropChance * luck >= chance)
             {
@@ -29,6 +32,7 @@ public class LootTable
 
                 foreach (var ac in item.AmountChances)
                 {
+                    GD.Print(ac.Amount,ac.Chance);
                     var amount_chance = System.Random.Shared.NextSingle();
                     if (ac.Chance * luck >= amount_chance)
                         amount += ac.Amount;

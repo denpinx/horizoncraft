@@ -22,7 +22,7 @@
         "Name": "ItemDurableComponent",
         "Tag": "any|pickaxe",
         "ToolLevel": 1,
-        "Efficiency": 2,
+        "Efficiency": 3,
         "Max": 250,
         "Value": 250
       }
@@ -35,7 +35,7 @@
         "Name": "ItemDurableComponent",
         "Tag": "any|pickaxe",
         "ToolLevel": 2,
-        "Efficiency": 3,
+        "Efficiency": 5,
         "Max": 500,
         "Value": 500
       }

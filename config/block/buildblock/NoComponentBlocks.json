@@ -1,13 +1,11 @@
 {
   "cobblestone": {
-    "rigidity": 2
+    "rigidity": 1
   },
   "stone": {
-    "rigidity": 2,
-    "tiletype": "terrain",
+    "rigidity": 1,
     "tags": {
-      "type": "pickaxe",
-      "link": "stone"
+      "type": "pickaxe"
     },
     "loot": [
       {

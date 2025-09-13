@@ -1,0 +1,52 @@
+{
+  "coal_ore": {
+    "rigidity": 1,
+    "ore": {
+      "deep": -1,
+      "size": 8,
+      "count": 10
+    },
+    "tag": {
+      "type": "pickaxe"
+    },
+    "loot": [
+      {
+        "name": "coal",
+        "drop-chance": 1
+      }
+    ]
+  },
+  "iron_ore": {
+    "rigidity": 1,
+    "ore": {
+      "deep": -1,
+      "size": 4,
+      "count": 5
+    },
+    "tag": {
+      "type": "pickaxe"
+    }
+  },
+  "copper_ore": {
+    "rigidity": 1,
+    "ore": {
+      "deep": -1,
+      "size": 4,
+      "count": 4
+    },
+    "tag": {
+      "type": "pickaxe"
+    }
+  },
+  "tin_ore": {
+    "rigidity": 1,
+    "ore": {
+      "deep": 1,
+      "size": 4,
+      "count": 2
+    },
+    "tag": {
+      "type": "pickaxe"
+    }
+  }
+}

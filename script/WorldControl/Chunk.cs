@@ -220,12 +220,12 @@ namespace horizoncraft.script.WorldControl
             }
         }
 
-        public void ClearLight()
+        public void SetLight(int light)
         {
             for (int x = 0; x < Chunk.Size; x++)
             for (int y = 0; y < Chunk.Size; y++)
             {
-                data[x, y, 1].Light = 0;
+                data[x, y, 1].Light = light;
             }
         }
 

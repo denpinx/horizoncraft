@@ -7,6 +7,7 @@ using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.WorldControl.Context;
+using horizoncraft.script.WorldControl.Struct;
 using static horizoncraft.script.WorldControl.BiomeManage;
 
 namespace horizoncraft.script.WorldControl
@@ -58,6 +59,8 @@ namespace horizoncraft.script.WorldControl
             Random random = new Random(x * 3 + y * 7 + z * 11);
             List<BlockStruct> structs = new();
             BiomeType biomeType = BiomeManage.CheckRange(highmap, x, y);
+            //structs.Add(OreManage.GeneratorOre(random, x, y));
+
             if (biomeType == BiomeType.LandBiome)
             {
                 var landBiomeStructContext = new LandBiomeStructContext()
@@ -72,10 +75,11 @@ namespace horizoncraft.script.WorldControl
                     int gx = x * Chunk.Size + i;
                     int gy = highmap[i, z] - 1;
                     int hy = highmap[i, z] - y * Chunk.Size;
+                    landBiomeStructContext.GlobalX = gx;
+                    landBiomeStructContext.GlobalY = gy;
+                    landBiomeStructContext.Altitude = hy;
                     if (hy >= 0 && hy < Chunk.Size)
                     {
-                        landBiomeStructContext.GlobalX = gx;
-                        landBiomeStructContext.GlobalY = gy;
                         landbiome.GeneratorStruct(landBiomeStructContext);
                     }
                 }
@@ -94,6 +98,7 @@ namespace horizoncraft.script.WorldControl
                     GlobalY = y * Chunk.Size
                 };
                 Biome biome = BiomeManage.GetDeepBiome(x, y);
+                biome.GeneratorOre(biomeStructContext);
                 biome.GeneratorStruct(biomeStructContext);
                 if (structs.Count > 0)
                     return structs;
@@ -115,6 +120,20 @@ namespace horizoncraft.script.WorldControl
             }
 
             return null;
+        }
+
+        public static List<BlockStruct> GetAllOres(int x, int y)
+        {
+            List<BlockStruct> structs = new();
+            for (int i = x - 1; i <= x + 1; i++)
+            for (int j = y - 1; j <= y + 1; j++)
+            {
+                Random random = new Random(i * Int16.MaxValue + j);
+                var st = OreManage.GeneratorOre(random, i, j);
+                if (st != null) structs.Add(st);
+            }
+
+            return structs;
         }
 
         public static List<BlockStruct> GetAllStructs(int x, int y)
@@ -160,6 +179,7 @@ namespace horizoncraft.script.WorldControl
             var landbiome = BiomeManage.GetLandBiome(chunk.X);
             int[,] highmap = GetHighMap(chunk.X);
             List<BlockStruct> structs = GetAllStructs(chunk.X, chunk.Y);
+            List<BlockStruct> ores = GetAllOres(chunk.X, chunk.Y);
             //地表生物群系
 
             BiomeType biomeType = BiomeManage.CheckRange(highmap, chunk.X, chunk.Y);
@@ -194,7 +214,11 @@ namespace horizoncraft.script.WorldControl
 
                         var data = GetStructData(structs, gx, gy, z);
                         if (data.Item1 != null)
+                        {
+                            // var insideblock = chunk.GetBlock(x, y, z);
+                            // if (insideblock.IsMeta("air"))
                             chunk.SetBlock(x, y, z, data.Item1, data.Item2);
+                        }
                     }
                 }
             }
@@ -240,7 +264,25 @@ namespace horizoncraft.script.WorldControl
 
                         var data = GetStructData(structs, gx, gy, z);
                         if (data.Item1 != null)
+                        {
                             chunk.SetBlock(x, y, z, data.Item1, data.Item2);
+                        }
+                    }
+                }
+            }
+
+            for (int x = 0; x < Chunk.Size; x++)
+            {
+                for (int y = 0; y < Chunk.Size; y++)
+                {
+                    int gx = chunk.X * Chunk.Size + x;
+                    int gy = chunk.Y * Chunk.Size + y;
+                    var ore = GetStructData(ores, gx, gy, 1);
+                    if (ore.Item1 != null)
+                    {
+                        var insideblock = chunk.GetBlock(x, y, 1);
+                        if (insideblock.IsMeta("stone"))
+                            chunk.SetBlock(x, y, 1, ore.Item1, ore.Item2);
                     }
                 }
             }

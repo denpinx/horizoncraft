@@ -21,7 +21,7 @@ public class LootItem
 public class LootItemSnapshot
 {
     public string Name;
-    public float DropChance;
+    public float DropChance=1;
     public List<AmountChance> AmountChances = new();
 }
 

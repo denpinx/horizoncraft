@@ -1,0 +1,21 @@
+{
+  "type": "craft",
+  "tag": "player",
+  "recipes": [
+    {
+      "cost": [
+        "#-#",
+        "###",
+        "#-#"
+      ],
+      "mask": {
+        "-": "air",
+        "#": "stick"
+      },
+      "result": [
+        "ladder",
+        7
+      ]
+    }
+  ]
+}
