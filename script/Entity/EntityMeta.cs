@@ -14,20 +14,20 @@ namespace horizoncraft.script.Entity
         public delegate Node2D GetEntityNodelegate(PackedScene packedScene);
 
         public GetEntityNodelegate get_entity_node;
-        public PackedScene packedScene = new();
-        public string NAME;
-        public int id;
+        public PackedScene PackedScene = new();
+        public string Name;
+        public int Id;
 
         public EntityMeta(string name, string scenepath)
         {
-            packedScene = GD.Load<PackedScene>(scenepath);
-            this.NAME = name;
+            PackedScene = GD.Load<PackedScene>(scenepath);
+            this.Name = name;
         }
 
         public IEntityNode GetEntityNode()
         {
-            IEntityNode entityNode = get_entity_node(packedScene) as IEntityNode; 
-            entityNode.Id = id;
+            IEntityNode entityNode = PackedScene.Instantiate() as IEntityNode;
+            entityNode.Id = Id;
             return entityNode;
         }
     }

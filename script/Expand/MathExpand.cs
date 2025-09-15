@@ -84,4 +84,9 @@ public static class MathExpand
             (v2i.Y % chunkSize + chunkSize) % chunkSize
         );
     }
+
+    public static Vector3I ToVector3I(this System.Numerics.Vector3 v3)
+    {
+        return new Vector3I((int)v3.X, (int)v3.Y, (int)v3.Z);
+    }
 }

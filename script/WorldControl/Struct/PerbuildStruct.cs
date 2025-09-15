@@ -7,7 +7,7 @@ namespace horizoncraft.script.WorldControl.Struct;
 public class PreBuildStruct
 {
     public string name;
-    public System.Collections.Generic.Dictionary<Vector3I,PreBuildStructItem> blocks = new();
+    public System.Collections.Generic.Dictionary<Vector3I, PreBuildStructItem> blocks = new();
 
     public Dictionary ToDictionary()
     {
@@ -19,7 +19,7 @@ public class PreBuildStruct
             ["name"] = name,
             ["blocks"] = array
         };
-    } 
+    }
 }
 
 public class PreBuildStructItem

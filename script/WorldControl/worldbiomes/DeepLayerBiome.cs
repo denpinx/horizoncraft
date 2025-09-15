@@ -12,6 +12,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             weight = 100;
             color = Color.Color8(41, 41, 41);
         }
+
         public override void GeneratorTerrain(BiomeTerrainContext btc)
         {
             //btc.Chunk[btc.LocalX, btc.LocalY, btc.GloablZ] = Materials.Valueof("stone").Blockdata();

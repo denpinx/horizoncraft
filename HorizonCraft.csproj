@@ -25,6 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\packscene\" />
+    <Folder Include="script\Net\SyncDatas\" />
     <Folder Include="script\WorldParials\" />
   </ItemGroup>
   <ItemGroup>

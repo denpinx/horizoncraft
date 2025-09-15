@@ -12,7 +12,6 @@ public class SingleWorldService : WorldServiceBase
 {
     public SingleWorldService(World world) : base(world)
     {
-
     }
 
     public override void InitializeServices()

@@ -13,7 +13,9 @@ namespace horizoncraft.script.Events
         //传入
         public BlockData BlockData;
         public ItemStack ItemStack;
+
         public int Index;
+
         //传出
         public ItemStack DropItemStack;
     }

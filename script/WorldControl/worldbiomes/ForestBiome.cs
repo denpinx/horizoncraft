@@ -20,7 +20,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
 
         public override int GetHigh(Random random, FastNoiseLite noise, int x, int z)
         {
-            return random.Next(-32, 10) + random.Next(-32, 0);
+            return random.Next(-32, 10) + random.Next(-32, 10);
         }
 
         public override void GeneratorStruct(LandBiomeStructContext lbsc)
@@ -33,6 +33,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                 lbsc.BlockStructs.Add(blockStrcut);
             }
         }
+
         public override void GeneratorTerrain(BiomeTerrainContext context)
         {
             int num = context.HighMap[context.LocalX, context.GlobalZ] - context.GlobalY;

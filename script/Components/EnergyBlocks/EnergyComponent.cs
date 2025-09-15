@@ -10,7 +10,7 @@ public partial class EnergyUnitComponent : TickComponent, IGetProgress
     public int EnergyUnitValue;
     public int Rate = 0;
     public bool InputAble = true;
-    
+
     public ProgressValue GetProgress()
     {
         return new ProgressValue

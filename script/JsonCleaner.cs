@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+
 namespace horizoncraft.script
 {
     public class JsonCleaner
@@ -34,6 +35,7 @@ namespace horizoncraft.script
             {
                 dict[prop.Name] = ConvertRoot(prop.Value);
             }
+
             return dict;
         }
 
@@ -44,6 +46,7 @@ namespace horizoncraft.script
             {
                 list.Add(ConvertRoot(item));
             }
+
             return list;
         }
     }

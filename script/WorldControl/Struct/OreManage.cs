@@ -52,6 +52,7 @@ public static class OreManage
                     blocks.AddBlock(final_pos.X, final_pos.Y, 1, Materials.Valueof(config.Name));
                 }
             }
+
         return blocks;
     }
 }

@@ -22,7 +22,7 @@ public class OreStruct : StructBuild
         ;
         string name = (string)args[0];
         int chance = (int)args[1];
-        if (z == 1) AddOre(rand, blocks,ref  chance, name, x, y, z);
+        if (z == 1) AddOre(rand, blocks, ref chance, name, x, y, z);
         return blocks;
     }
 

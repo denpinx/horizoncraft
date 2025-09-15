@@ -277,6 +277,19 @@ public partial class ChunkServiceBase : IDisposable
         return false;
     }
 
+    public bool TryGetBlock(Vector3I globalPosition, out BlockData block)
+    {
+        var b = GetBlock(globalPosition);
+        if (b != null)
+        {
+            block = b;
+            return true;
+        }
+
+        block = null;
+        return false;
+    }
+
     /// <summary>
     /// 获取方块
     /// </summary>
@@ -468,7 +481,7 @@ public partial class ChunkServiceBase : IDisposable
     {
         var player = World.PlayerNode.playerData;
         if (player == null) return;
-        HashSet<Vector2I> poss = new HashSet<Vector2I>();
+        var poss = new HashSet<Vector2I>();
         GetLoadRangeChunks(player.ChunkCoord, poss);
         int light = 0;
         if (LightMode == LightModeEnum.None) light = 16;
@@ -478,6 +491,7 @@ public partial class ChunkServiceBase : IDisposable
             if (poss.Contains(chunk.coord))
                 sts.Value.SetLight(light);
         }
+
         if (LightMode == LightModeEnum.None) return;
 
         foreach (var sts in Chunks)
@@ -487,12 +501,12 @@ public partial class ChunkServiceBase : IDisposable
                 UpdataChunkLight(chunk);
         }
 
-        int Size = LightSize / 2;
-        if (player.Mode == 1) Size = LightSize * 4;
+        int lightsize = LightSize / 2;
+        if (player.Mode == 1) lightsize = LightSize * 4;
         if (LightMode == LightModeEnum.DFSMode)
-            DfsUpdateLight(new Vector3I(player.Coord.X, player.Coord.Y, 1),Size);
+            DfsUpdateLight(new Vector3I(player.Coord.X, player.Coord.Y, 1), lightsize);
         if (LightMode == LightModeEnum.RayCastMode)
-            RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), Size, 32);
+            RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), lightsize, 32);
     }
 
     public List<BlockData> GetBlockAsSameComponent<T>(Vector3I pos) where T : Component
@@ -544,6 +558,6 @@ public partial class ChunkServiceBase : IDisposable
         World.timer.Timeout -= Ticking;
         _tokenSource.Cancel();
         _processLoadTask?.Wait(1000);
-        _processLoadTask.Dispose();
+        _processLoadTask?.Dispose();
     }
 }

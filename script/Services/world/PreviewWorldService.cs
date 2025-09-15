@@ -27,6 +27,5 @@ public class PreviewWorldService : WorldServiceBase
 
     public override void LoadWorldProfile()
     {
-
     }
 }

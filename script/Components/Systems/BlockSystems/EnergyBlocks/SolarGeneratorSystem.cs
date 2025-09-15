@@ -11,18 +11,13 @@ public class SolarGeneratorSystem : TickSystem
     {
         if (component is EnergyUnitComponent energy)
         {
-            bool update = false;
             int sv = energy.EnergyUnitValue;
             if (blockTickEvent.Service.IsDay())
             {
                 if (energy.EnergyUnitValue + energy.Rate <= energy.EnergyUnitMax)
-                {
                     energy.EnergyUnitValue += energy.Rate;
-                }
                 else
-                {
                     energy.EnergyUnitValue = energy.EnergyUnitMax;
-                }
             }
 
             if (energy.EnergyUnitValue < energy.Rate) return;
@@ -36,7 +31,7 @@ public class SolarGeneratorSystem : TickSystem
                 var cmp = block.GetComponent<EnergyUnitComponent>();
                 if (cmp == null) continue;
                 int space = cmp.EnergyUnitMax - cmp.EnergyUnitValue;
-                if(space<=0)continue;
+                if (space <= 0) continue;
                 if (space > energy.Rate)
                 {
                     cmp.EnergyUnitValue += energy.Rate;
@@ -44,7 +39,7 @@ public class SolarGeneratorSystem : TickSystem
                 }
                 else
                 {
-                    cmp.EnergyUnitValue = energy.EnergyUnitMax;
+                    cmp.EnergyUnitValue = cmp.EnergyUnitMax;
                     energy.EnergyUnitValue -= space;
                 }
             }

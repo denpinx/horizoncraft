@@ -98,7 +98,7 @@ public partial class PlayerInventoryServiceNode : Node
     {
         if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))
         {
-            playerData.Inventory.HandSlot = (short)slot;
+            playerData.Inventory.ToolBarIndex = (short)slot;
         }
     }
 

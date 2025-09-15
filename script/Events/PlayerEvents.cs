@@ -4,86 +4,78 @@ using horizoncraft.script.Components;
 using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Events.player;
+using horizoncraft.script.Expand;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.NewProxy.player;
 using horizoncraft.script.Recipes;
 using HorizonCraft.script.Services.world;
 using horizoncraft.script.WorldControl;
+using Vector2 = System.Numerics.Vector2;
 
 namespace horizoncraft.script.Events;
 
+/// <summary>
+/// 玩家事件处理集
+/// </summary>
 public class PlayerEvents
 {
+    /// <summary>
+    /// 设置玩家当前打开方块的组件信息
+    /// </summary>
+    /// <param name="e"></param>
     public virtual void SetOpenBlockComponent(PlayerSetBlockComponentEvent e)
     {
-        var pos = new Vector3I((int)e.Player.OpenInventory.X, (int)e.Player.OpenInventory.Y,
-            (int)e.Player.OpenInventory.Z);
-        var block = e.world.Service.ChunkService.GetBlock(pos);
-        if (block != null)
+        if (e.ChunkService.TryGetBlock(e.Player.OpenInventory.ToVector3I(), out var block))
             ComponentManager.SetBlockComponentData(e.Player, block, e.ComponentData);
     }
 
-    public virtual void CraftGridRecipeItem(PlayerCraftItemEvent e)
+    /// <summary>
+    /// 合成玩家配方
+    /// </summary>
+    /// <param name="playerCraftItemEvent"></param>
+    public virtual void CraftGridRecipeItem(PlayerCraftItemEvent playerCraftItemEvent)
     {
-        var gri = RecipeManage.GetRecipe(e.Player.Inventory, 2, 36);
-        if (e.IsAllCraft)
+        var gri = RecipeManage.GetRecipe(playerCraftItemEvent.Player.Inventory, 2, 36);
+        if (playerCraftItemEvent.IsAllCraft)
         {
+            //一键合成,直接返回背包
             while (gri != null)
             {
-                var handitme = e.Player.Inventory.GetHandItemStack();
-                if (handitme == null
-                   )
-                {
-                    e.Player.Inventory.HandItemStack = gri.Result.Copy();
-                }
-                else if (
-                    handitme.Id == gri.Result.Id &&
-                    handitme.Amount + gri.Result.Amount <= gri.Result.GetItemMeta().MaxAmount
-                )
-                {
-                    handitme.Amount += gri.Result.Amount;
-                }
-                else
-                {
+                if (!playerCraftItemEvent.Player.Inventory.TryAddItem(gri.Result.Copy()))
                     return;
-                }
-
                 for (int i = 0; i < 4; i++)
-                {
-                    e.Player.Inventory.ReduceItemAmount(36 + i);
-                }
-
-                gri = RecipeManage.GetRecipe(e.Player.Inventory, 2, 36);
+                    playerCraftItemEvent.Player.Inventory.ReduceItemAmount(36 + i);
+                gri = RecipeManage.GetRecipe(playerCraftItemEvent.Player.Inventory, 2, 36);
             }
         }
         else if (gri != null)
         {
-            var handitme = e.Player.Inventory.GetHandItemStack();
+            //手动合成
+            var handitme = playerCraftItemEvent.Player.Inventory.GetHandItemStack();
             if (handitme == null
                )
             {
-                e.Player.Inventory.HandItemStack = gri.Result.Copy();
+                playerCraftItemEvent.Player.Inventory.HandItemStack = gri.Result.Copy();
             }
             else if (
                 handitme.Id == gri.Result.Id &&
                 handitme.Amount + gri.Result.Amount <= gri.Result.GetItemMeta().MaxAmount
             )
-            {
                 handitme.Amount += gri.Result.Amount;
-            }
-            else
-            {
-                return;
-            }
+            else return;
+
 
             for (int i = 0; i < 4; i++)
-            {
-                e.Player.Inventory.ReduceItemAmount(36 + i);
-            }
+                playerCraftItemEvent.Player.Inventory.ReduceItemAmount(36 + i);
         }
     }
 
+    /// <summary>
+    /// 让玩家打开物品栏
+    /// </summary>
+    /// <param name="world">世界</param>
+    /// <param name="viewName">物品栏名</param>
     public void OpenInventory(World world, string viewName)
     {
         if (world.PlayerNode.ShowView != null)
@@ -96,6 +88,11 @@ public class PlayerEvents
         world.PlayerNode.AddChild(world.PlayerNode.ShowView);
     }
 
+    /// <summary>
+    /// 接收查看的方块信息
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public virtual bool ReciveLookingBlockData(PlayerOpenBlockViewEvent e)
     {
         var world = e.world;
@@ -114,6 +111,11 @@ public class PlayerEvents
         return true;
     }
 
+    /// <summary>
+    /// 打开方块的物品栏
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public virtual bool OpenBlockView(PlayerOpenBlockViewEvent e)
     {
         var world = e.world;
@@ -134,6 +136,11 @@ public class PlayerEvents
         return true;
     }
 
+    /// <summary>
+    /// 拾取物品到手中
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public virtual bool PickItem(PlayerPickItemEvent e)
     {
         if (e.Inventory == null) return false;
@@ -199,95 +206,69 @@ public class PlayerEvents
         return true;
     }
 
+    /// <summary>
+    /// 放置方块
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public virtual bool PlaceBlock(PlayerPlaceBlockEvent e)
     {
-        var pos0 = new Vector3I(e.Position.X, e.Position.Y, 0);
-        var pos1 = new Vector3I(e.Position.X, e.Position.Y, 1);
-        var block1 = e.ChunkService.GetBlock(pos0);
-        var block2 = e.ChunkService.GetBlock(pos1);
+        var set = e.GetBlockData();
+        var block = set.Item1;
+        var pos = set.Item2;
+        e.PlaceLayerResult = pos.Z;
+        if (block == null) return false;
+        if (!block.IsMeta("air")) return false;
 
-        if (block1 == null || block2 == null) return false;
-
-        Vector3I finalpos;
-        BlockData finalblock;
-        if (e.coercive)
-        {
-            finalblock = block1;
-            finalpos = pos0;
-        }
-        else
-        {
-            if (block1.IsMeta("air"))
-            {
-                finalblock = block1;
-                finalpos = pos0;
-            }
-            else
-            {
-                finalblock = block2;
-                finalpos = pos1;
-                if (e.IsCollide) return false;
-            }
-        }
-
-        if (!finalblock.IsMeta("air")) return false;
-
-        var item = e.Player.Inventory.GetItem(e.Player.Inventory.HandSlot);
+        var item = e.Player.Inventory.GetItem(e.Player.Inventory.ToolBarIndex);
         if (item == null) return false;
 
         BlockMeta bm = item.GetBlockMeta();
         if (bm == null) return false;
 
-        e.ChunkService.SetBlock(finalpos, bm);
-        if (e.Player.Mode == 0) e.Player.Inventory.ReduceItemAmount(e.Player.Inventory.HandSlot);
+        e.ChunkService.SetBlock(pos, bm);
+
+        if (e.Player.Mode == 0)
+            e.Player.Inventory.ReduceItemAmount(e.Player.Inventory.ToolBarIndex);
         return true;
     }
 
+    /// <summary>
+    /// 破坏方块
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public virtual bool BreakBlock(PlayerBreakblockEvent e)
     {
-        var targetblock = e.ChunkService.GetBlock(e.Position);
+        var targetblock = e.GetBlockData();
 
-
-        if (e.Player.Mode == 0)
+        if (e.Player.Mode == 0 &&
+            targetblock != null &&
+            !targetblock.IsMeta("air") &&
+            !e.ChunkService.CheckIsCloseBlock(e.Position))
         {
-            if (e.ChunkService.CheckIsCloseBlock(e.Position) || targetblock == null || targetblock.IsMeta("air"))
-                return false;
             var item = targetblock.BlockMeta?.ItemMeta?.GetItemStack();
             if (item != null)
             {
-                var handItem = e.Player.Inventory.GetItem(e.Player.Inventory.HandSlot);
+                var handItem = e.Player.Inventory.GetItem(e.Player.Inventory.ToolBarIndex);
+                //执行物品组件事件,由事件决定掉落物
                 if (handItem != null && handItem.Components.Count > 0)
-                {
-                    ComponentManager.ExecuteComponents(e, handItem);
-                }
-                else
-                {
-                    e.DropLoots.Add(item);
-                }
+                    ComponentManager.ExecuteItemComponents(e, handItem);
+                //没有物品组件则默认掉落方块的直接物品
+                else e.DropLoots.Add(item);
 
                 foreach (var dropitem in e.DropLoots)
                 {
+                    //直接给予物品
                     //e.Player.Inventory.TryAddItem(dropitem);
-                    var data = new EntityData()
-                    {
-                        Name = "item_entity",
-                        Owned = PlayerNode.Profile.Name,
-                        Position = new(e.Position.X * 16, e.Position.Y * 16),
-                        Components = new List<Component>()
-                        {
-                            new ItemEntityComponent()
-                            {
-                                Name = "ItemEntityComponent",
-                                ItemStack = dropitem,
-                            }
-                        }
-                    };
+                    //生成掉落物实体
+                    var data = dropitem.GetEntityData(new Vector2I(e.Position.X * 16, e.Position.Y * 16));
                     e.world.Service.EntityService.AddEntityData(data);
                 }
             }
             else
             {
-                GD.PrintErr($"物品不存在！ :{targetblock.BlockMeta.Name}");
+                GD.PrintErr($"[物品不存在]:{targetblock?.BlockMeta?.Name}");
             }
         }
 
@@ -295,6 +276,11 @@ public class PlayerEvents
         return true;
     }
 
+    /// <summary>
+    /// 右键交互方块
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
     public virtual bool InterfaceBlock(InterfaceBlockEvent e)
     {
         var pos0 = new Vector3I(e.Position.X, e.Position.Y, 0);
@@ -334,11 +320,60 @@ public class PlayerEvents
         return true;
     }
 
+    /// <summary>
+    /// 关闭物品栏订阅
+    /// </summary>
+    /// <param name="service"></param>
+    /// <param name="name"></param>
     public virtual void CloseInventory(WorldServiceBase service, string name)
     {
         if (service.PlayerService.Players.TryGetValue(name, out var player))
         {
             player.OpeningBlockInventory = false;
+        }
+    }
+
+    /// <summary>
+    /// 丢弃一个物品
+    /// </summary>
+    /// <param name="service"></param>
+    /// <param name="name"></param>
+    public virtual void DropItem(WorldServiceBase service, string name)
+    {
+        if (service.PlayerService.Players.TryGetValue(name, out var player))
+        {
+            var item = player.Inventory.GetToolBarItem();
+            if (item != null && item.Amount > 0)
+            {
+                var pos = player.Position;
+                if (player.FaceLeft) pos -= Vector2.UnitX * 16 + Vector2.UnitY * 32;
+                else pos -= Vector2.UnitX * -16 + Vector2.UnitY * 32;
+                var data = item.Copy(1).GetEntityData(pos.ToVector2I());
+                item.Amount -= 1;
+                service.EntityService.AddEntityData(data);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 丢弃一组物品
+    /// </summary>
+    /// <param name="service"></param>
+    /// <param name="name"></param>
+    public virtual void DropAllItem(WorldServiceBase service, string name)
+    {
+        if (service.PlayerService.Players.TryGetValue(name, out var player))
+        {
+            var item = player.Inventory.GetToolBarItem();
+            if (item != null && item.Amount > 0)
+            {
+                var pos = player.Position;
+                if (player.FaceLeft) pos -= Vector2.UnitX * 16 + Vector2.UnitY * 32;
+                else pos -= Vector2.UnitX * -16 + Vector2.UnitY * 32;
+                var data = item.GetEntityData(pos.ToVector2I());
+                player.Inventory.SetItem(player.Inventory.ToolBarIndex, null);
+                service.EntityService.AddEntityData(data);
+            }
         }
     }
 }

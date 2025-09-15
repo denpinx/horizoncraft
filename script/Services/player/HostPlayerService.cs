@@ -13,7 +13,6 @@ public class HostPlayerService : PlayerServiceBase
 {
     public HostPlayerService(World world) : base(world)
     {
-        
     }
 
     public override void Ticking()

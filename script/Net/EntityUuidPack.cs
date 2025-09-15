@@ -8,6 +8,7 @@ namespace horizoncraft.script.Net;
 public partial class EntityUuidPack
 {
     public HashSet<Guid> Uuids = new HashSet<Guid>();
+
     public override int GetHashCode()
     {
         return Uuids.GetHashCode();

@@ -5,7 +5,7 @@ using horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Services.player;
 
-public class SinglePlayerService:PlayerServiceBase
+public class SinglePlayerService : PlayerServiceBase
 {
     public SinglePlayerService(World world) : base(world)
     {

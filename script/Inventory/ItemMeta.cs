@@ -20,7 +20,7 @@ public class ItemMeta
     public BlockMeta BlockMeta = null;
     public Dictionary<string, string> Tags = new Dictionary<string, string>();
 
-    public Texture2D GetTexture(int state=0)
+    public Texture2D GetTexture(int state = 0)
     {
         if (ShowTexture != null) return ShowTexture;
         if (state > Itemset.Textures.Count)

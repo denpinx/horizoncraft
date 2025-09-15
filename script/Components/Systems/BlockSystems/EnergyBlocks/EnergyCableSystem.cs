@@ -11,19 +11,22 @@ public class EnergyCableSystem : TickSystem
         if (component is EnergyUnitComponent energy)
         {
             if (energy.EnergyUnitValue < energy.Rate) return;
+            int sv = energy.EnergyUnitValue;
             var result =
                 blockTickEvent.Service.ChunkService.GetBlockAsSameComponent<EnergyUnitComponent>(blockTickEvent
                     .GlobalePos);
             foreach (var block in result)
             {
-                if (energy.EnergyUnitValue < energy.Rate) return;
+                if (energy.EnergyUnitValue < energy.Rate) continue;
                 var cmp = block.GetComponent<EnergyUnitComponent>();
                 if (cmp == null) continue;
-                if(!cmp.InputAble)continue;
+                if (!cmp.InputAble) continue;
                 if ((float)cmp.EnergyUnitValue / cmp.EnergyUnitMax >
                     (float)energy.EnergyUnitValue / energy.EnergyUnitMax) continue;
 
                 int space = cmp.EnergyUnitMax - cmp.EnergyUnitValue;
+                if (space <= 0) continue;
+                
                 if (space > energy.Rate)
                 {
                     cmp.EnergyUnitValue += energy.Rate;
@@ -31,9 +34,14 @@ public class EnergyCableSystem : TickSystem
                 }
                 else
                 {
-                    cmp.EnergyUnitValue = energy.EnergyUnitMax;
+                    cmp.EnergyUnitValue = cmp.EnergyUnitMax;
                     energy.EnergyUnitValue -= space;
                 }
+            }
+
+            if (energy.EnergyUnitValue != sv)
+            {
+                blockTickEvent.SetUpdate();
             }
         }
     }

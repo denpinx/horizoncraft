@@ -1,4 +1,5 @@
 using Godot;
+
 namespace horizoncraft.script.Entity;
 
 /// <summary>

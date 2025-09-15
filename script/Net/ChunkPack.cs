@@ -6,6 +6,7 @@ using horizoncraft.script.WorldControl;
 using MemoryPack;
 
 namespace horizoncraft.script.Net;
+
 /// <summary>
 /// 全量同步
 /// </summary>
@@ -25,6 +26,7 @@ public partial class ChunkPack
                 ret.Add(entity.Uuid);
             }
         }
+
         return ret;
     }
 }

@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/PlayerNode.cs" id="1_knoa1"]
 [ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="1_qob58"]
-[ext_resource type="Script" uid="uid://c4uuiue21aw2o" path="res://tscn/Camera2d.cs" id="3_vvow5"]
 [ext_resource type="PackedScene" uid="uid://cakto4xqnoeua" path="res://tscn/Menu/HotBar.tscn" id="4_kghmo"]
 [ext_resource type="Script" uid="uid://d1fcknwxu8kry" path="res://tscn/DEBUG_INFO.cs" id="4_knoa1"]
 [ext_resource type="FontVariation" uid="uid://ce62qf4xrcdme" path="res://texture/ttf/font.tres" id="4_q1haa"]
@@ -36,6 +35,17 @@ font_size = 24
 [sub_resource type="LabelSettings" id="LabelSettings_emu1f"]
 font = ExtResource("4_q1haa")
 font_size = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qpm1p"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.6, 0.6, 0.6, 0.752941)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hdrus"]
 atlas = ExtResource("6_emu1f")
@@ -266,7 +276,6 @@ metadata/_edit_vertical_guides_ = [575.0]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(2, 2)
-script = ExtResource("3_vvow5")
 metadata/_edit_lock_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -354,8 +363,17 @@ horizontal_alignment = 2
 
 [node name="BlockInfoView" parent="CanvasLayer" instance=ExtResource("7_2i02x")]
 
+[node name="Tip" type="Label" parent="CanvasLayer"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 1.0
+grow_vertical = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_qpm1p")
+text = "提示: 按住[shift],可以仅在背景墙放置方块，和仅破坏前景方块"
+
 [node name="RayCast2D" type="RayCast2D" parent="."]
-visible = false
 target_position = Vector2(128, 0)
 metadata/_edit_lock_ = true
 

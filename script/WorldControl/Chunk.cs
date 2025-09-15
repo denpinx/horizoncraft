@@ -36,7 +36,7 @@ namespace horizoncraft.script.WorldControl
         public string BiomeName = "";
 
         public int RemoveCount = 0;
-        
+
         public List<Vector3> TickList = new();
         public List<Vector2> LightList = new();
         [MemoryPackIgnore] public List<Vector3I> UpdateList = new(32);
@@ -58,7 +58,7 @@ namespace horizoncraft.script.WorldControl
 
         //加载完区块后释放到世界中，卸载区块时再从世界中捕获
         public List<EntityData> Entitys = new();
-        
+
         public BlockData[,,] data = new BlockData[Size, Size, SizeZ];
         public int SpawnCostTime;
 
@@ -147,7 +147,7 @@ namespace horizoncraft.script.WorldControl
             return data[x, y, z];
         }
 
-      public void Tick(WorldServiceBase WorldService, World world)
+        public void Tick(WorldServiceBase WorldService, World world)
         {
             version = WorldService.TickTimes;
 
@@ -189,7 +189,7 @@ namespace horizoncraft.script.WorldControl
                     state = block.State;
                     try
                     {
-                        ComponentManager.ExecuteComponents(blockTickEvnet, block);
+                        ComponentManager.ExecuteBlockComponents(blockTickEvnet, block);
                         blockTickEvnet.Reset();
                     }
                     catch (Exception e)
@@ -211,6 +211,7 @@ namespace horizoncraft.script.WorldControl
                 }
             }
         }
+
         public void FillLight(int value)
         {
             for (int x = 0; x < Chunk.Size; x++)
@@ -236,6 +237,7 @@ namespace horizoncraft.script.WorldControl
             {
                 result.Add(entity.Name);
             }
+
             return result;
         }
     }

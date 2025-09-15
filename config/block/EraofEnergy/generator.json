@@ -1,6 +1,7 @@
 {
   "solar_generator": {
     "rigidity": 0.5,
+    "cube": false,
     "tags": {
       "type": "any",
       "link": "energy"

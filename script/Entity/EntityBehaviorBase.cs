@@ -12,7 +12,7 @@ public class EntityBehaviorBase
         var node = entityNode.GetNode();
         entityNode.Entity.Position.X = node.GlobalPosition.X;
         entityNode.Entity.Position.Y = node.GlobalPosition.Y;
-        CheckUpdate(entityNode,delta);
+        CheckUpdate(entityNode, delta);
     }
 
     public void CheckUpdate(IEntityNode entityNode, double delta)
@@ -21,6 +21,7 @@ public class EntityBehaviorBase
         {
             entityNode.Entity.Update = true;
         }
+
         entityNode.Entity.LastPosition = entityNode.Entity.Position;
     }
 }

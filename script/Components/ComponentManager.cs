@@ -6,22 +6,25 @@ using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Components.Systems;
 using horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
-using horizoncraft.script.Entity;
 using horizoncraft.script.Events;
 using horizoncraft.script.Events.player;
 using horizoncraft.script.Events.SystemEvents;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
-using HorizonCraft.script.Services.world;
 using horizoncraft.script.WorldControl;
 
 namespace horizoncraft.script.Components;
 
-public class ComponentManager
+public static class ComponentManager
 {
-    static Dictionary<string, ComponentAndSystem> ComponentSets = new();
+    private static readonly Dictionary<string, ComponentAndSystem> ComponentSets = new();
 
-    public static bool ExecuteComponents(EntitySystemEvent ese)
+    /// <summary>
+    /// 处理实体组件事件
+    /// </summary>
+    /// <param name="ese"></param>
+    /// <returns></returns>
+    public static bool ExecuteEntityComponents(EntitySystemEvent ese)
     {
         foreach (var com in ese.EntityData.Components)
         {
@@ -36,7 +39,13 @@ public class ComponentManager
         return true;
     }
 
-    public static bool ExecuteComponents(PlayerEvent playerEvent, ItemStack itemStack)
+    /// <summary>
+    /// 处理物品组件事件
+    /// </summary>
+    /// <param name="playerEvent"></param>
+    /// <param name="itemStack"></param>
+    /// <returns></returns>
+    public static bool ExecuteItemComponents(PlayerEvent playerEvent, ItemStack itemStack)
     {
         int start_id = itemStack.Id;
         for (int i = 0; i < itemStack.Components.Count; i++)
@@ -44,16 +53,15 @@ public class ComponentManager
             Component component = itemStack.Components[i];
             if (component == null)
             {
-                //特殊异常,必须手动解决，如果运行时出现问题，代表有严重bug要修复
                 GD.PrintErr("组件被异常删除!");
                 itemStack.Components.RemoveAt(i);
                 return false;
             }
 
-            if (ComponentSets.ContainsKey(component.Name))
+            if (ComponentSets.TryGetValue(component.Name, out var value))
             {
                 //如果有任意一个组件取消了事件，之后的组件都不执行了
-                var s = ComponentSets[component.Name].system.Execute(playerEvent, component);
+                var s = value.system.ExecuteItemComponent(playerEvent, component);
                 if (!s) return false;
             }
 
@@ -64,7 +72,13 @@ public class ComponentManager
         return true;
     }
 
-    public static bool ExecuteComponents(WorldEvent worldEvent, BlockData blockData)
+    /// <summary>
+    /// 处理方块组件事件
+    /// </summary>
+    /// <param name="worldEvent"></param>
+    /// <param name="blockData"></param>
+    /// <returns></returns>
+    public static bool ExecuteBlockComponents(WorldEvent worldEvent, BlockData blockData)
     {
         int start_id = blockData.Id;
         for (int i = 0; i < blockData.components.Count; i++)
@@ -79,7 +93,7 @@ public class ComponentManager
 
             if (ComponentSets.ContainsKey(component.Name))
             {
-                var s = ComponentSets[component.Name].system.Execute(worldEvent, component);
+                var s = ComponentSets[component.Name].system.ExecuteBlockComponent(worldEvent, component);
                 //取消事件
                 if (!s) return false;
             }
@@ -92,6 +106,12 @@ public class ComponentManager
         return true;
     }
 
+    /// <summary>
+    /// 设置方块组件数据
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="blockData"></param>
+    /// <param name="setComponentData"></param>
     public static void SetBlockComponentData(PlayerData player, BlockData blockData,
         SetComponentData setComponentData)
     {
@@ -105,10 +125,9 @@ public class ComponentManager
                 return;
             }
 
-            if (setComponentData.ComponentSets.ContainsKey(component.Name))
+            if (setComponentData.ComponentSets.TryGetValue(component.Name, out var dict))
             {
-                var d = setComponentData.ComponentSets[component.Name];
-                ComponentSets[component.Name].system.SetComponentValue(player, component, d);
+                ComponentSets[component.Name].system.SetComponentValue(player, component, dict);
             }
             else
             {
@@ -117,6 +136,12 @@ public class ComponentManager
         }
     }
 
+    /// <summary>
+    /// 注册组件功能
+    /// </summary>
+    /// <param name="key">功能名</param>
+    /// <param name="func">组件</param>
+    /// <param name="System">处理方法</param>
     public static void Register(String key, Func<Component> func, IComponentSystem System)
     {
         ComponentSets.Add(key, new ComponentAndSystem()

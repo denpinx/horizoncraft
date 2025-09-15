@@ -58,6 +58,5 @@ public class ClientWorldService : WorldServiceBase
 
     public override void LoadWorldProfile()
     {
-        
     }
 }

@@ -46,7 +46,7 @@ public class EntityServiceBase : IDisposable
                 Service = World.Service,
                 EntityData = entity,
             };
-            ComponentManager.ExecuteComponents(ese);
+            ComponentManager.ExecuteEntityComponents(ese);
         }
     }
 
@@ -83,8 +83,8 @@ public class EntityServiceBase : IDisposable
         var list = new List<EntityData>();
         foreach (var entity in EntityDatas.Values)
         {
-            if(entity.Name!=name)continue;
-            
+            if (entity.Name != name) continue;
+
             var pos = (entity.Position.ToVector2I() - coord).Abs();
             if (pos.X < range && pos.Y < range)
             {
@@ -94,6 +94,7 @@ public class EntityServiceBase : IDisposable
 
         return list;
     }
+
     public List<EntityData> GetEntityInRange(Vector2I coord, int range)
     {
         var list = new List<EntityData>();

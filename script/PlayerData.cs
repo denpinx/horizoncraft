@@ -17,10 +17,10 @@ namespace horizoncraft.script;
 public partial class PlayerData
 {
     //已经加载实体的所有uuid
-    [MemoryPackIgnore] public EntityUuidPack EntityUuidPack = new  EntityUuidPack();
-    [MemoryPackIgnore] public EntityUuidPack LastFarmeEntityUuidPack = new  EntityUuidPack();
+    [MemoryPackIgnore] public EntityUuidPack EntityUuidPack = new EntityUuidPack();
+    [MemoryPackIgnore] public EntityUuidPack LastFarmeEntityUuidPack = new EntityUuidPack();
     [MemoryPackIgnore] public Vector2 LastPosition = Vector2.Zero;
-    
+
 
     [MemoryPackAllowSerialize] private Vector2 _position;
     [MemoryPackAllowSerialize] private bool _faceLeft;

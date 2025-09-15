@@ -22,7 +22,6 @@ public class ClientChunkService : ChunkServiceBase
         {
             if (i > 5)
             {
-                
             }
             else
             {
@@ -48,7 +47,7 @@ public class ClientChunkService : ChunkServiceBase
                 RegetList.TryRemove(pos, out i);
                 continue;
             }
-            
+
             if (i > 5)
             {
                 RegetList.TryRemove(pos, out i);

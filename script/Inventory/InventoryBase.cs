@@ -25,6 +25,11 @@ public abstract partial class InventoryBase
         Items = new ItemStack[Size];
     }
 
+    /// <summary>
+    /// 获取空余的物品栏下标
+    /// </summary>
+    /// <param name="start"></param>
+    /// <returns></returns>
     public int GetEmpyIndex(int start = 0)
     {
         for (int i = start; i < Size; i++)
@@ -35,19 +40,29 @@ public abstract partial class InventoryBase
         return -1;
     }
 
-    public ItemStack GetItem(int id)
+    /// <summary>
+    /// 获取物品
+    /// </summary>
+    /// <param name="index">下标</param>
+    /// <returns></returns>
+    public ItemStack GetItem(int index)
     {
-        if (Items[id] != null && Items[id].Amount <= 0)
-            Items[id] = null;
-        return Items[id];
+        if (Items[index] != null && Items[index].Amount <= 0)
+            Items[index] = null;
+        return Items[index];
     }
 
-    public void SetItem(int id, ItemStack item)
+    /// <summary>
+    /// 设置物品
+    /// </summary>
+    /// <param name="index">下标</param>
+    /// <param name="item">物品</param>
+    public void SetItem(int index, ItemStack item)
     {
         if (item == null || item.Amount <= 0)
-            Items[id] = null;
+            Items[index] = null;
         else
-            Items[id] = item;
+            Items[index] = item;
         update = true;
     }
 
@@ -89,11 +104,10 @@ public abstract partial class InventoryBase
         return 0;
     }
 
-    public bool IsLoaded()
-    {
-        return false;
-    }
-
+    /// <summary>
+    /// 是否为全空
+    /// </summary>
+    /// <returns></returns>
     public bool IsEmpty()
     {
         for (int i = 0; i < Size; i++)
@@ -105,11 +119,16 @@ public abstract partial class InventoryBase
         return true;
     }
 
-    public bool IsEmpty(int id)
+    /// <summary>
+    /// 该下标的物品是否为空
+    /// </summary>
+    /// <param name="index">下标</param>
+    /// <returns></returns>
+    public bool IndexIsEmpty(int index)
     {
-        if (Items[id] != null && Items[id].Amount <= 0)
-            Items[id] = null;
-        return Items[id] == null;
+        if (Items[index] != null && Items[index].Amount <= 0)
+            Items[index] = null;
+        return Items[index] == null;
     }
 
     /// <summary>
@@ -156,6 +175,11 @@ public abstract partial class InventoryBase
         return false;
     }
 
+    /// <summary>
+    /// 是否有空间可以添加物品
+    /// </summary>
+    /// <param name="additem"></param>
+    /// <returns></returns>
     private bool HasSpace(ItemStack additem)
     {
         int space = 0;
@@ -231,24 +255,12 @@ public abstract partial class InventoryBase
         update = true;
     }
 
+    /// <summary>
+    /// 清空物品栏
+    /// </summary>
     public void Clear()
     {
         for (int i = 0; i < Size; i++)
             SetItem(i, null);
-    }
-
-    public ItemStack TryTakeItem(int amout)
-    {
-        for (int i = 0; i < Size; i++)
-        {
-            var item = GetItem(i);
-            if (item != null)
-            {
-                ReduceItemAmount(i);
-                return item.Copy(1);
-            }
-        }
-
-        return null;
     }
 }

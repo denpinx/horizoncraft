@@ -40,11 +40,10 @@ public partial class PlayerNode : CharacterBody2D
     //
     AnimationPlayer animationPlayer_other;
     AnimationPlayer animationPlayer_move;
-    private BlockInfoView BlockInfoView;
+    private HorizonCraft.tscn.Gui.BlockInfoView BlockInfoView;
     CollisionShape2D collisionShape2D;
     public CanvasLayer OvrCanvasLayer;
     public InventoryNode ShowView;
-    public RayCast2D RayCast;
     public Timer Timer_Tick;
     Label Label_DEBUG_Right;
     Label Label_DEBUG_Left;
@@ -59,6 +58,7 @@ public partial class PlayerNode : CharacterBody2D
     private bool LastFramIsLeft = false;
     private bool LastFramIsRight = false;
 
+    private int LastFramLayer = 0;
     //private Vector2I LastFramPosition;
 
     public override void _Process(double delta)
@@ -76,9 +76,11 @@ public partial class PlayerNode : CharacterBody2D
             OvrCanvasLayer.GetChildCount() == 0)
         {
             OnMouseLeftClick(coord, delta);
+            LastFramIsLeft = true;
         }
         else
         {
+            LastFramIsLeft = false;
             if (BreakProcess.ProcessTime > 0) BreakProcess.ProcessTime = 0;
         }
 
@@ -86,6 +88,11 @@ public partial class PlayerNode : CharacterBody2D
             OvrCanvasLayer.GetChildCount() == 0)
         {
             OnMouseRightClick(coord, delta);
+            LastFramIsRight = true;
+        }
+        else
+        {
+            LastFramIsRight = false;
         }
 
 
@@ -151,6 +158,7 @@ public partial class PlayerNode : CharacterBody2D
             }
         }
 
+        LastFramLayer = finalpos.Z;
 
         if (InterfaceBlock.IsMeta("air"))
         {
@@ -184,7 +192,7 @@ public partial class PlayerNode : CharacterBody2D
                 float efficiency = 1f;
                 float gap = meta.BreakLevel;
 
-                var durable = playerData.Inventory.GetItemInHand()?.GetComponent<ItemDurableComponent>();
+                var durable = playerData.Inventory.GetToolBarItem()?.GetComponent<ItemDurableComponent>();
                 if (durable != null)
                 {
                     string tag = InterfaceBlock.GetTag("type");
@@ -194,6 +202,7 @@ public partial class PlayerNode : CharacterBody2D
                     {
                         GD.Print("not has tag");
                     }
+
                     gap = meta.BreakLevel - durable.ToolLevel;
                 }
 
@@ -216,88 +225,106 @@ public partial class PlayerNode : CharacterBody2D
     private void OnMouseRightClick(Vector2I coord, double delta)
     {
         var targetpos = new Vector3I(coord.X, coord.Y, 0);
-        bool coercive = false;
+        bool coercivePlace = false;
         if (Input.IsKeyPressed(Key.Shift))
         {
-            coercive = true;
+            coercivePlace = true;
             targetpos = new Vector3I(coord.X, coord.Y, 0);
         }
 
+        var e = new PlayerPlaceBlockEvent()
+        {
+            world = world,
+            Player = playerData,
+            Position = targetpos,
+            CoerciveBackGroundPlace = coercivePlace,
+            IsCollideWithPlayer = IsInRange(targetpos.X * 16, targetpos.Y * 16)
+        };
+        //连续放置时优先放置上一次图层
+        if (LastFramIsRight)
+            e.CoerciveLayer = LastFramLayer;
 
-        if (
-            world.Service.PlayerService.Events.PlaceBlock(new()
-            {
-                world = world,
-                Player = playerData,
-                Position = targetpos,
-                coercive = coercive,
-                IsCollide = IsInRange(targetpos.X * 16, targetpos.Y * 16)
-            }))
-        {
-        }
-        else
-        {
+        if (world.Service.PlayerService.Events.PlaceBlock(e))
+            LastFramLayer = e.PlaceLayerResult;
+        else if (!LastFramIsRight)
             world.Service.PlayerService.Events.InterfaceBlock(new InterfaceBlockEvent()
             {
                 world = world,
                 Player = playerData,
                 Position = targetpos,
             });
-        }
     }
 
     //处理输入
     private void InputHandle(double delta)
     {
+        if (playerData == null) return;
         if (!Inputable) return;
         bool AnyMove = false;
-        if (playerData != null)
+
+        for (int i = 1; i < 10; i++)
+            if (Input.IsKeyPressed(i + Key.Key0))
+            {
+                playerData.Inventory.ToolBarIndex = (byte)(i - 1);
+                if (world.Service is ClientWorldService wcs)
+                    world.Service.PlayerInventoryServiceNode.RpcId(
+                        1,
+                        nameof(PlayerInventoryServiceNode.SetHandSlot),
+                        playerData.Name, playerData.Inventory.ToolBarIndex
+                    );
+                if (BreakProcess.ProcessTime > 0)
+                    BreakProcess.ProcessTime = 0;
+            }
+
+
+        if (Input.IsActionJustPressed("roller_up"))
         {
-            for (int i = 1; i < 10; i++)
-                if (Input.IsKeyPressed(i + Key.Key0))
-                {
-                    playerData.Inventory.HandSlot = (byte)(i - 1);
-                    if (world.Service is ClientWorldService wcs)
-                        world.Service.PlayerInventoryServiceNode.RpcId(
-                            1,
-                            nameof(PlayerInventoryServiceNode.SetHandSlot),
-                            playerData.Name, playerData.Inventory.HandSlot
-                        );
-                    if (BreakProcess.ProcessTime > 0)
-                        BreakProcess.ProcessTime = 0;
-                }
+            playerData.Inventory.ToolBarIndex -= 1;
+            if (playerData.Inventory.ToolBarIndex < 0) playerData.Inventory.ToolBarIndex = 8;
+            if (world.Service is ClientWorldService wcs)
+                world.Service.PlayerInventoryServiceNode.RpcId(
+                    1,
+                    nameof(PlayerInventoryServiceNode.SetHandSlot),
+                    playerData.Name, playerData.Inventory.ToolBarIndex
+                );
+            if (BreakProcess.ProcessTime > 0)
+                BreakProcess.ProcessTime = 0;
+        }
 
+        if (Input.IsActionJustPressed("roller_down"))
+        {
+            playerData.Inventory.ToolBarIndex += 1;
+            if (playerData.Inventory.ToolBarIndex > 8) playerData.Inventory.ToolBarIndex = 0;
+            if (world.Service is ClientWorldService wcs)
+                world.Service.PlayerInventoryServiceNode.RpcId(
+                    1,
+                    nameof(PlayerInventoryServiceNode.SetHandSlot),
+                    playerData.Name, playerData.Inventory.ToolBarIndex
+                );
+            if (BreakProcess.ProcessTime > 0)
+                BreakProcess.ProcessTime = 0;
+        }
 
-            if (Input.IsActionJustPressed("roller_up"))
+        if (Input.IsActionJustPressed("e") && OvrCanvasLayer.GetChildCount() == 0)
+        {
+            if (ShowView != null)
             {
-                playerData.Inventory.HandSlot -= 1;
-                if (playerData.Inventory.HandSlot < 0) playerData.Inventory.HandSlot = 8;
-                if (world.Service is ClientWorldService wcs)
-                    world.Service.PlayerInventoryServiceNode.RpcId(
-                        1,
-                        nameof(PlayerInventoryServiceNode.SetHandSlot),
-                        playerData.Name, playerData.Inventory.HandSlot
-                    );
-                if (BreakProcess.ProcessTime > 0)
-                    BreakProcess.ProcessTime = 0;
+                world.Service.PlayerService.Events.CloseInventory(world.Service, playerData.Name);
+                world.PlayerNode.playerData.OpeningBlockInventory = false;
+                RemoveChild(ShowView);
+                ShowView = null;
             }
+            else
+                world.Service.PlayerService.Events.OpenInventory(world, "PlayerInventory");
+        }
 
-            if (Input.IsActionJustPressed("roller_down"))
+        if (Input.IsActionJustPressed("OpenOperatingMenu"))
+        {
+            if (OvrCanvasLayer.GetChildCount() == 0)
             {
-                playerData.Inventory.HandSlot += 1;
-                if (playerData.Inventory.HandSlot > 8) playerData.Inventory.HandSlot = 0;
-                if (world.Service is ClientWorldService wcs)
-                    world.Service.PlayerInventoryServiceNode.RpcId(
-                        1,
-                        nameof(PlayerInventoryServiceNode.SetHandSlot),
-                        playerData.Name, playerData.Inventory.HandSlot
-                    );
-                if (BreakProcess.ProcessTime > 0)
-                    BreakProcess.ProcessTime = 0;
-            }
+                var menu = GD.Load<PackedScene>("res://tscn/Menu/operating_menu.tscn");
+                OvrCanvasLayer.AddChild(menu.Instantiate<OperatingMenu>());
 
-            if (Input.IsActionJustPressed("e") && OvrCanvasLayer.GetChildCount() == 0)
-            {
                 if (ShowView != null)
                 {
                     world.Service.PlayerService.Events.CloseInventory(world.Service, playerData.Name);
@@ -305,35 +332,26 @@ public partial class PlayerNode : CharacterBody2D
                     RemoveChild(ShowView);
                     ShowView = null;
                 }
-                else
-                    world.Service.PlayerService.Events.OpenInventory(world, "PlayerInventory");
             }
-
-            if (Input.IsActionJustPressed("OpenOperatingMenu"))
+            else
             {
-                if (OvrCanvasLayer.GetChildCount() == 0)
+                var children = OvrCanvasLayer.GetChildren();
+                foreach (var child in children)
                 {
-                    var menu = GD.Load<PackedScene>("res://tscn/Menu/operating_menu.tscn");
-                    OvrCanvasLayer.AddChild(menu.Instantiate<OperatingMenu>());
-
-                    if (ShowView != null)
-                    {
-                        world.Service.PlayerService.Events.CloseInventory(world.Service, playerData.Name);
-                        world.PlayerNode.playerData.OpeningBlockInventory = false;
-                        RemoveChild(ShowView);
-                        ShowView = null;
-                    }
-                }
-                else
-                {
-                    var children = OvrCanvasLayer.GetChildren();
-                    foreach (var child in children)
-                    {
-                        OvrCanvasLayer.RemoveChild(child);
-                        child.QueueFree();
-                    }
+                    OvrCanvasLayer.RemoveChild(child);
+                    child.QueueFree();
                 }
             }
+        }
+        ///丢弃单个物品
+        if (Input.IsActionJustPressed("drop_item"))
+        {
+            world.Service.PlayerService.Events.DropItem(world.Service,playerData.Name);
+        }
+        //丢弃所有物品
+        if (Input.IsActionJustPressed("drop_all_item"))
+        {
+            world.Service.PlayerService.Events.DropAllItem(world.Service,playerData.Name);
         }
 
         if (playerData.Mode == 0)
@@ -405,23 +423,6 @@ public partial class PlayerNode : CharacterBody2D
         {
             if (Input.IsActionJustPressed("TEST_1"))
             {
-                //生成生物
-
-                var data = new EntityData()
-                {
-                    Name = "item_entity",
-                    Owned = PlayerNode.Profile.Name,
-                    Position = new(GetGlobalMousePosition().X, GetGlobalMousePosition().Y),
-                    Components = new List<Component>()
-                    {
-                        new ItemEntityComponent()
-                        {
-                            Name = "ItemEntityComponent",
-                            ItemStack = Materials.Dictionary_ItemMetas["grass"].GetItemStack()
-                        }
-                    }
-                };
-                world.Service.EntityService.AddEntityData(data);
             }
 
             if (Input.IsActionJustPressed("F1") && Inputable)
@@ -481,7 +482,7 @@ public partial class PlayerNode : CharacterBody2D
     private void UpdateCursor()
     {
         Label_PlayerName.Text = Profile.Name;
-        
+
         Vector2I coord = new(
             (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
@@ -510,7 +511,6 @@ public partial class PlayerNode : CharacterBody2D
     public override void _Ready()
     {
         var loadingMenu = GetNode<LoadingMenu>("OvrCanvasLayer/LoadingMenu");
-
         Label_DEBUG_Left = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Left");
         Label_DEBUG_Right = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Right");
         animationPlayer_move = GetNode<AnimationPlayer>("AnimationPlayer_Move");
@@ -523,7 +523,7 @@ public partial class PlayerNode : CharacterBody2D
         Timer_Tick = GetNode<Timer>("Timer_Tick");
         camera2d = GetNode<Camera2D>("Camera2D");
         Cursor = GetNode<Sprite2D>("Cursor");
-        BlockInfoView = GetNode<BlockInfoView>("CanvasLayer/BlockInfoView");
+        BlockInfoView = GetNode<HorizonCraft.tscn.Gui.BlockInfoView>("CanvasLayer/BlockInfoView");
         if (playerData != null)
             playerData.PlayerNode = this;
         hotBar.PlayerNode = this;

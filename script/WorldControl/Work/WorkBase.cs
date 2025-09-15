@@ -17,6 +17,8 @@ namespace horizoncraft.script.WorldControl
             Type = "NONE";
         }
 
-        public virtual void Execute(Chunk chunk) { }
+        public virtual void Execute(Chunk chunk)
+        {
+        }
     }
 }

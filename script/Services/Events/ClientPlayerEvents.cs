@@ -70,12 +70,12 @@ public class ClientPlayerEvents : PlayerEvents
         service.PlayerInventoryServiceNode.RpcId(1, nameof(PlayerInventoryServiceNode.CloseInventory), name);
     }
 
-    public override void CraftGridRecipeItem(PlayerCraftItemEvent e)
+    public override void CraftGridRecipeItem(PlayerCraftItemEvent playerCraftItemEvent)
     {
-        e.world.Service.PlayerInventoryServiceNode.RpcId(1,
+        playerCraftItemEvent.world.Service.PlayerInventoryServiceNode.RpcId(1,
             nameof(PlayerInventoryServiceNode.CraftGridRecipeItem),
-            e.Player.Name, e.IsAllCraft);
-        base.CraftGridRecipeItem(e);
+            playerCraftItemEvent.Player.Name, playerCraftItemEvent.IsAllCraft);
+        base.CraftGridRecipeItem(playerCraftItemEvent);
     }
 
     public override void SetOpenBlockComponent(PlayerSetBlockComponentEvent e)
@@ -83,5 +83,15 @@ public class ClientPlayerEvents : PlayerEvents
         e.world.Service.ChunkServiceNode.RpcId(1,
             nameof(ChunkServiceNode.SetOpenBlockComponent),
             e.Player.Name, ByteTool.ToBytes(e.ComponentData));
+    }
+
+    public override void DropItem(WorldServiceBase service, string name)
+    {
+        service.PlayerServiceNode.RpcId(1, nameof(PlayerServiceNode.DropItemEvent), name, false);
+    }
+
+    public override void DropAllItem(WorldServiceBase service, string name)
+    {
+        service.PlayerServiceNode.RpcId(1, nameof(PlayerServiceNode.DropItemEvent), name, false);
     }
 }

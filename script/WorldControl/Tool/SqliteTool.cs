@@ -22,11 +22,12 @@ public static class SqliteTool
             {
                 GD.PrintErr($"{worldName} is empy!");
             }
-            
+
             if (worldName != LastWalWorld)
             {
                 IsEnableWAL = false;
             }
+
             LastWalWorld = worldName;
 
 
@@ -270,13 +271,14 @@ public static class SqliteTool
         if (conn?.State != System.Data.ConnectionState.Open) return;
         IsEnableWAL = false;
         LastWalWorld = "";
-        
+
         try
         {
             using (var cmd = new SqliteCommand("PRAGMA wal_checkpoint;", conn))
             {
                 cmd.ExecuteNonQuery();
             }
+
             using (var cmd = new SqliteCommand("PRAGMA journal_mode=DELETE;", conn))
             {
                 cmd.ExecuteScalar(); // 必须读取结果

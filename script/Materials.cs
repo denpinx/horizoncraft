@@ -34,9 +34,9 @@ namespace horizoncraft.script
 
         public static EntityMeta RegEntityMeta(EntityMeta meta)
         {
-            meta.id = EntityMetas.Count;
+            meta.Id = EntityMetas.Count;
             EntityMetas.Add(meta);
-            DictionaryEntityMetas.Add(meta.NAME, meta);
+            DictionaryEntityMetas.Add(meta.Name, meta);
             return meta;
         }
 
@@ -133,10 +133,7 @@ namespace horizoncraft.script
 
         private static void ProcessEntity()
         {
-            RegEntityMeta(new EntityMeta("item_entity", "res://tscn/Entity/ItemEntity.tscn")
-            {
-                get_entity_node = (PackedScene packedScene) => (Node2D)packedScene.Instantiate<ItemEntity>()
-            });
+            RegEntityMeta(new EntityMeta("item_entity", "res://tscn/Entity/ItemEntity.tscn"));
         }
 
         /// <summary>
@@ -147,7 +144,8 @@ namespace horizoncraft.script
             for (int i = 0; i < BlockMetas.Count; i++)
             {
                 var meta = BlockMetas[i];
-                meta.LootTable = new LootTable();;
+                meta.LootTable = new LootTable();
+                ;
                 foreach (var ls in meta._LootItemSnapshots_)
                 {
                     var loot_item = new LootItem();
@@ -158,7 +156,6 @@ namespace horizoncraft.script
                     meta.LootTable.LootItems.Add(loot_item);
                     GD.Print($"[后处理] 添加战利品 {loot_item.Item.GetItemMeta().Name},战利品数{loot_item.AmountChances.Count}");
                 }
-                
             }
         }
 

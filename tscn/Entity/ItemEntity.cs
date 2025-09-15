@@ -27,7 +27,7 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
     double _cooldown_ = 0.5f;
     PlayerNode _playerNode;
     PlayerNode _farPlayerNode;
-    
+
     public override void _Ready()
     {
         base._Ready();
@@ -84,9 +84,9 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
             Freeze = false;
         else
             Freeze = true;
-        
-        if(!Freeze) World.Service.EntityBehavior.Process(this,delta);
-        
+
+        if (!Freeze) World.Service.EntityBehavior.Process(this, delta);
+
         if (_farPlayerNode != null)
         {
             Vector2 direction = (_farPlayerNode.GlobalPosition - GlobalPosition).Normalized();

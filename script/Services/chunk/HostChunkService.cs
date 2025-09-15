@@ -130,6 +130,7 @@ public class HostChunkService : ChunkServiceBase
                         nameof(EntityServiceNode.ReciveAllNeedEntityUuid),
                         ByteTool.ToBytes(player.EntityUuidPack));
                 }
+
                 player.LastFarmeEntityUuidPack = player.EntityUuidPack;
                 player.EntityUuidPack = new EntityUuidPack();
             }

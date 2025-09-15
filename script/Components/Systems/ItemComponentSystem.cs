@@ -10,14 +10,12 @@ namespace horizoncraft.script.Components.Systems;
 
 public class ItemComponentSystem : IComponentSystem
 {
-    public bool Execute(WorldEvent worldEvent, Component component)
+    public bool ExecuteBlockComponent(WorldEvent worldEvent, Component component)
     {
-
-
         return true;
     }
 
-    public bool Execute(PlayerEvent playerEvent, Component component)
+    public bool ExecuteItemComponent(PlayerEvent playerEvent, Component component)
     {
         if (component is ItemComponent ic)
         {
@@ -42,7 +40,6 @@ public class ItemComponentSystem : IComponentSystem
 
     public virtual void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)
     {
-        
     }
 
     public virtual bool OnBreakBlock(PlayerBreakblockEvent bbe, ItemComponent itemComponent)

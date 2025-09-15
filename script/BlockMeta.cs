@@ -52,11 +52,11 @@ namespace horizoncraft.script
 
         /// <summary>硬度，决定破坏时间</summary>
         public float Rigidity = 0.5f;
-        
+
         public int BreakLevel = 0;
 
         public OreConfig OreConfig = null;
-        
+
         /// <summary>掉落物</summary>
         public LootTable LootTable;
 
@@ -66,27 +66,18 @@ namespace horizoncraft.script
 
         /// <summary>对应的物品配置 </summary>
         public ItemMeta ItemMeta = null;
-        
+
         /// <summary>物品输入遮罩 </summary>
         public HashSet<int> InputMask = new();
 
         /// <summary>物品输出遮罩 </summary>
         public HashSet<int> OutputMask = new();
 
-        
-        
+
         //
         public List<LootItemSnapshot> _LootItemSnapshots_ = new();
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
         /// <summary>获取方块实列</summary>
         public BlockData CreateBlockData()
         {

@@ -4,36 +4,34 @@ using MemoryPack;
 namespace horizoncraft.script.Inventory;
 
 [MemoryPackable]
-public partial class PlayerInventory : InventoryBase
+public partial class PlayerInventory() : InventoryBase(4 * 9 + 4)
 {
-    public short HandSlot = 0;
+    /// <summary>
+    /// 工具栏的手中物品
+    /// </summary>
+    public short ToolBarIndex = 0;
+
+    /// <summary>
+    /// 在打开背包时手持的物品
+    /// </summary>
     public ItemStack HandItemStack;
-
-    public PlayerInventory() : base(4 * 9 + 4)
-    {
-    }
-
-    public void SubHandItemAmount(int amount = 0)
-    {
-        if (HandItemStack == null)
-        {
-            GD.PrintErr("SubHandItemAmount: HandItemStack is null");
-            return;
-        }
-
-        HandItemStack.Amount -= amount;
-        if (HandItemStack.Amount <= 0) HandItemStack = null;
-    }
-
+    
+    
+    /// <summary>
+    /// 获取物品栏中手中的物品
+    /// </summary>
+    /// <returns></returns>
     public ItemStack GetHandItemStack()
     {
-        if(HandItemStack==null)return null;
-        if (HandItemStack.Amount <= 0) return null;
-        return HandItemStack;
+        if (HandItemStack == null) return null;
+        return HandItemStack.Amount <= 0 ? null : HandItemStack;
     }
-
-    public ItemStack GetItemInHand()
+    /// <summary>
+    /// 获取工具栏中使用的物品
+    /// </summary>
+    /// <returns></returns>
+    public ItemStack GetToolBarItem()
     {
-        return GetItem(HandSlot);
+        return GetItem(ToolBarIndex);
     }
 }

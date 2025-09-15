@@ -24,10 +24,14 @@ namespace horizoncraft.script.Events
         private BlockData _frontBlock;
         private BlockData _backBlock;
 
+        /// <summary>
+        /// 将方块标记为已更新
+        /// </summary>
         public void SetUpdate()
         {
             Chunk.UpdateList.Add(LocalPos);
         }
+
         public void SetBlock(BlockMeta meta, int state = 0) =>
             Chunk.SetBlock(LocalPos.X, LocalPos.Y, LocalPos.Z, meta, state);
 
@@ -38,7 +42,7 @@ namespace horizoncraft.script.Events
             return _bottomBlock;
         }
 
-        public BlockData SetBottomBlock(BlockMeta meta, int state=0) =>
+        public BlockData SetBottomBlock(BlockMeta meta, int state = 0) =>
             _bottomBlock = Service.ChunkService.SetBlock(GlobalePos + Vector3I.Up, meta, state);
 
         /// <summary>获取上方方块</summary>
@@ -49,7 +53,7 @@ namespace horizoncraft.script.Events
         }
 
         /// <summary>设置顶部方块</summary>
-        public BlockData SetTopBlock(BlockMeta meta, int state=0) =>
+        public BlockData SetTopBlock(BlockMeta meta, int state = 0) =>
             _topBlock = Service.ChunkService.SetBlock(GlobalePos + Vector3I.Down, meta, state);
 
         /// <summary>获取左边方块</summary>
@@ -60,7 +64,7 @@ namespace horizoncraft.script.Events
         }
 
         /// <summary>设置左边方块</summary>
-        public BlockData SetLeftBlock(BlockMeta meta, int state=0) =>
+        public BlockData SetLeftBlock(BlockMeta meta, int state = 0) =>
             _leftBlock = Service.ChunkService.SetBlock(GlobalePos + Vector3I.Left, meta, state);
 
         /// <summary>获取右边方块</summary>
@@ -71,7 +75,7 @@ namespace horizoncraft.script.Events
         }
 
         /// <summary>设置右边方块</summary>
-        public BlockData SetRightBlock(BlockMeta meta, int state=0) =>
+        public BlockData SetRightBlock(BlockMeta meta, int state = 0) =>
             _rightBlock = Service.ChunkService.SetBlock(GlobalePos + Vector3I.Right, meta, state);
 
         /// <summary>获取前景方块</summary>
@@ -82,8 +86,8 @@ namespace horizoncraft.script.Events
         }
 
         /// <summary>设置前景方块</summary>
-        public BlockData SetFrontBlock(BlockMeta meta, int state=0) =>
-            _frontBlock =Service.ChunkService.SetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 1), meta, state);
+        public BlockData SetFrontBlock(BlockMeta meta, int state = 0) =>
+            _frontBlock = Service.ChunkService.SetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 1), meta, state);
 
         /// <summary>获取背景方块</summary>
         public BlockData GetBackBlock()
@@ -93,7 +97,7 @@ namespace horizoncraft.script.Events
         }
 
         /// <summary>设置背景方块</summary>
-        public BlockData SetBackBlock(BlockMeta meta, int state=0) =>
+        public BlockData SetBackBlock(BlockMeta meta, int state = 0) =>
             _backBlock = Service.ChunkService.SetBlock(new Vector3I(GlobalePos.X, GlobalePos.Y, 0), meta, state);
 
 

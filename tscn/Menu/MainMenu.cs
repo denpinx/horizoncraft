@@ -19,7 +19,7 @@ public partial class MainMenu : horizoncraft.script.World
     public override void _Ready()
     {
         WorldProfilesScene = GD.Load<PackedScene>("res://tscn/Menu/WorldListMenu.tscn");
-        
+
         GuiCanvasLayer = GetNode<CanvasLayer>("GuiCanvasLayer");
         TopCanvasLayer = GetNode<CanvasLayer>("TopCanvasLayer");
         worldMode = WorldMode.Preview;
@@ -86,7 +86,7 @@ public partial class MainMenu : horizoncraft.script.World
         {
             var coord = (PlayerNode.Position.ToVector2I().MathFloor(16)).Remainder(Chunk.Size);
             var targetpos = new Vector2(PlayerNode.Position.X, chunk.HighMap[coord.X, 0] * 16f);
-            PlayerNode.Position=targetpos;
+            PlayerNode.Position = targetpos;
             //var tween = GetTree().CreateTween();
             //tween.TweenProperty(PlayerNode, "position", targetpos, 0.1f);
         }
