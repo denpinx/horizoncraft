@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Godot;
+using Godot.NativeInterop;
 using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Systems;
 using horizoncraft.script.Entity;
@@ -26,9 +28,14 @@ namespace horizoncraft.script.Components
                     tc.Current++;
                 }
             }
-            else if (component is InventoryComponent ic)
-                ProcessTick(worldEvent as BlockTickEvent, ic);
 
+            if (component is InventoryComponent ic)
+                ProcessTick(worldEvent as BlockTickEvent, ic);
+            if (component is ReactiveComponent rc)
+            {
+                GD.Print("ReactiveComponent");
+                ReactiveTick(worldEvent as BlockTickEvent, rc);
+            }
             return true;
         }
 
@@ -70,6 +77,10 @@ namespace horizoncraft.script.Components
         }
 
         public virtual void Tick(EntityTickEvent e)
+        {
+        }
+
+        public virtual void ReactiveTick(BlockTickEvent blockTickEvent, ReactiveComponent component)
         {
         }
     }

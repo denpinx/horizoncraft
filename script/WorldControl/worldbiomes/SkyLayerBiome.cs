@@ -10,7 +10,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             name = "天空";
             biomeType = BiomeType.Sky;
             weight = 100;
-            color = Color.Color8(73, 140, 255);
+            DebugColor = Color.Color8(73, 140, 255);
         }
     }
 }

@@ -85,6 +85,7 @@ public partial class ChunkServiceNode : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void ReciveLookingBlockData(byte[] data, byte[] playerinv)
     {
+        // TODO 待优化
         BlockData blockData = ByteTool.FromBytes<BlockData>(data);
         PlayerInventory inv = ByteTool.FromBytes<PlayerInventory>(playerinv);
         World.PlayerNode.playerData.Inventory = inv;
@@ -96,13 +97,17 @@ public partial class ChunkServiceNode : Node
         else
         {
             GD.Print("收到数据,打开菜单");
-            var opbv = new PlayerOpenBlockViewEvent()
+            
+            if (World.PlayerNode.ShowView != null)
             {
-                world = World,
-                Player = World.PlayerNode.playerData,
-                ViewName = blockData.GetComponent<InventoryComponent>().InventoryName
-            };
-            World.Service.PlayerService.Events.ReciveLookingBlockData(opbv);
+                World.PlayerNode.RemoveChild(World.PlayerNode.ShowView);
+            }
+            var block = blockData;
+            if (block == null) return;
+            World.PlayerNode.ShowView = InventoryManage.GetInventory<InventoryNode>(block.GetComponent<InventoryComponent>().InventoryName);
+            World.PlayerNode.ShowView.TargetBlock = block;
+            World.PlayerNode.ShowView.PlayerNode = World.PlayerNode;
+            World.PlayerNode.AddChild(World.PlayerNode.ShowView);
         }
     }
 

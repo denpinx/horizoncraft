@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Net;
@@ -112,17 +113,20 @@ public class HostChunkService : ChunkServiceBase
         {
             if (key != 0)
             {
-                var bytes = ByteTool.ToBytes<WorldSnapshot>(diffUpdate[key]);
-                World.Service.ChunkServiceNode.RpcId(key,
-                    nameof(ChunkServiceNode.ReciveChunkUpdatePack),
-                    bytes);
+                if (World.Multiplayer.GetPeers().Contains(key))
+                {
+                    var bytes = ByteTool.ToBytes<WorldSnapshot>(diffUpdate[key]);
+                    World.Service.ChunkServiceNode.RpcId(key,
+                        nameof(ChunkServiceNode.ReciveChunkUpdatePack),
+                        bytes);
+                }
             }
         }
 
         //确保服务端的实体被删除后，客户端也能够知道
         foreach (var player in World.Service.PlayerService.Players.Values)
         {
-            if (player.PeerId != 0 && player.EntityUuidPack.Uuids.Count > 0)
+            if (player.PeerId != 0)
             {
                 if (!player.LastFarmeEntityUuidPack.Equals(player.EntityUuidPack))
                 {

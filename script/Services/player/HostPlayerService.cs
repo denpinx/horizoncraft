@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Components;
@@ -72,11 +73,12 @@ public class HostPlayerService : PlayerServiceBase
                 if (player.Inventory.update)
                 {
                     player.Inventory.update = false;
-                    World.Service.PlayerServiceNode.RpcId(
-                        player.PeerId,
-                        nameof(PlayerServiceNode.ReceivePlayerInv),
-                        ByteTool.ToBytes<PlayerInventory>(player.Inventory)
-                    );
+                    if (World.Multiplayer.GetPeers().Contains(player.PeerId))
+                        World.Service.PlayerServiceNode.RpcId(
+                            player.PeerId,
+                            nameof(PlayerServiceNode.ReceivePlayerInv),
+                            ByteTool.ToBytes<PlayerInventory>(player.Inventory)
+                        );
                 }
 
                 if (player.OpeningBlockInventory)

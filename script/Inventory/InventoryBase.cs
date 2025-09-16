@@ -78,7 +78,7 @@ public abstract partial class InventoryBase
 
         Items[id].Amount -= amount;
         if (Items[id].Amount <= 0) Items[id] = null;
-
+        update = true;
         OnReduceItemAmount?.Invoke(id, amount);
     }
 

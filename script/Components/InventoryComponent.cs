@@ -6,7 +6,7 @@ using MemoryPack;
 namespace horizoncraft.script.Components;
 
 [MemoryPackable]
-public partial class InventoryComponent : Component
+public partial class InventoryComponent : TickComponent
 {
     public string InventoryName = "";
     public string InventoryTile = "容器";

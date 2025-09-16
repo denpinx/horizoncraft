@@ -18,6 +18,8 @@ namespace horizoncraft.script
         /// <summary>组件属性集合</summary>
         public List<Func<Component>> Components = new();
 
+        public List<Component> Examples = new();
+
         // TODO 待实现,或将转移指组件system中执行
         /// <summary>方块放置事件</summary>
         public Action<PlaceBlockEvent> PlaceBlockEvent;
@@ -111,6 +113,14 @@ namespace horizoncraft.script
             if (Tags.TryGetValue(name, out str))
                 return str;
             return null;
+        }
+
+        public bool HasComponent<T>()
+        {
+            foreach (var component in Examples)
+                if (component is T)
+                    return true;
+            return false;
         }
     }
 }

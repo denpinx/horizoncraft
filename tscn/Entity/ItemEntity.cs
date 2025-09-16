@@ -87,16 +87,16 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
 
         if (!Freeze) World.Service.EntityBehavior.Process(this, delta);
 
-        if (_farPlayerNode != null)
-        {
-            Vector2 direction = (_farPlayerNode.GlobalPosition - GlobalPosition).Normalized();
-
-            Vector2 attractVelocity = direction * 40f;
-            Vector2 newVelocity = LinearVelocity;
-            newVelocity.X += attractVelocity.X;
-            newVelocity.X = Mathf.Clamp(newVelocity.X, -100f, 100f);
-            LinearVelocity = newVelocity;
-        }
+        // if (_farPlayerNode != null)
+        // {
+        //     Vector2 direction = (_farPlayerNode.GlobalPosition - GlobalPosition).Normalized();
+        //
+        //     Vector2 attractVelocity = direction * 40f;
+        //     Vector2 newVelocity = LinearVelocity;
+        //     newVelocity.X += attractVelocity.X;
+        //     newVelocity.X = Mathf.Clamp(newVelocity.X, -100f, 100f);
+        //     LinearVelocity = newVelocity;
+        // }
 
         var selfcmp = Entity.GetComponent<ItemEntityComponent>();
         if (selfcmp == null) return;
@@ -104,8 +104,8 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
         {
             _itemTexture_.Visible = true;
             _itemTexture_.Texture = selfcmp.ItemStack.GetItemMeta().GetTexture();
-            _itemLabel_.Text = $"*{selfcmp.ItemStack.Amount}";
-            //_itemLabel_.Text = $"所属{Entity.Owned},更新状态{Entity.Update}";
+            //_itemLabel_.Text = $"*{selfcmp.ItemStack.Amount}";
+            _itemLabel_.Text = $"所属{Entity.Owned},更新状态{Entity.Update}";
         }
         else
         {

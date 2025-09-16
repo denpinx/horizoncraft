@@ -10,7 +10,27 @@ public class LogisticsInputSystem : TickSystem
     public override void Ticking(BlockTickEvent e, Component component)
     {
         HashSet<Vector3I> finded = new HashSet<Vector3I>();
+        var formblock = GetInventoryBlock(e, e.GlobalePos, true);
+        if (formblock == null) return;
 
+        var input_inv = formblock.GetComponent<InventoryComponent>();
+        if (input_inv == null) return;
+
+        var result = FindInputBlock(e, finded, e.GlobalePos);
+        if (result == null) return;
+
+        var (index, item) = input_inv.TryTakeItem(formblock.BlockMeta, 1, false);
+        if (item == null) return;
+
+        var targetmeta = result.BlockMeta;
+        var target_inv = result.GetComponent<InventoryComponent>();
+        if (target_inv.TryPushItem(targetmeta, item))
+            input_inv.GetInventory().ReduceItemAmount(index, 1);
+    }
+
+    public override void ReactiveTick(BlockTickEvent e, ReactiveComponent component)
+    {
+        HashSet<Vector3I> finded = new HashSet<Vector3I>();
         var formblock = GetInventoryBlock(e, e.GlobalePos, true);
         if (formblock == null) return;
 

@@ -15,6 +15,8 @@ public class HostEntityService : EntityServiceBase
         List<EntityDataSnapShot> call_back = new();
         foreach (var entity in entityPack.Entitys)
             UpdateEntityData(entity, call_back);
+        
+        
         //异常回溯
         if (call_back.Count > 0 &&
             World.Service.PlayerService.Players.TryGetValue(entityPack.From, out var player))
@@ -24,7 +26,7 @@ public class HostEntityService : EntityServiceBase
                 From = PlayerNode.Profile.Name,
                 Entitys = call_back
             };
-            World.Service.EntityServiceNode.RpcId(player.PeerId, nameof(EntityServiceNode.ReceiveEntityPack),
+            World.Service.EntityServiceNode.RpcId(player.PeerId, nameof(EntityServiceNode.ClientReceiveEntityPack),
                 ByteTool.ToBytes<EntityPack>(pack));
         }
     }

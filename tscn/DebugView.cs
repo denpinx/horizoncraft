@@ -44,7 +44,7 @@ public partial class DebugView : Node2D
             }, color, 4
         );
         var biomebase = BiomeManage.GetBiomeAsName(chunk.BiomeType);
-        DrawRect(new Rect2(0, 0, new(16 * Chunk.Size, 16 * Chunk.Size)), biomebase.color);
+        DrawRect(new Rect2(0, 0, new(16 * Chunk.Size, 16 * Chunk.Size)), biomebase.DebugColor);
         DrawString(font, new(0, 1 * Chunk.Size), $"坐标：{chunk.coord.X}，{chunk.coord.Y} ");
         DrawString(font, new(0, 2 * Chunk.Size), $"生成耗时：{chunk.SpawnCostTime} ms");
         DrawString(font, new(0, 3 * Chunk.Size), $"生物群系类型：{chunk.BiomeType} ");

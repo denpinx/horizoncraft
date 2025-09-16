@@ -14,7 +14,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
         {
             name = "雪地";
             weight = 2;
-            color = Color.Color8(255, 255, 255);
+            DebugColor = Color.Color8(255, 255, 255);
         }
 
         public override int GetHigh(Random random, FastNoiseLite noise, int x, int z)

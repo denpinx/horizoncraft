@@ -12,7 +12,7 @@ namespace horizoncraft.script.WorldControl
         public int weight;
         public Vector2 weight_range;
 
-        public Color color;
+        public Color DebugColor;
 
         public T Copy<T>() where T : BaseBiome
         {

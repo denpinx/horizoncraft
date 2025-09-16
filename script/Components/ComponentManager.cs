@@ -6,6 +6,7 @@ using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Components.Systems;
 using horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
+using horizoncraft.script.Components.Systems.BlockSystems.Reactive;
 using horizoncraft.script.Events;
 using horizoncraft.script.Events.player;
 using horizoncraft.script.Events.SystemEvents;
@@ -81,13 +82,13 @@ public static class ComponentManager
     public static bool ExecuteBlockComponents(WorldEvent worldEvent, BlockData blockData)
     {
         int start_id = blockData.Id;
-        for (int i = 0; i < blockData.components.Count; i++)
+        for (int i = 0; i < blockData.Components.Count; i++)
         {
-            Component component = blockData.components[i];
+            Component component = blockData.Components[i];
             if (component == null)
             {
                 GD.PrintErr("组件被异常删除!");
-                blockData.components.RemoveAt(i);
+                blockData.Components.RemoveAt(i);
                 return false;
             }
 
@@ -115,13 +116,13 @@ public static class ComponentManager
     public static void SetBlockComponentData(PlayerData player, BlockData blockData,
         SetComponentData setComponentData)
     {
-        for (int i = 0; i < blockData.components.Count; i++)
+        for (int i = 0; i < blockData.Components.Count; i++)
         {
-            Component component = blockData.components[i];
+            Component component = blockData.Components[i];
             if (component == null)
             {
                 GD.PrintErr("组件被异常删除!");
-                blockData.components.RemoveAt(i);
+                blockData.Components.RemoveAt(i);
                 return;
             }
 
@@ -167,5 +168,6 @@ public static class ComponentManager
         Register("ItemEntityComponent", () => new ItemEntityComponent(), new ItemEntitySystem());
         Register("SolarGenerator", () => new EnergyUnitComponent(), new SolarGeneratorSystem());
         Register("EnergyCable", () => new EnergyUnitComponent(), new EnergyCableSystem());
+        Register("TestReactiveSystem", () => new ReactiveComponent(), new TestReactiveSystem());
     }
 }

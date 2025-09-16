@@ -38,6 +38,7 @@ public class EntityServiceBase : IDisposable
     {
         ProcessEntityNode();
         ProcessEntityNodeUpdate();
+
         foreach (var entity in EntityDatas.Values)
         {
             if (entity.Removed) continue;
@@ -145,16 +146,19 @@ public class EntityServiceBase : IDisposable
     public List<EntityData> GetChunkMovedEntity(Vector2I coord)
     {
         var list = new List<EntityData>();
-        foreach (var Entity in EntityDatas.Values)
+        foreach (var entity in EntityDatas.Values)
         {
-            if (Entity.Update)
+            if (entity.ChunkCoord == coord)
             {
-                list.Add(Entity);
-                Entity.Update = false;
-            }
-            else if (Entity.Owned == "")
-            {
-                list.Add(Entity);
+                if (entity.Update)
+                {
+                    list.Add(entity);
+                    entity.Update = false;
+                }
+                else if (entity.Owned == "")
+                {
+                    list.Add(entity);
+                }
             }
         }
 
@@ -175,7 +179,7 @@ public class EntityServiceBase : IDisposable
         }
     }
 
-    public void ProcessEntityNodeUpdate()
+    public virtual void ProcessEntityNodeUpdate()
     {
         foreach (var uuid in EntityDatas.Keys)
         {
@@ -186,6 +190,7 @@ public class EntityServiceBase : IDisposable
             }
             else
             {
+                //创建视图
                 var node = SpawnEntity(EntityDatas[uuid]);
                 if (node == null)
                 {
@@ -196,9 +201,11 @@ public class EntityServiceBase : IDisposable
                 World.AddChild(node.GetNode());
             }
 
-            var Entity = EntityDatas[uuid];
-            if (!World.HasTileMap(Entity.ChunkCoord))
+            //卸载不可见实体视图,更新所属权
+            var entity = EntityDatas[uuid];
+            if (!World.HasTileMap(entity.ChunkCoord))
             {
+                entity.Owned = "";
                 if (EntityNodes.ContainsKey(uuid))
                 {
                     var node = EntityNodes[uuid];
@@ -206,10 +213,20 @@ public class EntityServiceBase : IDisposable
                     node.GetNode().QueueFree();
                 }
             }
+            else
+            {
+                //服务端拿回所属权
+                if (entity.Owned != PlayerNode.Profile.Name)
+                {
+                    //更新状态，同步回客户端
+                    entity.Update = true;
+                    entity.Owned = PlayerNode.Profile.Name;
+                }
+            }
         }
     }
 
-    private IEntityNode SpawnEntity(EntityData data)
+    protected IEntityNode SpawnEntity(EntityData data)
     {
         if (Materials.DictionaryEntityMetas.TryGetValue(data.Name, out var meta))
         {
@@ -233,7 +250,7 @@ public class EntityServiceBase : IDisposable
         }
     }
 
-    public void UpdateEntityData(EntityDataSnapShot data, List<EntityDataSnapShot> CallBack = null)
+    public virtual void UpdateEntityData(EntityDataSnapShot data, List<EntityDataSnapShot> CallBack = null)
     {
         //默认是主机玩家
         if (data.Owned == "") data.Owned = PlayerNode.Profile.Name;
@@ -241,11 +258,12 @@ public class EntityServiceBase : IDisposable
         {
             if (entity.Owned != data.Owned)
             {
+                //删除客户端的uuid
                 if (World.Service.PlayerService.Players.TryGetValue(data.Owned, out var player))
                 {
                     World.Service.EntityServiceNode.RpcId(player.PeerId,
                         nameof(EntityServiceNode.RemoveEntityDataOwned),
-                        entity.Uuid.ToByteArray());
+                        entity.Uuid.ToString());
                 }
             }
             else
@@ -266,23 +284,32 @@ public class EntityServiceBase : IDisposable
                 }
             }
         }
+        //删除
         else if (World.Service.PlayerService.Players.TryGetValue(data.Owned, out var player))
         {
             World.Service.EntityServiceNode.RpcId(player.PeerId,
                 nameof(EntityServiceNode.RemoveEntityData),
-                entity.Uuid.ToString());
+                data.Uuid.ToString());
         }
     }
 
-    public void AddEntityData(EntityData data)
+    /// <summary>
+    /// 添加实体数据
+    /// </summary>
+    /// <param name="data"></param>
+    public virtual void AddEntityData(EntityData data)
     {
         //默认是主机玩家
         if (data.Owned == "") data.Owned = PlayerNode.Profile.Name;
         if (data.Uuid == Guid.Empty) data.Uuid = System.Guid.NewGuid();
-        data.Update = false;
+        //data.Update = false;
         EntityDatas.AddOrUpdate(data.Uuid, data, (key, old) => data);
     }
 
+    /// <summary>
+    /// 删除实体
+    /// </summary>
+    /// <param name="uuid"></param>
     public void RemoveEntityData(Guid uuid)
     {
         if (EntityDatas.TryRemove(uuid, out var data))
@@ -291,6 +318,10 @@ public class EntityServiceBase : IDisposable
         }
     }
 
+    /// <summary>
+    /// 删除实体的所属权
+    /// </summary>
+    /// <param name="uuid"></param>
     public void RemoveEntityDataOwned(Guid uuid)
     {
         if (EntityDatas.TryGetValue(uuid, out var entity))

@@ -9,7 +9,7 @@ public class MountainsBiome : LandBiome
     {
         name = "高山";
         weight = 2;
-        color = Color.Color8(222, 222, 222);
+        DebugColor = Color.Color8(222, 222, 222);
     }
 
     public override int GetHigh(Random random, FastNoiseLite noise, int x, int z)

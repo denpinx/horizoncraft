@@ -95,19 +95,19 @@ public class PlayerEvents
     /// <returns></returns>
     public virtual bool ReciveLookingBlockData(PlayerOpenBlockViewEvent e)
     {
-        var world = e.world;
-        if (world.PlayerNode.ShowView != null)
-        {
-            world.PlayerNode.RemoveChild(world.PlayerNode.ShowView);
-        }
-
-        var block = world.Service.ChunkService.GetBlock(e.Position);
-        if (block == null) return false;
-        world.PlayerNode.ShowView = InventoryManage.GetInventory<InventoryNode>(e.ViewName);
-        world.PlayerNode.ShowView.TargetBlock = block;
-        world.PlayerNode.ShowView.TargetBlockGlobalPos = e.Position;
-        world.PlayerNode.ShowView.PlayerNode = world.PlayerNode;
-        world.PlayerNode.AddChild(world.PlayerNode.ShowView);
+        //TODO 待移除
+        // var world = e.world;
+        // if (world.PlayerNode.ShowView != null)
+        // {
+        //     world.PlayerNode.RemoveChild(world.PlayerNode.ShowView);
+        // }
+        //
+        // var block = world.Service.ChunkService.GetBlock(e.Position);
+        // if (block == null) return false;
+        // world.PlayerNode.ShowView = InventoryManage.GetInventory<InventoryNode>(e.ViewName);
+        // world.PlayerNode.ShowView.TargetBlock = block;
+        // world.PlayerNode.ShowView.PlayerNode = world.PlayerNode;
+        // world.PlayerNode.AddChild(world.PlayerNode.ShowView);
         return true;
     }
 
@@ -130,7 +130,6 @@ public class PlayerEvents
         if (block == null) return false;
         world.PlayerNode.ShowView = InventoryManage.GetInventory<InventoryNode>(e.ViewName);
         world.PlayerNode.ShowView.TargetBlock = block;
-        world.PlayerNode.ShowView.TargetBlockGlobalPos = e.Position;
         world.PlayerNode.ShowView.PlayerNode = world.PlayerNode;
         world.PlayerNode.AddChild(world.PlayerNode.ShowView);
         return true;
@@ -229,7 +228,9 @@ public class PlayerEvents
         e.ChunkService.SetBlock(pos, bm);
 
         if (e.Player.Mode == 0)
+        {
             e.Player.Inventory.ReduceItemAmount(e.Player.Inventory.ToolBarIndex);
+        }
         return true;
     }
 
@@ -273,6 +274,7 @@ public class PlayerEvents
         }
 
         e.ChunkService.SetBlock(e.Position, Materials.Valueof("air"));
+        e.Player.Inventory.update=true;
         return true;
     }
 
@@ -350,7 +352,9 @@ public class PlayerEvents
                 else pos -= Vector2.UnitX * -16 + Vector2.UnitY * 32;
                 var data = item.Copy(1).GetEntityData(pos.ToVector2I());
                 item.Amount -= 1;
+                data.Update = true;
                 service.EntityService.AddEntityData(data);
+                player.Inventory.update = true;
             }
         }
     }
@@ -371,8 +375,10 @@ public class PlayerEvents
                 if (player.FaceLeft) pos -= Vector2.UnitX * 16 + Vector2.UnitY * 32;
                 else pos -= Vector2.UnitX * -16 + Vector2.UnitY * 32;
                 var data = item.GetEntityData(pos.ToVector2I());
+                data.Update = true;
                 player.Inventory.SetItem(player.Inventory.ToolBarIndex, null);
                 service.EntityService.AddEntityData(data);
+                player.Inventory.update = true;
             }
         }
     }

@@ -1,22 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.Components;
 using horizoncraft.script.Entity;
-using horizoncraft.script.Events;
-//using GodotDictionary = Godot.Collections.Dictionary;
-using Dictionary = System.Collections.Generic.Dictionary<string, object>;
-using System.Data.Common;
-using System.Text.Json.Serialization;
-using System.Xml;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Struct;
-using ItemEntity = HorizonCraft.tscn.Entity.ItemEntity;
 
 namespace horizoncraft.script
 {
@@ -183,6 +172,7 @@ namespace horizoncraft.script
             var jsonText = fileAccess.GetAsText();
             fileAccess.Close();
             var dict = JsonCleaner.FromJson(jsonText);
+
             foreach (string item_name in dict.Keys)
             {
                 ItemMeta itemMeta = new ItemMeta()
@@ -279,6 +269,13 @@ namespace horizoncraft.script
                     Name = item_name,
                     Components = components
                 };
+
+                foreach (var cmp in components)
+                {
+                    blockmeta.Examples.Add(cmp());
+                }
+
+
                 if (config.ContainsKey("tiletype"))
                 {
                     blockmeta.TileType = (string)config["tiletype"];

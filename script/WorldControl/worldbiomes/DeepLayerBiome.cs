@@ -10,7 +10,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             name = "深层";
             biomeType = BiomeType.Deep;
             weight = 100;
-            color = Color.Color8(41, 41, 41);
+            DebugColor = Color.Color8(41, 41, 41);
         }
 
         public override void GeneratorTerrain(BiomeTerrainContext btc)

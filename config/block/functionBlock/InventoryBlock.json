@@ -4,6 +4,7 @@
     "components": {
       "InventoryComponent": {
         "Name": "BoxComponent",
+        "Max": 20,
         "Size": 36,
         "InventoryName": "StorageBoxInv"
       }

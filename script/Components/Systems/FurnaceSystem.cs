@@ -38,12 +38,14 @@ public class FurnaceSystem : TickSystem
                 var result = furnace.Result[0];
                 if (output == null)
                 {
+                    evnet.UpdateNeighborBlock();
                     furnace.GetInventory().SetItem(2, result.Copy());
                     furnace.Progress = 0;
                     furnace.Result = null;
                 }
                 else if (output.Id == result.Id && output.Amount + result.Amount <= result.GetItemMeta().MaxAmount)
                 {
+                    evnet.UpdateNeighborBlock();
                     furnace.GetInventory().AddItemAmount(2, result.Amount);
                     furnace.Progress = 0;
                     furnace.Result = null;

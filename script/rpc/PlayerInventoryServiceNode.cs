@@ -54,8 +54,8 @@ public partial class PlayerInventoryServiceNode : Node
     {
         if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))
         {
-            BlockInventory blockInventory = WorldService.ChunkService.GetBlock(new Vector3I(x, y, z))
-                ?.GetComponent<InventoryComponent>()?.GetInventory();
+            var block = WorldService.ChunkService.GetBlock(new Vector3I(x, y, z));
+            BlockInventory blockInventory = block?.GetComponent<InventoryComponent>()?.GetInventory();
             if (blockInventory != null)
             {
                 blockInventory.update = true;

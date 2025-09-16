@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
+using horizoncraft.script.Components;
+using horizoncraft.script.Expand;
 using horizoncraft.script.WorldControl;
+using Vector3 = System.Numerics.Vector3;
 
 namespace horizoncraft.script.Events
 {
@@ -112,6 +115,34 @@ namespace horizoncraft.script.Events
         {
             return blockData != null && blockData.BlockMeta.Cube;
         }
+
+        /// <summary>
+        /// 更新周围的所有被动更新方块,注:是延迟到下tick更新
+        /// </summary>
+        public void UpdateNeighborBlock()
+        {
+            UpdateBlock(GlobalePos + Vector3I.Up);
+            UpdateBlock(GlobalePos + Vector3I.Down);
+            UpdateBlock(GlobalePos + Vector3I.Left);
+            UpdateBlock(GlobalePos + Vector3I.Right);
+        }
+
+        private void UpdateBlock(Vector3I globale)
+        {
+            var block = World.Service.ChunkService.GetBlock(globale);
+            if (block != null)
+            {
+                var chunkcoord = globale.MathFloor(Chunk.Size * 16);
+                var local2i = globale.Remainder(Chunk.Size);
+                var local = new Vector3(local2i.X, local2i.Y, globale.Z);
+                if (block.GetComponent<ReactiveComponent>() != null)
+                {
+                    if (World.Service.ChunkService.Chunks.TryGetValue(chunkcoord, out var chunk))
+                        chunk.ReactiveTickList.Add(local);
+                }
+            }
+        }
+
 
         public void Reset()
         {

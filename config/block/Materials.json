@@ -22,9 +22,8 @@
   "input_block": {
     "rigidity": 0.5,
     "components": {
-      "TickComponent": {
-        "Name": "LogisticsInputComponent",
-        "Max": 20
+      "ReactiveComponent": {
+        "Name": "LogisticsInputComponent"
       }
     },
     "tags": {
@@ -44,6 +43,11 @@
     "tags": {
       "type": "any",
       "link": "net"
+    },
+    "components": {
+      "ReactiveComponent": {
+        "Name": "TestReactiveSystem"
+      }
     }
   }
 }

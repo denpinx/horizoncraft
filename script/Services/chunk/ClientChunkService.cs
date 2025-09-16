@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script;
+using horizoncraft.script.Net;
 using horizoncraft.script.rpc;
 using horizoncraft.script.WorldControl;
 
@@ -39,6 +40,7 @@ public class ClientChunkService : ChunkServiceBase
     public override void Ticking()
     {
         base.Ticking();
+        AsyncOwnedEntities();
         foreach (var pos in RegetList.Keys.ToArray())
         {
             var i = RegetList[pos];
@@ -56,6 +58,30 @@ public class ClientChunkService : ChunkServiceBase
                 );
                 //GD.Print($"重新加载区块{pos}");
             }
+        }
+    }
+
+    public void AsyncOwnedEntities()
+    {
+        EntityPack entityPack = new EntityPack();
+        foreach (var entity in World.Service.EntityService.EntityDatas.Values)
+        {
+            if (entity.Owned == PlayerNode.Profile.Name)
+            {
+                if (entity.Update)
+                {
+                    entity.Update = false;
+                    entityPack.Entitys.Add(new EntityDataSnapShot(entity));
+                }
+            }
+        }
+
+        if (entityPack.Entitys.Count > 0)
+        {
+            GD.Print($"[客户端]同步{entityPack.Entitys.Count}个实体回服务端");
+            World.Service.EntityServiceNode.RpcId(1,
+                nameof(EntityServiceNode.ServerReceiveEntityPack),
+                ByteTool.ToBytes(entityPack));
         }
     }
 

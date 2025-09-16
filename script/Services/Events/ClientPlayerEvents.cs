@@ -92,6 +92,6 @@ public class ClientPlayerEvents : PlayerEvents
 
     public override void DropAllItem(WorldServiceBase service, string name)
     {
-        service.PlayerServiceNode.RpcId(1, nameof(PlayerServiceNode.DropItemEvent), name, false);
+        service.PlayerServiceNode.RpcId(1, nameof(PlayerServiceNode.DropItemEvent), name, true);
     }
 }

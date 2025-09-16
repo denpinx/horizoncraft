@@ -12,7 +12,7 @@ config_version=5
 
 config/name="HorizonCraft"
 run/main_scene="uid://b387xrf6eof4w"
-config/features=PackedStringArray("4.4", "C#", "Forward Plus")
+config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]
@@ -28,6 +28,15 @@ window/vsync/vsync_mode=0
 [dotnet]
 
 project/assembly_name="HorizonCraft"
+
+[file_customization]
+
+folder_colors={
+"res://config/": "green",
+"res://script/": "pink",
+"res://texture/": "orange",
+"res://tscn/": "purple"
+}
 
 [gui]
 

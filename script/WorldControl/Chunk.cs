@@ -15,6 +15,7 @@ using Array = Godot.Collections.Array;
 using MemoryPack;
 using horizoncraft.script.Components;
 using horizoncraft.script.Components.EntityComponents;
+using horizoncraft.script.Expand;
 using horizoncraft.script.Net;
 using HorizonCraft.script.Services.world;
 using Vector2 = System.Numerics.Vector2;
@@ -37,7 +38,8 @@ namespace horizoncraft.script.WorldControl
 
         public int RemoveCount = 0;
 
-        public List<Vector3> TickList = new();
+        public HashSet<Vector3> TickList = new();
+        public HashSet<Vector3> ReactiveTickList = new();
         public List<Vector2> LightList = new();
         [MemoryPackIgnore] public List<Vector3I> UpdateList = new(32);
         [MemoryPackIgnore] public List<Vector3I> UpdateList_buffer = new();
@@ -94,15 +96,11 @@ namespace horizoncraft.script.WorldControl
         {
             var pos = new Vector3(x, y, z);
             var posv2 = new Vector2(x, y);
-            if (meta.Components.Count > 0)
+            if (meta.HasComponent<TickComponent>())
             {
-                if (!TickList.Contains(pos))
-                {
-                    TickList.Add(pos);
-                }
+                TickList.Add(pos);
             }
-            else if (data[x, y, z].BlockMeta.Components.Count > 0)
-                TickList.Remove(pos);
+            else TickList.Remove(pos);
 
             if (z == 1)
             {
@@ -130,16 +128,23 @@ namespace horizoncraft.script.WorldControl
         public BlockData SetBlock(int x, int y, int z, BlockData blockData, int state = 0)
         {
             var pos = new Vector3(x, y, z);
-            if (blockData.BlockMeta.Components.Count > 0)
-            {
-                if (!TickList.Contains(pos))
-                {
-                    TickList.Add(pos);
-                }
-            }
-            else if (data[x, y, z].BlockMeta.Components.Count > 0)
-                TickList.Remove(pos);
+            // if (blockData.GetComponent<TickComponent>() != null)
+            // {
+            //     if (!TickList.Contains(pos))
+            //     {
+            //         TickList.Add(pos);
+            //     }
+            // }
+            // else if (data[x, y, z].BlockMeta.HasComponent<TickComponent>())
+            //     TickList.Remove(pos);
 
+            if (blockData.GetComponent<TickComponent>() != null)
+            {
+                TickList.Add(pos);
+            }
+            else TickList.Remove(pos);
+
+            data[x, y, z].Components.Clear();
             data[x, y, z] = blockData;
             data[x, y, z].State = state;
             UpdateList_buffer.Add(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z));
@@ -165,14 +170,38 @@ namespace horizoncraft.script.WorldControl
                 Service = WorldService,
                 Chunk = this,
             };
+
+            //TODO 同时拥有被动更新和主动更新会导致主动更新被更新两次
+
+            foreach (var pos in ReactiveTickList)
+            {
+                var block = GetBlock((int)pos.X, (int)pos.Y, (int)pos.Z);
+                foreach (var cmp in block.Components)
+                {
+                    var globale = new Vector3I((int)(this.coord.X * Chunk.Size + pos.X)
+                        , (int)(this.coord.Y * Chunk.Size + pos.Y)
+                        , (int)pos.Z);
+                    if (cmp is ReactiveComponent)
+                    {
+                        blockTickEvnet.BlockData = block;
+                        blockTickEvnet.GlobalePos = globale;
+                        blockTickEvnet.LocalPos = pos.ToVector3I();
+                        ComponentManager.ExecuteBlockComponents(blockTickEvnet, block);
+                        blockTickEvnet.Reset();
+                    }
+                }
+            }
+            ReactiveTickList.Clear();
+
+
             var coord = new Godot.Vector3I(0, 0, 0);
             var local = new Godot.Vector3I(0, 0, 0);
             int id;
             int state;
-            // foreach (var item in TickList.ToArray())
-            for (int i = 0; i < TickList.Count; i++)
+            foreach (var item in TickList.ToArray())
+                //for (int i = 0; i < TickList.Count; i++)
             {
-                var item = TickList[i];
+                //var item = TickList;
                 local.X = (int)item.X;
                 local.Y = (int)item.Y;
                 local.Z = (int)item.Z;
@@ -180,7 +209,7 @@ namespace horizoncraft.script.WorldControl
                 coord.Y = this.coord.Y * Chunk.Size + (int)item.Y;
                 coord.Z = (int)item.Z;
                 var block = GetBlock(local.X, local.Y, local.Z);
-                if (block.components.Count != 0)
+                if (block.Components.Count != 0)
                 {
                     blockTickEvnet.BlockData = block;
                     blockTickEvnet.GlobalePos = coord;

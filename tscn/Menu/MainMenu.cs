@@ -26,9 +26,9 @@ public partial class MainMenu : horizoncraft.script.World
         LoadProfile();
 
         var cmd = OS.GetCmdlineArgs();
-        if (cmd.Length > 1)
+        if (cmd.Length > 2)
         {
-            PlayerNode.Profile.Name = cmd[1];
+            PlayerNode.Profile.Name = cmd[2];
             GD.Print($"运行参数：{string.Join(",", cmd)}");
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -58,13 +59,17 @@ public partial class ChunkServiceBase : IDisposable
     private CancellationTokenSource _tokenSource;
     private Task _processLoadTask;
 
+    Stopwatch _stopwatchTick = new Stopwatch();
+
+    private long tickConsumed;
 
     public ChunkServiceBase(World world)
     {
         this.World = world;
         world.timer.Timeout += Ticking;
         PlayerNode.GetInformation[nameof(ChunkServiceBase)] =
-            () => $"加载区块:{Chunks.Count}";
+            () => $"加载区块:{Chunks.Count}\n" +
+                  $"tick耗时:{tickConsumed} ms\n";
 
         _tokenSource = new CancellationTokenSource();
         _processLoadTask = Task.Run(ProcessChunkLoadThread, _tokenSource.Token);
@@ -75,13 +80,40 @@ public partial class ChunkServiceBase : IDisposable
     /// <summary>
     /// 区块时刻，默认实现光照更新和Tick处理
     /// </summary>
-    public virtual void Ticking()
+    public virtual async void Ticking()
     {
-        foreach (var chunk in Chunks.Values)
+        _stopwatchTick.Restart();
+        //方案一
+        //单线程区块Tick计算
+        // foreach (var chunk in Chunks.Values)
+        // {
+        //     chunk.Tick(this.World.Service, this.World);
+        // }
+        //方案二
+        //所有相邻的区块组,连续坐标的为一个组
+        var groups = GetProximityChunkGroup();
+        if (groups.Count > 0)
         {
-            chunk.Tick(this.World.Service, this.World);
+            Parallel.For(0, groups.Count, (i) =>
+            {
+                foreach (var pos in groups[i])
+                {
+                    if (Chunks.TryGetValue(pos, out var chunk))
+                        chunk.Tick(World.Service, World);
+                }
+            });
         }
 
+        //≈ 0 ms
+        //方案三
+        //使用 Parallel.For 进行并行计算，由于每个区块有50*50大小,读写竞争应该不多
+        // var chunks = Chunks.Values.ToArray();
+        // Parallel.For(0, chunks.Length,(i)=>
+        // {
+        //     chunks[i].Tick(World.Service, World);
+        // });
+        _stopwatchTick.Stop();
+        tickConsumed = _stopwatchTick.ElapsedMilliseconds;
         UpdateLights();
     }
 
@@ -546,6 +578,42 @@ public partial class ChunkServiceBase : IDisposable
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// 连续区块分组
+    /// </summary>
+    /// <returns></returns>
+    public List<List<Vector2I>> GetProximityChunkGroup()
+    {
+        List<List<Vector2I>> result = new List<List<Vector2I>>();
+        HashSet<Vector2I> enterys = new();
+        foreach (var pos in Chunks.Keys.ToArray())
+        {
+            if (!enterys.Contains(pos))
+            {
+                List<Vector2I> group = new List<Vector2I>();
+                GetProximityChunk(group, pos.X, pos.Y);
+                result.Add(group);
+            }
+        }
+
+        return result;
+
+        void GetProximityChunk(List<Vector2I> group, int x, int y)
+        {
+            var pos = new Vector2I(x, y);
+            //GD.Print(pos);
+            if (!enterys.Contains(pos) && Chunks.ContainsKey(pos))
+            {
+                enterys.Add(pos);
+                group.Add(pos);
+                GetProximityChunk(group, x + 1, y);
+                GetProximityChunk(group, x - 1, y);
+                GetProximityChunk(group, x, y + 1);
+                GetProximityChunk(group, x, y - 1);
+            }
+        }
     }
 
     #endregion

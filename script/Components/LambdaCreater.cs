@@ -23,6 +23,7 @@ namespace horizoncraft.script.Components
             Register<FurnaceComponent>();
             Register<ItemDurableComponent>();
             Register<EnergyUnitComponent>();
+            Register<ReactiveComponent>();
         }
 
         public static void Register<T>() where T : Component, new()

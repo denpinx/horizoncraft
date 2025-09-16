@@ -9,7 +9,7 @@ namespace horizoncraft.script.WorldControl
     public partial class BlockData
     {
         /// <summary>组件属性</summary>
-        public List<Component> components = new();
+        public List<Component> Components = new();
 
         /// <summary>方块id</summary>
         public int Id;
@@ -21,7 +21,6 @@ namespace horizoncraft.script.WorldControl
         public int Light;
 
         [MemoryPackIgnore] private BlockMeta _blockMeta;
-        [MemoryPackIgnore] private Component _lastcomponent;
 
         [MemoryPackIgnore]
         public BlockMeta BlockMeta
@@ -36,20 +35,13 @@ namespace horizoncraft.script.WorldControl
 
         public T GetComponent<T>() where T : Component
         {
-            if (_lastcomponent != null && _lastcomponent is T) return _lastcomponent as T;
-            var result = components.Find(cmp => cmp is T);
-            if (result != null)
-            {
-                _lastcomponent = result;
-                return result as T;
-            }
-
-            return null;
+            var result = Components.Find(cmp => cmp is T);
+            return result as T;
         }
 
         public T GetComponent<T>(string name) where T : Component
         {
-            var result = components.Find(cmp => cmp is T && cmp.Name == name);
+            var result = Components.Find(cmp => cmp is T && cmp.Name == name);
             if (result != null) return result as T;
             return null;
         }
@@ -74,9 +66,9 @@ namespace horizoncraft.script.WorldControl
         {
             BlockMeta = meta;
             Id = meta.Id;
-            components.Clear();
+            Components.Clear();
             foreach (Func<Component> cmp in meta.Components)
-                components.Add(cmp());
+                Components.Add(cmp());
         }
 
         public bool IsMeta(string name)
