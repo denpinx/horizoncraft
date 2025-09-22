@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="BlockMetaResource" load_steps=4 format=3 uid="uid://b7xi3q6dfogep"]
+
+[ext_resource type="Script" uid="uid://1kp2k8nfh1nu" path="res://script/resource/BlockMetaResource.cs" id="1_dbcuc"]
+[ext_resource type="Script" uid="uid://dy030tm0ab12q" path="res://script/resource/OreConfigResource.cs" id="1_qxego"]
+
+[sub_resource type="Resource" id="Resource_ry1tk"]
+script = ExtResource("1_qxego")
+Count = 8
+Size = 3
+Deep = -1
+metadata/_custom_type_script = "uid://dy030tm0ab12q"
+
+[resource]
+script = ExtResource("1_dbcuc")
+BlockName = "coal_ore"
+Rigidity = 1.0
+Components = null
+BlockStateSets = null
+OreConfig = SubResource("Resource_ry1tk")
+LootItems = null
+Tags = null
+InputMask = null
+OutPutMask = null
+metadata/_custom_type_script = "uid://1kp2k8nfh1nu"

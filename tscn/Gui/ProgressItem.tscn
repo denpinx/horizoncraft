@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://dxn1kv2n6wuo7"]
+
+[ext_resource type="Script" uid="uid://brkl5asnk0ask" path="res://tscn/Gui/ProgressItem.cs" id="1_ki3ge"]
+[ext_resource type="Texture2D" uid="uid://dp0h0qhbfpwm3" path="res://texture/Gui/progress_energy_unit.png" id="2_ptoep"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h1acr"]
+atlas = ExtResource("2_ptoep")
+region = Rect2(16, 0, 16, 6)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5xht3"]
+atlas = ExtResource("2_ptoep")
+region = Rect2(16, 6, 16, 6)
+
+[sub_resource type="LabelSettings" id="LabelSettings_72e1c"]
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[node name="ProgressItem" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1877.0
+offset_bottom = -1057.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ki3ge")
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+value = 58.0
+nine_patch_stretch = true
+stretch_margin_left = 1
+stretch_margin_top = 1
+stretch_margin_right = 1
+stretch_margin_bottom = 1
+texture_under = SubResource("AtlasTexture_h1acr")
+texture_progress = SubResource("AtlasTexture_5xht3")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+text = "进度条:32/64"
+label_settings = SubResource("LabelSettings_72e1c")
+horizontal_alignment = 1
+vertical_alignment = 1

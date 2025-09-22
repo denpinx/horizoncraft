@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BlockMetaResource" load_steps=4 format=3 uid="uid://diy82qu15vpl6"]
+
+[ext_resource type="Script" uid="uid://1kp2k8nfh1nu" path="res://script/resource/BlockMetaResource.cs" id="1_5en7l"]
+[ext_resource type="Script" uid="uid://bf0tjjn683vq7" path="res://script/resource/ComponentsResource.cs" id="1_3601y"]
+
+[sub_resource type="Resource" id="Resource_66p2l"]
+script = ExtResource("1_3601y")
+ComponentName = "TickComponent"
+ComponentData = Dictionary[String, Variant]({
+"Max": 20,
+"Name": "BottomCheck"
+})
+metadata/_custom_type_script = "uid://bf0tjjn683vq7"
+
+[resource]
+script = ExtResource("1_5en7l")
+BlockName = "bush"
+CompleteBlock = false
+Collide = false
+Rigidity = 0.1
+Components = Array[Object]([SubResource("Resource_66p2l")])
+BlockStateSets = null
+LootItems = null
+Tags = null
+InputMask = null
+OutPutMask = null
+metadata/_custom_type_script = "uid://1kp2k8nfh1nu"

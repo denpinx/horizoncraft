@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="BlockMetaResource" load_steps=5 format=3 uid="uid://3b4g4gxfvmhq"]
+
+[ext_resource type="Script" uid="uid://yq6r0v0qrq46" path="res://script/resource/BlockStateSetResource.cs" id="1_6046s"]
+[ext_resource type="Script" uid="uid://1kp2k8nfh1nu" path="res://script/resource/BlockMetaResource.cs" id="1_xhd1b"]
+
+[sub_resource type="Resource" id="Resource_f2jes"]
+script = ExtResource("1_6046s")
+TextureName = "oak_log"
+metadata/_custom_type_script = "uid://yq6r0v0qrq46"
+
+[sub_resource type="Resource" id="Resource_2ossi"]
+script = ExtResource("1_6046s")
+TextureName = "oak_log_horizontal"
+metadata/_custom_type_script = "uid://yq6r0v0qrq46"
+
+[resource]
+script = ExtResource("1_xhd1b")
+BlockName = "oak_log"
+Rigidity = 1.0
+Components = null
+BlockStateSets = Array[Object]([SubResource("Resource_f2jes"), SubResource("Resource_2ossi")])
+LootItems = null
+Tags = Dictionary[String, String]({
+"type": "axe"
+})
+InputMask = null
+OutPutMask = null
+metadata/_custom_type_script = "uid://1kp2k8nfh1nu"

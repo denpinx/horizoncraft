@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="BlockMetaResource" load_steps=2 format=3 uid="uid://tovxxsxb74sq"]
+
+[ext_resource type="Script" uid="uid://1kp2k8nfh1nu" path="res://script/resource/BlockMetaResource.cs" id="1_2g7gs"]
+
+[resource]
+script = ExtResource("1_2g7gs")
+BlockName = "oak_plank"
+Components = null
+BlockStateSets = null
+LootItems = null
+Tags = Dictionary[String, String]({
+"type": "axe"
+})
+InputMask = null
+OutPutMask = null
+metadata/_custom_type_script = "uid://1kp2k8nfh1nu"

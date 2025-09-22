@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="BlockMetaResource" load_steps=4 format=3 uid="uid://7omw24rdl6ea"]
+
+[ext_resource type="Script" uid="uid://bf0tjjn683vq7" path="res://script/resource/ComponentsResource.cs" id="1_b1ufv"]
+[ext_resource type="Script" uid="uid://1kp2k8nfh1nu" path="res://script/resource/BlockMetaResource.cs" id="1_ja3qq"]
+
+[sub_resource type="Resource" id="Resource_q71fo"]
+script = ExtResource("1_b1ufv")
+ComponentName = "FluidComponent"
+ComponentData = Dictionary[String, Variant]({
+"BlockName": "Water",
+"Max": 5,
+"Name": "FluidComponent"
+})
+metadata/_custom_type_script = "uid://bf0tjjn683vq7"
+
+[resource]
+script = ExtResource("1_ja3qq")
+BlockName = "water"
+CompleteBlock = false
+Collide = false
+Rigidity = 1.0
+Components = Array[Object]([SubResource("Resource_q71fo")])
+BlockStateSets = null
+LootItems = null
+TileType = 1
+Tags = Dictionary[String, String]({
+"enter_action": "no-fall"
+})
+InputMask = null
+OutPutMask = null
+metadata/_custom_type_script = "uid://1kp2k8nfh1nu"

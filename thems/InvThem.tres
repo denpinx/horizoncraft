@@ -1,0 +1,65 @@
+[gd_resource type="Theme" load_steps=13 format=3 uid="uid://joabf0lpqylf"]
+
+[ext_resource type="Texture2D" uid="uid://1563ysqub3lo" path="res://texture/Gui/panel2.png" id="1_ogh8t"]
+[ext_resource type="FontVariation" uid="uid://ce62qf4xrcdme" path="res://texture/ttf/font.tres" id="1_wmlrk"]
+[ext_resource type="Texture2D" uid="uid://bqultxgk0gmug" path="res://texture/Gui/processbar.png" id="2_ogh8t"]
+[ext_resource type="Texture2D" uid="uid://b0pg7rmffcc8k" path="res://texture/Gui/panel3.png" id="3_lmj7o"]
+[ext_resource type="FontFile" uid="uid://buqrbo5h6a8bg" path="res://texture/ttf/微软雅黑.ttf" id="4_vjeqv"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vjeqv"]
+bg_color = Color(0.6, 0.6, 0.6, 0.870588)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 4
+border_color = Color(0.188235, 0.188235, 0.188235, 0.870588)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.47451)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ogh8t"]
+texture = ExtResource("1_ogh8t")
+texture_margin_left = 3.0
+texture_margin_top = 4.0
+texture_margin_right = 3.0
+texture_margin_bottom = 7.0
+expand_margin_left = 4.0
+expand_margin_top = 4.0
+expand_margin_right = 4.0
+expand_margin_bottom = 4.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lmj7o"]
+atlas = ExtResource("2_ogh8t")
+region = Rect2(0, 0, 32, 8)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_wmlrk"]
+texture = SubResource("AtlasTexture_lmj7o")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vjeqv"]
+atlas = ExtResource("2_ogh8t")
+region = Rect2(0, 8, 32, 8)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_n7u0e"]
+texture = SubResource("AtlasTexture_vjeqv")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vjeqv"]
+texture = ExtResource("3_lmj7o")
+texture_margin_left = 3.0
+texture_margin_top = 4.0
+texture_margin_right = 3.0
+texture_margin_bottom = 7.0
+
+[resource]
+Button/styles/normal = SubResource("StyleBoxFlat_vjeqv")
+Label/fonts/font = ExtResource("1_wmlrk")
+Panel/styles/panel = SubResource("StyleBoxTexture_ogh8t")
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_ogh8t")
+ProgressBar/styles/background = SubResource("StyleBoxTexture_wmlrk")
+ProgressBar/styles/fill = SubResource("StyleBoxTexture_n7u0e")
+TooltipLabel/constants/outline_size = 4
+TooltipLabel/font_sizes/font_size = 24
+TooltipLabel/fonts/font = ExtResource("4_vjeqv")
+TooltipPanel/font_sizes/title_font_size = 24
+TooltipPanel/styles/panel = SubResource("StyleBoxTexture_vjeqv")

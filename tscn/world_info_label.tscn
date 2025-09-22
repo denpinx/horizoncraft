@@ -1,0 +1,106 @@
+[gd_scene load_steps=11 format=3 uid="uid://c5twqneaedjwq"]
+
+[ext_resource type="Theme" uid="uid://joabf0lpqylf" path="res://thems/InvThem.tres" id="1_35j46"]
+[ext_resource type="Script" uid="uid://dwfy0fxb5vyui" path="res://tscn/WorldInfoLabel.cs" id="2_0dyfj"]
+[ext_resource type="Texture2D" uid="uid://bae6oydh8om5n" path="res://texture/Gui/panel6.png" id="3_5w4ro"]
+[ext_resource type="Texture2D" uid="uid://ud7rixlaail" path="res://texture/Gui/panel7.png" id="4_0dyfj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0dyfj"]
+bg_color = Color(1, 1, 1, 0)
+border_width_bottom = 4
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_03e0w"]
+texture = ExtResource("4_0dyfj")
+texture_margin_left = 16.0
+texture_margin_top = 16.0
+texture_margin_right = 16.0
+texture_margin_bottom = 16.0
+modulate_color = Color(1, 1, 1, 0.823529)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_jotun"]
+texture = ExtResource("3_5w4ro")
+texture_margin_left = 16.0
+texture_margin_top = 16.0
+texture_margin_right = 16.0
+texture_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_s8ec6"]
+texture = ExtResource("3_5w4ro")
+texture_margin_left = 16.0
+texture_margin_top = 16.0
+texture_margin_right = 16.0
+texture_margin_bottom = 16.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_03e0w"]
+font_size = 32
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_jotun"]
+font_size = 24
+font_color = Color(0.0962047, 0.0962048, 0.0962047, 1)
+
+[node name="WorldInfoLabel" type="HBoxContainer"]
+custom_minimum_size = Vector2(0, 48)
+anchors_preset = -1
+anchor_top = -0.0148148
+anchor_right = 1.0
+anchor_bottom = -0.0148148
+offset_bottom = 64.0
+grow_horizontal = 2
+theme = ExtResource("1_35j46")
+script = ExtResource("2_0dyfj")
+metadata/_edit_use_anchors_ = true
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/focus = SubResource("StyleBoxFlat_0dyfj")
+theme_override_styles/hover = SubResource("StyleBoxTexture_03e0w")
+theme_override_styles/pressed = SubResource("StyleBoxTexture_jotun")
+theme_override_styles/normal = SubResource("StyleBoxTexture_s8ec6")
+action_mode = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LabelWorldName" type="Label" parent="Button/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "世界名"
+label_settings = SubResource("LabelSettings_03e0w")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelCreateDate" type="Label" parent="Button/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "创建日期"
+label_settings = SubResource("LabelSettings_jotun")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelLoadDate" type="Label" parent="Button/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "最近一次加载:"
+label_settings = SubResource("LabelSettings_jotun")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LabelWorldSeed" type="Label" parent="Button/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "种子"
+label_settings = SubResource("LabelSettings_jotun")
+horizontal_alignment = 1
+vertical_alignment = 1

@@ -1,0 +1,112 @@
+[gd_scene load_steps=9 format=3 uid="uid://ueuyc3tok54d"]
+
+[ext_resource type="Script" uid="uid://ccbq5or4qt32y" path="res://tscn/Menu/Slot.cs" id="1_kfvcn"]
+[ext_resource type="Texture2D" uid="uid://clbkuojql0dul" path="res://texture/Gui/slot2.png" id="2_sltuw"]
+[ext_resource type="Texture2D" uid="uid://onv5i0hy7olq" path="res://texture/item/grass.png" id="3_sltuw"]
+[ext_resource type="Texture2D" uid="uid://dp6f3knyviw8i" path="res://texture/Gui/Select.png" id="4_g70kf"]
+[ext_resource type="Texture2D" uid="uid://u5nkrknmjk2a" path="res://texture/durable_progress.png" id="5_2obk7"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_kgkgy"]
+font_size = 32
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7k3lq"]
+atlas = ExtResource("5_2obk7")
+region = Rect2(0, 2, 16, 2)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_64qxm"]
+atlas = ExtResource("5_2obk7")
+region = Rect2(0, 0, 16, 2)
+
+[node name="Slot" type="Control"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 3
+anchor_left = -0.004
+anchor_top = -0.007
+anchor_right = 0.004
+anchor_bottom = 0.007
+offset_left = 7.68
+offset_top = 7.56
+offset_right = -7.68
+offset_bottom = -7.56
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_kfvcn")
+
+[node name="TextureRect_BackRound" type="TextureRect" parent="."]
+visible = false
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_sltuw")
+
+[node name="TextureRect_Item" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -24.0
+offset_top = -24.0
+offset_right = 24.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_sltuw")
+
+[node name="Label_Amount" type="Label" parent="."]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 15.0
+offset_bottom = 15.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.8, 0.8)
+text = "64"
+label_settings = SubResource("LabelSettings_kgkgy")
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="."]
+custom_minimum_size = Vector2(60, 4)
+layout_mode = 0
+offset_top = 52.0
+offset_right = 60.0
+offset_bottom = 56.0
+value = 11.0
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_7k3lq")
+texture_progress = SubResource("AtlasTexture_64qxm")
+
+[node name="TextureRect_Selected" type="TextureRect" parent="."]
+visible = false
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -30.0
+offset_top = -30.0
+offset_right = 30.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_g70kf")

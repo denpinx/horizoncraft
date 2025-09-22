@@ -1,0 +1,57 @@
+[gd_scene load_steps=4 format=3 uid="uid://rroruvwvo4sg"]
+
+[ext_resource type="Script" uid="uid://de5qy8g38p48h" path="res://tscn/Gui/ChatView.cs" id="1_ymcwq"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ihlu"]
+bg_color = Color(1, 1, 1, 0.870588)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_807xs"]
+bg_color = Color(0.678431, 0.678431, 0.678431, 0.870588)
+
+[node name="ChatView" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ymcwq")
+
+[node name="Box" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ChatHistory" type="Label" parent="Box"]
+visible = false
+layout_mode = 2
+text = "[player]:test12345
+[player]:test12345
+[player]:test12345
+[player]:test12345
+[player]:test12345
+[player]:test12345
+[player]:test12345
+[player]:test12345
+[player]:test12345
+[player]:test12345
+[player]:test12345
+[player]:test12345"
+
+[node name="InstantMessag" type="VBoxContainer" parent="Box"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 2
+
+[node name="LineEdit" type="LineEdit" parent="Box"]
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_colors/font_placeholder_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_styles/focus = SubResource("StyleBoxFlat_3ihlu")
+theme_override_styles/normal = SubResource("StyleBoxFlat_807xs")
+placeholder_text = "输入消息"
+caret_blink = true

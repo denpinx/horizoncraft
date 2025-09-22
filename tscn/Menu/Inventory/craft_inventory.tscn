@@ -1,0 +1,182 @@
+[gd_scene load_steps=5 format=3 uid="uid://dc1o3yaksw3b8"]
+
+[ext_resource type="Script" uid="uid://8odlpvr1jdpy" path="res://tscn/Menu/Inventory/CraftInventory.cs" id="1_thcka"]
+[ext_resource type="Theme" uid="uid://joabf0lpqylf" path="res://thems/InvThem.tres" id="2_ahki2"]
+[ext_resource type="PackedScene" uid="uid://7x1qdfnvc64p" path="res://tscn/Menu/Inventory/item_manage.tscn" id="2_uk7gw"]
+[ext_resource type="PackedScene" uid="uid://bjutbqmtgb304" path="res://tscn/Menu/InvSlot.tscn" id="3_maak5"]
+
+[node name="CraftInventory" type="CanvasLayer"]
+layer = 11
+script = ExtResource("1_thcka")
+
+[node name="ItemManage" parent="." instance=ExtResource("2_uk7gw")]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 618.0
+offset_top = 298.0
+offset_right = 1302.0
+offset_bottom = 782.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("2_ahki2")
+
+[node name="PanelContainer_Craft" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer_Craft"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/PanelContainer_Craft/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+
+[node name="InvSlot0" parent="VBoxContainer/PanelContainer_Craft/HBoxContainer/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="InvSlot1" parent="VBoxContainer/PanelContainer_Craft/HBoxContainer/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="InvSlot2" parent="VBoxContainer/PanelContainer_Craft/HBoxContainer/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="InvSlot3" parent="VBoxContainer/PanelContainer_Craft/HBoxContainer/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer/PanelContainer_Craft/HBoxContainer"]
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+stretch_mode = 0
+
+[node name="InvSlot_result" parent="VBoxContainer/PanelContainer_Craft/HBoxContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PanelContainer_Inv" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/PanelContainer_Inv"]
+layout_mode = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 9
+metadata/_edit_use_anchors_ = true
+
+[node name="PlayerInvSlot9" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot10" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot11" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot12" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot13" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot14" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot15" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot16" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot17" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot18" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot19" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot20" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot21" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot22" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot23" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot24" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot25" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot26" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot27" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot28" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot29" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot30" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot31" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot32" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot33" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot34" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot35" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot0" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot1" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot2" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot3" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot4" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot5" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot6" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot7" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2
+
+[node name="PlayerInvSlot8" parent="VBoxContainer/PanelContainer_Inv/GridContainer" instance=ExtResource("3_maak5")]
+layout_mode = 2

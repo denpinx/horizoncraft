@@ -58,8 +58,7 @@
       "PhysicsComponent": {
         "Name": "PhysicsComponent",
         "BlockName": "sand",
-        "Max": 2,
-        "Current": 0
+        "Max": 2
       }
     },
     "tags": {

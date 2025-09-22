@@ -9,10 +9,12 @@ using horizoncraft.script.Inventory;
 using horizoncraft.script.resource;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Struct;
-using Microsoft.VisualBasic;
-
+using YamlDotNet;
 namespace horizoncraft.script
 {
+    /// <summary>
+    /// 更新:使用 tres作为配置文件，放弃json
+    /// </summary>
     public class Materials
     {
         public static TileSet tileSet;
@@ -38,7 +40,7 @@ namespace horizoncraft.script
             meta.Id = ItemMetas.Count;
             if (Dictionary_ItemMetas.ContainsKey(meta.Name))
             {
-                GD.PrintErr($"{meta.Name} already exists");
+                GD.PrintErr($"{meta.Name} 已存在");
                 var blockmeta = Dictionary_ItemMetas[meta.Name].BlockMeta;
                 Dictionary_ItemMetas[meta.Name] = meta;
                 meta.BlockMeta = blockmeta;
@@ -99,7 +101,7 @@ namespace horizoncraft.script
 
         public static BlockMeta Valueof(int id)
         {
-            if (id > BlockMetas.Count) GD.PrintErr($"[错误1] {id} BlockMeta 不存在！");
+            if (id > BlockMetas.Count) GD.PrintErr($"{id} BlockMeta 不存在！");
             return BlockMetas[id];
         }
 
@@ -117,8 +119,10 @@ namespace horizoncraft.script
             );
 
             LoadAllItemConfigs();
-            //LoadAllBlockConfigs();
-            LoadBlockResources();
+            LoadAllBlockConfigs();
+
+            //LoadItemResources();
+            //LoadBlockResources();
             ProcessEntity();
             CreateTileSet();
             ProcessTextures();
@@ -154,8 +158,46 @@ namespace horizoncraft.script
         }
 
         /// <summary>
-        /// 
-        /// 基于.tres的方块配置
+        /// 加载基于tres文件的物品配置
+        /// </summary>
+        private static void LoadItemResources()
+        {
+            var list = new List<string>();
+            GetAllFiles("resources/item", list);
+            foreach (var file in list)
+            {
+                if (!file.EndsWith(".tres")) continue;
+                var res = GD.Load<ItemMetaResource>(file);
+                if (res == null) continue;
+                var meta = new ItemMeta();
+
+                meta.Name = res.ItemName;
+                meta.MaxAmount = res.MaxAmount;
+                meta.Description = res.Description;
+
+                meta.Tags = (res.Tags == null ? meta.Tags : res.Tags.ToCsharp());
+                if (res.Components != null)
+                {
+                    foreach (var cmpdict in res.Components)
+                    {
+                        var cmp = cmpdict.ComponentData.ToCsharp();
+                        var func = LambdaCreater.CreateLambda(cmpdict.ComponentName, cmp);
+                        meta.Components.Add(func);
+                    }
+                }
+
+                if (res.Textures != null)
+                    meta.Itemset.TextureNames.AddRange(res.Textures);
+                else
+                    meta.Itemset.TextureNames.Add(meta.Name);
+
+                RegItemMeta(meta);
+            }
+        }
+
+
+        /// <summary>
+        /// 加载基于tres文件的方块配置
         /// </summary>
         private static void LoadBlockResources()
         {
@@ -164,13 +206,14 @@ namespace horizoncraft.script
             foreach (var file in list)
             {
                 if (!file.EndsWith(".tres")) continue;
-                var res = GD.Load<BlockMetaResource>("resources/block/" + file);
+                var res = GD.Load<BlockMetaResource>(file);
+                if (res == null) continue;
                 var meta = new BlockMeta();
-                
+
                 meta.Name = res.BlockName;
                 meta.Cube = res.CompleteBlock;
                 meta.Collide = res.Collide;
-                meta.TileType = res.TileType.ToString();
+                meta.TileType = res.TileType.ToString().ToLower();
                 meta.Light = res.LightSource;
                 meta.BreakLevel = res.BreakLevel;
                 meta.Tags = (res.Tags == null ? meta.Tags : res.Tags.ToCsharp());
@@ -204,12 +247,21 @@ namespace horizoncraft.script
                             DropChance = lis.DropChance,
                             Name = lis.Name,
                         };
-                        foreach (var ac in lis.AmountChances)
+                        if (lis.AmountChances != null)
+                            foreach (var ac in lis.AmountChances)
+                            {
+                                li.AmountChances.Add(new AmountChance()
+                                {
+                                    Amount = ac.Amount,
+                                    Chance = ac.Chance
+                                });
+                            }
+                        else
                         {
                             li.AmountChances.Add(new AmountChance()
                             {
-                                Amount = ac.Amount,
-                                Chance = ac.Chance
+                                Amount = 1,
+                                Chance = 1
                             });
                         }
 
@@ -233,35 +285,30 @@ namespace horizoncraft.script
                     });
                 }
 
-                if (res.BlockStateSets != null)
+                if (res.BlockStateSets.Count == 0)
                 {
-                    List<BlockTileSet> blockTileSets = new List<BlockTileSet>();
-                    int state_id = 0;
-                    foreach (var sets in res.BlockStateSets)
+                    res.BlockStateSets.Add(new BlockStateSetResource()
                     {
-                        var tile = new BlockTileSet()
-                        {
-                            state = state_id,
-                            texture_name = sets.TextureName,
-                            scene = sets.Tscn
-                        };
-                        blockTileSets.Add(tile);
-                        state_id++;
-                    }
+                        TextureName = meta.Name
+                    });
+                }
 
-                    meta.blockTileDatas = blockTileSets;
-                }
-                else
+                List<BlockTileSet> blockTileSets = new List<BlockTileSet>();
+                int state_id = 0;
+                foreach (var sets in res.BlockStateSets)
                 {
-                    meta.blockTileDatas =
-                    [
-                        new BlockTileSet()
-                        {
-                            state = 0,
-                            texture_name = meta.Name,
-                        }
-                    ];
+                    var tile = new BlockTileSet()
+                    {
+                        state = state_id,
+                        texture_name = sets.TextureName,
+                        scene = sets.Tscn
+                    };
+                    blockTileSets.Add(tile);
+                    state_id++;
                 }
+
+
+                meta.blockTileDatas = blockTileSets;
 
                 if (res.InputMask != null)
                     foreach (var num in res.InputMask)
@@ -270,7 +317,7 @@ namespace horizoncraft.script
                 if (res.OutPutMask != null)
                     foreach (var num in res.OutPutMask)
                         meta.OutputMask.Add(num);
-                
+
                 RegBlockMeta(meta);
             }
         }
@@ -279,6 +326,7 @@ namespace horizoncraft.script
         /// <summary>
         /// 加载所有物品配置
         /// </summary>
+        [Obsolete]
         private static void LoadAllItemConfigs()
         {
             var list = new List<string>();
@@ -294,6 +342,7 @@ namespace horizoncraft.script
         /// 加载指定地址的物品配置
         /// </summary>
         /// <param name="dir"></param>
+        [Obsolete]
         private static void LoadItemConfigs(string dir)
         {
             var fileAccess = FileAccess.Open(dir, FileAccess.ModeFlags.Read);
@@ -357,6 +406,7 @@ namespace horizoncraft.script
         /// <summary>
         /// 加载所有方块配置
         /// </summary>
+        [Obsolete]
         private static void LoadAllBlockConfigs()
         {
             var list = new List<string>();
@@ -571,6 +621,7 @@ namespace horizoncraft.script
 
                 if (config.ContainsKey("cube")) blockmeta.Cube = (bool)config["cube"];
                 if (config.ContainsKey("collide")) blockmeta.Collide = (bool)config["collide"];
+
                 RegBlockMeta(blockmeta);
             }
         }
@@ -644,6 +695,7 @@ namespace horizoncraft.script
             {
                 BlockMeta meta = BlockMetas[i];
                 if (meta.Name == "air") continue;
+
                 for (int state_index = 0; state_index < meta.blockTileDatas.Count; state_index++)
                 {
                     BlockTileSet blockTileSet = meta.blockTileDatas[state_index];

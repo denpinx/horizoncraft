@@ -1,0 +1,269 @@
+[gd_scene load_steps=15 format=3 uid="uid://gxpw6hr85mw2"]
+
+[ext_resource type="Script" uid="uid://c5r8ucxoola8a" path="res://tscn/Menu/Inventory/FurnaceInv.cs" id="1_bxjxm"]
+[ext_resource type="Theme" uid="uid://joabf0lpqylf" path="res://thems/InvThem.tres" id="2_ojlrj"]
+[ext_resource type="PackedScene" uid="uid://7x1qdfnvc64p" path="res://tscn/Menu/Inventory/item_manage.tscn" id="2_tjfg0"]
+[ext_resource type="PackedScene" uid="uid://bjutbqmtgb304" path="res://tscn/Menu/InvSlot.tscn" id="3_tjfg0"]
+[ext_resource type="Texture2D" uid="uid://dj87vydseujv2" path="res://texture/Gui/progress_fule.png" id="4_ojlrj"]
+[ext_resource type="Texture2D" uid="uid://bqultxgk0gmug" path="res://texture/Gui/processbar.png" id="6_ichx6"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_ojlrj"]
+font_size = 24
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_tjfg0"]
+font_size = 24
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_ichx6"]
+font_size = 24
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tjfg0"]
+atlas = ExtResource("4_ojlrj")
+region = Rect2(0, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ichx6"]
+atlas = ExtResource("4_ojlrj")
+region = Rect2(16, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f5141"]
+atlas = ExtResource("6_ichx6")
+region = Rect2(0, 0, 32, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p6kqg"]
+atlas = ExtResource("6_ichx6")
+region = Rect2(0, 8, 32, 8)
+
+[sub_resource type="LabelSettings" id="LabelSettings_f5141"]
+font_size = 24
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+
+[node name="FurnaceInv" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_bxjxm")
+
+[node name="ItemManage" parent="." instance=ExtResource("2_tjfg0")]
+
+[node name="MarginContainer" type="PanelContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -339.0
+offset_top = -238.0
+offset_right = 339.0
+offset_bottom = 238.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_ojlrj")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "熔炉"
+label_settings = SubResource("LabelSettings_ojlrj")
+horizontal_alignment = 1
+
+[node name="TargetInvBase" type="GridContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 4
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TargetInvBase"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/TargetInvBase/VBoxContainer3"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "输入"
+label_settings = SubResource("LabelSettings_tjfg0")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/TargetInvBase/VBoxContainer3"]
+layout_mode = 2
+size_flags_vertical = 3
+label_settings = SubResource("LabelSettings_tjfg0")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/TargetInvBase/VBoxContainer3"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "燃料"
+label_settings = SubResource("LabelSettings_ichx6")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TargetInvBase"]
+layout_mode = 2
+
+[node name="Input" parent="MarginContainer/VBoxContainer/TargetInvBase/VBoxContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="TextureProgressBar_Fuel" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/TargetInvBase/VBoxContainer"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+tooltip_text = "当前燃料"
+value = 74.0
+fill_mode = 3
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_tjfg0")
+texture_progress = SubResource("AtlasTexture_ichx6")
+
+[node name="Fuel" parent="MarginContainer/VBoxContainer/TargetInvBase/VBoxContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="ProgressBar" type="TextureProgressBar" parent="MarginContainer/VBoxContainer/TargetInvBase"]
+custom_minimum_size = Vector2(128, 32)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+value = 50.0
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_f5141")
+texture_progress = SubResource("AtlasTexture_p6kqg")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TargetInvBase"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="OutPut" parent="MarginContainer/VBoxContainer/TargetInvBase/VBoxContainer2" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "物品栏"
+label_settings = SubResource("LabelSettings_f5141")
+horizontal_alignment = 1
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 9
+
+[node name="PlayerInvSlot9" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot10" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot11" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot12" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot13" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot14" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot15" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot16" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot17" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot18" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot19" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot20" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot21" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot22" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot23" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot24" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot25" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot26" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot27" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot28" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot29" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot30" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot31" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot32" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot33" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot34" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot35" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot0" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot1" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot2" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot3" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot4" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot5" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot6" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot7" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2
+
+[node name="PlayerInvSlot8" parent="MarginContainer/VBoxContainer/GridContainer" instance=ExtResource("3_tjfg0")]
+layout_mode = 2

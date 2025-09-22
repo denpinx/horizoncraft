@@ -1,0 +1,112 @@
+[gd_scene load_steps=7 format=3 uid="uid://c6e02cn0ir7nl"]
+
+[ext_resource type="Texture2D" uid="uid://bjuca7ee6moc8" path="res://texture/block/dirt.png" id="1_6rmum"]
+[ext_resource type="Script" uid="uid://dice8aj7t7l6d" path="res://tscn/Menu/LoadingMenu.cs" id="1_ps4g2"]
+
+[sub_resource type="Animation" id="Animation_tlx64"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureRect:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TextureRect/VBoxContainer/Label:visible_ratio")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-0.166667]
+}
+
+[sub_resource type="Animation" id="Animation_jdfd7"]
+resource_name = "loading"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureRect/VBoxContainer/Label:visible_ratio")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [-0.166667, 1.0, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_55sw6"]
+resource_name = "loadover"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TextureRect:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -2000)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_es78q"]
+_data = {
+&"RESET": SubResource("Animation_tlx64"),
+&"loading": SubResource("Animation_jdfd7"),
+&"loadover": SubResource("Animation_55sw6")
+}
+
+[node name="LoadingMenu" type="CanvasLayer"]
+layer = 11
+script = ExtResource("1_ps4g2")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_6rmum")
+stretch_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TextureRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="TextureRect/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_vertical = 6
+
+[node name="Label" type="Label" parent="TextureRect/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+text = "加载中..."
+horizontal_alignment = 1
+visible_characters = 0
+visible_ratio = 0.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_es78q")
+}

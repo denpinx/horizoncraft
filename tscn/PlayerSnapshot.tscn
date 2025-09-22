@@ -1,0 +1,206 @@
+[gd_scene load_steps=13 format=3 uid="uid://b2y1j1yqbixq"]
+
+[ext_resource type="Script" uid="uid://bq6vp14ho3yo2" path="res://tscn/PlayerSnapshot.cs" id="1_f2pik"]
+[ext_resource type="Texture2D" uid="uid://dc7ccxk2dn3pn" path="res://texture/player.png" id="2_mhjhb"]
+[ext_resource type="Texture2D" uid="uid://yv22qd68ymlw" path="res://texture/item/stone_pickaxe.png" id="3_8olnf"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_mhjhb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o8thr"]
+atlas = ExtResource("2_mhjhb")
+region = Rect2(6, 17, 8, 15)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7twa1"]
+atlas = ExtResource("2_mhjhb")
+region = Rect2(4, 4, 12, 12)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lm32n"]
+atlas = SubResource("AtlasTexture_7twa1")
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hw465"]
+atlas = ExtResource("2_mhjhb")
+region = Rect2(16, 32, 6, 15)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gg5jg"]
+atlas = ExtResource("2_mhjhb")
+region = Rect2(16, 16, 5, 11)
+
+[sub_resource type="Animation" id="Animation_8olnf"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Body/Right_arm:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Body/Left_leg:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Body/Right_leg:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Body/Left_arm:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_mhjhb"]
+resource_name = "moving"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Body/Right_arm:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.766667, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.0, -0.799275, 0.833932, 0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Body/Left_leg:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.766667, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.0, -0.51393, 0.54502, 0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Body/Right_leg:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.766667, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.685709, -0.485862, 0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Body/Left_arm:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.3, 0.766667, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.0, 0.822891, -0.656152, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_8olnf"]
+_data = {
+&"RESET": SubResource("Animation_8olnf"),
+&"moving": SubResource("Animation_mhjhb")
+}
+
+[node name="PlayerSnapshot" type="Node2D"]
+z_index = 10
+script = ExtResource("1_f2pik")
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -10.0
+offset_top = -45.0
+offset_right = 32.0
+offset_bottom = -22.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.5, 0.5)
+size_flags_horizontal = 4
+text = "玩家1"
+label_settings = SubResource("LabelSettings_mhjhb")
+horizontal_alignment = 1
+
+[node name="Body" type="Sprite2D" parent="."]
+position = Vector2(0, -11)
+texture = SubResource("AtlasTexture_o8thr")
+
+[node name="Head" type="Sprite2D" parent="Body"]
+position = Vector2(0, -7)
+texture = SubResource("AtlasTexture_lm32n")
+offset = Vector2(0, -6)
+
+[node name="Left_leg" type="Sprite2D" parent="Body"]
+position = Vector2(0, 6)
+texture = SubResource("AtlasTexture_hw465")
+offset = Vector2(0, 6)
+
+[node name="Right_leg" type="Sprite2D" parent="Body"]
+show_behind_parent = true
+position = Vector2(0, 6)
+texture = SubResource("AtlasTexture_hw465")
+offset = Vector2(0, 6)
+
+[node name="Left_arm" type="Sprite2D" parent="Body"]
+position = Vector2(1, -4)
+texture = SubResource("AtlasTexture_gg5jg")
+offset = Vector2(-1, 3)
+
+[node name="TextureRect" type="TextureRect" parent="Body/Left_arm"]
+visible = false
+show_behind_parent = true
+offset_left = -1.62684
+offset_top = -0.989645
+offset_right = 8.37316
+offset_bottom = 9.01035
+rotation = -1.95466
+pivot_offset = Vector2(1.61628, 8.51794)
+texture = ExtResource("3_8olnf")
+expand_mode = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Right_arm" type="Sprite2D" parent="Body"]
+show_behind_parent = true
+position = Vector2(1, -4)
+texture = SubResource("AtlasTexture_gg5jg")
+offset = Vector2(-1, 3)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_8olnf")
+}

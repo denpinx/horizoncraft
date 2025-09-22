@@ -1,0 +1,89 @@
+[gd_scene load_steps=6 format=3 uid="uid://cakto4xqnoeua"]
+
+[ext_resource type="Script" uid="uid://wllfbvf43mpg" path="res://tscn/Menu/HotBar.cs" id="1_lbdpl"]
+[ext_resource type="Texture2D" uid="uid://1563ysqub3lo" path="res://texture/Gui/panel2.png" id="2_d8mm2"]
+[ext_resource type="PackedScene" uid="uid://ueuyc3tok54d" path="res://tscn/Menu/Slot.tscn" id="2_fbc2m"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_0qaje"]
+texture = ExtResource("2_d8mm2")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+expand_margin_left = 4.0
+expand_margin_top = 4.0
+expand_margin_right = 4.0
+expand_margin_bottom = 4.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+
+[sub_resource type="Theme" id="Theme_v073u"]
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_0qaje")
+
+[node name="HotBar" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_lbdpl")
+metadata/_edit_horizontal_guides_ = [9.0, 44.0]
+metadata/_edit_use_anchors_ = true
+metadata/_edit_vertical_guides_ = [670.0]
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.05
+autostart = true
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="Control"]
+modulate = Color(1, 1, 1, 0.870588)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -290.0
+offset_top = -75.0
+offset_right = 290.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = SubResource("Theme_v073u")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Slot1" parent="Control/PanelContainer/HBoxContainer" instance=ExtResource("2_fbc2m")]
+layout_mode = 2
+
+[node name="Slot2" parent="Control/PanelContainer/HBoxContainer" instance=ExtResource("2_fbc2m")]
+layout_mode = 2
+
+[node name="Slot3" parent="Control/PanelContainer/HBoxContainer" instance=ExtResource("2_fbc2m")]
+layout_mode = 2
+
+[node name="Slot4" parent="Control/PanelContainer/HBoxContainer" instance=ExtResource("2_fbc2m")]
+layout_mode = 2
+
+[node name="Slot5" parent="Control/PanelContainer/HBoxContainer" instance=ExtResource("2_fbc2m")]
+layout_mode = 2
+
+[node name="Slot6" parent="Control/PanelContainer/HBoxContainer" instance=ExtResource("2_fbc2m")]
+layout_mode = 2
+
+[node name="Slot7" parent="Control/PanelContainer/HBoxContainer" instance=ExtResource("2_fbc2m")]
+layout_mode = 2
+
+[node name="Slot8" parent="Control/PanelContainer/HBoxContainer" instance=ExtResource("2_fbc2m")]
+layout_mode = 2
+
+[node name="Slot9" parent="Control/PanelContainer/HBoxContainer" instance=ExtResource("2_fbc2m")]
+layout_mode = 2

@@ -1,0 +1,6 @@
+[gd_resource type="FontVariation" load_steps=2 format=3 uid="uid://ce62qf4xrcdme"]
+
+[ext_resource type="FontFile" uid="uid://buqrbo5h6a8bg" path="res://texture/ttf/微软雅黑.ttf" id="1_xm2an"]
+
+[resource]
+base_font = ExtResource("1_xm2an")
