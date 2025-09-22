@@ -7,6 +7,7 @@
     <PackageReference Include="MemoryPack" Version="1.21.4" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.7" />
     <PackageReference Include="SQLite" Version="3.13.0" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="Godot.SourceGenerators" Version="4.4.1" />
@@ -27,8 +28,10 @@
     <Folder Include="config\packscene\" />
     <Folder Include="script\Net\SyncDatas\" />
     <Folder Include="script\WorldParials\" />
+    <Folder Include="script\Yaml\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="config\block\blocks.yaml" />
     <Content Include="config\block\buildblock\HasComponentBlocks.json" />
     <Content Include="config\block\buildblock\NoComponentBlocks.json" />
     <Content Include="config\block\EraofEnergy\cables.json" />
