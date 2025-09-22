@@ -4,7 +4,10 @@ using horizoncraft.script;
 using horizoncraft.script.Components;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
+using horizoncraft.script.Expand;
+using horizoncraft.script.resource;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Struct;
 
@@ -14,6 +17,8 @@ public partial class TestTscn : Node2D
     {
         //ChunkTest(1000);
         //GetAllStructsTest(200);
+        // var bmr =GD.Load<BlockMetaResource>("res://resources/block/stone.tres");
+        // GD.Print(bmr.Components[0].cmps.ToCsharp());
     }
 
     public void SpawnTreeTest(int count)

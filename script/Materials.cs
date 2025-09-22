@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using horizoncraft.script.Components;
 using horizoncraft.script.Entity;
+using horizoncraft.script.Expand;
 using horizoncraft.script.Inventory;
+using horizoncraft.script.resource;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Struct;
+using Microsoft.VisualBasic;
 
 namespace horizoncraft.script
 {
@@ -113,7 +117,8 @@ namespace horizoncraft.script
             );
 
             LoadAllItemConfigs();
-            LoadAllBlockConfigs();
+            //LoadAllBlockConfigs();
+            LoadBlockResources();
             ProcessEntity();
             CreateTileSet();
             ProcessTextures();
@@ -147,6 +152,129 @@ namespace horizoncraft.script
                 }
             }
         }
+
+        /// <summary>
+        /// 
+        /// 基于.tres的方块配置
+        /// </summary>
+        private static void LoadBlockResources()
+        {
+            var list = new List<string>();
+            GetAllFiles("resources/block", list);
+            foreach (var file in list)
+            {
+                if (!file.EndsWith(".tres")) continue;
+                var res = GD.Load<BlockMetaResource>("resources/block/" + file);
+                var meta = new BlockMeta();
+                
+                meta.Name = res.BlockName;
+                meta.Cube = res.CompleteBlock;
+                meta.Collide = res.Collide;
+                meta.TileType = res.TileType.ToString();
+                meta.Light = res.LightSource;
+                meta.BreakLevel = res.BreakLevel;
+                meta.Tags = (res.Tags == null ? meta.Tags : res.Tags.ToCsharp());
+
+                if (res.Components != null)
+                {
+                    foreach (var cmpdict in res.Components)
+                    {
+                        var cmp = cmpdict.ComponentData.ToCsharp();
+                        var func = LambdaCreater.CreateLambda(cmpdict.ComponentName, cmp);
+                        meta.Components.Add(func);
+                    }
+                }
+
+                if (res.OreConfig != null)
+                {
+                    meta.OreConfig = new();
+                    meta.OreConfig.Count = res.OreConfig.Count;
+                    meta.OreConfig.Deep = res.OreConfig.Deep;
+                    meta.OreConfig.Size = res.OreConfig.Size;
+                    meta.OreConfig.Name = meta.Name;
+                }
+
+                if (res.LootItems != null)
+                {
+                    meta.LootTable = new LootTable();
+                    foreach (var lis in res.LootItems)
+                    {
+                        var li = new LootItemSnapshot()
+                        {
+                            DropChance = lis.DropChance,
+                            Name = lis.Name,
+                        };
+                        foreach (var ac in lis.AmountChances)
+                        {
+                            li.AmountChances.Add(new AmountChance()
+                            {
+                                Amount = ac.Amount,
+                                Chance = ac.Chance
+                            });
+                        }
+
+                        meta._LootItemSnapshots_.Add(li);
+                    }
+                }
+                else
+                {
+                    meta._LootItemSnapshots_.Add(new LootItemSnapshot()
+                    {
+                        Name = meta.Name,
+                        DropChance = 1f,
+                        AmountChances = new List<AmountChance>()
+                        {
+                            new AmountChance()
+                            {
+                                Amount = 1,
+                                Chance = 1
+                            }
+                        }
+                    });
+                }
+
+                if (res.BlockStateSets != null)
+                {
+                    List<BlockTileSet> blockTileSets = new List<BlockTileSet>();
+                    int state_id = 0;
+                    foreach (var sets in res.BlockStateSets)
+                    {
+                        var tile = new BlockTileSet()
+                        {
+                            state = state_id,
+                            texture_name = sets.TextureName,
+                            scene = sets.Tscn
+                        };
+                        blockTileSets.Add(tile);
+                        state_id++;
+                    }
+
+                    meta.blockTileDatas = blockTileSets;
+                }
+                else
+                {
+                    meta.blockTileDatas =
+                    [
+                        new BlockTileSet()
+                        {
+                            state = 0,
+                            texture_name = meta.Name,
+                        }
+                    ];
+                }
+
+                if (res.InputMask != null)
+                    foreach (var num in res.InputMask)
+                        meta.InputMask.Add(num);
+
+                if (res.OutPutMask != null)
+                    foreach (var num in res.OutPutMask)
+                        meta.OutputMask.Add(num);
+                
+                RegBlockMeta(meta);
+            }
+        }
+
 
         /// <summary>
         /// 加载所有物品配置

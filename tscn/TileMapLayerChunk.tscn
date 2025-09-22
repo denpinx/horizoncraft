@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://b8sm5vjvrp1v2"]
+[gd_scene load_steps=8 format=3 uid="uid://b8sm5vjvrp1v2"]
 
 [ext_resource type="Script" uid="uid://ckrstqs6hvawg" path="res://tscn/TileMapLayerChunk.cs" id="1_2arkn"]
 [ext_resource type="Texture2D" uid="uid://cg50yloerq0wx" path="res://texture/shadow.png" id="2_61nbq"]
+[ext_resource type="Texture2D" uid="uid://d0886y664n172" path="res://texture/item/default.png" id="4_wribj"]
 [ext_resource type="Script" uid="uid://ckokgwlpye0pe" path="res://tscn/DebugView.cs" id="8_agw1w"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wribj"]
@@ -19,6 +20,8 @@ texture = ExtResource("2_61nbq")
 [sub_resource type="TileSet" id="TileSet_bfswo"]
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_wribj")
+
+[sub_resource type="QuadMesh" id="QuadMesh_bfswo"]
 
 [node name="TileMapLayerChunk" type="Node2D"]
 top_level = true
@@ -41,3 +44,7 @@ tile_set = SubResource("TileSet_bfswo")
 self_modulate = Color(1, 1, 1, 0.462745)
 z_index = 2
 script = ExtResource("8_agw1w")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="."]
+mesh = SubResource("QuadMesh_bfswo")
+texture = ExtResource("4_wribj")

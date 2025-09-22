@@ -18,8 +18,5 @@ namespace horizoncraft.script.WorldControl
         public int tile_count;
         public bool scene = false;
         public string texture_name;
-
-        public int terrian_id;
-        public int terrian_set_id;
     }
 }

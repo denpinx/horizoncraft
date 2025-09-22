@@ -33,6 +33,7 @@ project/assembly_name="HorizonCraft"
 
 folder_colors={
 "res://config/": "green",
+"res://resources/": "red",
 "res://script/": "pink",
 "res://texture/": "orange",
 "res://tscn/": "purple"

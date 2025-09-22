@@ -27,7 +27,7 @@ public partial class PlayerNode : CharacterBody2D
     public static System.Collections.Generic.Dictionary<string, Func<string>> GetInformation = new();
     public static LocalProfile Profile;
 
-    public PlayerBreakProcess BreakProcess = new PlayerBreakProcess();
+    public PlayerBreakProcess BreakProcess = new();
     public const float JumpVelocity = -200.0f;
     public Action OnMoveToChunk;
     public PlayerData playerData;
@@ -343,15 +343,17 @@ public partial class PlayerNode : CharacterBody2D
                 }
             }
         }
+
         ///丢弃单个物品
         if (Input.IsActionJustPressed("drop_item"))
         {
-            world.Service.PlayerService.Events.DropItem(world.Service,playerData.Name);
+            world.Service.PlayerService.Events.DropItem(world.Service, playerData.Name);
         }
+
         //丢弃所有物品
         if (Input.IsActionJustPressed("drop_all_item"))
         {
-            world.Service.PlayerService.Events.DropAllItem(world.Service,playerData.Name);
+            world.Service.PlayerService.Events.DropAllItem(world.Service, playerData.Name);
         }
 
         if (playerData.Mode == 0)
