@@ -86,7 +86,11 @@ public class PlayerPickItemEvent : PlayerEvent
     public int ActionType;
 
     public ItemStack GetIndexItem()
-        => Inventory.GetItem(Index);
+    {
+        if (Index > Inventory.Items.Length)
+            return null;
+        return Inventory.GetItem(Index);
+    }
 
     public void SetIndexItem(ItemStack item)
         => Inventory.SetItem(Index, item);
