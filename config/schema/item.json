@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "properties": {
+      "max": {
+        "type": "integer",
+        "description": "物品叠加数量"
+      },
+      "components":{
+        "type": "object",
+        "additionalProperties":{
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string",
+              "description": "组件功能名"
+            }
+          }
+        },
+        "description": "物品组件"
+      },
+      "tags": {
+        "type": "object",
+        "properties": {
+          "fuel": {
+            "type": "string",
+            "description": "燃烧值-单位Tick"
+          },
+          "thesaurus": {
+            "type": "string",
+            "description": "词典"
+          }
+        },
+        "description": "标签"
+      }
+    }
+  }
+}

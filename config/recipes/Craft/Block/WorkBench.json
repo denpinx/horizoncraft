@@ -3,12 +3,12 @@
   "tag": "player",
   "recipes": [
     {
-      "cost": [
+      "template-tag": [
         "##",
         "##"
       ],
       "mask": {
-        "#": "oak_plank"
+        "#": "plank"
       },
       "result": [
         "workbench",

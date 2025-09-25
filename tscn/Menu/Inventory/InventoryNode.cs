@@ -125,7 +125,6 @@ public partial class InventoryNode : CanvasLayer
             var targetinv = TargetBlock?.GetComponent<InventoryComponent>()?.GetInventory();
             if (targetinv == null)
             {
-                GD.Print("targetinv==null");
                 events.PickItem(ppi);
                 if (index < 9)
                 {

@@ -11,8 +11,8 @@ namespace horizoncraft.script.Recipes;
 /// </summary>
 public class RecipeManage
 {
-    private static List<Recipe> ProcessRecipes = new List<Recipe>();
-    private static List<GridRecipe> GridRecipes = new List<GridRecipe>();
+    private static List<ProcessRecipePack> ProcessRecipes = new List<ProcessRecipePack>();
+    private static List<GridRecipePack> GridRecipes = new List<GridRecipePack>();
 
 
     public static GridRecipeItem MatchGridRecipe(ItemStack[,] items, string tag)
@@ -66,54 +66,63 @@ public class RecipeManage
         return RecipeManage.MatchGridRecipe(ResultItems, "player");
     }
 
-    public static void RegGridRecipe(GridRecipe recipe)
+    public static void RegGridRecipe(GridRecipePack recipePack)
     {
-        if (recipe == null)
+        if (recipePack == null)
         {
             GD.PrintErr($"[RecipeManage] 注册失败! recipe 为 null");
             return;
         }
 
-        var result = GridRecipes.Find(r => r.Tag == recipe.Tag);
+        var result = GridRecipes.Find(r => r.Tag == recipePack.Tag);
         if (result != null)
         {
-            GD.Print($"[RecipeManage] 添加 {recipe.Tag} 配方,{recipe.recipes.Count} 个");
-            foreach (var r in recipe.recipes)
+            GD.Print($"[RecipeManage] 添加 {recipePack.Tag} 配方,{recipePack.recipes.Count} 个");
+            foreach (var r in recipePack.recipes)
                 result.recipes.Add(r);
         }
         else
         {
-            GD.Print($"[RecipeManage] 创建 {recipe.Tag} 配方,{recipe.recipes.Count} 个");
-            GridRecipes.Add(recipe);
+            GD.Print($"[RecipeManage] 创建 {recipePack.Tag} 配方,{recipePack.recipes.Count} 个");
+            GridRecipes.Add(recipePack);
         }
     }
 
-    public static void RegRecipe(Recipe recipe)
+    public static void RegRecipe(ProcessRecipePack processRecipePack)
     {
-        if (recipe == null)
+        if (processRecipePack == null)
         {
             GD.PrintErr($"[RecipeManage] 注册失败! recipe 为 null");
             return;
         }
 
-        var result = ProcessRecipes.Find(r => r.Tag == recipe.Tag);
+        var result = ProcessRecipes.Find(r => r.Tag == processRecipePack.Tag);
         if (result != null)
         {
-            GD.Print($"[RecipeManage] 添加 {recipe.Tag} 配方,{recipe.recipes.Count} 个");
-            foreach (var r in recipe.recipes)
-                result.recipes.Add(r);
+            GD.Print($"[RecipeManage] 添加 {processRecipePack.Tag} 配方,{processRecipePack.Recipes.Count} 个");
+            foreach (var r in processRecipePack.Recipes)
+                result.Recipes.Add(r);
         }
         else
         {
-            GD.Print($"[RecipeManage] 创建 {recipe.Tag} 配方,{recipe.recipes.Count} 个");
-            ProcessRecipes.Add(recipe);
+            GD.Print($"[RecipeManage] 创建 {processRecipePack.Tag} 配方,{processRecipePack.Recipes.Count} 个");
+            ProcessRecipes.Add(processRecipePack);
         }
     }
 
     private static GridRecipeItem ParseGridRecipeItem(Dictionary<string, object> dict)
     {
         GridRecipeItem item = new GridRecipeItem();
-        var cost_list = (List<object>)dict["cost"];
+        List<object> cost_list;
+        if (dict.ContainsKey("template-tag"))
+        {
+            item.MatchType = RecipeItemMatchType.TagMatch;
+            cost_list = (List<object>)dict["template-tag"];
+        }
+        else
+            cost_list = (List<object>)dict["template"];
+        
+        
         var Mask_ = (Dictionary<string, object>)dict["mask"];
         var result_list = (List<object>)dict["result"];
 
@@ -131,36 +140,64 @@ public class RecipeManage
         foreach (var r in cost_list)
             strlist.Add((string)r);
 
+        
         ItemStack[,] cost = new ItemStack[max, maxy];
+        string[,] strs = new string[max, max];
         for (int x = 0; x < max; x++)
         {
             for (int y = 0; y < maxy; y++)
             {
-                GD.Print($"{x},{y} at {strlist[y][x]} ");
 
-                var key = strlist[y][x];
-                var itemname = mask[key.ToString()];
-                if (itemname == "air") cost[x, y] = null;
-                else
-                    cost[x, y] = Materials.Dictionary_ItemMetas[itemname].GetItemStack();
+                if (item.MatchType == RecipeItemMatchType.TagMatch)
+                {
+                    var key = strlist[y][x];
+                    var tag = mask[key.ToString()];
+                    if (tag == "air") strs[x, y] = null;
+                    else
+                    {
+                        strs[x,y] = tag;
+                    }
+                }
+                if (item.MatchType == RecipeItemMatchType.ItemMatch)
+                {
+                    var key = strlist[y][x];
+                    var itemname = mask[key.ToString()];
+                    if (itemname == "air") cost[x, y] = null;
+                    else
+                        cost[x, y] = Materials.Dictionary_ItemMetas[itemname].GetItemStack();
+                }
+
             }
         }
 
+        item.CostTagMatch = strs;
         item.Cost = cost;
         item.Result = Materials.Dictionary_ItemMetas[result_name].GetItemStack();
         item.Result.Amount = result_count;
         return item;
     }
 
-    private static RecipeItem ParseRecipeItem(Dictionary<string, object> dict)
+    private static ProcessRecipeItem ParseRecipeItem(Dictionary<string, object> dict)
     {
-        RecipeItem item = new RecipeItem();
-        var CostList = (List<object>)dict["cost"];
+        ProcessRecipeItem item = new ProcessRecipeItem();
+        
+        List<object> costList;
+        if (dict.ContainsKey("cost-tag"))
+        {
+            item.MatchType = RecipeItemMatchType.TagMatch;
+            costList = (List<object>)dict["cost-tag"];
+        }
+        else
+            costList = (List<object>)dict["cost"];
+        
+        
+        
+        
         var ResultList = (List<object>)dict["result"];
         if (dict.ContainsKey("process"))
             item.ProcessTick = (int)dict["process"];
 
-        foreach (var costInfo_ in CostList)
+        foreach (var costInfo_ in costList)
         {
             var costInfo = (List<object>)costInfo_;
             var itemstack = Materials.Dictionary_ItemMetas[(string)costInfo[0]].GetItemStack();
@@ -181,9 +218,9 @@ public class RecipeManage
         return item;
     }
 
-    private static GridRecipe ParseGridFile(Dictionary<string, object> dict)
+    private static GridRecipePack ParseGridFile(Dictionary<string, object> dict)
     {
-        var recipe = new GridRecipe();
+        var recipe = new GridRecipePack();
         if (dict.TryGetValue("tag", out object value))
             recipe.Tag = (string)value;
 
@@ -195,16 +232,16 @@ public class RecipeManage
         return recipe;
     }
 
-    private static Recipe ParseProcessRecipeFile(Dictionary<string, object> dict)
+    private static ProcessRecipePack ParseProcessRecipeFile(Dictionary<string, object> dict)
     {
-        var recipe = new Recipe();
+        var recipe = new ProcessRecipePack();
         if (dict.TryGetValue("tag", out var value))
             recipe.Tag = (string)value;
 
 
         var list = (List<object>)dict["recipes"];
         foreach (var recipeItem in list)
-            recipe.recipes.Add(ParseRecipeItem((Dictionary<string, object>)recipeItem));
+            recipe.Recipes.Add(ParseRecipeItem((Dictionary<string, object>)recipeItem));
 
         return recipe;
     }
@@ -258,21 +295,27 @@ public class RecipeManage
     }
 
 
-    public static Recipe GetRecipe(string tag)
+    public static ProcessRecipePack GetRecipe(string tag)
     {
         var recipe = ProcessRecipes.Find(r => r.Tag == tag);
         if (recipe == null) GD.PrintErr($"[RecipeManage] 配方{tag} 不存在!");
         return recipe;
     }
 
-    public static RecipeItem GetRecipeItem(string tag, Func<RecipeItem, bool> mathAction)
+    public static ProcessRecipeItem GetProcessRecipe(string tag, Func<ProcessRecipeItem, bool> mathAction)
     {
         var recipe = GetRecipe(tag);
         if (recipe == null) return null;
-        var result = recipe.recipes.Find(rcp => mathAction(rcp));
+        var result = recipe.Recipes.Find(rcp => mathAction(rcp));
         return result;
     }
-
+    public static ProcessRecipeItem GetProcessRecipe(string tag, ItemStack[] Items)
+    {
+        var recipe = GetRecipe(tag);
+        if (recipe == null) return null;
+        var result = recipe.Recipes.Find(r=>r.ItemMatch(Items));
+        return result;
+    }
     private static void GetAllFiles(string path, List<string> filelist)
     {
         DirAccess dir = DirAccess.Open(path);

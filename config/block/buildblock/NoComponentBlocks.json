@@ -31,7 +31,8 @@
       }
     },
     "tags": {
-      "type": "axe"
+      "type": "axe",
+      "thesaurus": "log"
     }
   },
   "oak_leaves": {

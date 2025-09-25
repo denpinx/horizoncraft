@@ -19,8 +19,11 @@ public class FurnaceSystem : TickSystem
         {
             if (input != null)
             {
-                var recipe = RecipeManage.GetRecipeItem("furnace",
-                    recipeItem => recipeItem.Cost[0].Id == input.Id && recipeItem.Cost[0].Amount <= input.Amount);
+                //var recipe = RecipeManage.GetProcessRecipe("furnace",
+                   // recipeItem => recipeItem.Cost[0].Id == input.Id && recipeItem.Cost[0].Amount <= input.Amount);
+                
+                var recipe = RecipeManage.GetProcessRecipe("furnace",[input]);
+                
                 if (recipe != null)
                 {
                     loadfuel = furnace.Fuel <= 0;

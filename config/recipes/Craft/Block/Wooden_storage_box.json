@@ -3,7 +3,7 @@
   "tag": "player",
   "recipes": [
     {
-      "cost": [
+      "template": [
         "###",
         "#-#",
         "###"

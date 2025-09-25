@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["craft","process"],
+      "description": "配方类型"
+    },
+    "tag": {
+      "type": "string",
+      "description": "作用标签"
+    },
+    "recipes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "cost": {
+            "type": "array",
+            "description": "消耗"
+          },
+          "cost-tag": {
+            "type": "array",
+            "description": "标签匹配的消耗"
+          },
+          "result": {
+            "type": "array",
+            "description": "结果"
+          },
+          "process": {
+            "type": "integer",
+            "description": "配方处理时间"
+          },
+          "template": {
+            "type": "array",
+            "description": "模板",
+            "items": {
+              "type": "string"
+            }
+          },
+          "template-tag": {
+            "type": "array",
+            "description": "标签匹配模板",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mask": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "模板的替换"
+          }
+        }
+      }
+    }
+  },
+  "required": ["type","recipes"]
+}

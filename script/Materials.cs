@@ -38,9 +38,14 @@ namespace horizoncraft.script
         public static ItemMeta RegItemMeta(ItemMeta meta)
         {
             meta.Id = ItemMetas.Count;
+            
+            if(!meta.Tags.ContainsKey("thesaurus"))
+                meta.Tags.Add("thesaurus",meta.Name);
+            
+            
             if (Dictionary_ItemMetas.ContainsKey(meta.Name))
             {
-                GD.PrintErr($"{meta.Name} 已存在");
+                //覆盖更新
                 var blockmeta = Dictionary_ItemMetas[meta.Name].BlockMeta;
                 Dictionary_ItemMetas[meta.Name] = meta;
                 meta.BlockMeta = blockmeta;
@@ -48,6 +53,7 @@ namespace horizoncraft.script
             }
             else
             {
+                //添加
                 ItemMetas.Add(meta);
                 Dictionary_ItemMetas.Add(meta.Name, meta);
             }
@@ -67,25 +73,36 @@ namespace horizoncraft.script
             {
                 OreManage.Registry(meta.OreConfig);
             }
-
+            
             if (meta.Name != "air")
             {
+                if (meta.IsLiquid)
+                {
+                    ItemMeta itemMeta = new ItemMeta()
+                    {
+                        Name = meta.Name+"_liquid",
+                        MaxAmount = 1000
+                    };
+                    
+                    //TODO 待完成，还没想好用什么方案
+                }
                 if (!Dictionary_ItemMetas.ContainsKey(meta.Name))
                 {
+                    //添加
                     ItemMeta itemMeta = new ItemMeta()
                     {
                         Name = meta.Name,
                         HasBlock = true
                     };
-                    GD.Print($"[方块注册物品]{itemMeta.Name}");
                     itemMeta.Itemset.TextureNames.Add(meta.Name);
+                    itemMeta.Tags.Add("thesaurus",meta.Tags["thesaurus"]);
                     RegItemMeta(itemMeta);
                     itemMeta.BlockMeta = meta;
                     meta.ItemMeta = itemMeta;
                 }
                 else
                 {
-                    GD.Print($"[更新方块物品信息]{Dictionary_ItemMetas[meta.Name].Name}");
+                    //更新
                     Dictionary_ItemMetas[meta.Name].BlockMeta = meta;
                     meta.ItemMeta = Dictionary_ItemMetas[meta.Name];
                 }
@@ -160,6 +177,7 @@ namespace horizoncraft.script
         /// <summary>
         /// 加载基于tres文件的物品配置
         /// </summary>
+        [Obsolete]
         private static void LoadItemResources()
         {
             var list = new List<string>();
@@ -199,6 +217,7 @@ namespace horizoncraft.script
         /// <summary>
         /// 加载基于tres文件的方块配置
         /// </summary>
+        [Obsolete]
         private static void LoadBlockResources()
         {
             var list = new List<string>();
@@ -326,7 +345,6 @@ namespace horizoncraft.script
         /// <summary>
         /// 加载所有物品配置
         /// </summary>
-        [Obsolete]
         private static void LoadAllItemConfigs()
         {
             var list = new List<string>();
@@ -342,7 +360,6 @@ namespace horizoncraft.script
         /// 加载指定地址的物品配置
         /// </summary>
         /// <param name="dir"></param>
-        [Obsolete]
         private static void LoadItemConfigs(string dir)
         {
             var fileAccess = FileAccess.Open(dir, FileAccess.ModeFlags.Read);
@@ -352,6 +369,8 @@ namespace horizoncraft.script
 
             foreach (string item_name in dict.Keys)
             {
+                if(item_name=="$schema")continue;
+                
                 ItemMeta itemMeta = new ItemMeta()
                 {
                     Name = item_name,
@@ -430,6 +449,8 @@ namespace horizoncraft.script
             var dict = JsonCleaner.FromJson(jsonText);
             foreach (string item_name in dict.Keys)
             {
+                if(item_name=="$schema")continue;
+                
                 Dictionary<string, object> config = (Dictionary<string, object>)dict[item_name];
                 List<Func<Component>> components = new();
                 if (config.ContainsKey("components"))
@@ -452,7 +473,11 @@ namespace horizoncraft.script
                 {
                     blockmeta.Examples.Add(cmp());
                 }
-
+                
+                if (config.TryGetValue("liquid", out var value))
+                {
+                    blockmeta.IsLiquid = (bool)value;
+                }
 
                 if (config.ContainsKey("tiletype"))
                 {
@@ -484,6 +509,11 @@ namespace horizoncraft.script
                     var dict_attr = (Dictionary<string, object>)config["tags"];
                     foreach (var v in dict_attr)
                         blockmeta.Tags.Add(v.Key, (string)v.Value);
+                }
+
+                if (!blockmeta.Tags.ContainsKey("thesaurus"))
+                {
+                    blockmeta.Tags.Add("thesaurus",blockmeta.Name);
                 }
 
                 if (config.ContainsKey("loot"))

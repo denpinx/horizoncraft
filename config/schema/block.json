@@ -1,0 +1,165 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "properties": {
+      "liquid": {
+        "type": "boolean",
+        "description": "是否为流体"
+      },
+      "rigidity": {
+        "type": "number",
+        "description": "方块硬度"
+      },
+      "collide": {
+        "type": "boolean",
+        "description": "碰撞"
+      },
+      "cube": {
+        "type": "boolean",
+        "description": "是否为完整方块"
+      },
+      "light": {
+        "type": "boolean",
+        "description": "是否为光源"
+      },
+      "tiletype": {
+        "type": "string",
+        "enum": ["atlas","tile","terrain"],
+        "description": "贴图类型:(tile:根据方块坐标获取贴图内的贴图,atlas:根据方块状态,横向获取方块贴图)"
+      },
+      "tags": {
+        "type": "object",
+        "description": "标签列表",
+        "properties": {
+          "type":{
+            "type": "string",
+            "enum": ["axe","pickaxe","shovel","any"],
+            "description": "应用工具类型"
+          },
+          "thesaurus": {
+            "type": "string",
+            "description": "词典"
+          }
+        }
+      },
+      "loot": {
+        "type": "array",
+        "description": "掉落物",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "掉落物名"
+            },
+            "drop-chance": {
+              "type": "number",
+              "description": "掉落概率 [0.0-1.0]"
+            },
+            "amount-chance": {
+              "type": "array",
+              "description": "物品掉落数量叠加",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "integer",
+                    "description": "掉落数量"
+                  },
+                  "chance": {
+                    "type": "number",
+                    "description": "掉落概率"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "components": {
+        "type": "object",
+        "description": "组件",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "Name": {
+              "type": "string",
+              "description": "组件功能名"
+            },
+            "BlockName": {
+              "type": "string",
+              "description": "组件操作目标方块"
+            },
+            "Max": {
+              "type": "integer",
+              "description": "触发时刻的最大时间"
+            }
+          }
+        }
+      },
+      "state": {
+        "type": "object",
+        "description": "不同状态的不同贴图",
+        "additionalProperties": {
+          "type": "object",
+          "properties": {
+            "texture": {
+              "type": "string",
+              "description": "贴图"
+            },
+            "scene": {
+              "type": "boolean",
+              "description": "texture是否为场景地址"
+            }
+          },
+          "required": ["texture"]
+        }
+      },
+      
+      "ore": {
+        "type": "object",
+        "properties": {
+          "deep": {
+            "type": "integer",
+            "description": "方块生成的深度,小于0则为海平面以上"
+          },
+          "size": {
+            "type": "integer",
+            "description": "生成的大小"
+          },
+          "count": {
+            "type": "integer",
+            "description": "生成的最大数量"
+          }
+        },
+        "description": "矿物生成配置,定义如何在世界中生成"
+      },
+      
+      
+      "mask": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "array",
+            "description": "输入格位下标",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "output": {
+            "type": "array",
+            "description": "输出格位下标",
+            "items": {
+              "type": "integer"
+            }
+          }
+        },
+        "description": "定义容器的输入输出口"
+      }
+      
+    }
+  },
+  "minProperties": 1
+}

@@ -87,7 +87,7 @@ public class PlayerPickItemEvent : PlayerEvent
 
     public ItemStack GetIndexItem()
     {
-        if (Index > Inventory.Items.Length)
+        if (Index >= Inventory.Items.Length)
             return null;
         return Inventory.GetItem(Index);
     }

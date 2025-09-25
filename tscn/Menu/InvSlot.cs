@@ -134,6 +134,11 @@ public partial class InvSlot : Control
                 ProgressBar.Visible = false;
             }
 
+            foreach (var kvp in itemStack.GetItemMeta().Tags)
+            {
+                stringBuilder.AppendLine($"[{kvp.Key} : {kvp.Value}]");
+            }
+            
             TextureButton.TooltipText = stringBuilder.ToString();
         }
         else
