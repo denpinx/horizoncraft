@@ -113,17 +113,23 @@ public class RecipeManage
     private static GridRecipeItem ParseGridRecipeItem(Dictionary<string, object> dict)
     {
         GridRecipeItem item = new GridRecipeItem();
-        List<object> cost_list;
-        if (dict.ContainsKey("template-tag"))
+
+        
+        
+        
+        List<object> cost_list= (List<object>)dict["template"];
+        Dictionary<string, object> Mask_;
+        
+        if (dict.TryGetValue("mask-tag", out var value))
         {
             item.MatchType = RecipeItemMatchType.TagMatch;
-            cost_list = (List<object>)dict["template-tag"];
+            Mask_ = (Dictionary<string, object>)value;
         }
         else
-            cost_list = (List<object>)dict["template"];
+        {
+            Mask_ = (Dictionary<string, object>)dict["mask"];
+        }
         
-        
-        var Mask_ = (Dictionary<string, object>)dict["mask"];
         var result_list = (List<object>)dict["result"];
 
         var result_count = 1;

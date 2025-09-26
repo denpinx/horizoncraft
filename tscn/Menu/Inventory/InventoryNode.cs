@@ -185,14 +185,7 @@ public partial class InventoryNode : CanvasLayer
 
     public void UpdateGui()
     {
-        if (PlayerNode?.playerData?.Inventory == null)
-        {
-        }
-        else
-        {
-            if (playerNode != null) playerNode.Visible = Visible;
-        }
-
+        if (playerNode != null) playerNode.Visible = Visible;
         if (PlayerNode?.playerData?.Inventory != null)
         {
             if (PlayerNode?.playerData?.Inventory.GetHandItemStack() != null)

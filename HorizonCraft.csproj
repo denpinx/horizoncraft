@@ -62,5 +62,12 @@
     <Content Include="config\schema\block.json" />
     <Content Include="config\schema\item.json" />
     <Content Include="config\schema\recipe.json" />
+    <Content Include="doc\文档-注册实体.md" />
+    <Content Include="doc\文档-注册容器菜单.md" />
+    <Content Include="doc\文档-注册物品.md" />
+    <Content Include="doc\文档-注册方块.md" />
+    <Content Include="doc\文档-注册生物群系.md" />
+    <Content Include="doc\文档-注册组件.md" />
+    <Content Include="doc\文档-注册配方.md" />
   </ItemGroup>
 </Project>

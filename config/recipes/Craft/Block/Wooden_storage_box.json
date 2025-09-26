@@ -8,9 +8,9 @@
         "#-#",
         "###"
       ],
-      "mask": {
+      "mask-tag": {
         "-": "air",
-        "#": "oak_plank"
+        "#": "plank"
       },
       "result": [
         "wooden_storage_box",

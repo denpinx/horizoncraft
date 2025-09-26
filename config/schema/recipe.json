@@ -39,19 +39,19 @@
               "type": "string"
             }
           },
-          "template-tag": {
-            "type": "array",
-            "description": "标签匹配模板",
-            "items": {
-              "type": "string"
-            }
-          },
           "mask": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
             },
-            "description": "模板的替换"
+            "description": "模板的替换"    
+          },
+          "mask-tag": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "模板替换-但是基于物品词典"
           }
         }
       }

@@ -3,11 +3,11 @@
   "tag": "player",
   "recipes": [
     {
-      "template-tag": [
+      "template": [
         "##",
         "##"
       ],
-      "mask": {
+      "mask-tag": {
         "#": "plank"
       },
       "result": [

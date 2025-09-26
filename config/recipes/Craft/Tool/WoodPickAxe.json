@@ -8,10 +8,10 @@
         "-!-",
         "-!-"
       ],
-      "mask": {
+      "mask-tag": {
         "-": "air",
         "!": "stick",
-        "#": "oak_plank"
+        "#": "plank"
       },
       "result": [
         "wood_pickaxe",
