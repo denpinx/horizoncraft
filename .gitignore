@@ -2,4 +2,4 @@
 .godot/
 /android/
 /save/**/*
-.VSCodeCounter/
+.VSCodeCounter/**/*
