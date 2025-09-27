@@ -6,8 +6,6 @@ public partial class DebugView : Node2D
     public Chunk chunk;
     Font font = new SystemFont();
     public static bool DEBUG = false;
-    public long time = 0;
-
     public override void _Draw()
     {
         if (!DEBUG) return;
@@ -51,6 +49,5 @@ public partial class DebugView : Node2D
         DrawString(font, new(0, 4 * Chunk.Size), $"更新时间戳：{chunk.version} ");
         DrawString(font, new(0, 5 * Chunk.Size), $"Tick数：{chunk.TickList.Count} ");
         DrawString(font, new(0, 6 * Chunk.Size), $"光源对象：{chunk.LightList.Count} ");
-        DrawString(font, new(0, 8 * Chunk.Size), $"Tilemap标识：{time} ");
     }
 }

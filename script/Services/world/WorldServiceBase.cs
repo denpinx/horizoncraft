@@ -100,13 +100,13 @@ public abstract class WorldServiceBase : IDisposable
 
     public bool IsDay()
     {
-        int h = GetTimeHour();
+        int h = (int)GetTimeHour();
         return h is >= 6 and < 20;
     }
 
-    public int GetTimeHour()
+    public float GetTimeHour()
     {
-        return (int)(((float)TickTimes % (float)DayTicks) / (float)DayTicks * 24f);
+        return (((float)TickTimes % (float)DayTicks) / (float)DayTicks * 24f);
     }
 
     public int GetTimeDay()

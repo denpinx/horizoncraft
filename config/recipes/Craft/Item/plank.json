@@ -1,0 +1,18 @@
+{
+  "type": "craft",
+  "tag": "playFer",
+  "recipes": [
+    {
+      "template": [
+        "#"
+      ],
+      "mask": {
+        "#": "log"
+      },
+      "result": [
+        "plank",
+        4
+      ]
+    }
+  ]
+}

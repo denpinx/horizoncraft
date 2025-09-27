@@ -445,7 +445,9 @@ public partial class ChunkServiceBase : IDisposable
         var block = GetBlock(coord);
         if (block == null) return;
         if (block.Light < value)
+        {
             block.Light = value;
+        }
         else
         {
             return;
@@ -517,28 +519,34 @@ public partial class ChunkServiceBase : IDisposable
         GetLoadRangeChunks(player.ChunkCoord, poss);
         int light = 0;
         if (LightMode == LightModeEnum.None) light = 16;
+        List<Chunk> resultchunk = new List<Chunk>();
         foreach (var sts in Chunks)
         {
             var chunk = sts.Value;
             if (poss.Contains(chunk.coord))
+            {
+                resultchunk.Add(sts.Value);
                 sts.Value.SetLight(light);
+            }
         }
-
-        if (LightMode == LightModeEnum.None) return;
-
-        foreach (var sts in Chunks)
+        if (LightMode != LightModeEnum.None)
         {
-            var chunk = sts.Value;
-            if (poss.Contains(chunk.coord))
-                UpdataChunkLight(chunk);
+            foreach (var sts in Chunks)
+            {
+                var chunk = sts.Value;
+                if (poss.Contains(chunk.coord))
+                    UpdataChunkLight(chunk);
+            }
+            int lightsize = LightSize / 2;
+            if (player.Mode == 1) lightsize = LightSize * 4;
+            if (LightMode == LightModeEnum.DFSMode)
+                DfsUpdateLight(new Vector3I(player.Coord.X, player.Coord.Y, 1), lightsize);
+            if (LightMode == LightModeEnum.RayCastMode)
+                RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), lightsize, 32);
         }
-
-        int lightsize = LightSize / 2;
-        if (player.Mode == 1) lightsize = LightSize * 4;
-        if (LightMode == LightModeEnum.DFSMode)
-            DfsUpdateLight(new Vector3I(player.Coord.X, player.Coord.Y, 1), lightsize);
-        if (LightMode == LightModeEnum.RayCastMode)
-            RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), lightsize, 32);
+        
+        foreach (var chunk in resultchunk)
+            chunk.CheckLightUpdate();
     }
 
     public List<BlockData> GetBlockAsSameComponent<T>(Vector3I pos) where T : Component

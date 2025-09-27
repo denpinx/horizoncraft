@@ -96,6 +96,7 @@ namespace horizoncraft.script
         public override void _Process(double delta)
         {
             textureRect.Modulate = GetSkyChange();
+            colorRect.Color = Color.Color8(0,0,0,GetLightChange());
             if (RequeueFreeze > 0) RequeueFreeze -= delta;
             else RequeueFreeze = 0;
 
@@ -147,18 +148,24 @@ namespace horizoncraft.script
 
         private void AddTileMap(Chunk chunk)
         {
-            for (int i = 0; i < tileMapLayerChunks.Count; i++)
-            {
-                if (tileMapLayerChunks[i].chunk.coord == chunk.coord)
-                {
-                    chunk.update_tilemap = true;
-                    tileMapLayerChunks[i].chunk = chunk;
-                    return;
-                }
-            }
-
+            // for (int i = 0; i < tileMapLayerChunks.Count; i++)
+            // {
+            //     if (tileMapLayerChunks[i].chunk.coord == chunk.coord)
+            //     {
+            //         if (tileMapLayerChunks[i].chunk != chunk)
+            //         {
+            //             chunk.update_tilemap = true;
+            //             tileMapLayerChunks[i].chunk = chunk;
+            //         }
+            //         return;
+            //     }
+            // }
+            if (tileMapLayerChunks.Find(a => a.chunk.coord == chunk.coord) != null) return;
+            
+            
             TileMapLayerChunk tmly = PSTilemapLayerChunk.Instantiate<TileMapLayerChunk>();
             tmly.chunk = chunk;
+            chunk.update_tilemap = true;
             tmly.GlobalPosition = chunk.coord * Chunk.Size * 16;
             tmly.Visible = true;
             tmly.PlayerNode = PlayerNode;
@@ -238,9 +245,9 @@ namespace horizoncraft.script
             }
         }
 
-        public byte GetLightChange(float t)
+        public byte GetLightChange()
         {
-            float hour = t * 24f;
+            float hour = Service.GetTimeHour();
             if (hour < 5f || hour >= 20f)
                 return 200;
             else if (hour >= 5f && hour < 8f)

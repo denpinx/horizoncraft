@@ -1,0 +1,41 @@
+{
+  "stone_shovel": {
+    "max": 1,
+    "components": {
+      "ItemDurableComponent": {
+        "Name": "ItemDurableComponent",
+        "Tag": "shovel",
+        "ToolLevel": 0,
+        "Efficiency": 3,
+        "Max": 250,
+        "Value": 250
+      }
+    }
+  },
+  "iron_shovel": {
+    "max": 1,
+    "components": {
+      "ItemDurableComponent": {
+        "Name": "ItemDurableComponent",
+        "Tag": "shovel",
+        "ToolLevel": 0,
+        "Efficiency": 5,
+        "Max": 500,
+        "Value": 500
+      }
+    }
+  },
+  "diamond_shovel": {
+    "max": 1,
+    "components": {
+      "ItemDurableComponent": {
+        "Name": "ItemDurableComponent",
+        "Tag": "shovel",
+        "ToolLevel": 0,
+        "Efficiency": 8,
+        "Max": 1500,
+        "Value": 1500
+      }
+    }
+  }
+}

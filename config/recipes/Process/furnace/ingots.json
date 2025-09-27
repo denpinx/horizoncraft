@@ -1,50 +1,40 @@
 {
   "type": "process",
   "tag": "furnace",
-  "recipes": [
+  "recipes": [    
     {
-      "process": 20,
-      "cost": [
-        [
-          "iron_ore",
-          1
-        ]
-      ],
-      "result": [
-        [
-          "iron_ingot",
-          1
-        ]
-      ]
+    "process": 20,
+    "cost-tag": [["log", 1]],
+    "result": [["charcoal", 1]]
+    },    {
+    "process": 20,
+    "cost": [["coal_ore", 1]],
+    "result": [["coal", 1]]
     },
     {
       "process": 20,
-      "cost": [
-        [
-          "copper_ore",
-          1
-        ]
-      ],
-      "result": [
-        [
-          "copper_ingot",
-          1
-        ]
-      ]
+      "cost": [["iron_ore", 1]],
+      "result": [["iron_ingot", 1]]
     },
     {
       "process": 20,
-      "cost": [
-        [
-          "tin_ore",
-          1
-        ]
-      ],
-      "result": [
-        [
-          "tin_ingot",
-          1
-        ]
+      "cost": [["copper_ore", 1]],
+      "result": [["copper_ingot", 1]]
+    },
+    {
+      "process": 20,
+      "cost": [["tin_ore", 1]],
+      "result": [["tin_ingot", 1]]
+    },
+    {
+      "process": 20,
+      "cost": [["gold_ore", 1]],
+      "result": [["gold_ingot", 1]]
+    },
+    {
+      "process": 20,
+      "cost": [["diamond_ore", 1]],
+      "result": [["diamond", 1]
       ]
     }
   ]

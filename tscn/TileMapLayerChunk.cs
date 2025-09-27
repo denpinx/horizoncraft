@@ -34,23 +34,24 @@ public partial class TileMapLayerChunk : Node2D
         if (chunk == null && GetParent() == null)
         {
             QueueFree();
+            return;
         }
-
+        
+        if (debugView.Visible)
+        {
+            debugView.chunk = chunk;
+            debugView.QueueRedraw();
+        }
+        
         if (chunk.update_tilemap)
         {
-            if (debugView.Visible)
+            for (int x = 0; x < Chunk.Size; x++)
             {
-                debugView.time = time++;
-                debugView.chunk = chunk;
-                debugView.QueueRedraw();
-            }
-
-            for (int z = 0; z < Chunk.SizeZ && z < 2; z++)
-            {
-                for (int x = 0; x < Chunk.Size; x++)
+                for (int y = 0; y < Chunk.Size; y++)
                 {
-                    for (int y = 0; y < Chunk.Size; y++)
+                    for (int z = 0; z < Chunk.SizeZ && z < 2; z++)
                     {
+                        
                         var pos = new Vector2I(x, y);
                         BlockData block = chunk.GetBlock(x, y, z);
                         BlockData block_back = chunk.GetBlock(x, y, 0);
@@ -106,6 +107,11 @@ public partial class TileMapLayerChunk : Node2D
                         }
                         else
                         {
+                            if (block_font.Light >= 7)
+                            {
+                                if (tileMapLayer_shadow.GetCellSourceId(pos) != -1)
+                                    tileMapLayer_shadow.SetCell(new(x, y), -1);
+                            }else
                             if (tileMapLayer_shadow.GetCellAtlasCoords(pos) != new Vector2I(block_font.Light, 0))
                                 tileMapLayer_shadow.SetCell(new(x, y), 0, new Vector2I(block_font.Light, 0));
 

@@ -385,7 +385,6 @@ namespace horizoncraft.script
                         itemMeta.Components.Add(LambdaCreater.CreateLambda(cmp_name, cmp_dict));
                     }
                 }
-
                 if (item_dict.ContainsKey("tags"))
                 {
                     var dict_attr = (Dictionary<string, object>)item_dict["tags"];
@@ -397,7 +396,6 @@ namespace horizoncraft.script
                 {
                     itemMeta.MaxAmount = (int)item_dict["max"];
                 }
-
                 if (item_dict.ContainsKey("state"))
                 {
                     var itemset = new ItemStateSet();
@@ -477,6 +475,10 @@ namespace horizoncraft.script
                 if (config.TryGetValue("liquid", out var value))
                 {
                     blockmeta.IsLiquid = (bool)value;
+                }
+                if (config.TryGetValue("break-level", out var vbl))
+                {
+                    blockmeta.BreakLevel = (int)vbl;
                 }
 
                 if (config.ContainsKey("tiletype"))

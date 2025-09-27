@@ -18,6 +18,7 @@
   },
   "iron_ore": {
     "rigidity": 1,
+    "break-level": 1,
     "ore": {
       "deep": -1,
       "size": 4,
@@ -29,6 +30,7 @@
   },
   "copper_ore": {
     "rigidity": 1,
+    "break-level": 1,
     "ore": {
       "deep": -1,
       "size": 4,
@@ -40,6 +42,7 @@
   },
   "tin_ore": {
     "rigidity": 1,
+    "break-level": 2,
     "ore": {
       "deep": 1,
       "size": 4,
@@ -48,5 +51,33 @@
     "tag": {
       "type": "pickaxe"
     }
+  },  
+  "gold_ore": {
+    "rigidity": 1,
+    "break-level": 2,
+    "ore": {
+      "deep": 1,
+      "size": 4,
+      "count": 2
+    },
+    "tag": {
+      "type": "pickaxe"
+    }
+  },
+  "diamond_ore": {
+    "rigidity": 1,
+    "break-level": 2,
+    "ore": {
+      "deep": 16,
+      "size": 1,
+      "count": 4
+    },
+    "tag": {
+      "type": "pickaxe"
+    },
+    "loot": [{
+      "name": "diamond",
+      "drop-chance": 1
+    }]
   }
 }

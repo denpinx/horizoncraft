@@ -1,0 +1,21 @@
+{
+  "type": "craft",
+  "tag": "player",
+  "recipes": [
+    {
+      "template": [
+        "#",
+        "!",
+        "!"
+      ],
+      "mask-tag": {
+        "!": "stick",
+        "#": "stone"
+      },
+      "result": [
+        "stone_shovel",
+        1
+      ]
+    }
+  ]
+}

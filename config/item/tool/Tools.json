@@ -40,5 +40,18 @@
         "Value": 500
       }
     }
+  },
+  "diamond_pickaxe": {
+    "max": 1,
+    "components": {
+      "ItemDurableComponent": {
+        "Name": "ItemDurableComponent",
+        "Tag": "any|pickaxe",
+        "ToolLevel": 3,
+        "Efficiency": 8,
+        "Max": 1500,
+        "Value": 1500
+      }
+    }
   }
 }

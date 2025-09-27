@@ -19,6 +19,7 @@ namespace horizoncraft.script.WorldControl
 
         /// <summary>方块光照值</summary>
         public int Light;
+        [MemoryPackIgnore]public int OldLight;
 
         [MemoryPackIgnore] private BlockMeta _blockMeta;
 

@@ -240,25 +240,30 @@ namespace horizoncraft.script.WorldControl
                 }
             }
         }
-
-        public void FillLight(int value)
-        {
-            for (int x = 0; x < Chunk.Size; x++)
-            for (int y = 0; y < Chunk.Size; y++)
-            {
-                data[x, y, 1].Light = value;
-            }
-        }
-
         public void SetLight(int light)
         {
             for (int x = 0; x < Chunk.Size; x++)
             for (int y = 0; y < Chunk.Size; y++)
             {
-                data[x, y, 1].Light = light;
+                
+                data[x, y, 1].OldLight= data[x,y,1].Light;
+                data[x, y, 1].Light= light;
             }
         }
+        public bool CheckLightUpdate()
+        {
+            for (int x = 0; x < Chunk.Size; x++)
+            for (int y = 0; y < Chunk.Size; y++)
+            {
 
+                if (data[x, y, 1].OldLight != data[x, y, 1].Light)
+                {
+                    update_tilemap = true;
+                    return true;
+                }
+            }
+            return false;
+        }
         public HashSet<string> GetAllEntitys()
         {
             HashSet<string> result = new HashSet<string>();

@@ -146,7 +146,7 @@ public class PlayerEvents
         if (e.Player == null) return false;
         var handitem = e.Player.Inventory.GetHandItemStack();
         e.Inventory.update = true;
-        var targetitem = e.GetIndexItem();
+            var targetitem = e.GetIndexItem();
         if (targetitem != null && handitem != null && targetitem.Id == handitem.Id)
         {
             //目标有物品，且id相同，且有空间

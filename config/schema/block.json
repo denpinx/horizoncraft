@@ -11,6 +11,10 @@
       "rigidity": {
         "type": "number",
         "description": "方块硬度"
+      },      
+      "break-level": {
+        "type": "number",
+        "description": "方块破坏等级"
       },
       "collide": {
         "type": "boolean",

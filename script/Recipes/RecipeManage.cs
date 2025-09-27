@@ -148,7 +148,7 @@ public class RecipeManage
 
         
         ItemStack[,] cost = new ItemStack[max, maxy];
-        string[,] strs = new string[max, max];
+        string[,] strs = new string[max, maxy];
         for (int x = 0; x < max; x++)
         {
             for (int y = 0; y < maxy; y++)

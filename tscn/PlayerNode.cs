@@ -374,6 +374,7 @@ public partial class PlayerNode : CharacterBody2D
             if (direction != Vector2.Zero)
             {
                 velocity.X = direction.X * playerData.MoveSpeed.Value;
+                if (direction.Y > 0) velocity.Y += direction.Y * playerData.MoveSpeed.Value;
                 AnyMove = true;
             }
             else

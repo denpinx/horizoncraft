@@ -36,6 +36,7 @@ z_index = 1
 [node name="TileMapLayer_shadow" type="TileMapLayer" parent="."]
 z_index = 2
 tile_set = SubResource("TileSet_bfswo")
+navigation_enabled = false
 
 [node name="DebugView" type="Node2D" parent="."]
 self_modulate = Color(1, 1, 1, 0.462745)

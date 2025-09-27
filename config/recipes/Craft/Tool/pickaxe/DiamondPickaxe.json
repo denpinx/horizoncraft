@@ -1,0 +1,22 @@
+{
+  "type": "craft",
+  "tag": "player",
+  "recipes": [
+    {
+      "template": [
+        "###",
+        "-!-",
+        "-!-"
+      ],
+      "mask-tag": {
+        "-": "air",
+        "!": "stick",
+        "#": "diamond"
+      },
+      "result": [
+        "diamond_pickaxe",
+        1
+      ]
+    }
+  ]
+}

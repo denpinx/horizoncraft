@@ -1,0 +1,21 @@
+{
+  "type": "craft",
+  "tag": "player",
+  "recipes": [
+    {
+      "template": [
+        "#",
+        "!",
+        "!"
+      ],
+      "mask-tag": {
+        "!": "stick",
+        "#": "diamond"
+      },
+      "result": [
+        "diamond_shovel",
+        1
+      ]
+    }
+  ]
+}
