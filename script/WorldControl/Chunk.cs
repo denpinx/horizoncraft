@@ -183,6 +183,7 @@ namespace horizoncraft.script.WorldControl
                         , (int)pos.Z);
                     if (cmp is ReactiveComponent)
                     {
+                        GD.Print("更新被动方块");
                         blockTickEvnet.BlockData = block;
                         blockTickEvnet.GlobalePos = globale;
                         blockTickEvnet.LocalPos = pos.ToVector3I();

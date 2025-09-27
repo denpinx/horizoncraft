@@ -32,6 +32,8 @@ public partial class InventoryNode : CanvasLayer
 
     public override void _Ready()
     {
+        SetLayer(10);
+        
         Timer timer = new Timer();
         timer.Autostart = true;
         timer.SetWaitTime(0.05);

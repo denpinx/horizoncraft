@@ -9,9 +9,11 @@ public partial class HotBar : CanvasLayer
     public PlayerNode PlayerNode;
     private List<Slot> slots = new List<Slot>();
     private Timer timer = new Timer();
+    private Control control;
 
     public override void _Ready()
     {
+        control = GetNode<Control>("Control");
         timer = GetNode<Timer>("Timer");
         for (int i = 0; i < 9; i++)
         {
@@ -25,6 +27,15 @@ public partial class HotBar : CanvasLayer
     {
         if (PlayerNode != null && PlayerNode.playerData != null)
         {
+            if (PlayerNode.ShowView != null)
+            {
+                if (control.Visible) control.Visible = false;
+            }
+            else
+            {
+                if (!control.Visible) control.Visible = true;
+            }
+
             for (int i = 0; i < 9; i++)
             {
                 ItemStack item = PlayerNode.playerData.Inventory.GetItem(i);

@@ -66,7 +66,7 @@ public partial class PlayerNode : CharacterBody2D
         if (!Inputable || playerData == null) return;
         if (playerData.FaceLeft) sprite2D_body.SetScale(new Vector2(1, 1));
         else sprite2D_body.SetScale(new Vector2(-1, 1));
-
+        
         Vector2I coord = new(
             (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)

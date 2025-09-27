@@ -1,18 +1,4 @@
 {
-  "wooden_storage_box": {
-    "rigidity": 0.5,
-    "components": {
-      "InventoryComponent": {
-        "Name": "BoxComponent",
-        "Max": 20,
-        "Size": 36,
-        "InventoryName": "StorageBoxInv"
-      }
-    },
-    "tags": {
-      "type": "axe"
-    }
-  },
   "workbench": {
     "rigidity": 0.5,
     "components": {

@@ -11,7 +11,7 @@
       "rigidity": {
         "type": "number",
         "description": "方块硬度"
-      },      
+      },
       "break-level": {
         "type": "number",
         "description": "方块破坏等级"
@@ -30,16 +30,25 @@
       },
       "tiletype": {
         "type": "string",
-        "enum": ["atlas","tile","terrain"],
+        "enum": [
+          "atlas",
+          "tile",
+          "terrain"
+        ],
         "description": "贴图类型:(tile:根据方块坐标获取贴图内的贴图,atlas:根据方块状态,横向获取方块贴图)"
       },
       "tags": {
         "type": "object",
         "description": "标签列表",
         "properties": {
-          "type":{
+          "type": {
             "type": "string",
-            "enum": ["axe","pickaxe","shovel","any"],
+            "enum": [
+              "axe",
+              "pickaxe",
+              "shovel",
+              "any"
+            ],
             "description": "应用工具类型"
           },
           "thesaurus": {
@@ -118,10 +127,11 @@
               "description": "texture是否为场景地址"
             }
           },
-          "required": ["texture"]
+          "required": [
+            "texture"
+          ]
         }
       },
-      
       "ore": {
         "type": "object",
         "properties": {
@@ -136,12 +146,14 @@
           "count": {
             "type": "integer",
             "description": "生成的最大数量"
+          },
+          "range": {
+            "type": "integer",
+            "description": "生成的最大范围"
           }
         },
         "description": "矿物生成配置,定义如何在世界中生成"
       },
-      
-      
       "mask": {
         "type": "object",
         "properties": {
@@ -162,7 +174,6 @@
         },
         "description": "定义容器的输入输出口"
       }
-      
     }
   },
   "minProperties": 1

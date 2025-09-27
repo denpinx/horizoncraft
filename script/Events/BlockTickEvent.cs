@@ -127,22 +127,24 @@ namespace horizoncraft.script.Events
             UpdateBlock(GlobalePos + Vector3I.Right);
         }
 
-        private void UpdateBlock(Vector3I globale)
+        /// <summary>
+        /// 更新方块
+        /// </summary>
+        /// <param name="position">全局坐标</param>
+        public void UpdateBlock(Vector3I position)
         {
-            var block = World.Service.ChunkService.GetBlock(globale);
-            if (block != null)
-            {
-                var chunkcoord = globale.MathFloor(Chunk.Size * 16);
-                var local2i = globale.Remainder(Chunk.Size);
-                var local = new Vector3(local2i.X, local2i.Y, globale.Z);
-                if (block.GetComponent<ReactiveComponent>() != null)
-                {
-                    if (World.Service.ChunkService.Chunks.TryGetValue(chunkcoord, out var chunk))
-                        chunk.ReactiveTickList.Add(local);
-                }
-            }
-        }
+            var block = World.Service.ChunkService.GetBlock(position);
+            if (block == null) return;
 
+            var chunkPos = position.MathFloor(Chunk.Size);
+            var localPos = position.Remainder(Chunk.Size);
+
+            var local = new Vector3(localPos.X, localPos.Y, position.Z);
+            if (!block.HasComponent<ReactiveComponent>()) return;
+            
+            if (World.Service.ChunkService.Chunks.TryGetValue(chunkPos, out var chunk))
+                chunk.ReactiveTickList.Add(local);
+        }
 
         public void Reset()
         {

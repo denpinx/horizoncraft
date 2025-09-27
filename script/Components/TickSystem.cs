@@ -16,7 +16,9 @@ namespace horizoncraft.script.Components
     {
         public bool ExecuteBlockComponent(WorldEvent worldEvent, Component component)
         {
-            if (component is TickComponent tc)
+            if (component is InventoryComponent ic)
+                ProcessTick(worldEvent as BlockTickEvent, ic);
+            else if (component is TickComponent tc)
             {
                 if (tc.Current == tc.Max)
                 {
@@ -28,14 +30,12 @@ namespace horizoncraft.script.Components
                     tc.Current++;
                 }
             }
-
-            if (component is InventoryComponent ic)
-                ProcessTick(worldEvent as BlockTickEvent, ic);
-            if (component is ReactiveComponent rc)
+            else if (component is ReactiveComponent rc)
             {
                 GD.Print("ReactiveComponent");
                 ReactiveTick(worldEvent as BlockTickEvent, rc);
             }
+
             return true;
         }
 

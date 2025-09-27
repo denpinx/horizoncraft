@@ -19,7 +19,8 @@ namespace horizoncraft.script.WorldControl
 
         /// <summary>方块光照值</summary>
         public int Light;
-        [MemoryPackIgnore]public int OldLight;
+
+        [MemoryPackIgnore] public int OldLight;
 
         [MemoryPackIgnore] private BlockMeta _blockMeta;
 
@@ -38,6 +39,11 @@ namespace horizoncraft.script.WorldControl
         {
             var result = Components.Find(cmp => cmp is T);
             return result as T;
+        }
+
+        public bool HasComponent<T>() where T : Component
+        {
+            return Components.Find(cmp => cmp is T) != null;
         }
 
         public T GetComponent<T>(string name) where T : Component

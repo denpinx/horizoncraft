@@ -120,7 +120,6 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 tooltip_text = "当前燃料"
-value = 74.0
 fill_mode = 3
 nine_patch_stretch = true
 texture_under = SubResource("AtlasTexture_tjfg0")

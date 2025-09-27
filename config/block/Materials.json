@@ -22,7 +22,7 @@
   "input_block": {
     "rigidity": 0.5,
     "components": {
-      "ReactiveComponent": {
+      "TickComponent": {
         "Name": "LogisticsInputComponent"
       }
     },

@@ -1,0 +1,31 @@
+{
+  "wooden_storage_box": {
+    "rigidity": 0.5,
+    "components": {
+      "InventoryComponent": {
+        "Name": "BoxComponent",
+        "Max": 20,
+        "Size": 36,
+        "InventoryName": "WoodStorageBoxInventory"
+      }
+    },
+    "tags": {
+      "type": "axe"
+    }
+  },
+  "iron_storage_box": {
+    "rigidity": 2,
+    "break-level": 2,
+    "components": {
+      "InventoryComponent": {
+        "Name": "BoxComponent",
+        "Max": 20,
+        "Size": 72,
+        "InventoryName": "IronStorageBoxInventory"
+      }
+    },
+    "tags": {
+      "type": "pickaxe"
+    }
+  }
+}

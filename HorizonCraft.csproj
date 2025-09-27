@@ -39,6 +39,7 @@
     <Content Include="config\block\functionBlock\InventoryBlock.json" />
     <Content Include="config\block\Materials.json" />
     <Content Include="config\block\oreblock\ores.json" />
+    <Content Include="config\block\Storage\storageBox.json" />
     <Content Include="config\block_tscn\furnace_0.tscn" />
     <Content Include="config\block_tscn\furnace_1.tscn" />
     <Content Include="config\block_tscn\furnace_1.tscn31451182426.tmp" />

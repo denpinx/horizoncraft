@@ -168,6 +168,9 @@ public static class ComponentManager
         Register("ItemEntityComponent", () => new ItemEntityComponent(), new ItemEntitySystem());
         Register("SolarGenerator", () => new EnergyUnitComponent(), new SolarGeneratorSystem());
         Register("EnergyCable", () => new EnergyUnitComponent(), new EnergyCableSystem());
+        
+        
+        
         Register("TestReactiveSystem", () => new ReactiveComponent(), new TestReactiveSystem());
     }
 }

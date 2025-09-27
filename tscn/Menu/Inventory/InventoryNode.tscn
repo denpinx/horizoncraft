@@ -30,7 +30,7 @@ mouse_filter = 1
 theme = ExtResource("4_25mba")
 
 [node name="GridContainer" type="GridContainer" parent="MarginContainer"]
-layout_mode = 2
+layout_mode = 0
 offset_right = 668.0
 offset_bottom = 288.0
 theme_override_constants/h_separation = 16

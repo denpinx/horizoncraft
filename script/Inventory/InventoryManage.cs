@@ -29,8 +29,12 @@ public class InventoryManage
         RegInv("PlayerInventory", GD.Load<PackedScene>("res://tscn/Menu/Inventory/craft_inventory.tscn").Instantiate());
         RegInv("CraftingTableInventory",
             GD.Load<PackedScene>("res://tscn/Menu/Inventory/CraftingTableInventory.tscn").Instantiate());
-        RegInv("StorageBoxInv",
+        RegInv("WoodStorageBoxInventory",
             GD.Load<PackedScene>("res://tscn/Menu/Inventory/StorageBoxInv.tscn").Instantiate<StorageBoxInv>());
+        RegInv("IronStorageBoxInventory",
+            GD.Load<PackedScene>("res://tscn/Menu/Inventory/IronStorageBoxInventory.tscn")
+                .Instantiate<IronStorageBoxInventory>());
+
         RegInv("FurnaceInv",
             GD.Load<PackedScene>("res://tscn/Menu/Inventory/FurnaceInv.tscn").Instantiate<FurnaceInv>());
     }

@@ -1,12 +1,12 @@
 {
   "type": "craft",
-  "tag": "playFer",
+  "tag": "player",
   "recipes": [
     {
       "template": [
         "#"
       ],
-      "mask": {
+      "mask-tag": {
         "#": "log"
       },
       "result": [

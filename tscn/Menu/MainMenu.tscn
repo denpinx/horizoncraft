@@ -21,9 +21,6 @@ script = ExtResource("2_lvpjg")
 metadata/_edit_horizontal_guides_ = [372.0]
 metadata/_edit_vertical_guides_ = [448.0, 704.0]
 
-[node name="CanvasLayer" parent="." index="0"]
-visible = true
-
 [node name="Player" parent="." index="1"]
 position = Vector2(0, 0)
 

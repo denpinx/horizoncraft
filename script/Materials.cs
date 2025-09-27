@@ -496,6 +496,7 @@ namespace horizoncraft.script
                     blockmeta.OreConfig = new OreConfig() { Name = blockmeta.Name };
                     var dict_ore = (Dictionary<string, object>)config["ore"];
                     if (dict_ore.ContainsKey("size")) blockmeta.OreConfig.Size = (int)dict_ore["size"];
+                    if (dict_ore.ContainsKey("range")) blockmeta.OreConfig.Range = (int)dict_ore["range"];
                     if (dict_ore.ContainsKey("count")) blockmeta.OreConfig.Count = (int)dict_ore["count"];
                     if (dict_ore.ContainsKey("deep")) blockmeta.OreConfig.Deep = (int)dict_ore["deep"];
                 }

@@ -14,7 +14,11 @@ public class OreConfig
     /// </summary>
     public int Count = 1;
     /// <summary>
-    /// 生成最大范围
+    /// 生成最大数量
     /// </summary>
     public int Size = 1;
+    /// <summary>
+    /// 生成最大范围
+    /// </summary>
+    public int Range = 1;
 }

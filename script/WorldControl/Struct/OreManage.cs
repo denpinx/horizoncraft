@@ -45,10 +45,11 @@ public static class OreManage
                 var offsetpos = new Vector2I(rand.Next(Chunk.Size), rand.Next(Chunk.Size));
                 var pos = offsetpos + Gpos;
                 if (blocks.HasBlock(pos.X, pos.Y, 1)) continue;
-                for (int j = 0; j < config.Size; j++)
+                int trycount = rand.Next(1, config.Size);
+                for (int j = 0; j < trycount; j++)
                 {
-                    var rand_offset_pos = new Vector2I(rand.Next(-config.Size + 1, config.Size),
-                        rand.Next(-config.Size + 1, config.Size));
+                    var rand_offset_pos = new Vector2I(rand.Next(-config.Range + 1, config.Range),
+                        rand.Next(-config.Range + 1, config.Range));
                     var final_pos = pos + rand_offset_pos;
                     blocks.AddBlock(final_pos.X, final_pos.Y, 1, Materials.Valueof(config.Name));
                 }
