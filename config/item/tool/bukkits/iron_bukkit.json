@@ -1,0 +1,8 @@
+{
+  "iron_bukkit": {
+    "max": 16
+  },
+  "iron_bukkit_water": {
+    "max": 4
+  }
+}

@@ -1,68 +1,91 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using horizoncraft.script.Components.EnergyBlocks;
-using horizoncraft.script.Components.Item;
+using Godot;
 using Dict = System.Collections.Generic.Dictionary<string, object>;
+using Expression = System.Linq.Expressions.Expression;
 
 namespace horizoncraft.script.Components
 {
     public class LambdaCreater
     {
-        public static readonly Dictionary<string, Func<Dict, Component>> _factories = new();
-
-        static LambdaCreater()
+        public static Func<Component> CreateLambda(string typename, Dict cfg)
         {
-            Register<TickComponent>();
-            Register<ItemComponent>();
-            Register<ExpandComponent>();
-            Register<FluidComponent>();
-            Register<PhysicsComponent>();
-            Register<InventoryComponent>();
-            Register<FurnaceComponent>();
-            Register<ItemDurableComponent>();
-            Register<EnergyUnitComponent>();
-            Register<ReactiveComponent>();
-        }
-
-        public static void Register<T>() where T : Component, new()
-        {
-            _factories[typeof(T).Name] = cfg =>
+            string Typenamespace = "horizoncraft.script.Components";
+            Type type = null;
+            List<Type> types = FindTypesInNamespaceGlobally(typename, Typenamespace);
+            if (types.Count > 0) type = types.First();
+            if (type == null)
             {
-                var newExpr = Expression.New(typeof(T));
-                var bindings = new List<MemberBinding>();
+                GD.PrintErr($"{Typenamespace + "." + typename} 不存在!");
+                return null;
+            }
 
-                foreach (var kv in cfg)
+            var newExpr = Expression.New(type);
+            var bindings = new List<MemberBinding>();
+            foreach (var kv in cfg)
+            {
+                var key = kv.Key.ToString();
+                var value = kv.Value;
+
+                var member = (MemberInfo)type.GetField(key) ?? type.GetProperty(key);
+                if (member == null) continue;
+
+                var targetType = member switch
                 {
-                    var key = kv.Key.ToString();
-                    var value = kv.Value;
+                    FieldInfo f => f.FieldType,
+                    PropertyInfo p => p.PropertyType,
+                    _ => null
+                };
+                if (targetType == null) continue;
 
-                    var member = (MemberInfo)typeof(T).GetField(key) ?? typeof(T).GetProperty(key);
-                    if (member == null) continue;
-
-                    var targetType = member switch
-                    {
-                        FieldInfo f => f.FieldType,
-                        PropertyInfo p => p.PropertyType,
-                        _ => null
-                    };
-                    if (targetType == null) continue;
-                    bindings.Add(Expression.Bind(member, Expression.Constant(value, targetType)));
+                //防止输入类型和实际类型不符
+                object ResultValue = value;
+                if (value.GetType() != targetType)
+                {
+                    ResultValue = Convert.ChangeType(value, targetType);
                 }
 
-                var body = Expression.MemberInit(newExpr, bindings);
-                var lambda = Expression.Lambda<Func<Dict, Component>>(body, Expression.Parameter(typeof(Dict), "cfg"));
-                return lambda.Compile()(cfg);
-            };
+                bindings.Add(Expression.Bind(member, Expression.Constant(ResultValue, targetType)));
+            }
+
+            var body = Expression.MemberInit(newExpr, bindings);
+            var lambda = Expression.Lambda<Func<Component>>(body);
+            //GD.Print(lambda.ToString());
+            return lambda.Compile();
         }
 
-        public static Func<Component> CreateLambda(string typeName, Dict cfg)
+        public static List<Type> FindTypesInNamespaceGlobally(
+            string typeName,
+            string namespacePrefix)
         {
-            if (!_factories.TryGetValue(typeName, out var factory))
-                throw new ArgumentException($"未注册的组件类型: {typeName}");
+            var results = new List<Type>();
+            string prefix = namespacePrefix.EndsWith(".") ? namespacePrefix : namespacePrefix + ".";
 
-            return () => factory(cfg);
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
+                {
+                    var types = assembly.GetTypes()
+                        .Where(t => t.Name == typeName &&
+                                    t.Namespace != null &&
+                                    (t.Namespace == namespacePrefix || t.Namespace.StartsWith(prefix)));
+                    results.AddRange(types);
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    var types = ex.Types
+                        .Where(t => t != null &&
+                                    t.Name == typeName &&
+                                    t.Namespace != null &&
+                                    (t.Namespace == namespacePrefix || t.Namespace.StartsWith(prefix)));
+                    results.AddRange(types);
+                }
+            }
+
+            return results;
         }
     }
 }

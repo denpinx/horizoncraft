@@ -15,11 +15,13 @@ public class HostWorldService : WorldServiceBase
 {
     public static int Port = 9999;
     public static int MaxPlayer = 10;
-
+    
     public HostWorldService(World world) : base(world)
     {
         world.Multiplayer.PeerDisconnected += OnPlayerExit;
         var enet = new ENetMultiplayerPeer();
+        enet.CreateServer(Port, MaxPlayer);
+        world.Multiplayer.MultiplayerPeer = enet;
         enet.CreateServer(Port, MaxPlayer);
         world.Multiplayer.MultiplayerPeer = enet;
     }

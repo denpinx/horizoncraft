@@ -19,11 +19,14 @@ public class LootTable
     /// </summary>
     /// <param name="luck">幸运值，影响掉落几率，默认为1</param>
     /// <returns>获取的战利品</returns>
-    public List<ItemStack> TryTakeItem(float luck = 1f)
+    public List<ItemStack> TryTakeItem(int state,float luck = 1f)
     {
         var loots = new List<ItemStack>();
         foreach (LootItem item in LootItems)
         {
+            if (item.DropState != -1)
+                if(item.DropState != state)continue;
+            
             var chance = System.Random.Shared.NextSingle();
             if (item.DropChance * luck >= chance)
             {

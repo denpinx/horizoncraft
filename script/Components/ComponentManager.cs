@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using horizoncraft.script.Components.BlockComponents;
 using horizoncraft.script.Components.EnergyBlocks;
 using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Item;
@@ -168,9 +169,9 @@ public static class ComponentManager
         Register("ItemEntityComponent", () => new ItemEntityComponent(), new ItemEntitySystem());
         Register("SolarGenerator", () => new EnergyUnitComponent(), new SolarGeneratorSystem());
         Register("EnergyCable", () => new EnergyUnitComponent(), new EnergyCableSystem());
-        
-        
-        
+        Register("CropGrowComponent", () => new CropGrowComponent(), new CropGrowthSystem());
+
+
         Register("TestReactiveSystem", () => new ReactiveComponent(), new TestReactiveSystem());
     }
 }

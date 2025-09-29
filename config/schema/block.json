@@ -71,6 +71,10 @@
               "type": "number",
               "description": "掉落概率 [0.0-1.0]"
             },
+            "drop-state": {
+              "type": "number",
+              "description": "指定方块状态破坏才会掉落"
+            },
             "amount-chance": {
               "type": "array",
               "description": "物品掉落数量叠加",

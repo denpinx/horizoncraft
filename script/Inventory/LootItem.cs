@@ -12,7 +12,7 @@ public class LootItem
 
     ///定义掉落数量的概率
     public List<AmountChance> AmountChances = new();
-
+    public int DropState = -1;
     ///定义改物品掉落的概率 [0,1f]
     public float DropChance;
 }
@@ -22,6 +22,7 @@ public class LootItemSnapshot
 {
     public string Name;
     public float DropChance = 1;
+    public int DropState = -1;
     public List<AmountChance> AmountChances = new();
 }
 

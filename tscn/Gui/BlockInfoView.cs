@@ -37,7 +37,7 @@ public partial class BlockInfoView : Control
         }
 
         Visible = true;
-        _label.Text = block.BlockMeta.Name +":"+block.Components.Count;
+        _label.Text = block.BlockMeta.Name +" 组件数:"+block.Components.Count+",状态:"+block.State;
         _textureRect.Texture = block.BlockMeta.ItemMeta.GetTexture();
         int used = 0;
         foreach (var cmp in block.Components)

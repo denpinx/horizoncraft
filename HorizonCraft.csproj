@@ -36,6 +36,7 @@
     <Content Include="config\block\EraofEnergy\cables.json" />
     <Content Include="config\block\EraofEnergy\energystore.json" />
     <Content Include="config\block\EraofEnergy\generator.json" />
+    <Content Include="config\block\crop\carrot.json" />
     <Content Include="config\block\functionBlock\InventoryBlock.json" />
     <Content Include="config\block\Materials.json" />
     <Content Include="config\block\oreblock\ores.json" />
@@ -48,6 +49,7 @@
     <Content Include="config\item\Ingots.json" />
     <Content Include="config\item\Materials.json" />
     <Content Include="config\item\ores\ores.json" />
+    <Content Include="config\item\tool\bukkits\iron_bukkit.json" />
     <Content Include="config\item\tool\shovels.json" />
     <Content Include="config\item\tool\Tools.json" />
     <Content Include="config\item\wood\logs.json" />

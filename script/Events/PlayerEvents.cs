@@ -146,7 +146,7 @@ public class PlayerEvents
         if (e.Player == null) return false;
         var handitem = e.Player.Inventory.GetHandItemStack();
         e.Inventory.update = true;
-            var targetitem = e.GetIndexItem();
+        var targetitem = e.GetIndexItem();
         if (targetitem != null && handitem != null && targetitem.Id == handitem.Id)
         {
             //目标有物品，且id相同，且有空间
@@ -231,6 +231,7 @@ public class PlayerEvents
         {
             e.Player.Inventory.ReduceItemAmount(e.Player.Inventory.ToolBarIndex);
         }
+
         return true;
     }
 
@@ -256,25 +257,22 @@ public class PlayerEvents
                 if (handItem != null && handItem.Components.Count > 0)
                     ComponentManager.ExecuteItemComponents(e, handItem);
                 //没有物品组件则默认掉落方块的直接物品
-                else e.DropLoots.Add(item);
-
-                foreach (var dropitem in e.DropLoots)
-                {
-                    //直接给予物品
-                    //e.Player.Inventory.TryAddItem(dropitem);
-                    //生成掉落物实体
-                    var data = dropitem.GetEntityData(new Vector2I(e.Position.X * 16, e.Position.Y * 16));
-                    e.world.Service.EntityService.AddEntityData(data);
-                }
+                else
+                    e.DropLoots = e.GetBlockData().BlockMeta.LootTable.TryTakeItem(e.GetBlockData().State);
             }
-            else
+
+            foreach (var dropitem in e.DropLoots)
             {
-                GD.PrintErr($"[物品不存在]:{targetblock?.BlockMeta?.Name}");
+                //直接给予物品
+                //e.Player.Inventory.TryAddItem(dropitem);
+                //生成掉落物实体
+                var data = dropitem.GetEntityData(new Vector2I(e.Position.X * 16, e.Position.Y * 16));
+                e.world.Service.EntityService.AddEntityData(data);
             }
         }
 
         e.ChunkService.SetBlock(e.Position, Materials.Valueof("air"));
-        e.Player.Inventory.update=true;
+        e.Player.Inventory.update = true;
         return true;
     }
 

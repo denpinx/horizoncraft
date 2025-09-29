@@ -10,6 +10,7 @@ using horizoncraft.script.resource;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Struct;
 using YamlDotNet;
+
 namespace horizoncraft.script
 {
     /// <summary>
@@ -38,11 +39,11 @@ namespace horizoncraft.script
         public static ItemMeta RegItemMeta(ItemMeta meta)
         {
             meta.Id = ItemMetas.Count;
-            
-            if(!meta.Tags.ContainsKey("thesaurus"))
-                meta.Tags.Add("thesaurus",meta.Name);
-            
-            
+
+            if (!meta.Tags.ContainsKey("thesaurus"))
+                meta.Tags.Add("thesaurus", meta.Name);
+
+
             if (Dictionary_ItemMetas.ContainsKey(meta.Name))
             {
                 //覆盖更新
@@ -73,19 +74,20 @@ namespace horizoncraft.script
             {
                 OreManage.Registry(meta.OreConfig);
             }
-            
+
             if (meta.Name != "air")
             {
                 if (meta.IsLiquid)
                 {
                     ItemMeta itemMeta = new ItemMeta()
                     {
-                        Name = meta.Name+"_liquid",
+                        Name = meta.Name + "_liquid",
                         MaxAmount = 1000
                     };
-                    
+
                     //TODO 待完成，还没想好用什么方案
                 }
+
                 if (!Dictionary_ItemMetas.ContainsKey(meta.Name))
                 {
                     //添加
@@ -95,7 +97,7 @@ namespace horizoncraft.script
                         HasBlock = true
                     };
                     itemMeta.Itemset.TextureNames.Add(meta.Name);
-                    itemMeta.Tags.Add("thesaurus",meta.Tags["thesaurus"]);
+                    itemMeta.Tags.Add("thesaurus", meta.Tags["thesaurus"]);
                     RegItemMeta(itemMeta);
                     itemMeta.BlockMeta = meta;
                     meta.ItemMeta = itemMeta;
@@ -124,7 +126,6 @@ namespace horizoncraft.script
 
         static Materials()
         {
-            _ = LambdaCreater._factories;
             RegBlockMeta(
                 new BlockMeta()
                 {
@@ -168,6 +169,7 @@ namespace horizoncraft.script
                         loot_item.Item = itemmeta.GetItemStack();
                     loot_item.DropChance = ls.DropChance;
                     loot_item.AmountChances = ls.AmountChances;
+                    loot_item.DropState = ls.DropState;
                     meta.LootTable.LootItems.Add(loot_item);
                     GD.Print($"[后处理] 添加战利品 {loot_item.Item.GetItemMeta().Name},战利品数{loot_item.AmountChances.Count}");
                 }
@@ -369,8 +371,8 @@ namespace horizoncraft.script
 
             foreach (string item_name in dict.Keys)
             {
-                if(item_name=="$schema")continue;
-                
+                if (item_name == "$schema") continue;
+
                 ItemMeta itemMeta = new ItemMeta()
                 {
                     Name = item_name,
@@ -385,6 +387,7 @@ namespace horizoncraft.script
                         itemMeta.Components.Add(LambdaCreater.CreateLambda(cmp_name, cmp_dict));
                     }
                 }
+
                 if (item_dict.ContainsKey("tags"))
                 {
                     var dict_attr = (Dictionary<string, object>)item_dict["tags"];
@@ -396,6 +399,7 @@ namespace horizoncraft.script
                 {
                     itemMeta.MaxAmount = (int)item_dict["max"];
                 }
+
                 if (item_dict.ContainsKey("state"))
                 {
                     var itemset = new ItemStateSet();
@@ -447,14 +451,15 @@ namespace horizoncraft.script
             var dict = JsonCleaner.FromJson(jsonText);
             foreach (string item_name in dict.Keys)
             {
-                if(item_name=="$schema")continue;
-                
+                if (item_name == "$schema") continue;
+
                 Dictionary<string, object> config = (Dictionary<string, object>)dict[item_name];
                 List<Func<Component>> components = new();
                 if (config.ContainsKey("components"))
                 {
                     foreach (string cmp_name in ((Dictionary<string, object>)config["components"]).Keys)
                     {
+                        GD.Print("组件:"+cmp_name);
                         Dictionary<string, object> cmp_dict =
                             (Dictionary<string, object>)((Dictionary<string, object>)config["components"])[cmp_name];
                         components.Add(LambdaCreater.CreateLambda(cmp_name, cmp_dict));
@@ -471,11 +476,12 @@ namespace horizoncraft.script
                 {
                     blockmeta.Examples.Add(cmp());
                 }
-                
+
                 if (config.TryGetValue("liquid", out var value))
                 {
                     blockmeta.IsLiquid = (bool)value;
                 }
+
                 if (config.TryGetValue("break-level", out var vbl))
                 {
                     blockmeta.BreakLevel = (int)vbl;
@@ -516,7 +522,7 @@ namespace horizoncraft.script
 
                 if (!blockmeta.Tags.ContainsKey("thesaurus"))
                 {
-                    blockmeta.Tags.Add("thesaurus",blockmeta.Name);
+                    blockmeta.Tags.Add("thesaurus", blockmeta.Name);
                 }
 
                 if (config.ContainsKey("loot"))
@@ -526,6 +532,9 @@ namespace horizoncraft.script
                     {
                         var loot_dict = (Dictionary<string, object>)v;
                         var item = new LootItemSnapshot();
+
+                        if (loot_dict.TryGetValue("drop-state", out var value1))
+                            item.DropState = (int)value1;
 
                         if (loot_dict.ContainsKey("name")) item.Name = (string)loot_dict["name"];
                         else item.Name = blockmeta.Name;

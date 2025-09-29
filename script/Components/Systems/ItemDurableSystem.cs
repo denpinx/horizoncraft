@@ -15,7 +15,7 @@ public class ItemDurableSystem : ItemComponentSystem
         if (bbe.GetBlockData().BlockMeta.BreakLevel <= durable.ToolLevel)
         {
             //正常掉落
-            bbe.DropLoots = bbe.GetBlockData().BlockMeta.LootTable.TryTakeItem();
+            bbe.DropLoots = bbe.GetBlockData().BlockMeta.LootTable.TryTakeItem(bbe.GetBlockData().State);
             //bbe.DropItem = bbe.GetBlockData().BlockMeta.ItemMeta.GetItemStack();
         }
         else

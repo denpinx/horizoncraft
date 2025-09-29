@@ -104,8 +104,8 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
         {
             _itemTexture_.Visible = true;
             _itemTexture_.Texture = selfcmp.ItemStack.GetItemMeta().GetTexture();
-            //_itemLabel_.Text = $"*{selfcmp.ItemStack.Amount}";
-            _itemLabel_.Text = $"所属{Entity.Owned},更新状态{Entity.Update}";
+            _itemLabel_.Text = $"*{selfcmp.ItemStack.Amount}";
+            //_itemLabel_.Text = $"所属{Entity.Owned},更新状态{Entity.Update}";
         }
         else
         {

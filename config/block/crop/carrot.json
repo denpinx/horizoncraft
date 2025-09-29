@@ -1,0 +1,52 @@
+{
+  "carrot": {
+    "rigidity": 0.5,
+    "collide": false,
+    "cube": false,
+    "tiletype": "atlas",
+    "components": {
+      "CropGrowComponent": {
+        "Name": "CropGrowComponent",
+        "Max": 20,
+        "Water": false,
+        "GroupChance": 0.5,
+        "StateMax": 8,
+        "GrowthMax": 16
+      }
+    },
+    "loot": [
+      {
+        "drop-chance": 1,
+        "name": "carrot",
+        "amount-chance": [
+          {
+            "amount": 1,
+            "chance": 1
+          }
+        ]
+      },
+      {
+        "drop-chance": 7,
+        "name": "carrot",
+        "amount-chance": [
+          {
+            "amount": 2,
+            "chance": 1
+          },
+          {
+            "amount": 2,
+            "chance": 0.5
+          },
+          {
+            "amount": 2,
+            "chance": 0.5
+          },
+          {
+            "amount": 1,
+            "chance": 0.2
+          }
+        ]
+      }
+    ]
+  }
+}
