@@ -38,6 +38,7 @@
     <Content Include="config\block\EraofEnergy\generator.json" />
     <Content Include="config\block\crop\carrot.json" />
     <Content Include="config\block\functionBlock\InventoryBlock.json" />
+    <Content Include="config\block\logs\logs.json" />
     <Content Include="config\block\Materials.json" />
     <Content Include="config\block\oreblock\ores.json" />
     <Content Include="config\block\Storage\storageBox.json" />

@@ -521,7 +521,7 @@ public partial class PlayerNode : CharacterBody2D
         collisionShape2D = GetNode<CollisionShape2D>("CollisionShape2D");
         OvrCanvasLayer = GetNode<CanvasLayer>("OvrCanvasLayer");
         Label_PlayerName = GetNode<Label>("Label_PlayerName");
-        hotBar = GetNode<HotBar>("CanvasLayer/HotBar");
+        hotBar = GetNode<HotBar>("GuidCanvasLayer/HotBar");
         sprite2D_body = GetNode<Sprite2D>("Body");
         Timer_Tick = GetNode<Timer>("Timer_Tick");
         camera2d = GetNode<Camera2D>("Camera2D");

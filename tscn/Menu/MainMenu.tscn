@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://b387xrf6eof4w"]
+[gd_scene load_steps=15 format=3 uid="uid://b387xrf6eof4w"]
 
 [ext_resource type="PackedScene" uid="uid://bem5bibh4ch2d" path="res://tscn/world.tscn" id="1_n4w62"]
 [ext_resource type="Script" uid="uid://er56e2mbajku" path="res://tscn/Menu/MainMenu.cs" id="2_lvpjg"]
@@ -15,6 +15,34 @@ region = Rect2(0, 64, 128, 32)
 [sub_resource type="AtlasTexture" id="AtlasTexture_yxxv2"]
 atlas = ExtResource("3_t0cg7")
 region = Rect2(0, 32, 128, 32)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_t0cg7"]
+load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i1sr3"]
+atlas = SubResource("CompressedTexture2D_t0cg7")
+region = Rect2(16, 48, 16, 16)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_xg1av"]
+load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nvwmy"]
+atlas = SubResource("CompressedTexture2D_xg1av")
+region = Rect2(64, 32, 16, 16)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_8lkrk"]
+load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4my72"]
+atlas = SubResource("CompressedTexture2D_8lkrk")
+region = Rect2(0, 32, 16, 16)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_wwbxd"]
+load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xg1av"]
+atlas = SubResource("CompressedTexture2D_wwbxd")
+region = Rect2(0, 48, 16, 16)
 
 [node name="World" instance=ExtResource("1_n4w62")]
 script = ExtResource("2_lvpjg")
@@ -52,16 +80,17 @@ grow_vertical = 2
 [node name="HBoxContainer" type="HBoxContainer" parent="GuiCanvasLayer/VBoxContainer" index="0"]
 layout_mode = 2
 
-[node name="Button_Single" type="TextureButton" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer" index="0" node_paths=PackedStringArray("shortcut_context")]
+[node name="Button_Single1" type="TextureButton" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer" index="0" node_paths=PackedStringArray("shortcut_context")]
+visible = false
 layout_mode = 2
-focus_neighbor_bottom = NodePath("../../HBoxContainer2/Button_Exit")
-focus_next = NodePath("../../HBoxContainer2/Button_Exit")
-shortcut_context = NodePath("../../HBoxContainer2/Button_Exit")
+focus_neighbor_bottom = NodePath("../../HBoxContainer2/Button_Exit1")
+focus_next = NodePath("../../HBoxContainer2/Button_Exit1")
+shortcut_context = NodePath("../../HBoxContainer2/Button_Exit1")
 texture_normal = SubResource("AtlasTexture_wwbxd")
 texture_pressed = SubResource("AtlasTexture_8lkrk")
 texture_hover = SubResource("AtlasTexture_yxxv2")
 
-[node name="Label" type="Label" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Single" index="0"]
+[node name="Label" type="Label" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Single1" index="0"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -74,18 +103,19 @@ horizontal_alignment = 1
 vertical_alignment = 1
 metadata/_edit_lock_ = true
 
-[node name="Button_Connect" type="TextureButton" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer" index="1" node_paths=PackedStringArray("shortcut_context")]
+[node name="Button_Connect1" type="TextureButton" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer" index="1" node_paths=PackedStringArray("shortcut_context")]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-focus_neighbor_bottom = NodePath("../Button_Single")
-focus_next = NodePath("../Button_Single")
-shortcut_context = NodePath("../Button_Single")
+focus_neighbor_bottom = NodePath("../Button_Single1")
+focus_next = NodePath("../Button_Single1")
+shortcut_context = NodePath("../Button_Single1")
 texture_normal = SubResource("AtlasTexture_wwbxd")
 texture_pressed = SubResource("AtlasTexture_8lkrk")
 texture_hover = SubResource("AtlasTexture_yxxv2")
 
-[node name="Label" type="Label" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Connect" index="0"]
+[node name="Label" type="Label" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Connect1" index="0"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -98,21 +128,35 @@ horizontal_alignment = 1
 vertical_alignment = 1
 metadata/_edit_lock_ = true
 
+[node name="Button_Single" type="Button" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer" index="2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "单人游戏"
+icon = SubResource("AtlasTexture_i1sr3")
+
+[node name="Button_Connect" type="Button" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer" index="3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "加入游戏"
+icon = SubResource("AtlasTexture_nvwmy")
+icon_alignment = 2
+
 [node name="HBoxContainer2" type="HBoxContainer" parent="GuiCanvasLayer/VBoxContainer" index="1"]
 layout_mode = 2
 
-[node name="Button_Setting" type="TextureButton" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer2" index="0" node_paths=PackedStringArray("shortcut_context")]
+[node name="Button_Setting2" type="TextureButton" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer2" index="0" node_paths=PackedStringArray("shortcut_context")]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-focus_neighbor_bottom = NodePath("../../HBoxContainer/Button_Single")
-focus_next = NodePath("../../HBoxContainer/Button_Single")
-shortcut_context = NodePath("../../HBoxContainer/Button_Single")
+focus_neighbor_bottom = NodePath("../../HBoxContainer/Button_Single1")
+focus_next = NodePath("../../HBoxContainer/Button_Single1")
+shortcut_context = NodePath("../../HBoxContainer/Button_Single1")
 texture_normal = SubResource("AtlasTexture_wwbxd")
 texture_pressed = SubResource("AtlasTexture_8lkrk")
 texture_hover = SubResource("AtlasTexture_yxxv2")
 
-[node name="Label" type="Label" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer2/Button_Setting" index="0"]
+[node name="Label" type="Label" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer2/Button_Setting2" index="0"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -125,18 +169,19 @@ horizontal_alignment = 1
 vertical_alignment = 1
 metadata/_edit_lock_ = true
 
-[node name="Button_Exit" type="TextureButton" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer2" index="1" node_paths=PackedStringArray("shortcut_context")]
+[node name="Button_Exit1" type="TextureButton" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer2" index="1" node_paths=PackedStringArray("shortcut_context")]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-focus_neighbor_bottom = NodePath("../../HBoxContainer/Button_Connect")
-focus_next = NodePath("../../HBoxContainer/Button_Connect")
-shortcut_context = NodePath("../../HBoxContainer/Button_Connect")
+focus_neighbor_bottom = NodePath("../../HBoxContainer/Button_Connect1")
+focus_next = NodePath("../../HBoxContainer/Button_Connect1")
+shortcut_context = NodePath("../../HBoxContainer/Button_Connect1")
 texture_normal = SubResource("AtlasTexture_wwbxd")
 texture_pressed = SubResource("AtlasTexture_8lkrk")
 texture_hover = SubResource("AtlasTexture_yxxv2")
 
-[node name="Label" type="Label" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer2/Button_Exit" index="0"]
+[node name="Label" type="Label" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer2/Button_Exit1" index="0"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -148,6 +193,19 @@ text = "退出游戏"
 horizontal_alignment = 1
 vertical_alignment = 1
 metadata/_edit_lock_ = true
+
+[node name="Button_Setting" type="Button" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer2" index="2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "游戏设置"
+icon = SubResource("AtlasTexture_4my72")
+
+[node name="Button_Exit" type="Button" parent="GuiCanvasLayer/VBoxContainer/HBoxContainer2" index="3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "退出游戏"
+icon = SubResource("AtlasTexture_xg1av")
+icon_alignment = 2
 
 [node name="TopCanvasLayer" type="CanvasLayer" parent="." index="6"]
 layer = 11

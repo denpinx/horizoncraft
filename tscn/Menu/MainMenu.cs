@@ -11,7 +11,7 @@ namespace HorizonCraft.tscn.Menu;
 public partial class MainMenu : horizoncraft.script.World
 {
     private CanvasLayer TopCanvasLayer, GuiCanvasLayer;
-    private TextureButton ButtonSingle, buttonExit, ButtonConnect;
+    private Button ButtonSingle, buttonExit, ButtonConnect;
     private TextEdit TextEdit;
 
     private PackedScene WorldProfilesScene;
@@ -36,9 +36,9 @@ public partial class MainMenu : horizoncraft.script.World
         base._Ready();
         PlayerNode.hotBar.Visible = false;
 
-        ButtonSingle = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Single");
-        buttonExit = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/HBoxContainer2/Button_Exit");
-        ButtonConnect = GetNode<TextureButton>("GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Connect");
+        ButtonSingle = GetNode<Button>("GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Single");
+        buttonExit = GetNode<Button>("GuiCanvasLayer/VBoxContainer/HBoxContainer2/Button_Exit");
+        ButtonConnect = GetNode<Button>("GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Connect");
         TextEdit = GetNode<TextEdit>("GuiCanvasLayer/TextEdit");
 
         var worldScene = GD.Load<PackedScene>("res://tscn/world.tscn");
@@ -50,7 +50,10 @@ public partial class MainMenu : horizoncraft.script.World
                 TopCanvasLayer.AddChild(WorldProfilesScene.Instantiate());
             }
         };
-        buttonExit.Pressed += () => { QueueFree(); };
+        buttonExit.Pressed += () =>
+        {
+            GetTree().Quit();
+        };
         ButtonConnect.Pressed += () =>
         {
             worldMode = WorldMode.MultiplayerClient;

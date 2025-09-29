@@ -1,10 +1,4 @@
 {
-  "oak_log": {
-    "tags": {
-      "fuel": "160",
-      "thesaurus": "log"
-    }
-  },
   "oak_plank": {
     "tags": {
       "fuel": "160",

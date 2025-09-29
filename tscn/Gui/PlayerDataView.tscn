@@ -1,0 +1,146 @@
+[gd_scene load_steps=17 format=3 uid="uid://nthrohnlpkux"]
+
+[ext_resource type="Script" uid="uid://qcrt4g08ahc3" path="res://tscn/Gui/PlayerDataView.cs" id="1_7ag6m"]
+[ext_resource type="Texture2D" uid="uid://c3qeypa70wjub" path="res://texture/Gui/icos.png" id="1_hj48k"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hj48k"]
+atlas = ExtResource("1_hj48k")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ag6m"]
+atlas = ExtResource("1_hj48k")
+region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_fmem7"]
+load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0dmg8"]
+atlas = SubResource("CompressedTexture2D_fmem7")
+region = Rect2(80, 0, 16, 16)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_adf8v"]
+load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6fmhx"]
+atlas = SubResource("CompressedTexture2D_adf8v")
+region = Rect2(64, 0, 16, 16)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_hj48k"]
+load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fmem7"]
+atlas = SubResource("CompressedTexture2D_hj48k")
+region = Rect2(112, 0, 16, 16)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_0dmg8"]
+load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_adf8v"]
+atlas = SubResource("CompressedTexture2D_0dmg8")
+region = Rect2(96, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_65thf"]
+atlas = ExtResource("1_hj48k")
+region = Rect2(0, 120, 128, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yy0fx"]
+atlas = ExtResource("1_hj48k")
+region = Rect2(0, 112, 128, 8)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7ag6m"]
+bg_color = Color(1, 1, 1, 0.5019608)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_fmem7"]
+font_color = Color(0, 0, 0, 1)
+
+[node name="PlayerDataView" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_7ag6m")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -36.0
+offset_right = 16.0
+grow_vertical = 0
+
+[node name="Progress_Health" type="TextureProgressBar" parent="VBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+tooltip_text = "生命值"
+value = 56.0
+fill_mode = 3
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_hj48k")
+texture_progress = SubResource("AtlasTexture_7ag6m")
+
+[node name="Progress_Hunger" type="TextureProgressBar" parent="VBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+tooltip_text = "饥饿值"
+value = 67.0
+fill_mode = 3
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_0dmg8")
+texture_progress = SubResource("AtlasTexture_6fmhx")
+
+[node name="Progress_Thirst" type="TextureProgressBar" parent="VBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+tooltip_text = "口渴值"
+value = 39.0
+fill_mode = 3
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_fmem7")
+texture_progress = SubResource("AtlasTexture_adf8v")
+
+[node name="Progress_Exp" type="TextureProgressBar" parent="VBoxContainer"]
+custom_minimum_size = Vector2(512, 32)
+layout_mode = 2
+tooltip_text = "口渴值"
+value = 55.0
+nine_patch_stretch = true
+texture_under = SubResource("AtlasTexture_65thf")
+texture_progress = SubResource("AtlasTexture_yy0fx")
+
+[node name="Label" type="Label" parent="VBoxContainer/Progress_Exp"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -17.5
+offset_top = -11.5
+offset_right = 17.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_7ag6m")
+text = "32级"
+label_settings = SubResource("LabelSettings_fmem7")
+horizontal_alignment = 1
+vertical_alignment = 1

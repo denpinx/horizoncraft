@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://dlka0sc4kl0vb"]
+[gd_scene load_steps=31 format=3 uid="uid://dlka0sc4kl0vb"]
 
 [ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/PlayerNode.cs" id="1_knoa1"]
 [ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="1_qob58"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://dc7ccxk2dn3pn" path="res://texture/player.png" id="6_emu1f"]
 [ext_resource type="PackedScene" uid="uid://dm7wxja8j5axr" path="res://tscn/Gui/BlockInfoView.tscn" id="7_2i02x"]
 [ext_resource type="Script" uid="uid://bjob2f4yubx5t" path="res://tscn/Body.cs" id="7_7twa1"]
+[ext_resource type="PackedScene" uid="uid://nthrohnlpkux" path="res://tscn/Gui/PlayerDataView.tscn" id="7_34em8"]
 [ext_resource type="Texture2D" uid="uid://yv22qd68ymlw" path="res://texture/item/stone_pickaxe.png" id="9_knoa1"]
 [ext_resource type="PackedScene" uid="uid://c6e02cn0ir7nl" path="res://tscn/Menu/LoadingMenu.tscn" id="11_qpm1p"]
 
@@ -312,6 +313,13 @@ label_settings = SubResource("LabelSettings_hdrus")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="GuidCanvasLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="HotBar" parent="GuidCanvasLayer" instance=ExtResource("4_kghmo")]
+
+[node name="PlayerDataView" parent="GuidCanvasLayer" instance=ExtResource("7_34em8")]
+
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 2
 script = ExtResource("4_knoa1")
@@ -359,11 +367,10 @@ text = "调试信息右"
 label_settings = SubResource("LabelSettings_emu1f")
 horizontal_alignment = 2
 
-[node name="HotBar" parent="CanvasLayer" instance=ExtResource("4_kghmo")]
-
 [node name="BlockInfoView" parent="CanvasLayer" instance=ExtResource("7_2i02x")]
 
 [node name="Tip" type="Label" parent="CanvasLayer"]
+visible = false
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0

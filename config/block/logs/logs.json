@@ -1,0 +1,38 @@
+{
+  "oak_log": {
+    "rigidity": 1,
+    "state": {
+      "normal": {
+        "texture": "oak_log"
+      },
+      "horizontal": {
+        "texture": "oak_log_horizontal"
+      }
+    },
+    "tags": {
+      "type": "axe",
+      "thesaurus": "log"
+    }
+  },
+  "oak_leaves": {
+    "rigidity": 0.2
+  },
+  "birch_log": {
+    "rigidity": 1,
+    "state": {
+      "normal": {
+        "texture": "birch_log"
+      },
+      "horizontal": {
+        "texture": "birch_log_horizontal"
+      }
+    },
+    "tags": {
+      "type": "axe",
+      "thesaurus": "log"
+    }
+  },
+  "birch_leaves": {
+    "rigidity": 0.2
+  }
+}

@@ -16,13 +16,13 @@ public partial class TestTscn : Node2D
 {
     public override void _Ready()
     {
-        //ChunkTest(1000);
+        ChunkTest(1000);
         //GetAllStructsTest(200);
         // var bmr =GD.Load<BlockMetaResource>("res://resources/block/stone.tres");
         // GD.Print(bmr.Components[0].cmps.ToCsharp());
         
         //测不准！
-        LambdaTest(10);
+        //LambdaTest(10);
 
 
     }
