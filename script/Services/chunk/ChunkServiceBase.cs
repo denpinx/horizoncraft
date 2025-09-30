@@ -54,6 +54,7 @@ public partial class ChunkServiceBase : IDisposable
     public Action<Chunk> OnChunkLoaded;
     public Action<Chunk> OnChunkSaving;
     public ConcurrentDictionary<Vector2I, Chunk> Chunks = new();
+    public HashSet<Vector2I> LoadChunkQueue = new ();
     protected World World;
     public int _loadrange = 1;
     private CancellationTokenSource _tokenSource;
@@ -231,6 +232,21 @@ public partial class ChunkServiceBase : IDisposable
                             Chunks.Remove(chunkpos, out _);
                         }
                     }
+                }
+                //加载区块队列
+                foreach (var key in LoadChunkQueue.ToArray())
+                {
+                    if (Chunks.ContainsKey(key))
+                    {
+                        LoadChunkQueue.Remove(key);
+                        return;
+                    }
+                    
+                    var chunk = await LoadChunk(key);
+                    if (Chunks.TryAdd(key, chunk))
+                        OnChunkLoaded?.Invoke(chunk);
+                    
+                    LoadChunkQueue.Remove(key);
                 }
             }
             catch (Exception e)

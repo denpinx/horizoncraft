@@ -48,6 +48,11 @@ public class EntityServiceBase : IDisposable
                 EntityData = entity,
             };
             ComponentManager.ExecuteEntityComponents(ese);
+            //尝试加载该区块
+            if (!World.Service.ChunkService.Chunks.ContainsKey(entity.ChunkCoord))
+            {
+                World.Service.ChunkService.LoadChunkQueue.Add(entity.ChunkCoord);
+            }
         }
     }
 
