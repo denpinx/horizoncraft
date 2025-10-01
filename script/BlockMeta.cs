@@ -48,6 +48,8 @@ namespace horizoncraft.script
 
         /// <summary>是否为完整方块</summary>
         public bool Cube = true;
+        /// <summary>是否可以被直接替换</summary>
+        public bool Replaceable = false;
 
         /// <summary>是否为光照方块</summary>
         public bool Light = false;
@@ -56,14 +58,14 @@ namespace horizoncraft.script
         public float Rigidity = 0.5f;
 
         public int BreakLevel = 0;
-        
+
         public bool IsLiquid = false;
-        
+
         public OreConfig OreConfig = null;
 
         /// <summary>掉落物</summary>
         public LootTable LootTable;
-        
+
         // TODO 待实现
         /// <summary>方块的大小,这里不是指像素大小，而是一个方块究竟占多少格子，如果1*1就占1个格子，如果是2*2就占4个格子</summary>
         public Vector2I GridSize;

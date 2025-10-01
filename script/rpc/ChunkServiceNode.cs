@@ -50,11 +50,12 @@ public partial class ChunkServiceNode : Node
         {
             if (World.Service.ChunkService.Chunks.TryGetValue(new Vector2I(update.X, update.Y), out Chunk chunk2))
             {
+                
                 foreach (var block in update.list)
                 {
                     chunk2.SetBlock(block.x, block.y, block.z, Materials.BlockMetas[block.id], block.state);
                 }
-
+                GD.Print("chunk2+recive:"+chunk2.coord.ToString(),"update.list"+update.Entiydatas.Count);
                 foreach (var entity in update.Entiydatas)
                     WorldService.EntityService.AddEntityData(entity);
             }

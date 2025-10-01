@@ -9,22 +9,25 @@ public class PhysicsSystem : TickSystem
         PhysicsComponent pc = cmp as PhysicsComponent;
         BlockMeta pcmeta = Materials.Valueof(pc.BlockName);
         BlockMeta air = Materials.Valueof("air");
-        if (e.CheckMeta(e.GetBottomBlock(), air))
+        if (e.CheckCanReplaceAndNotMeta(e.GetBottomBlock(),pcmeta))
         {
+            e.DropBlockLoot(e.GetBottomBlock());
             e.SetBottomBlock(pcmeta, 0);
             e.SetBlock(air);
             return;
         }
         else if (e.CheckMeta(e.GetTopBlock(), pcmeta))
         {
-            if (e.CheckMeta(e.GetLeftBlock(), air))
+            if (e.CheckCanReplaceAndNotMeta(e.GetLeftBlock(),pcmeta))
             {
+                e.DropBlockLoot(e.GetLeftBlock());
                 e.SetLeftBlock(pcmeta, 0);
                 e.SetBlock(air);
                 return;
             }
-            else if (e.CheckMeta(e.GetRightBlock(), air))
+            else if (e.CheckCanReplaceAndNotMeta(e.GetRightBlock(),pcmeta))
             {
+                e.DropBlockLoot(e.GetRightBlock());
                 e.SetRightBlock(pcmeta, 0);
                 e.SetBlock(air);
                 return;

@@ -6,7 +6,7 @@ using horizoncraft.script.Components;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Expand;
 using horizoncraft.script.Inventory;
-using horizoncraft.script.resource;
+using horizoncraft.script.Utility;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Struct;
 using YamlDotNet;
@@ -132,15 +132,13 @@ namespace horizoncraft.script
                     Name = "air",
                     Id = -1,
                     Cube = false,
-                    Collide = false
+                    Collide = false,
+                    Replaceable = true
                 }
             );
 
             LoadAllItemConfigs();
             LoadAllBlockConfigs();
-
-            //LoadItemResources();
-            //LoadBlockResources();
             ProcessEntity();
             CreateTileSet();
             ProcessTextures();
@@ -177,180 +175,12 @@ namespace horizoncraft.script
         }
 
         /// <summary>
-        /// 加载基于tres文件的物品配置
-        /// </summary>
-        [Obsolete]
-        private static void LoadItemResources()
-        {
-            var list = new List<string>();
-            GetAllFiles("resources/item", list);
-            foreach (var file in list)
-            {
-                if (!file.EndsWith(".tres")) continue;
-                var res = GD.Load<ItemMetaResource>(file);
-                if (res == null) continue;
-                var meta = new ItemMeta();
-
-                meta.Name = res.ItemName;
-                meta.MaxAmount = res.MaxAmount;
-                meta.Description = res.Description;
-
-                meta.Tags = (res.Tags == null ? meta.Tags : res.Tags.ToCsharp());
-                if (res.Components != null)
-                {
-                    foreach (var cmpdict in res.Components)
-                    {
-                        var cmp = cmpdict.ComponentData.ToCsharp();
-                        var func = LambdaCreater.CreateLambda(cmpdict.ComponentName, cmp);
-                        meta.Components.Add(func);
-                    }
-                }
-
-                if (res.Textures != null)
-                    meta.Itemset.TextureNames.AddRange(res.Textures);
-                else
-                    meta.Itemset.TextureNames.Add(meta.Name);
-
-                RegItemMeta(meta);
-            }
-        }
-
-
-        /// <summary>
-        /// 加载基于tres文件的方块配置
-        /// </summary>
-        [Obsolete]
-        private static void LoadBlockResources()
-        {
-            var list = new List<string>();
-            GetAllFiles("resources/block", list);
-            foreach (var file in list)
-            {
-                if (!file.EndsWith(".tres")) continue;
-                var res = GD.Load<BlockMetaResource>(file);
-                if (res == null) continue;
-                var meta = new BlockMeta();
-
-                meta.Name = res.BlockName;
-                meta.Cube = res.CompleteBlock;
-                meta.Collide = res.Collide;
-                meta.TileType = res.TileType.ToString().ToLower();
-                meta.Light = res.LightSource;
-                meta.BreakLevel = res.BreakLevel;
-                meta.Tags = (res.Tags == null ? meta.Tags : res.Tags.ToCsharp());
-
-                if (res.Components != null)
-                {
-                    foreach (var cmpdict in res.Components)
-                    {
-                        var cmp = cmpdict.ComponentData.ToCsharp();
-                        var func = LambdaCreater.CreateLambda(cmpdict.ComponentName, cmp);
-                        meta.Components.Add(func);
-                    }
-                }
-
-                if (res.OreConfig != null)
-                {
-                    meta.OreConfig = new();
-                    meta.OreConfig.Count = res.OreConfig.Count;
-                    meta.OreConfig.Deep = res.OreConfig.Deep;
-                    meta.OreConfig.Size = res.OreConfig.Size;
-                    meta.OreConfig.Name = meta.Name;
-                }
-
-                if (res.LootItems != null)
-                {
-                    meta.LootTable = new LootTable();
-                    foreach (var lis in res.LootItems)
-                    {
-                        var li = new LootItemSnapshot()
-                        {
-                            DropChance = lis.DropChance,
-                            Name = lis.Name,
-                        };
-                        if (lis.AmountChances != null)
-                            foreach (var ac in lis.AmountChances)
-                            {
-                                li.AmountChances.Add(new AmountChance()
-                                {
-                                    Amount = ac.Amount,
-                                    Chance = ac.Chance
-                                });
-                            }
-                        else
-                        {
-                            li.AmountChances.Add(new AmountChance()
-                            {
-                                Amount = 1,
-                                Chance = 1
-                            });
-                        }
-
-                        meta._LootItemSnapshots_.Add(li);
-                    }
-                }
-                else
-                {
-                    meta._LootItemSnapshots_.Add(new LootItemSnapshot()
-                    {
-                        Name = meta.Name,
-                        DropChance = 1f,
-                        AmountChances = new List<AmountChance>()
-                        {
-                            new AmountChance()
-                            {
-                                Amount = 1,
-                                Chance = 1
-                            }
-                        }
-                    });
-                }
-
-                if (res.BlockStateSets.Count == 0)
-                {
-                    res.BlockStateSets.Add(new BlockStateSetResource()
-                    {
-                        TextureName = meta.Name
-                    });
-                }
-
-                List<BlockTileSet> blockTileSets = new List<BlockTileSet>();
-                int state_id = 0;
-                foreach (var sets in res.BlockStateSets)
-                {
-                    var tile = new BlockTileSet()
-                    {
-                        state = state_id,
-                        texture_name = sets.TextureName,
-                        scene = sets.Tscn
-                    };
-                    blockTileSets.Add(tile);
-                    state_id++;
-                }
-
-
-                meta.blockTileDatas = blockTileSets;
-
-                if (res.InputMask != null)
-                    foreach (var num in res.InputMask)
-                        meta.InputMask.Add(num);
-
-                if (res.OutPutMask != null)
-                    foreach (var num in res.OutPutMask)
-                        meta.OutputMask.Add(num);
-
-                RegBlockMeta(meta);
-            }
-        }
-
-
-        /// <summary>
         /// 加载所有物品配置
         /// </summary>
         private static void LoadAllItemConfigs()
         {
             var list = new List<string>();
-            GetAllFiles("config/item", list);
+            DirUtility.GetAllFiles("config/item", list);
             foreach (var fn in list)
             {
                 if (!fn.EndsWith(".json")) continue;
@@ -431,7 +261,7 @@ namespace horizoncraft.script
         private static void LoadAllBlockConfigs()
         {
             var list = new List<string>();
-            GetAllFiles("config/block", list);
+            DirUtility.GetAllFiles("config/block", list);
             foreach (var fn in list)
             {
                 if (!fn.EndsWith(".json")) continue;
@@ -459,7 +289,7 @@ namespace horizoncraft.script
                 {
                     foreach (string cmp_name in ((Dictionary<string, object>)config["components"]).Keys)
                     {
-                        GD.Print("组件:"+cmp_name);
+                        GD.Print("组件:" + cmp_name);
                         Dictionary<string, object> cmp_dict =
                             (Dictionary<string, object>)((Dictionary<string, object>)config["components"])[cmp_name];
                         components.Add(LambdaCreater.CreateLambda(cmp_name, cmp_dict));
@@ -510,7 +340,11 @@ namespace horizoncraft.script
                 if (config.ContainsKey("rigidity"))
                 {
                     blockmeta.Rigidity = (float)Convert.ToDouble(config["rigidity"]);
-                    GD.Print($"{blockmeta.Name} rgdt : {blockmeta.Rigidity}");
+                }
+
+                if (config.ContainsKey("replace"))
+                {
+                    blockmeta.Replaceable = (bool)config["replace"];
                 }
 
                 if (config.ContainsKey("tags"))
@@ -804,42 +638,6 @@ namespace horizoncraft.script
             }
 
             return tileSet;
-        }
-
-        /// <summary>
-        /// 加载目录下的所有文件
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="filelist"></param>
-        private static void GetAllFiles(string path, List<string> filelist)
-        {
-            DirAccess dir = DirAccess.Open(path);
-            if (dir == null)
-            {
-                GD.PrintErr($"[GetAllFiles] 无法打开{path}");
-                return;
-            }
-
-            dir.ListDirBegin();
-            var filename = dir.GetNext();
-            while (filename != "")
-            {
-                if (filename == "." || filename == "..")
-                    continue;
-                string deep_path = path + "/" + filename;
-                if (dir.CurrentIsDir())
-                {
-                    GetAllFiles(deep_path, filelist);
-                }
-                else
-                {
-                    filelist.Add(deep_path);
-                }
-
-                filename = dir.GetNext();
-            }
-
-            dir.ListDirEnd();
         }
     }
 }

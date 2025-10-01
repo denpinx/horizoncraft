@@ -226,6 +226,7 @@ public class PlayerEvents
         if (bm == null) return false;
 
         e.ChunkService.SetBlock(pos, bm);
+        e.ChunkService.PassiveUpdateNeighborBlock(e.Position);
 
         if (e.Player.Mode == 0)
         {
@@ -263,15 +264,15 @@ public class PlayerEvents
 
             foreach (var dropitem in e.DropLoots)
             {
-                //直接给予物品
-                //e.Player.Inventory.TryAddItem(dropitem);
-                //生成掉落物实体
                 var data = dropitem.GetEntityData(new Vector2I(e.Position.X * 16, e.Position.Y * 16));
                 e.world.Service.EntityService.AddEntityData(data);
             }
+
+            targetblock.DropBlockInventoryItems(e.world, new Vector2I(e.Position.X, e.Position.Y));
         }
 
         e.ChunkService.SetBlock(e.Position, Materials.Valueof("air"));
+        e.ChunkService.PassiveUpdateNeighborBlock(e.Position);
         e.Player.Inventory.update = true;
         return true;
     }
@@ -307,7 +308,11 @@ public class PlayerEvents
         e.Player.OpeningBlockInventory = true;
         e.Player.OpenInventory = new System.Numerics.Vector3(finalpos.X, finalpos.Y, finalpos.Z);
         var blockinv = InterfaceBlock.GetComponent<InventoryComponent>();
-        if (blockinv == null) return false;
+        if (blockinv == null)
+        {
+            return false;
+        }
+
         var pobve = new PlayerOpenBlockViewEvent()
         {
             Player = e.Player,
@@ -315,7 +320,6 @@ public class PlayerEvents
             Position = finalpos,
             ViewName = blockinv.InventoryName
         };
-
         e.PlayerService.Events.OpenBlockView(pobve);
         return true;
     }

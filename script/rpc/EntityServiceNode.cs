@@ -24,6 +24,7 @@ public partial class EntityServiceNode : Node
     public void ClientReceiveEntityPack(byte[] bytes)
     {
         EntityPack pack = ByteTool.FromBytes<EntityPack>(bytes);
+        GD.Print("ClientReceiveEntityPack"+pack.Entitys.Count);
         WorldService.EntityService.ReceiveEntityPack(pack);
     }
 
@@ -31,6 +32,7 @@ public partial class EntityServiceNode : Node
     public void ServerReceiveEntityPack(byte[] bytes)
     {
         EntityPack pack = ByteTool.FromBytes<EntityPack>(bytes);
+        GD.Print("ServerReceiveEntityPack"+pack.Entitys.Count);
         WorldService.EntityService.ReceiveEntityPack(pack);
     }
 

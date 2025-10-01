@@ -1,5 +1,6 @@
 {
   "carrot": {
+    "replace": true,
     "rigidity": 0.5,
     "collide": false,
     "cube": false,
@@ -26,7 +27,8 @@
         ]
       },
       {
-        "drop-chance": 7,
+        "drop-chance": 1,
+        "drop-state": 7,
         "name": "carrot",
         "amount-chance": [
           {

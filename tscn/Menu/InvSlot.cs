@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Text;
 using horizoncraft.script.Components.Item;
+using horizoncraft.script.I18N;
 using horizoncraft.script.Inventory;
 
 public partial class InvSlot : Control
@@ -104,8 +105,7 @@ public partial class InvSlot : Control
         {
             this.TextureRect_Item.Texture = itemStack.GetItemMeta().GetTexture(itemStack.State);
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine($"物品名：{itemStack.GetItemMeta().Name}");
-
+            stringBuilder.AppendLine("tip_item_name".Trprefix("ui", itemStack.GetItemMeta().Name.Trprefix("meta")));
 
             if (itemStack.Amount > 1)
                 this.Label_Amount.Text = itemStack.Amount.ToString();
@@ -125,9 +125,9 @@ public partial class InvSlot : Control
                     ProgressBar.Visible = false;
                 }
 
-                stringBuilder.AppendLine($"工具等级:{durable.ToolLevel}");
-                stringBuilder.AppendLine($"工具类型:{durable.Tag}");
-                stringBuilder.AppendLine($"耐久:{durable.Value}/{durable.Max}");
+                stringBuilder.AppendLine("tip_item_tool_level".Trprefix("ui", durable.ToolLevel));
+                stringBuilder.AppendLine("tip_item_tool_type".Trprefix("ui", durable.Tag));
+                stringBuilder.AppendLine("tip_item_tool_durable".Trprefix("ui", durable.Value, durable.Max));
             }
             else
             {
@@ -138,7 +138,7 @@ public partial class InvSlot : Control
             {
                 stringBuilder.AppendLine($"[{kvp.Key} : {kvp.Value}]");
             }
-            
+
             TextureButton.TooltipText = stringBuilder.ToString();
         }
         else

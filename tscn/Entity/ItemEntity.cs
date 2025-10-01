@@ -26,7 +26,7 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
     //自身属性
     double _cooldown_ = 0.5f;
     PlayerNode _playerNode;
-    PlayerNode _farPlayerNode;
+    PlayerData _farPlayerNode;
 
     public override void _Ready()
     {
@@ -38,8 +38,6 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
         _itemLabel_ = GetNode<Label>("Label");
         _area2D_ = GetNode<Area2D>("Area2D");
         _area2DFar_ = GetNode<Area2D>("Area2D_Far");
-        _area2D_.BodyEntered += OnEnter;
-        _area2D_.BodyExited += OnExit;
         _area2DFar_.BodyEntered += FarPlayerEnter;
         _area2DFar_.BodyExited += FarPlayerExit;
         _animationPlayer_.Play("ide");
@@ -49,32 +47,20 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
     {
         if (node is PlayerNode player)
         {
-            _farPlayerNode = player;
+            _farPlayerNode = player.playerData;
+        }
+
+        if (node is PlayerSnapshot psn)
+        {
+            _farPlayerNode = psn.playerData;
         }
     }
 
     public void FarPlayerExit(Node2D node)
     {
-        if (node is PlayerNode player)
+        if (node is PlayerNode or PlayerSnapshot)
         {
             _farPlayerNode = null;
-        }
-    }
-
-    public void OnEnter(Node2D node)
-    {
-        if (node is PlayerNode player)
-        {
-            _playerNode = player;
-            return;
-        }
-    }
-
-    public void OnExit(Node2D node)
-    {
-        if (node is PlayerNode)
-        {
-            _playerNode = null;
         }
     }
 
@@ -87,16 +73,16 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
 
         if (!Freeze) World.Service.EntityBehavior.Process(this, delta);
 
-        // if (_farPlayerNode != null)
-        // {
-        //     Vector2 direction = (_farPlayerNode.GlobalPosition - GlobalPosition).Normalized();
-        //
-        //     Vector2 attractVelocity = direction * 40f;
-        //     Vector2 newVelocity = LinearVelocity;
-        //     newVelocity.X += attractVelocity.X;
-        //     newVelocity.X = Mathf.Clamp(newVelocity.X, -100f, 100f);
-        //     LinearVelocity = newVelocity;
-        // }
+        if (_farPlayerNode != null)
+        {
+            Vector2 direction = (_farPlayerNode.Position_v2 - GlobalPosition).Normalized();
+
+            Vector2 attractVelocity = direction * 40f;
+            Vector2 newVelocity = LinearVelocity;
+            newVelocity.X += attractVelocity.X;
+            newVelocity.X = Mathf.Clamp(newVelocity.X, -100f, 100f);
+            LinearVelocity = newVelocity;
+        }
 
         var selfcmp = Entity.GetComponent<ItemEntityComponent>();
         if (selfcmp == null) return;
@@ -104,8 +90,8 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
         {
             _itemTexture_.Visible = true;
             _itemTexture_.Texture = selfcmp.ItemStack.GetItemMeta().GetTexture();
-            _itemLabel_.Text = $"*{selfcmp.ItemStack.Amount}";
-            //_itemLabel_.Text = $"所属{Entity.Owned},更新状态{Entity.Update}";
+            //_itemLabel_.Text = $"*{selfcmp.ItemStack.Amount}";
+            _itemLabel_.Text = $"[所属{Entity.Owned}] [更新状态{Entity.Update}]";
         }
         else
         {

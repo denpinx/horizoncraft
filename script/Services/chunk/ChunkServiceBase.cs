@@ -54,7 +54,7 @@ public partial class ChunkServiceBase : IDisposable
     public Action<Chunk> OnChunkLoaded;
     public Action<Chunk> OnChunkSaving;
     public ConcurrentDictionary<Vector2I, Chunk> Chunks = new();
-    public HashSet<Vector2I> LoadChunkQueue = new ();
+    public HashSet<Vector2I> LoadChunkQueue = new();
     protected World World;
     public int _loadrange = 1;
     private CancellationTokenSource _tokenSource;
@@ -233,6 +233,7 @@ public partial class ChunkServiceBase : IDisposable
                         }
                     }
                 }
+
                 //加载区块队列
                 foreach (var key in LoadChunkQueue.ToArray())
                 {
@@ -241,11 +242,11 @@ public partial class ChunkServiceBase : IDisposable
                         LoadChunkQueue.Remove(key);
                         return;
                     }
-                    
+
                     var chunk = await LoadChunk(key);
                     if (Chunks.TryAdd(key, chunk))
                         OnChunkLoaded?.Invoke(chunk);
-                    
+
                     LoadChunkQueue.Remove(key);
                 }
             }
@@ -372,6 +373,33 @@ public partial class ChunkServiceBase : IDisposable
 
         return null;
     }
+
+    public void UpdateBlock(Vector3I globalPosition)
+    {
+        var block = World.Service.ChunkService.GetBlock(globalPosition);
+        if (block == null) return;
+
+        var chunkPos = globalPosition.MathFloor(Chunk.Size);
+        var localPos = globalPosition.Remainder(Chunk.Size);
+
+        var local = new System.Numerics.Vector3(localPos.X, localPos.Y, globalPosition.Z);
+        if (!block.HasComponent<ReactiveComponent>()) return;
+
+        if (World.Service.ChunkService.Chunks.TryGetValue(chunkPos, out var chunk))
+            chunk.PassiveTickList.Add(local);
+    }
+
+    public void PassiveUpdateNeighborBlock(Vector3I globalPosition)
+    {
+        if (globalPosition.Z == 0)
+            UpdateBlock(new Vector3I(globalPosition.X, globalPosition.Y, 1));
+        else UpdateBlock(new Vector3I(globalPosition.X, globalPosition.Y, 0));
+
+        UpdateBlock(globalPosition + Vector3I.Up);
+        UpdateBlock(globalPosition + Vector3I.Down);
+        UpdateBlock(globalPosition + Vector3I.Left);
+        UpdateBlock(globalPosition + Vector3I.Right);
+    }   
 
     /// <summary>
     /// 设置方块
@@ -545,6 +573,7 @@ public partial class ChunkServiceBase : IDisposable
                 sts.Value.SetLight(light);
             }
         }
+
         if (LightMode != LightModeEnum.None)
         {
             foreach (var sts in Chunks)
@@ -553,6 +582,7 @@ public partial class ChunkServiceBase : IDisposable
                 if (poss.Contains(chunk.coord))
                     UpdataChunkLight(chunk);
             }
+
             int lightsize = LightSize / 2;
             if (player.Mode == 1) lightsize = LightSize * 4;
             if (LightMode == LightModeEnum.DFSMode)
@@ -560,7 +590,7 @@ public partial class ChunkServiceBase : IDisposable
             if (LightMode == LightModeEnum.RayCastMode)
                 RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), lightsize, 32);
         }
-        
+
         foreach (var chunk in resultchunk)
             chunk.CheckLightUpdate();
     }

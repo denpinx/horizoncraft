@@ -10,7 +10,7 @@ public partial class PlayerSnapshot : Node2D
     private Vector2 LastPosition;
     private double cooldown = 0.25f;
     private bool FaceLeft = true;
-
+    public PlayerData playerData;
     public override void _Ready()
     {
         _label = GetNode<Label>("Label");
@@ -37,6 +37,7 @@ public partial class PlayerSnapshot : Node2D
 
     public void SetData(PlayerData pd)
     {
+        playerData = pd;
         this._label.Text = pd.Name;
         if (LastPosition != pd.Position_v2)
         {

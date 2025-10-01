@@ -4,11 +4,12 @@ using Godot.Collections;
 using horizoncraft.script;
 using horizoncraft.script.Config;
 using horizoncraft.script.Expand;
+using horizoncraft.script.I18N;
 using horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.tscn.Menu;
 
-public partial class MainMenu : horizoncraft.script.World
+public partial class MainMenu : horizoncraft.script.World,ITranslatable
 {
     private CanvasLayer TopCanvasLayer, GuiCanvasLayer;
     private Button ButtonSingle, buttonExit, ButtonConnect;
@@ -66,8 +67,10 @@ public partial class MainMenu : horizoncraft.script.World
             PlayerNode.Profile.Name = TextEdit.Text;
             SaveProfile();
         };
+        
+        
+        LanguageManage.SetLang("cn",GetTree());
     }
-
     public override void _PhysicsProcess(double delta)
     {
         PlayerNode.Visible = false;
@@ -133,5 +136,12 @@ public partial class MainMenu : horizoncraft.script.World
         FileAccess fs = FileAccess.Open("profile/local.json", FileAccess.ModeFlags.Write);
         fs.StoreString(Json.Stringify(PlayerNode.Profile.ToDictionary()));
         fs.Close();
+    }
+
+    public void TranslateChange()
+    {
+        buttonExit.Text = "ui.Exit".Trprefix();
+        ButtonSingle.Text = "ui.Single Play".Trprefix();
+        ButtonConnect.Text="ui.Connect Server".Trprefix();
     }
 }

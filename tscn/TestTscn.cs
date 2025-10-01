@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using horizoncraft.script.Expand;
-using horizoncraft.script.resource;
+using horizoncraft.script.I18N;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Struct;
 
@@ -16,25 +16,23 @@ public partial class TestTscn : Node2D
 {
     public override void _Ready()
     {
-        ChunkTest(1000);
-        //GetAllStructsTest(200);
-        // var bmr =GD.Load<BlockMetaResource>("res://resources/block/stone.tres");
-        // GD.Print(bmr.Components[0].cmps.ToCsharp());
-        
-        //测不准！
-        //LambdaTest(10);
-
-
+        GD.Print(LanguageManage.Trprefix("air"));
+        //ChunkTest(1000);
+        // LambdaTest(100);
+        // LambdaTest(100000);
+        // LambdaTest(1000000);
+        // LambdaTest(10000000);
     }
-    
+
     public void LambdaTest(int count)
     {
-
+        //lambda已经在构建时被预热一次了,这里构建耗时170ms,不作为测试标准
         var func = LambdaCreater.CreateLambda("TickComponent", new Dictionary<string, object>()
         {
-            ["Name"] = "TickComponent",
-        });
-        //GD.Print($"V2 构建耗时{stopwatch.ElapsedMilliseconds} ms");
+            ["name"] = "TickComponent",
+        },true);
+        
+        
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
         for (int i = 0; i < count; i++)
@@ -43,7 +41,27 @@ public partial class TestTscn : Node2D
         }
 
         stopwatch.Stop();
-        GD.Print($"V2 {count} 个,总耗时{stopwatch.ElapsedMilliseconds} ms");
+        GD.Print($"LambdaCreater 生成{count} 个对象,总耗时{stopwatch.ElapsedMilliseconds} ms");
+
+        var f = () => new TickComponent() { Name = "TickComponent" };
+        stopwatch.Restart();
+        for (int i = 0; i < count; i++)
+        {
+            _ = f();
+        }
+
+        stopwatch.Stop();
+        GD.Print($"原生Lambda构建 {count} 个对象,总耗时{stopwatch.ElapsedMilliseconds} ms");
+        
+        stopwatch.Restart();
+        for (int i = 0; i < count; i++)
+        {
+            _ = new TickComponent() { Name = "TickComponent" };
+        }
+
+        stopwatch.Stop();
+        GD.Print($"原生直接构建 {count} 个对象,总耗时{stopwatch.ElapsedMilliseconds} ms");
+        GD.Print("");
     }
 
     public void SpawnTreeTest(int count)

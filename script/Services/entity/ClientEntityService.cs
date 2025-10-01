@@ -45,32 +45,36 @@ public class ClientEntityService : EntityServiceBase
             var entity = EntityDatas[uuid];
             if (!World.HasTileMap(entity.ChunkCoord))
             {
-                entity.Owned = "";
+                //entity.Owned = "";
                 if (EntityNodes.ContainsKey(uuid))
                 {
                     var node = EntityNodes[uuid];
                     EntityNodes.Remove(uuid);
                     node.GetNode().QueueFree();
                 }
+
+                EntityDatas.TryRemove(uuid, out _);
             }
         }
     }
 
     public override void UpdateEntityData(EntityDataSnapShot data, List<EntityDataSnapShot> CallBack = null)
     {
+        GD.Print("UpdateEntityData" + data.Uuid);
         //默认是主机玩家
         if (EntityDatas.TryGetValue(data.Uuid, out var entity))
         {
             if (entity.Position != data.Position)
             {
                 entity.Position = data.Position;
-                entity.Update = true;
+                //entity.Update = true;
             }
         }
     }
 
     public override void AddEntityData(EntityData data)
     {
+        data.Update = false;
         EntityDatas.AddOrUpdate(data.Uuid, data, (key, old) => data);
     }
 

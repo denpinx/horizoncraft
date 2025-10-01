@@ -39,6 +39,8 @@ public class HostChunkService : ChunkServiceBase
         //差异更新
         foreach (var chunk in WorldSnapshot.chunks)
         {
+            if(chunk.list.Count==0&&chunk.Entiydatas.Count==0)continue;
+            
             foreach (var playerset in World.Service.PlayerService.Players)
             {
                 PlayerData pd1 = playerset.Value;
@@ -50,8 +52,8 @@ public class HostChunkService : ChunkServiceBase
                 {
                     if (!diffUpdate.ContainsKey(pd1.PeerId))
                         diffUpdate[pd1.PeerId] = new WorldSnapshot();
-                    diffUpdate[pd1.PeerId].chunks.Add(chunk);
                     chunk.ResetEmptyOwned(pd1.Name); //更新实体的从属
+                    diffUpdate[pd1.PeerId].chunks.Add(chunk);
                 }
             }
         }

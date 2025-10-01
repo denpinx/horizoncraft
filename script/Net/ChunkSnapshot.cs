@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Godot;
 using horizoncraft.script.Components;
 using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Entity;
@@ -27,7 +28,7 @@ public partial class ChunkSnapshot
             if (entity.Owned == "")
             {
                 entity.Owned = name;
-            }
+            }   
         }
     }
 }

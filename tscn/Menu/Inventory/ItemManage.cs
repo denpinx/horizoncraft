@@ -1,17 +1,18 @@
 using Godot;
 using System;
 using horizoncraft.script;
+using horizoncraft.script.I18N;
 using HorizonCraft.script.Services.chunk;
 
 /// <summary>
 /// 物品管理器
 /// TODO 待完成
 /// </summary>
-public partial class ItemManage : HBoxContainer
+public partial class ItemManage : HBoxContainer, ITranslatable
 {
     private int Page = 0;
     private int PageItemMax = 10;
-    
+
     private Button _buttonMode0;
     private Button _buttonMode1;
     private Button _buttonClear;
@@ -19,6 +20,7 @@ public partial class ItemManage : HBoxContainer
     private Button _buttonLight0;
     private Button _buttonLight1;
     private Button _buttonLight2;
+
     public override void _Ready()
     {
         _buttonMode0 = (Button)GetNode("PanelContainer2/VBoxContainer/HBoxContainer/Button_mod_0");
@@ -116,9 +118,16 @@ public partial class ItemManage : HBoxContainer
             invslot.SetShowItem(Materials.ItemMetas[i].GetItemStack());
         }
     }
-    
+
     public void ChangePage(int page)
     {
-        
+    }
+
+    public void TranslateChange()
+    {
+        _buttonMode0.Text = "button_mode_0".Trprefix("ui");
+        _buttonMode1.Text = "button_mode_1".Trprefix("ui");
+        _buttonSort.Text = "button_inventory_sort".Trprefix("ui");
+        _buttonClear.Text = "button_inventory_clear".Trprefix("ui");
     }
 }

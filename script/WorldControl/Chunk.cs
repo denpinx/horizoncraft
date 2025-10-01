@@ -39,7 +39,7 @@ namespace horizoncraft.script.WorldControl
         public int RemoveCount = 0;
 
         public HashSet<Vector3> TickList = new();
-        public HashSet<Vector3> ReactiveTickList = new();
+        public HashSet<Vector3> PassiveTickList = new();
         public List<Vector2> LightList = new();
         [MemoryPackIgnore] public List<Vector3I> UpdateList = new(32);
         [MemoryPackIgnore] public List<Vector3I> UpdateList_buffer = new();
@@ -133,7 +133,7 @@ namespace horizoncraft.script.WorldControl
             //     if (!TickList.Contains(pos))
             //     {
             //         TickList.Add(pos);
-            //     }
+            //     }    
             // }
             // else if (data[x, y, z].BlockMeta.HasComponent<TickComponent>())
             //     TickList.Remove(pos);
@@ -172,8 +172,7 @@ namespace horizoncraft.script.WorldControl
             };
 
             //TODO 同时拥有被动更新和主动更新会导致主动更新被更新两次
-
-            foreach (var pos in ReactiveTickList)
+            foreach (var pos in PassiveTickList)
             {
                 var block = GetBlock((int)pos.X, (int)pos.Y, (int)pos.Z);
                 foreach (var cmp in block.Components)
@@ -183,7 +182,6 @@ namespace horizoncraft.script.WorldControl
                         , (int)pos.Z);
                     if (cmp is ReactiveComponent)
                     {
-                        GD.Print("更新被动方块");
                         blockTickEvnet.BlockData = block;
                         blockTickEvnet.GlobalePos = globale;
                         blockTickEvnet.LocalPos = pos.ToVector3I();
@@ -192,7 +190,7 @@ namespace horizoncraft.script.WorldControl
                     }
                 }
             }
-            ReactiveTickList.Clear();
+            PassiveTickList.Clear();
 
 
             var coord = new Godot.Vector3I(0, 0, 0);

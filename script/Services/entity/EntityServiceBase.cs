@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Components;
@@ -29,9 +30,19 @@ public class EntityServiceBase : IDisposable
         world.timer.Timeout += Ticking;
         world.Service.ChunkService.OnChunkLoaded += OnChunkLoad;
         world.Service.ChunkService.OnChunkSaving += ExtractEntitiesFromChunk;
-        PlayerNode.GetInformation[nameof(EntityServiceBase)] =
-            () => $"加载实体:{EntityDatas.Count}" +
-                  $"渲染实体:{EntityNodes.Count}";
+        PlayerNode.GetInformation[nameof(EntityServiceBase)] = () =>
+        {
+            StringBuilder sb = new();
+            sb.Append($"加载实体数:{EntityDatas.Count}\n");
+            sb.Append($"实体节点数:{EntityNodes.Count}\n");
+
+            foreach (var data in EntityDatas.Values)
+            {
+                sb.Append($"{data.Name} : {data.Owned}\n");
+            }
+
+            return sb.ToString();
+        };
     }
 
     public virtual void Ticking()
@@ -186,7 +197,7 @@ public class EntityServiceBase : IDisposable
 
     public virtual void ProcessEntityNodeUpdate()
     {
-        foreach (var uuid in EntityDatas.Keys)
+        foreach (var uuid in EntityDatas.Keys.ToArray())
         {
             //更新数据
             if (EntityNodes.ContainsKey(uuid))
@@ -210,7 +221,12 @@ public class EntityServiceBase : IDisposable
             var entity = EntityDatas[uuid];
             if (!World.HasTileMap(entity.ChunkCoord))
             {
-                entity.Owned = "";
+                if (entity.Owned == PlayerNode.Profile.Name)
+                {
+                    entity.Owned = "";
+                    entity.Update = true;
+                }
+
                 if (EntityNodes.ContainsKey(uuid))
                 {
                     var node = EntityNodes[uuid];
@@ -224,8 +240,8 @@ public class EntityServiceBase : IDisposable
                 if (entity.Owned != PlayerNode.Profile.Name)
                 {
                     //更新状态，同步回客户端
-                    entity.Update = true;
                     entity.Owned = PlayerNode.Profile.Name;
+                    entity.Update = true;
                 }
             }
         }
@@ -305,7 +321,11 @@ public class EntityServiceBase : IDisposable
     public virtual void AddEntityData(EntityData data)
     {
         //默认是主机玩家
-        if (data.Owned == "") data.Owned = PlayerNode.Profile.Name;
+        if (data.Owned == "")
+        {
+            data.Owned = PlayerNode.Profile.Name;
+        }
+
         if (data.Uuid == Guid.Empty) data.Uuid = System.Guid.NewGuid();
         //data.Update = false;
         EntityDatas.AddOrUpdate(data.Uuid, data, (key, old) => data);

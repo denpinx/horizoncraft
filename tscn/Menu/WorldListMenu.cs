@@ -3,18 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using horizoncraft.script;
+using horizoncraft.script.I18N;
 using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl.Tool;
 using FileAccess = Godot.FileAccess;
 
-public partial class WorldListMenu : Control
+public partial class WorldListMenu : Control, ITranslatable
 {
     public WorldProfile SelectedWorld;
     private VBoxContainer ListRoot;
     private VBoxContainer Root;
     private List<WorldProfile> worldList = new List<WorldProfile>();
     private List<WorldInfoLabel> worldInfoLabels = new List<WorldInfoLabel>();
-    private TextureButton buttonBackMainMenu, buttonLoadWorld, buttonMultiplayer, buttonCreateWorld, buttonRemove;
+    private Button buttonBackMainMenu, buttonLoadWorld, buttonMultiplayer, buttonCreateWorld, buttonRemove;
     private Label buttonRemoveLabel;
     private PackedScene WorldCreateScene;
     private bool ConfirmDel = false;
@@ -27,17 +28,15 @@ public partial class WorldListMenu : Control
             "VBoxContainer/HBoxContainer/PanelContainer3/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer");
         Root = GetNode<VBoxContainer>("VBoxContainer");
         buttonLoadWorld =
-            GetNode<TextureButton>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_LoadGame");
+            GetNode<Button>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_LoadGame");
         buttonBackMainMenu =
-            GetNode<TextureButton>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_BackMainMenu");
+            GetNode<Button>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_BackMainMenu");
         buttonCreateWorld =
-            GetNode<TextureButton>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_CreateWorld");
+            GetNode<Button>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_CreateWorld");
         buttonMultiplayer =
-            GetNode<TextureButton>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_Multiplayer");
+            GetNode<Button>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_Multiplayer");
         buttonRemove =
-            GetNode<TextureButton>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_Remove");
-        buttonRemoveLabel =
-            GetNode<Label>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_Remove/Label");
+            GetNode<Button>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_Remove");
         worldList = GetWorldFiles();
         UpdateWorldList();
 
@@ -154,5 +153,14 @@ public partial class WorldListMenu : Control
         }
 
         return worldFiles;
+    }
+
+    public void TranslateChange()
+    {
+        buttonBackMainMenu.Text = "ui.Back Main Menu".Trprefix();
+        buttonLoadWorld.Text = "ui.Load World".Trprefix();
+        buttonCreateWorld.Text = "ui.Create New World".Trprefix();
+        buttonMultiplayer.Text = "ui.Create Multiplayer".Trprefix();
+        buttonRemove.Text = "ui.Back Main Menu".Trprefix();
     }
 }

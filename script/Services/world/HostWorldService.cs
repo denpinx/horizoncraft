@@ -22,8 +22,6 @@ public class HostWorldService : WorldServiceBase
         var enet = new ENetMultiplayerPeer();
         enet.CreateServer(Port, MaxPlayer);
         world.Multiplayer.MultiplayerPeer = enet;
-        enet.CreateServer(Port, MaxPlayer);
-        world.Multiplayer.MultiplayerPeer = enet;
     }
 
     public override void InitializeServices()

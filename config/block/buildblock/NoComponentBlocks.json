@@ -53,7 +53,8 @@
   "rose": {
     "rigidity": 0.1,
     "collide": false,
-    "cube": false
+    "cube": false,
+    "replace": true
   },
   "light": {
     "rigidity": 0.1,

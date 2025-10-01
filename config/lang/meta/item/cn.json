@@ -1,0 +1,25 @@
+{
+  "lang": "cn",
+  "prefix": "meta",
+  "texts": {
+    "charcoal": "木炭",
+    "coal": "煤炭",
+    "iron_ingot": "铁锭",
+    "copper_ingot": "铜锭",
+    "tin_ingot": "锡锭",
+    "gold_ingot": "金锭",
+    "diamond": "钻石",
+    "iron_bukkit": "铁桶",
+    "iron_bukkit_water": "含水铁桶",
+    "stone_shovel": "石铲",
+    "iron_shovel": "铁铲",
+    "diamond_shovel": "钻石铲",
+    "wood_pickaxe": "木镐",
+    "stone_pickaxe": "石镐",
+    "iron_pickaxe": "铁镐",
+    "diamond_pickaxe": "钻石镐",
+    "log": "原木",
+    "plank": "木板",
+    "stick": "木棍"
+  }
+}

@@ -55,6 +55,9 @@
     <Content Include="config\item\tool\Tools.json" />
     <Content Include="config\item\wood\logs.json" />
     <Content Include="config\item\wood\planks.json" />
+    <Content Include="config\lang\gui\cn.json" />
+    <Content Include="config\lang\meta\block\cn.json" />
+    <Content Include="config\lang\meta\item\cn.json" />
     <Content Include="config\recipes\Craft\Block\Furnace.json" />
     <Content Include="config\recipes\Craft\Block\Ladder.json" />
     <Content Include="config\recipes\Craft\Block\Wooden_storage_box.json" />
@@ -72,7 +75,9 @@
     <Content Include="config\recipes\Process\furnace\ingots.json" />
     <Content Include="config\schema\block.json" />
     <Content Include="config\schema\item.json" />
+    <Content Include="config\schema\lang.json" />
     <Content Include="config\schema\recipe.json" />
+    <Content Include="doc\文档-注册和使用语言文本.md" />
     <Content Include="doc\文档-注册实体.md" />
     <Content Include="doc\文档-注册容器菜单.md" />
     <Content Include="doc\文档-注册物品.md" />

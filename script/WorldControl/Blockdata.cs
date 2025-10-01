@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 using horizoncraft.script.Components;
 using MemoryPack;
 
@@ -120,6 +121,47 @@ namespace horizoncraft.script.WorldControl
         public void SetLight(int light)
         {
             this.Light = light;
+        }
+
+        /// <summary>
+        /// 掉落方块的掉落物
+        /// </summary>
+        /// <param name="World"></param>
+        /// <param name="GlobalePos"></param>
+        public void DropBlockLoot(World World, Vector2I GlobalePos)
+        {
+            if (BlockMeta.LootTable != null)
+            {
+                var items = BlockMeta.LootTable.TryTakeItem(State);
+                foreach (var item in items)
+                {
+                    World.Service.EntityService.AddEntityData(
+                        item.GetEntityData(new Vector2I(GlobalePos.X * 16, GlobalePos.Y * 16)));
+                }
+            }
+        }
+        /// <summary>
+        /// 掉落方块内的容器物品
+        /// </summary>
+        /// <param name="World"></param>
+        /// <param name="GlobalePos"></param>
+        public void DropBlockInventoryItems(World World, Vector2I GlobalePos)
+        {
+            //掉落容器物品
+            foreach (var cmp in Components)
+            {
+                if (cmp is InventoryComponent inv)
+                {
+                    foreach (var item in inv.GetInventory().Items)
+                    {
+                        if (item != null)
+                        {
+                            World.Service.EntityService.AddEntityData(
+                                item.GetEntityData(new Vector2I(GlobalePos.X * 16, GlobalePos.Y * 16)));
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.Components;
 using horizoncraft.script.Expand;
+using horizoncraft.script.Inventory;
 using horizoncraft.script.WorldControl;
 using Vector3 = System.Numerics.Vector3;
 
@@ -116,6 +117,16 @@ namespace horizoncraft.script.Events
             return blockData != null && blockData.BlockMeta.Cube;
         }
 
+        public bool CheckCanReplace(BlockData blockData)
+        {
+            return blockData != null && blockData.BlockMeta.Replaceable;
+        }
+
+        public bool CheckCanReplaceAndNotMeta(BlockData blockData, BlockMeta meta)
+        {
+            return blockData != null && blockData.BlockMeta.Replaceable && blockData.BlockMeta != meta;
+        }
+
         /// <summary>
         /// 更新周围的所有被动更新方块,注:是延迟到下tick更新
         /// </summary>
@@ -141,9 +152,15 @@ namespace horizoncraft.script.Events
 
             var local = new Vector3(localPos.X, localPos.Y, position.Z);
             if (!block.HasComponent<ReactiveComponent>()) return;
-            
+
             if (World.Service.ChunkService.Chunks.TryGetValue(chunkPos, out var chunk))
-                chunk.ReactiveTickList.Add(local);
+                chunk.PassiveTickList.Add(local);
+        }
+
+        public void DropBlockLoot(BlockData blockData)
+        {
+            blockData?.DropBlockLoot(World, new Vector2I(GlobalePos.X, GlobalePos.Y));
+            blockData?.DropBlockInventoryItems(World, new Vector2I(GlobalePos.X, GlobalePos.Y));
         }
 
         public void Reset()

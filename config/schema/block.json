@@ -20,6 +20,10 @@
         "type": "boolean",
         "description": "碰撞"
       },
+      "replace": {
+        "type": "boolean",
+        "description": "是否可被替換"
+      },
       "cube": {
         "type": "boolean",
         "description": "是否为完整方块"
