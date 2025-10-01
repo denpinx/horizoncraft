@@ -41,6 +41,24 @@
             </SchemaInfo>
           </value>
         </entry>
+        <entry key="语言配置">
+          <value>
+            <SchemaInfo>
+              <option name="generatedName" value="新建架构" />
+              <option name="name" value="语言配置" />
+              <option name="relativePathToSchema" value="config/schema/lang.json" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="directory" value="true" />
+                    <option name="path" value="config/lang" />
+                    <option name="mappingKind" value="Directory" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
         <entry key="配方配置">
           <value>
             <SchemaInfo>
