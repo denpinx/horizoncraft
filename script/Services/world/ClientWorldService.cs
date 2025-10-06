@@ -47,7 +47,7 @@ public class ClientWorldService : WorldServiceBase
         ChunkService = new ClientChunkService(World);
         PlayerService = new ClientPlayerService(World);
         EntityService = new ClientEntityService(World);
-        MessageService = new CilentMessageService(World);
+        MessageService = new ClientMessageService(World);
         InitializeNode();
 
         GD.Print($"[初始化完成]{nameof(ClientWorldService)}");

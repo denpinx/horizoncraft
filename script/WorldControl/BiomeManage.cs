@@ -78,8 +78,9 @@ namespace horizoncraft.script.WorldControl
         {
             //步骤一 混合与放大
             // 2-4-8-16-32
+            Random random = new Random((int)World.Seed);
             for (int i = 0; i < 5; i++)
-                MixinBiomes(32);
+                MixinBiomes(random, 32);
 
             //todo 步骤二, 添加过度群戏
 
@@ -107,7 +108,7 @@ namespace horizoncraft.script.WorldControl
         /// 混淆群系
         /// </summary>
         /// <param name="time">混淆次数</param>
-        private static void MixinBiomes(int time)
+        private static void MixinBiomes(Random random, int time)
         {
             if (MixinLandbiomes.Count == 0)
             {
@@ -126,11 +127,10 @@ namespace horizoncraft.script.WorldControl
                     MixinLandbiomes.Add(MixinLandbiomes[i]);
             }
 
-            Random rnd = new Random();
             for (int i = 0; i < time; i++)
             {
-                int v1 = rnd.Next(MixinLandbiomes.Count);
-                int v2 = rnd.Next(MixinLandbiomes.Count);
+                int v1 = random.Next(MixinLandbiomes.Count);
+                int v2 = random.Next(MixinLandbiomes.Count);
                 if (v1 != v2)
                 {
                     (MixinLandbiomes[v1], MixinLandbiomes[v2]) = (MixinLandbiomes[v2], MixinLandbiomes[v1]);
@@ -299,6 +299,7 @@ namespace horizoncraft.script.WorldControl
 
         static BiomeManage()
         {
+            BiomeNoise.Seed = (int)World.Seed;
             RegBiomes();
             ReSetWeight();
             Amplification();

@@ -4,9 +4,9 @@ using horizoncraft.script.rpc;
 
 namespace horizoncraft.script.Services.message;
 
-public class CilentMessageService : MessageServiceBase
+public class ClientMessageService : MessageServiceBase
 {
-    public CilentMessageService(World world) : base(world)
+    public ClientMessageService(World world) : base(world)
     {
     }
 
