@@ -2,13 +2,11 @@
 
 [ext_resource type="Script" uid="uid://c6kh82yqje088" path="res://tscn/Gui/MessageLabel.cs" id="1_yoh5f"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3xfws"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lyuea"]
 content_margin_left = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 2.0
-bg_color = Color(0.4926, 0.912777, 1, 1)
-border_width_left = 4
-border_color = Color(1, 0.740276, 0.492699, 1)
+bg_color = Color(0.303427, 0.635503, 0.849812, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -29,11 +27,13 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lyuea"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3xfws"]
 content_margin_left = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 2.0
-bg_color = Color(0.303427, 0.635503, 0.849812, 1)
+bg_color = Color(0.4926, 0.912777, 1, 1)
+border_width_left = 4
+border_color = Color(1, 0.740276, 0.492699, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -50,25 +50,28 @@ corner_radius_bottom_left = 4
 content_margin_left = 4.0
 content_margin_right = 4.0
 bg_color = Color(0.432001, 0.64383, 0.657739, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
 
-[node name="MessageLabel" type="HBoxContainer"]
+[node name="MessageLabel" type="HBoxContainer" node_paths=PackedStringArray("_menuBar", "_popupMenu", "_label")]
 offset_right = 182.0
 offset_bottom = 23.0
 size_flags_horizontal = 2
 size_flags_vertical = 2
 script = ExtResource("1_yoh5f")
+_menuBar = NodePath("MenuBar")
+_popupMenu = NodePath("MenuBar/PopupMenu")
+_label = NodePath("Message")
 
 [node name="MenuBar" type="MenuBar" parent="."]
 layout_mode = 2
 size_flags_horizontal = 2
 size_flags_vertical = 0
-theme_override_styles/hover = SubResource("StyleBoxFlat_3xfws")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_a2otw")
 theme_override_styles/normal = SubResource("StyleBoxFlat_lyuea")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_a2otw")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3xfws")
 
 [node name="PopupMenu" type="PopupMenu" parent="MenuBar"]
 title = "PlayerName"

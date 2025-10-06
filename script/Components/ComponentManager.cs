@@ -49,7 +49,7 @@ public static class ComponentManager
     /// <returns></returns>
     public static bool ExecuteItemComponents(PlayerEvent playerEvent, ItemStack itemStack)
     {
-        int start_id = itemStack.Id;
+        string start_id = itemStack.Name;
         for (int i = 0; i < itemStack.Components.Count; i++)
         {
             Component component = itemStack.Components[i];
@@ -67,7 +67,7 @@ public static class ComponentManager
                 if (!s) return false;
             }
 
-            if (itemStack.Id != start_id)
+            if (itemStack.Name != start_id)
                 return false;
         }
 
@@ -82,7 +82,7 @@ public static class ComponentManager
     /// <returns></returns>
     public static bool ExecuteBlockComponents(WorldEvent worldEvent, BlockData blockData)
     {
-        int start_id = blockData.Id;
+        string start_id = blockData.Id;
         for (int i = 0; i < blockData.Components.Count; i++)
         {
             Component component = blockData.Components[i];

@@ -149,7 +149,7 @@ public abstract partial class InventoryBase
                 OnItemAdd?.Invoke(i, additem);
                 return true;
             }
-            else if (item.Id == additem.Id)
+            else if (item.Name == additem.Name)
             {
                 int max = item.GetItemMeta().MaxAmount;
                 int space = max - item.Amount;
@@ -188,7 +188,7 @@ public abstract partial class InventoryBase
             ItemStack item = GetItem(i);
             if (item == null)
                 return true;
-            if (item.Id == additem.Id)
+            if (item.Name == additem.Name)
             {
                 space += item.GetItemMeta().MaxAmount - item.Amount;
             }
@@ -213,7 +213,7 @@ public abstract partial class InventoryBase
             {
                 for (var resultIndex = 0; resultIndex < ItemStacks.Count; resultIndex++)
                 {
-                    if (ItemStacks[resultIndex].Id == item.Id)
+                    if (ItemStacks[resultIndex].Name == item.Name)
                     {
                         var space = ItemStacks[resultIndex].GetItemMeta().MaxAmount - ItemStacks[resultIndex].Amount;
                         if (space > 0)
@@ -239,7 +239,7 @@ public abstract partial class InventoryBase
             }
         }
 
-        ItemStacks.Sort((a, b) => a.Id.CompareTo(b.Id));
+        ItemStacks.Sort((a, b) => a.Name.CompareTo(b.Name));
         for (int i = 0; i < Size; i++)
         {
             if (i < ItemStacks.Count)

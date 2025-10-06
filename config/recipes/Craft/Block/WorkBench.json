@@ -1,6 +1,6 @@
 {
   "type": "craft",
-  "tag": "player",
+  "tag": "workbench",
   "recipes": [
     {
       "template": [

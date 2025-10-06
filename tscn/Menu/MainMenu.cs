@@ -69,12 +69,12 @@ public partial class MainMenu : horizoncraft.script.World,ITranslatable
         };
         
         
-        LanguageManage.SetLang("cn",GetTree());
+        LanguageManage.SetTargetLang("cn",GetTree());
     }
     public override void _PhysicsProcess(double delta)
     {
         PlayerNode.Visible = false;
-        PlayerNode.Inputable = false;
+        PlayerNode.BaseInputable = false;
         base._PhysicsProcess(delta);
         PlayerNode.Position += Vector2.Left * 1;
 

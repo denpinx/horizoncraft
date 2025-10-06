@@ -16,15 +16,15 @@ public class WorkBenchSystem : TickSystem
             if (value["Action"] == "Craft-All")
             {
                 GD.Print("Craft-All");
-                var gri = RecipeManage.GetRecipe(BlockInv, 3);
+                var gri = RecipeManage.GetRecipe(BlockInv, 3, 0, "workbench");
                 while (gri != null)
                 {
                     if (!player.Inventory.TryAddItem(gri.Result.Copy()))
                         return;
-                    
+
                     for (int i = 0; i < 9; i++)
                         BlockInv.ReduceItemAmount(i);
-                    
+
                     gri = RecipeManage.GetRecipe(BlockInv, 3);
                 }
             }
@@ -42,7 +42,7 @@ public class WorkBenchSystem : TickSystem
                         player.Inventory.HandItemStack = gri.Result.Copy();
                     }
                     else if (
-                        handitme.Id == gri.Result.Id &&
+                        handitme.Name == gri.Result.Name &&
                         handitme.Amount + gri.Result.Amount <= gri.Result.GetItemMeta().MaxAmount
                     )
                     {

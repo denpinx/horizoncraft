@@ -42,7 +42,7 @@ public class ItemEntitySystem : EntitySystem
             foreach (var cmp in cmps)
             {
                 if (cmp.ItemStack == null) continue;
-                if (cmp.ItemStack.Id != component.ItemStack.Id) continue;
+                if (cmp.ItemStack.Name != component.ItemStack.Name) continue;
                 if (component.ItemStack.TryStackItem(cmp.ItemStack).Amount <= 0)
                 {
                     e.WorldService.EntityService.RemoveEntityData(entity.Uuid);

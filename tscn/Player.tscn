@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://dlka0sc4kl0vb"]
+[gd_scene load_steps=32 format=3 uid="uid://dlka0sc4kl0vb"]
 
 [ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/PlayerNode.cs" id="1_knoa1"]
 [ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="1_qob58"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://d1fcknwxu8kry" path="res://tscn/DEBUG_INFO.cs" id="4_knoa1"]
 [ext_resource type="FontVariation" uid="uid://ce62qf4xrcdme" path="res://texture/ttf/font.tres" id="4_q1haa"]
 [ext_resource type="Texture2D" uid="uid://bij7ptef3igbq" path="res://texture/break_process.png" id="5_gqu4d"]
+[ext_resource type="PackedScene" uid="uid://rroruvwvo4sg" path="res://tscn/Gui/chat_view.tscn" id="6_34em8"]
 [ext_resource type="Texture2D" uid="uid://dc7ccxk2dn3pn" path="res://texture/player.png" id="6_emu1f"]
 [ext_resource type="PackedScene" uid="uid://dm7wxja8j5axr" path="res://tscn/Gui/BlockInfoView.tscn" id="7_2i02x"]
 [ext_resource type="Script" uid="uid://bjob2f4yubx5t" path="res://tscn/Body.cs" id="7_7twa1"]
@@ -268,11 +269,25 @@ _data = {
 &"break": SubResource("Animation_7twa1")
 }
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("ChatView", "animationPlayer_other", "animationPlayer_move", "BlockInfoView", "collisionShape2D", "OvrCanvasLayer", "Timer_Tick", "Label_DEBUG_Right", "Label_DEBUG_Left", "Label_PlayerName", "sprite2D_body", "Cursor", "hotBar", "camera2d")]
 top_level = true
 z_index = 10
 collision_layer = 2
 script = ExtResource("1_knoa1")
+ChatView = NodePath("GuidCanvasLayer/ChatView")
+animationPlayer_other = NodePath("AnimationPlayer_Other")
+animationPlayer_move = NodePath("AnimationPlayer_Move")
+BlockInfoView = NodePath("CanvasLayer/BlockInfoView")
+collisionShape2D = NodePath("CollisionShape2D")
+OvrCanvasLayer = NodePath("OvrCanvasLayer")
+Timer_Tick = NodePath("Timer_Tick")
+Label_DEBUG_Right = NodePath("CanvasLayer/Control/Label_DEBUG_Right")
+Label_DEBUG_Left = NodePath("CanvasLayer/Control/Label_DEBUG_Left")
+Label_PlayerName = NodePath("Label_PlayerName")
+sprite2D_body = NodePath("Body")
+Cursor = NodePath("Cursor")
+hotBar = NodePath("GuidCanvasLayer/HotBar")
+camera2d = NodePath("Camera2D")
 metadata/_edit_vertical_guides_ = [575.0]
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -319,6 +334,10 @@ layer = 2
 [node name="HotBar" parent="GuidCanvasLayer" instance=ExtResource("4_kghmo")]
 
 [node name="PlayerDataView" parent="GuidCanvasLayer" instance=ExtResource("7_34em8")]
+
+[node name="ChatView" parent="GuidCanvasLayer" node_paths=PackedStringArray("Player") instance=ExtResource("6_34em8")]
+size_flags_horizontal = 4
+Player = NodePath("../..")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 layer = 2

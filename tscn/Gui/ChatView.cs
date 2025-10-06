@@ -10,54 +10,57 @@ using horizoncraft.script.Chat;
 /// </summary>
 public partial class ChatView : Control
 {
-    public Dictionary<Guid, MessageData> Messages = new();
-    public Dictionary<Guid, MessageLabel> MessageLabels = new();
-    LineEdit LineEdit;
-    private VBoxContainer MessageRoot;
-    PackedScene MessageLabelScene;
+    PackedScene MessageLabelScene = GD.Load<PackedScene>("res://tscn/Gui/MessageLabel.tscn");
+    [Export] public PlayerNode Player;
+    [Export] public LineEdit LineEdit;
+    [Export] public VBoxContainer MessageRoot;
+    double openFrozen = 0.5f;
 
     public override void _Ready()
     {
-        MessageLabelScene = GD.Load<PackedScene>("res://tscn/Gui/MessageLabel.tscn");
-        LineEdit = GetNode<LineEdit>("Box/LineEdit");
-        MessageRoot = GetNode<VBoxContainer>("Box/InstantMessag");
         LineEdit.GrabFocus();
         LineEdit.TextSubmitted += (text) =>
         {
             var guid = Guid.NewGuid();
-            Messages.Add(guid, new MessageData()
+            Player.world.Service.MessageService.UserInputMessage(new MessageData()
             {
-                Player = new PlayerData()
-                {
-                    Name = "test",
-                },
                 Id = guid,
-                Message = LineEdit.Text
+                PlayerName = Player.playerData.Name,
+                Message = LineEdit.Text,
             });
             LineEdit.Text = "";
+            LineEdit.Visible = false;
+            openFrozen = 0.25f;
         };
     }
 
     public override void _Process(double delta)
     {
-        foreach (var msg in Messages.Values)
-        {
-            if (MessageLabels.ContainsKey(msg.Id)) continue;
+        if (openFrozen > 0) openFrozen -= delta;
+        else openFrozen = 0;
+    }
 
-            var ml = MessageLabelScene.Instantiate<MessageLabel>();
-            ml.ParentChatView = this;
-            ml.MessageData = msg;
-            MessageLabels.Add(msg.Id,ml);
-            MessageRoot.AddChild(ml);
+    public override void _Input(InputEvent @event)
+    {
+        if (Input.IsActionJustReleased("chat"))
+        {
+            if (openFrozen != 0) return;
+            if (LineEdit.HasFocus()) return;
+
+            if (!LineEdit.Visible)
+            {
+                MessageRoot.Visible = true;
+                LineEdit.Visible = true;
+                LineEdit.GrabFocus();
+            }
         }
 
-        foreach (var guid in MessageLabels.Keys)
+        if (Input.IsActionJustReleased("OpenOperatingMenu"))
         {
-            var label = MessageLabels[guid];
-            if (Messages.ContainsKey(guid)) continue;
-            
-            label.QueueFree();
-            MessageLabels.Remove(guid);
+            if (LineEdit.Visible)
+            {
+                LineEdit.Visible = false;
+            }
         }
     }
 }

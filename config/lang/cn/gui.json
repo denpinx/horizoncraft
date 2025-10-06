@@ -11,6 +11,9 @@
     "Remove World": "删除世界",
     "Back Main Menu": "返回主菜单",
     "Create New World": "创建新世界",
+    "create_date": "创建日期:{0}",
+    "load_date": "上次加载日期:{0}",
+    "world_seed": "地图种子:{0}",
     "tip_item_name": "物品名 {0}",
     "tip_item_tool_level": "工具等级 {0}",
     "tip_item_tool_type": "工具类型 {0}",
@@ -18,6 +21,8 @@
     "button_mode_0": "生存模式",
     "button_mode_1": "创造模式",
     "button_inventory_sort": "物品栏排序",
-    "button_inventory_clear": "清空物品栏"
+    "button_inventory_clear": "清空物品栏",
+    "button_recipe_next": "下一个配方",
+    "button_recipe_last": "上一个配方"
   }
 }

@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://7x1qdfnvc64p"]
+[gd_scene load_steps=6 format=3 uid="uid://7x1qdfnvc64p"]
 
 [ext_resource type="Script" uid="uid://clbi3yf6nd0p0" path="res://tscn/Menu/Inventory/ItemManage.cs" id="1_x2ne4"]
+[ext_resource type="PackedScene" uid="uid://buh8fwmfrtiwa" path="res://tscn/Menu/Inventory/ReciperView.tscn" id="2_rhhaq"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rhhaq"]
 bg_color = Color(1, 1, 1, 0.0941176)
@@ -29,17 +30,18 @@ layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer2/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 10
 
 [node name="Button_mod_0" type="Button" parent="PanelContainer2/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(128, 48)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "生存模式"
 
 [node name="Button_mod_1" type="Button" parent="PanelContainer2/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(128, 48)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "创造模式"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer2/VBoxContainer"]
@@ -49,31 +51,44 @@ size_flags_vertical = 8
 [node name="Button_clear" type="Button" parent="PanelContainer2/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(128, 48)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "清空背包"
 
 [node name="Button_sort" type="Button" parent="PanelContainer2/VBoxContainer/HBoxContainer2"]
 custom_minimum_size = Vector2(128, 48)
 layout_mode = 2
+size_flags_horizontal = 3
 text = "整理背包"
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="PanelContainer2/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
 size_flags_vertical = 8
 
 [node name="Button_Light_0" type="Button" parent="PanelContainer2/VBoxContainer/HBoxContainer3"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "无光照"
 
 [node name="Button_Light_1" type="Button" parent="PanelContainer2/VBoxContainer/HBoxContainer3"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "光线投射"
 
 [node name="Button_Light_2" type="Button" parent="PanelContainer2/VBoxContainer/HBoxContainer3"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "深度优先"
 
 [node name="AspectRatioContainer" type="AspectRatioContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ReciperView" parent="." instance=ExtResource("2_rhhaq")]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+
+[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -88,10 +103,10 @@ layout_mode = 2
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="Button_Last_Page" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(128, 48)
 layout_mode = 2
-text = "下一页"
+text = "上一页"
 
 [node name="Label" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(64, 0)
@@ -101,12 +116,12 @@ text = "1"
 label_settings = SubResource("LabelSettings_xt4xo")
 horizontal_alignment = 1
 
-[node name="Button2" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="Button_Next_Page" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 custom_minimum_size = Vector2(128, 48)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 8
-text = "上一页"
+text = "下一页"
 
 [node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2

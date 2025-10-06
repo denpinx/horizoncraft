@@ -11,7 +11,7 @@ public partial class PlayerDataSnapshot
     public float X;
     public float Y;
     public bool FaceLeft = false;
-    public int HandItemId;
+    public string HandItemId;
 
     [MemoryPackConstructor]
     public PlayerDataSnapshot()
@@ -27,7 +27,7 @@ public partial class PlayerDataSnapshot
         var item = playerData.Inventory.GetHandItemStack();
         if (item != null)
         {
-            HandItemId = item.Id;
+            HandItemId = item.Name;
         }
     }
 

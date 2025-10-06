@@ -35,7 +35,7 @@ public partial class StructBuildTool : CanvasLayer
         var GridContainer = GetNode<GridContainer>("HBoxContainer/VBoxContainer3/PanelContainer2/GridContainer");
         PackedScene ps = GD.Load<PackedScene>("res://tscn/Menu/InvSlot.tscn");
         int i = 0;
-        foreach (var meta in Materials.BlockMetas)
+        foreach (var meta in Materials.BlockMetas.Values)
         {
             if (meta.ItemMeta == null) continue;
             var invslot = ps.Instantiate<InvSlot>();
@@ -63,7 +63,7 @@ public partial class StructBuildTool : CanvasLayer
         {
             if (block.z <= layer)
             {
-                var meta = Materials.Dictionary_BlockMetas[block.name];
+                var meta = Materials.BlockMetas[block.name];
                 var bts = meta.GetBlockTileSet(0);
                 EditTileMapView.SetCell(new(block.x, block.y), bts.tile_id, new Vector2I(0, 0));
             }

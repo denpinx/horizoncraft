@@ -19,11 +19,11 @@ namespace horizoncraft.script
     public class Materials
     {
         public static TileSet tileSet;
-        public static List<BlockMeta> BlockMetas = new();
-        public static List<ItemMeta> ItemMetas = new();
+        // public static List<BlockMeta> BlockMetas = new();
+        // public static List<ItemMeta> ItemMetas = new();
 
-        public static Dictionary<string, ItemMeta> Dictionary_ItemMetas = new();
-        public static Dictionary<string, BlockMeta> Dictionary_BlockMetas = new();
+        public static Dictionary<string, ItemMeta> ItemMetas = new();
+        public static Dictionary<string, BlockMeta> BlockMetas = new();
 
         public static List<EntityMeta> EntityMetas = new();
         public static Dictionary<string, EntityMeta> DictionaryEntityMetas = new();
@@ -44,19 +44,18 @@ namespace horizoncraft.script
                 meta.Tags.Add("thesaurus", meta.Name);
 
 
-            if (Dictionary_ItemMetas.ContainsKey(meta.Name))
+            if (ItemMetas.ContainsKey(meta.Name))
             {
                 //覆盖更新
-                var blockmeta = Dictionary_ItemMetas[meta.Name].BlockMeta;
-                Dictionary_ItemMetas[meta.Name] = meta;
+                var blockmeta = ItemMetas[meta.Name].BlockMeta;
+                ItemMetas[meta.Name] = meta;
                 meta.BlockMeta = blockmeta;
                 blockmeta.ItemMeta = meta;
             }
             else
             {
                 //添加
-                ItemMetas.Add(meta);
-                Dictionary_ItemMetas.Add(meta.Name, meta);
+                ItemMetas.Add(meta.Name, meta);
             }
 
             GD.Print($"[注册物品]{meta.Id} >{meta.Name}");
@@ -66,8 +65,7 @@ namespace horizoncraft.script
         public static BlockMeta RegBlockMeta(BlockMeta meta)
         {
             meta.Id = BlockMetas.Count;
-            BlockMetas.Add(meta);
-            Dictionary_BlockMetas.Add(meta.Name, meta);
+            BlockMetas.Add(meta.Name, meta);
             GD.Print($"[注册方块]{meta.Id} >{meta.Name}");
 
             if (meta.OreConfig != null)
@@ -88,7 +86,7 @@ namespace horizoncraft.script
                     //TODO 待完成，还没想好用什么方案
                 }
 
-                if (!Dictionary_ItemMetas.ContainsKey(meta.Name))
+                if (!ItemMetas.ContainsKey(meta.Name))
                 {
                     //添加
                     ItemMeta itemMeta = new ItemMeta()
@@ -105,8 +103,8 @@ namespace horizoncraft.script
                 else
                 {
                     //更新
-                    Dictionary_ItemMetas[meta.Name].BlockMeta = meta;
-                    meta.ItemMeta = Dictionary_ItemMetas[meta.Name];
+                    ItemMetas[meta.Name].BlockMeta = meta;
+                    meta.ItemMeta = ItemMetas[meta.Name];
                 }
             }
 
@@ -115,13 +113,20 @@ namespace horizoncraft.script
 
         public static BlockMeta Valueof(string name)
         {
-            return Dictionary_BlockMetas[name];
+            return BlockMetas[name];
         }
 
-        public static BlockMeta Valueof(int id)
+        public static ItemMeta GetItemByTag(string tag)
         {
-            if (id > BlockMetas.Count) GD.PrintErr($"{id} BlockMeta 不存在！");
-            return BlockMetas[id];
+            foreach (var im in ItemMetas.Values)
+            {
+                if (im.GetTag("thesaurus") == tag)
+                {
+                    return im;
+                }
+            }
+
+            return null;
         }
 
         static Materials()
@@ -155,15 +160,14 @@ namespace horizoncraft.script
         /// </summary>
         private static void Posttreatment()
         {
-            for (int i = 0; i < BlockMetas.Count; i++)
+            foreach (var meta in BlockMetas.Values)
             {
-                var meta = BlockMetas[i];
                 meta.LootTable = new LootTable();
                 ;
                 foreach (var ls in meta._LootItemSnapshots_)
                 {
                     var loot_item = new LootItem();
-                    if (Dictionary_ItemMetas.TryGetValue(ls.Name, out var itemmeta))
+                    if (ItemMetas.TryGetValue(ls.Name, out var itemmeta))
                         loot_item.Item = itemmeta.GetItemStack();
                     loot_item.DropChance = ls.DropChance;
                     loot_item.AmountChances = ls.AmountChances;
@@ -510,9 +514,8 @@ namespace horizoncraft.script
             var default_image = ResourceLoader.Load<Texture2D>(
                 $"res://texture/item/default.png");
 
-            for (int i = 0; i < ItemMetas.Count; i++)
+            foreach (var meta in ItemMetas.Values)
             {
-                ItemMeta meta = ItemMetas[i];
                 for (int j = 0; j < meta.Itemset.TextureNames.Count; j++)
                 {
                     var dir = $"res://texture/item/{meta.Itemset.TextureNames[j]}.png";
@@ -567,9 +570,8 @@ namespace horizoncraft.script
             tileSet.AddTerrainSet();
 
             tileSet.SetTerrainSetMode(0, TileSet.TerrainMode.Sides);
-            for (int i = 0; i < BlockMetas.Count; i++)
+            foreach (var meta in BlockMetas.Values)
             {
-                BlockMeta meta = BlockMetas[i];
                 if (meta.Name == "air") continue;
 
                 for (int state_index = 0; state_index < meta.blockTileDatas.Count; state_index++)

@@ -46,7 +46,7 @@ public class FurnaceSystem : TickSystem
                     furnace.Progress = 0;
                     furnace.Result = null;
                 }
-                else if (output.Id == result.Id && output.Amount + result.Amount <= result.GetItemMeta().MaxAmount)
+                else if (output.Name == result.Name && output.Amount + result.Amount <= result.GetItemMeta().MaxAmount)
                 {
                     evnet.UpdateNeighborBlock();
                     furnace.GetInventory().AddItemAmount(2, result.Amount);

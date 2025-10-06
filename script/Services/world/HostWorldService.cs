@@ -6,6 +6,7 @@ using horizoncraft.script.Net;
 using horizoncraft.script.NewProxy.player;
 using HorizonCraft.script.Services.chunk;
 using HorizonCraft.script.Services.entity;
+using horizoncraft.script.Services.message;
 using HorizonCraft.script.Services.player;
 using horizoncraft.script.WorldControl.Tool;
 
@@ -30,6 +31,7 @@ public class HostWorldService : WorldServiceBase
         ChunkService = new HostChunkService(World);
         PlayerService = new HostPlayerService(World);
         EntityService = new HostEntityService(World);
+        MessageService = new HostMessageService(World);
         InitializeNode();
 
         GD.Print($"[初始化完成]{nameof(HostWorldService)}");

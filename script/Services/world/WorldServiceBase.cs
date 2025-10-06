@@ -9,6 +9,7 @@ using horizoncraft.script.NewProxy.player;
 using horizoncraft.script.rpc;
 using HorizonCraft.script.Services.chunk;
 using HorizonCraft.script.Services.entity;
+using horizoncraft.script.Services.message;
 using HorizonCraft.script.Services.player;
 using horizoncraft.script.WorldControl.Tool;
 
@@ -39,6 +40,11 @@ public abstract class WorldServiceBase : IDisposable
 
     public EntityServiceNode EntityServiceNode;
 
+    /// <summary>消息服务</summary>
+    public MessageServiceBase MessageService;
+
+    public MessageServiceNode MessageServiceNode;
+
     public PlayerInventoryServiceNode PlayerInventoryServiceNode;
 
     /// <summary>实体节点行为,定义不同策略下的实体同步行为</summary>
@@ -56,19 +62,18 @@ public abstract class WorldServiceBase : IDisposable
         World.AddChild(PlayerServiceNode = new PlayerServiceNode(World));
         World.AddChild(PlayerInventoryServiceNode = new PlayerInventoryServiceNode(World));
         World.AddChild(EntityServiceNode = new EntityServiceNode(World));
+        World.AddChild(MessageServiceNode = new MessageServiceNode(World));
     }
 
     public abstract void InitializeServices();
 
     public void Dispose()
     {
-        World?.Dispose();
-        ChunkService?.Dispose();
-        ChunkServiceNode?.Dispose();
-        PlayerService?.Dispose();
-        PlayerServiceNode?.Dispose();
-        EntityServiceNode?.Dispose();
-        PlayerInventoryServiceNode?.Dispose();
+        // ChunkServiceNode?.QueueFree();
+        // PlayerServiceNode?.QueueFree();
+        // EntityServiceNode?.QueueFree();
+        // PlayerInventoryServiceNode?.QueueFree();
+        // MessageServiceNode?.QueueFree();
     }
 
     public virtual void LoadWorldProfile()

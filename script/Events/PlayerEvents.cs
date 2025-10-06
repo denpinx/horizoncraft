@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using horizoncraft.script.Components;
@@ -59,7 +60,7 @@ public class PlayerEvents
                 playerCraftItemEvent.Player.Inventory.HandItemStack = gri.Result.Copy();
             }
             else if (
-                handitme.Id == gri.Result.Id &&
+                handitme.Name == gri.Result.Name &&
                 handitme.Amount + gri.Result.Amount <= gri.Result.GetItemMeta().MaxAmount
             )
                 handitme.Amount += gri.Result.Amount;
@@ -78,14 +79,14 @@ public class PlayerEvents
     /// <param name="viewName">物品栏名</param>
     public void OpenInventory(World world, string viewName)
     {
-        if (world.PlayerNode.ShowView != null)
+        if (world.PlayerNode.OpeningInventoryNode != null)
         {
-            world.PlayerNode.RemoveChild(world.PlayerNode.ShowView);
+            world.PlayerNode.RemoveChild(world.PlayerNode.OpeningInventoryNode);
         }
 
-        world.PlayerNode.ShowView = InventoryManage.GetInventory<InventoryNode>(viewName);
-        world.PlayerNode.ShowView.PlayerNode = world.PlayerNode;
-        world.PlayerNode.AddChild(world.PlayerNode.ShowView);
+        world.PlayerNode.OpeningInventoryNode = InventoryManage.GetInventory<InventoryNode>(viewName);
+        world.PlayerNode.OpeningInventoryNode.PlayerNode = world.PlayerNode;
+        world.PlayerNode.AddChild(world.PlayerNode.OpeningInventoryNode);
     }
 
     /// <summary>
@@ -119,19 +120,18 @@ public class PlayerEvents
     public virtual bool OpenBlockView(PlayerOpenBlockViewEvent e)
     {
         var world = e.world;
-        if (world.PlayerNode.ShowView != null)
+        if (world.PlayerNode.OpeningInventoryNode != null)
         {
-            world.PlayerNode.RemoveChild(world.PlayerNode.ShowView);
-            world.PlayerNode.ShowView.QueueFree();
-            world.PlayerNode.ShowView = null;
+            world.PlayerNode.RemoveChild(world.PlayerNode.OpeningInventoryNode);
+            world.PlayerNode.OpeningInventoryNode = null;
         }
 
         var block = world.Service.ChunkService.GetBlock(e.Position);
         if (block == null) return false;
-        world.PlayerNode.ShowView = InventoryManage.GetInventory<InventoryNode>(e.ViewName);
-        world.PlayerNode.ShowView.TargetBlock = block;
-        world.PlayerNode.ShowView.PlayerNode = world.PlayerNode;
-        world.PlayerNode.AddChild(world.PlayerNode.ShowView);
+        world.PlayerNode.OpeningInventoryNode = InventoryManage.GetInventory<InventoryNode>(e.ViewName);
+        world.PlayerNode.OpeningInventoryNode.TargetBlock = block;
+        world.PlayerNode.OpeningInventoryNode.PlayerNode = world.PlayerNode;
+        world.PlayerNode.AddChild(world.PlayerNode.OpeningInventoryNode);
         return true;
     }
 
@@ -147,7 +147,7 @@ public class PlayerEvents
         var handitem = e.Player.Inventory.GetHandItemStack();
         e.Inventory.update = true;
         var targetitem = e.GetIndexItem();
-        if (targetitem != null && handitem != null && targetitem.Id == handitem.Id)
+        if (targetitem != null && handitem != null && targetitem.Name == handitem.Name)
         {
             //目标有物品，且id相同，且有空间
             int space = targetitem.GetItemMeta().MaxAmount - targetitem.Amount;
@@ -243,6 +243,8 @@ public class PlayerEvents
     /// <returns></returns>
     public virtual bool BreakBlock(PlayerBreakblockEvent e)
     {
+        if (!e.Player.Live) return false;
+
         var targetblock = e.GetBlockData();
 
         if (e.Player.Mode == 0 &&
@@ -268,9 +270,14 @@ public class PlayerEvents
                 e.world.Service.EntityService.AddEntityData(data);
             }
 
+            if (Random.Shared.Next(10) == 0 && e.Player.Hunger.Value > 0)
+                e.Player.Hunger.Value -= 0.1f;
+
             targetblock.DropBlockInventoryItems(e.world, new Vector2I(e.Position.X, e.Position.Y));
         }
 
+        
+        
         e.ChunkService.SetBlock(e.Position, Materials.Valueof("air"));
         e.ChunkService.PassiveUpdateNeighborBlock(e.Position);
         e.Player.Inventory.update = true;

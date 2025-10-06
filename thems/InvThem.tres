@@ -13,10 +13,10 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 4
 border_color = Color(0.188235, 0.188235, 0.188235, 0.870588)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 shadow_color = Color(0, 0, 0, 0.47451)
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ogh8t"]

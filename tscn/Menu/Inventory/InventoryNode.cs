@@ -35,7 +35,7 @@ public partial class InventoryNode : CanvasLayer
         SetLayer(10);
         
         Timer timer = new Timer();
-        timer.Autostart = true;
+        timer.Autostart = true; 
         timer.SetWaitTime(0.05);
         timer.Timeout += UpdateGui;
         AddChild(timer);

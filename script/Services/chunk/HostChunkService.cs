@@ -166,7 +166,7 @@ public class HostChunkService : ChunkServiceBase
                         x = (byte)v.X,
                         y = (byte)v.Y,
                         z = (byte)v.Z,
-                        id = (short)chunk.GetBlock(v.X, v.Y, v.Z).Id,
+                        id = chunk.GetBlock(v.X, v.Y, v.Z).Id,
                         state = (byte)chunk.GetBlock(v.X, v.Y, v.Z).State
                     });
                 }

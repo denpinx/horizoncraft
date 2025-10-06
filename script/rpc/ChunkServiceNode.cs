@@ -73,12 +73,12 @@ public partial class ChunkServiceNode : Node
     {
         BlockData block = ByteTool.FromBytes<BlockData>(data);
         WorldService.ChunkService.SetBlock(new Vector3I(x, y, z), block);
-        if (World.PlayerNode.ShowView != null &&
+        if (World.PlayerNode.OpeningInventoryNode != null &&
             World.PlayerNode.playerData.OpenInventory == new System.Numerics.Vector3(x, y, z))
         {
-            World.PlayerNode.ShowView.TargetBlock = block;
+            World.PlayerNode.OpeningInventoryNode.TargetBlock = block;
         }
-        else if (World.PlayerNode.ShowView != null)
+        else if (World.PlayerNode.OpeningInventoryNode != null)
         {
         }
     }
@@ -91,24 +91,24 @@ public partial class ChunkServiceNode : Node
         PlayerInventory inv = ByteTool.FromBytes<PlayerInventory>(playerinv);
         World.PlayerNode.playerData.Inventory = inv;
 
-        if (World.PlayerNode.ShowView != null)
+        if (World.PlayerNode.OpeningInventoryNode != null)
         {
-            World.PlayerNode.ShowView.TargetBlock = blockData;
+            World.PlayerNode.OpeningInventoryNode.TargetBlock = blockData;
         }
         else
         {
             GD.Print("收到数据,打开菜单");
             
-            if (World.PlayerNode.ShowView != null)
+            if (World.PlayerNode.OpeningInventoryNode != null)
             {
-                World.PlayerNode.RemoveChild(World.PlayerNode.ShowView);
+                World.PlayerNode.RemoveChild(World.PlayerNode.OpeningInventoryNode);
             }
             var block = blockData;
             if (block == null) return;
-            World.PlayerNode.ShowView = InventoryManage.GetInventory<InventoryNode>(block.GetComponent<InventoryComponent>().InventoryName);
-            World.PlayerNode.ShowView.TargetBlock = block;
-            World.PlayerNode.ShowView.PlayerNode = World.PlayerNode;
-            World.PlayerNode.AddChild(World.PlayerNode.ShowView);
+            World.PlayerNode.OpeningInventoryNode = InventoryManage.GetInventory<InventoryNode>(block.GetComponent<InventoryComponent>().InventoryName);
+            World.PlayerNode.OpeningInventoryNode.TargetBlock = block;
+            World.PlayerNode.OpeningInventoryNode.PlayerNode = World.PlayerNode;
+            World.PlayerNode.AddChild(World.PlayerNode.OpeningInventoryNode);
         }
     }
 
@@ -139,7 +139,7 @@ public partial class ChunkServiceNode : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-    public void SetBlock(int x, int y, int z, int id, int state)
+    public void SetBlock(int x, int y, int z, string id, int state)
     {
         WorldService.ChunkService.SetBlock(new(x, y, z), Materials.Valueof(id), state);
     }

@@ -14,13 +14,13 @@ namespace horizoncraft.script.WorldControl
 
         public Color DebugColor;
 
-        public T Copy<T>() where T : BaseBiome
+        public BiomeItem GetBiomeItem()
         {
-            return (T)new BaseBiome()
+            return new BiomeItem()
             {
-                name = name,
-                weight = weight,
-                weight_range = weight_range,
+                Name = name,
+                Weight = weight,
+                WeightRange = weight_range,
             };
         }
     }

@@ -1,39 +1,47 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script.WorldControl.work;
 using horizoncraft.script.WorldControl.worldbiomes;
-using MemoryPack.Compression;
 
 namespace horizoncraft.script.WorldControl
 {
-    public class BiomeManage
+    public struct BiomeItem
     {
-        public enum BiomeType
-        {
-            LandBiome,
-            Sky,
-            Deep
-        }
+        public Vector2 WeightRange;
+        public float Weight;
+        public string Name;
+    }
 
-        public static FastNoiseLite biome_noise = new FastNoiseLite();
+    public enum BiomeType
+    {
+        LandBiome,
+        Sky,
+        Deep
+    }
 
-        public static List<LandBiome> prim_landbiomes = new List<LandBiome>();
-        public static List<LandBiome> Mixin_Landbiomes = new List<LandBiome>();
-        public static List<Biome> deep_biomes = new List<Biome>();
-        public static List<Biome> sky_biomes = new List<Biome>();
-        public static float LandMaxWeight = 0;
-        public static float DeepMaxWeight = 0;
-        public static float SkyMaxWeight = 0;
+    public static class BiomeManage
+    {
+        private static float Zoom = 0.3f;
+        private static FastNoiseLite BiomeNoise = new FastNoiseLite();
 
-        public static void Register(BaseBiome basebiome)
+        private static List<LandBiome> LandBiomes = new List<LandBiome>();
+        private static List<BiomeItem> MixinLandbiomes = new List<BiomeItem>();
+        private static List<Biome> DeepBiomes = new List<Biome>();
+        private static List<Biome> SkyBiomes = new List<Biome>();
+        private static float LandMaxWeight = 0;
+        private static float MixinLandMaxWeight = 0;
+        private static float DeepMaxWeight = 0;
+        private static float SkyMaxWeight = 0;
+
+        /// <summary>
+        /// 注册生物群系
+        /// </summary>
+        /// <param name="basebiome">群系类型</param>
+        private static void Register(BaseBiome basebiome)
         {
             if (basebiome is LandBiome landBiome)
             {
-                prim_landbiomes.Add(landBiome);
+                LandBiomes.Add(landBiome);
                 LandMaxWeight += basebiome.weight;
             }
             else if (basebiome is Biome biome)
@@ -41,118 +49,138 @@ namespace horizoncraft.script.WorldControl
                 if (biome.biomeType == BiomeType.Deep)
                 {
                     DeepMaxWeight += basebiome.weight;
-                    deep_biomes.Add(biome);
+                    DeepBiomes.Add(biome);
                 }
                 else
                 {
                     SkyMaxWeight += basebiome.weight;
-                    sky_biomes.Add(biome);
+                    SkyBiomes.Add(biome);
                 }
             }
         }
 
-
-        // 平滑计算当前X轴的生物群系类型
-        public static LandBiome Valueof(string name)
+        /// <summary>
+        /// 获取原始地表群系
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static LandBiome GetLandBiome(string name)
         {
-            for (int i = 0; i < prim_landbiomes.Count; i++)
-                if (prim_landbiomes[i].name == name)
-                    return prim_landbiomes[i];
+            for (int i = 0; i < LandBiomes.Count; i++)
+                if (LandBiomes[i].name == name)
+                    return LandBiomes[i];
             return null;
         }
 
 
-        //只调用一次
-        //将群戏放大化，使得权重分配更均匀
+        //将群戏放大化，使得权重分配更随机
         private static void Amplification()
         {
-            //步骤一 搅拌和切砍
+            //步骤一 混合与放大
             // 2-4-8-16-32
             for (int i = 0; i < 5; i++)
-                Mixin(8);
+                MixinBiomes(32);
 
             //todo 步骤二, 添加过度群戏
 
             //步骤三，分配权重
-            int MaxWeight = 0;
-            for (int i = 0; i < Mixin_Landbiomes.Count; i++)
-                MaxWeight += Mixin_Landbiomes[i].weight;
+            float MaxWeight = 0;
+            for (int i = 0; i < MixinLandbiomes.Count; i++)
+                MaxWeight += MixinLandbiomes[i].Weight;
+
+            MixinLandMaxWeight = MaxWeight;
             float half = -MaxWeight / 2;
-            for (int i = 0; i < Mixin_Landbiomes.Count; i++)
+
+            for (int i = 0; i < MixinLandbiomes.Count; i++)
             {
-                Mixin_Landbiomes[i].weight_range.X = half;
-                Mixin_Landbiomes[i].weight_range.Y = half + Mixin_Landbiomes[i].weight;
-                half += Mixin_Landbiomes[i].weight;
+                MixinLandbiomes[i] = new BiomeItem()
+                {
+                    Name = MixinLandbiomes[i].Name,
+                    Weight = MixinLandbiomes[i].Weight,
+                    WeightRange = new Vector2(half, half + MixinLandbiomes[i].Weight)
+                };
+                half += MixinLandbiomes[i].Weight;
             }
         }
 
-        private static void Mixin(int time)
+        /// <summary>
+        /// 混淆群系
+        /// </summary>
+        /// <param name="time">混淆次数</param>
+        private static void MixinBiomes(int time)
         {
-            if (Mixin_Landbiomes.Count == 0)
+            if (MixinLandbiomes.Count == 0)
             {
                 //复制两遍
-                for (int i = 0; i < prim_landbiomes.Count; i++)
+                for (int i = 0; i < LandBiomes.Count; i++)
                 {
-                    Mixin_Landbiomes.Add(prim_landbiomes[i].Copy<LandBiome>());
-                    Mixin_Landbiomes.Add(prim_landbiomes[i].Copy<LandBiome>());
+                    MixinLandbiomes.Add(LandBiomes[i].GetBiomeItem());
+                    MixinLandbiomes.Add(LandBiomes[i].GetBiomeItem());
                 }
             }
             else
             {
                 //自我复制一遍
-                for (int i = 0; i < Mixin_Landbiomes.Count; i++)
-                    Mixin_Landbiomes.Add(Mixin_Landbiomes[i].Copy<LandBiome>());
+                var max = MixinLandbiomes.Count;
+                for (int i = 0; i < max; i++)
+                    MixinLandbiomes.Add(MixinLandbiomes[i]);
             }
 
             Random rnd = new Random();
             for (int i = 0; i < time; i++)
             {
-                int v1 = rnd.Next(Mixin_Landbiomes.Count);
-                int v2 = rnd.Next(Mixin_Landbiomes.Count);
+                int v1 = rnd.Next(MixinLandbiomes.Count);
+                int v2 = rnd.Next(MixinLandbiomes.Count);
                 if (v1 != v2)
                 {
-                    var temp = Mixin_Landbiomes[v1];
-                    Mixin_Landbiomes[v1] = Mixin_Landbiomes[v2];
-                    Mixin_Landbiomes[v2] = temp;
+                    (MixinLandbiomes[v1], MixinLandbiomes[v2]) = (MixinLandbiomes[v2], MixinLandbiomes[v1]);
                 }
             }
         }
 
-        public static void ReSetWeight()
+        /// <summary>
+        /// 更新原始群系权重
+        /// </summary>
+        private static void ReSetWeight()
         {
             float half = -LandMaxWeight / 2;
-            for (int i = 0; i < prim_landbiomes.Count; i++)
+            for (int i = 0; i < LandBiomes.Count; i++)
             {
-                prim_landbiomes[i].weight_range.X = half;
-                prim_landbiomes[i].weight_range.Y = half + prim_landbiomes[i].weight;
-                half += prim_landbiomes[i].weight;
+                LandBiomes[i].weight_range.X = half;
+                LandBiomes[i].weight_range.Y = half + LandBiomes[i].weight;
+                half += LandBiomes[i].weight;
                 GD.Print(
-                    $"群系名称：{prim_landbiomes[i].name} 权重:{prim_landbiomes[i].weight}，{prim_landbiomes[i].weight_range.X},{prim_landbiomes[i].weight_range.Y}");
+                    $"群系名称：{LandBiomes[i].name} 权重:{LandBiomes[i].weight}，{LandBiomes[i].weight_range.X},{LandBiomes[i].weight_range.Y}");
             }
 
             half = -DeepMaxWeight / 2;
-            for (int i = 0; i < deep_biomes.Count; i++)
+            for (int i = 0; i < DeepBiomes.Count; i++)
             {
-                deep_biomes[i].weight_range.X = half;
-                deep_biomes[i].weight_range.Y = half + deep_biomes[i].weight;
-                half += deep_biomes[i].weight;
+                DeepBiomes[i].weight_range.X = half;
+                DeepBiomes[i].weight_range.Y = half + DeepBiomes[i].weight;
+                half += DeepBiomes[i].weight;
                 GD.Print(
-                    $"群系名称：{deep_biomes[i].name} 权重:{deep_biomes[i].weight}，{deep_biomes[i].weight_range.X},{deep_biomes[i].weight_range.Y}");
+                    $"群系名称：{DeepBiomes[i].name} 权重:{DeepBiomes[i].weight}，{DeepBiomes[i].weight_range.X},{DeepBiomes[i].weight_range.Y}");
             }
 
             half = -SkyMaxWeight / 2;
-            for (int i = 0; i < sky_biomes.Count; i++)
+            for (int i = 0; i < SkyBiomes.Count; i++)
             {
-                sky_biomes[i].weight_range.X = half;
-                sky_biomes[i].weight_range.Y = half + sky_biomes[i].weight;
-                half += sky_biomes[i].weight;
+                SkyBiomes[i].weight_range.X = half;
+                SkyBiomes[i].weight_range.Y = half + SkyBiomes[i].weight;
+                half += SkyBiomes[i].weight;
                 GD.Print(
-                    $"群系名称：{sky_biomes[i].name} 权重:{sky_biomes[i].weight}，{sky_biomes[i].weight_range.X},{sky_biomes[i].weight_range.Y}");
+                    $"群系名称：{SkyBiomes[i].name} 权重:{SkyBiomes[i].weight}，{SkyBiomes[i].weight_range.X},{SkyBiomes[i].weight_range.Y}");
             }
         }
 
-
-        //检查生物群系属于地表群系还是二维群系
+        /// <summary>
+        /// 检查给予的高度图和区块坐标，是否属于一维群系，还是二维群系
+        /// </summary>
+        /// <param name="HighMap"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static BiomeType CheckRange(int[,] HighMap, int x, int y)
         {
             int gx = Chunk.Size * x;
@@ -183,43 +211,59 @@ namespace horizoncraft.script.WorldControl
             return BiomeType.LandBiome;
         }
 
-        //地表群系
-        public static LandBiome GetLandBiome(int x)
+        /// <summary>
+        /// 获取混淆后的地表群系
+        /// </summary>
+        /// <param name="x">一维坐标</param>
+        /// <returns></returns>
+        public static LandBiome GetMixinLandBiome(int x)
         {
-            var num = biome_noise.GetNoise1D((float)x) * ((float)LandMaxWeight / 2f);
-            for (int i = 0; i < prim_landbiomes.Count; i++)
+            var num = BiomeNoise.GetNoise1D((float)x * Zoom) * ((float)MixinLandMaxWeight / 2f);
+            for (int i = 0; i < MixinLandbiomes.Count; i++)
             {
-                if (num >= prim_landbiomes[i].weight_range.X && num < prim_landbiomes[i].weight_range.Y)
+                if (num >= MixinLandbiomes[i].WeightRange.X && num < MixinLandbiomes[i].WeightRange.Y)
                 {
-                    return prim_landbiomes[i];
+                    return GetLandBiome(MixinLandbiomes[i].Name);
                 }
             }
 
             return null;
         }
 
+        /// <summary>
+        /// 获取地下的二维生物群系
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static Biome GetDeepBiome(int x, int y)
         {
-            var num = biome_noise.GetNoise2D(x, y) * (DeepMaxWeight / 2f);
-            for (int i = 0; i < deep_biomes.Count; i++)
+            var num = BiomeNoise.GetNoise2D(x * Zoom, y * Zoom) * (DeepMaxWeight / 2f);
+            for (int i = 0; i < DeepBiomes.Count; i++)
             {
-                if (num >= deep_biomes[i].weight_range.X && num < deep_biomes[i].weight_range.Y)
+                if (num >= DeepBiomes[i].weight_range.X && num < DeepBiomes[i].weight_range.Y)
                 {
-                    return deep_biomes[i];
+                    return DeepBiomes[i];
                 }
             }
 
             return null;
         }
 
+        /// <summary>
+        /// 获取地上的二维生物群系
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static Biome GetSkyBiome(int x, int y)
         {
-            var num = biome_noise.GetNoise2D(x, y) * (SkyMaxWeight / 2f);
-            for (int i = 0; i < sky_biomes.Count; i++)
+            var num = BiomeNoise.GetNoise2D(x * Zoom, y * Zoom) * (SkyMaxWeight / 2f);
+            for (int i = 0; i < SkyBiomes.Count; i++)
             {
-                if (num >= sky_biomes[i].weight_range.X && num < sky_biomes[i].weight_range.Y)
+                if (num >= SkyBiomes[i].weight_range.X && num < SkyBiomes[i].weight_range.Y)
                 {
-                    return sky_biomes[i];
+                    return SkyBiomes[i];
                 }
             }
 
@@ -228,11 +272,11 @@ namespace horizoncraft.script.WorldControl
 
         public static BaseBiome GetBiomeAsName(string name)
         {
-            var land = prim_landbiomes.Find(B => B.name == name);
+            var land = LandBiomes.Find(B => B.name == name);
             if (land != null) return land;
-            var sky = sky_biomes.Find(B => B.name == name);
+            var sky = SkyBiomes.Find(B => B.name == name);
             if (sky != null) return sky;
-            var deep = deep_biomes.Find(B => B.name == name);
+            var deep = DeepBiomes.Find(B => B.name == name);
             if (deep != null) return deep;
             return null;
         }
@@ -242,9 +286,9 @@ namespace horizoncraft.script.WorldControl
             //森林
             Register(new ForestBiome());
             //平原
-            //Register(new PlainBiome());
+            Register(new PlainBiome());
             //雪地
-            //Register(new SnowfieldBiome());
+            Register(new SnowfieldBiome());
             //地下通用群系
             Register(new DeepLayerBiome());
             //天空通用群系
@@ -257,6 +301,7 @@ namespace horizoncraft.script.WorldControl
         {
             RegBiomes();
             ReSetWeight();
+            Amplification();
         }
     }
 }

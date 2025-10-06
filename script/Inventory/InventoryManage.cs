@@ -4,7 +4,7 @@ using Godot;
 
 namespace horizoncraft.script.Inventory;
 
-public class InventoryManage
+public static class InventoryManage
 {
     public static Dictionary<string, Node> Inventorys = new();
 

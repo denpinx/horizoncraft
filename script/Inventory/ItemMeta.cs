@@ -10,7 +10,9 @@ public class ItemMeta
     /// <summary>组件属性集合</summary>
     public List<Func<Component>> Components = new();
 
+    //内部id
     public int Id;
+    public string NameSpace = nameof(horizoncraft);
     public string Name;
     public string Description;
     public bool HasBlock = false;
@@ -33,7 +35,7 @@ public class ItemMeta
     {
         var item = new ItemStack()
         {
-            Id = Id,
+            Name = Name,
             Amount = 1,
         };
         foreach (var component in Components)

@@ -1,14 +1,20 @@
-[gd_scene load_steps=4 format=3 uid="uid://rroruvwvo4sg"]
+[gd_scene load_steps=3 format=3 uid="uid://rroruvwvo4sg"]
 
 [ext_resource type="Script" uid="uid://de5qy8g38p48h" path="res://tscn/Gui/ChatView.cs" id="1_ymcwq"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3ihlu"]
-bg_color = Color(1, 1, 1, 0.870588)
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_807xs"]
-bg_color = Color(0.678431, 0.678431, 0.678431, 0.870588)
+bg_color = Color(0.2231029, 0.2231029, 0.22310278, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 0.78431374)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
-[node name="ChatView" type="Control"]
+[node name="ChatView" type="Control" node_paths=PackedStringArray("LineEdit", "MessageRoot")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -16,6 +22,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ymcwq")
+LineEdit = NodePath("Box/HBoxContainer/LineEdit")
+MessageRoot = NodePath("Box/InstantMessag")
 
 [node name="Box" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -25,33 +33,30 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ChatHistory" type="Label" parent="Box"]
-visible = false
-layout_mode = 2
-text = "[player]:test12345
-[player]:test12345
-[player]:test12345
-[player]:test12345
-[player]:test12345
-[player]:test12345
-[player]:test12345
-[player]:test12345
-[player]:test12345
-[player]:test12345
-[player]:test12345
-[player]:test12345"
-
 [node name="InstantMessag" type="VBoxContainer" parent="Box"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 2
 
-[node name="LineEdit" type="LineEdit" parent="Box"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Box"]
 layout_mode = 2
 size_flags_vertical = 10
+
+[node name="LineEdit" type="LineEdit" parent="Box/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 10
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_placeholder_color = Color(1, 1, 1, 1)
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_styles/focus = SubResource("StyleBoxFlat_3ihlu")
 theme_override_styles/normal = SubResource("StyleBoxFlat_807xs")
+theme_override_styles/focus = SubResource("StyleBoxFlat_807xs")
 placeholder_text = "输入消息"
+max_length = 32
 caret_blink = true
+caret_force_displayed = true
+caret_mid_grapheme = true
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="Box/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0

@@ -4,7 +4,7 @@
     "ore": {
       "deep": -1,
       "size": 4,
-      "count": 10,
+      "count": 12,
       "range": 1
     },
     "tag": {
@@ -23,7 +23,7 @@
     "ore": {
       "deep": -1,
       "size": 4,
-      "count": 5,
+      "count": 9,
       "range": 1
     },
     "tag": {
@@ -36,7 +36,7 @@
     "ore": {
       "deep": -1,
       "size": 4,
-      "count": 5,
+      "count": 8,
       "range": 1
     },
     "tag": {
@@ -75,7 +75,7 @@
     "ore": {
       "deep": 16,
       "size": 4,
-      "count": 4,
+      "count": 7,
       "range": 1
     },
     "tag": {

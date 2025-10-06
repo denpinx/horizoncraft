@@ -4,7 +4,10 @@
   "properties": {
     "type": {
       "type": "string",
-      "enum": ["craft","process"],
+      "enum": [
+        "craft",
+        "process"
+      ],
       "description": "配方类型"
     },
     "tag": {
@@ -19,6 +22,10 @@
           "cost": {
             "type": "array",
             "description": "消耗"
+          },
+          "extended-tag": {
+            "type": "object",
+            "description": "扩展标签匹配"
           },
           "cost-tag": {
             "type": "array",
@@ -44,7 +51,7 @@
             "additionalProperties": {
               "type": "string"
             },
-            "description": "模板的替换"    
+            "description": "模板的替换"
           },
           "mask-tag": {
             "type": "object",
@@ -57,5 +64,8 @@
       }
     }
   },
-  "required": ["type","recipes"]
+  "required": [
+    "type",
+    "recipes"
+  ]
 }

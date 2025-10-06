@@ -29,7 +29,10 @@ public partial class PlayerData
 
     //连接id
     public int PeerId = 0;
-
+    public bool Live = true;
+    public ConfigSet<float> Health = new() { Value = 20f, Default = 20f };
+    public ConfigSet<float> Hunger = new() { Value = 20f, Default = 20f };
+    
     public ConfigSet<float> Resistance = new() { Value = 1f, Default = 1f };
     public ConfigSet<float> MoveSpeed = new() { Value = 16 * 5f, Default = 16 * 5f };
     public ConfigSet<bool> Fly = new() { Value = false, Default = false };

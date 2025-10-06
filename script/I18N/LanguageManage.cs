@@ -1,13 +1,18 @@
 using System.Collections.Generic;
 using Godot;
+using horizoncraft.script.Inventory;
 using horizoncraft.script.Utility;
 
 namespace horizoncraft.script.I18N;
 
+/// <summary>
+/// 本地化管理器，通常情况下，只会加载使用时的语言
+/// </summary>
 public static class LanguageManage
 {
-    public static string usingLang = "cn";
-    private static Dictionary<string, TextManage> TextManages = new Dictionary<string, TextManage>();
+    public static string CurrentLanguage = "cn";
+    public static List<string> Langs = new List<string>();
+    public static Dictionary<string, TextManage> TextManages = new Dictionary<string, TextManage>();
 
     private static void AddText(string lang, string key, string value)
     {
@@ -22,15 +27,27 @@ public static class LanguageManage
 
     static LanguageManage()
     {
+        ReLoadTargetLanguage(CurrentLanguage);
+    }
+
+    private static void ReLoadTargetLanguage(string Lang)
+    {
+        TextManages.Clear();
+
         List<string> files = new();
         DirUtility.GetAllFiles("config/lang", files);
         foreach (var file in files)
         {
-            LoadLanguage(file);
+            LoadTargetLanguage(file, Lang);
         }
     }
 
-    static void LoadLanguage(string dir)
+    /// <summary>
+    /// 加载目标语言
+    /// </summary>
+    /// <param name="dir">目录</param>
+    /// <param name="targetlang">目标语言</param>
+    private static void LoadTargetLanguage(string dir, string targetlang)
     {
         FileAccess fileAccess = FileAccess.Open(dir, FileAccess.ModeFlags.Read);
         string jsonText = fileAccess.GetAsText();
@@ -38,6 +55,12 @@ public static class LanguageManage
         var dict = JsonCleaner.FromJson(jsonText);
         if (dict.TryGetValue("lang", out var lang))
         {
+            if (!Langs.Contains((string)lang))
+            {
+                Langs.Add((string)lang);
+            }
+
+            if ((string)lang != targetlang) return;
             string perfix = "";
             if (dict.TryGetValue("prefix", out var perfix2))
             {
@@ -45,9 +68,9 @@ public static class LanguageManage
             }
 
 
-            if (dict.ContainsKey("texts"))
+            if (dict.TryGetValue("texts", out var value))
             {
-                var dict_texts = (Dictionary<string, object>)dict["texts"];
+                var dict_texts = (Dictionary<string, object>)value;
                 foreach (var kvp in dict_texts)
                 {
                     AddText((string)lang, perfix + kvp.Key, kvp.Value as string);
@@ -56,10 +79,16 @@ public static class LanguageManage
         }
     }
 
-    public static string Tr(this string key, params string[] args)
+    /// <summary>
+    /// 本地化文本
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="args">文本格式化参数　用　｛０｝｛１｝表示</param>
+    /// <returns></returns>
+    public static string Tr(this string key, params object[] args)
     {
         string result = key;
-        if (TextManages.TryGetValue(usingLang, out var textManage))
+        if (TextManages.TryGetValue(CurrentLanguage, out var textManage))
         {
             result = textManage.Tr(key);
 
@@ -67,24 +96,23 @@ public static class LanguageManage
             {
                 result = string.Format(result, args);
             }
-
-            return result;
         }
         else GD.PrintErr($"[LanguageManage] {key} 文本不存在");
+
         return result;
     }
 
     /// <summary>
-    /// 翻译
+    /// 本地化文本,且使用前缀
     /// </summary>
     /// <param name="key">键</param>
     /// <param name="prefix">前缀</param>
     /// <returns></returns>
-    public static string Trprefix(this string key, string prefix = "", params object[] paramss)
+    public static string Trprefix(this string key, string prefix = "", params object[] args)
     {
         string result = key;
         if (prefix != "") result = prefix + "." + key;
-        if (TextManages.TryGetValue(usingLang, out var textManage))
+        if (TextManages.TryGetValue(CurrentLanguage, out var textManage))
         {
             if (prefix != "")
             {
@@ -95,9 +123,9 @@ public static class LanguageManage
                 result = textManage.Tr(key);
             }
 
-            if (paramss.Length > 0)
+            if (args.Length > 0)
             {
-                result = string.Format(result, paramss);
+                result = string.Format(result, args);
             }
 
             return result;
@@ -113,14 +141,21 @@ public static class LanguageManage
     /// <summary>
     /// 切换语言
     /// </summary>
-    /// <param name="lang"></param>
-    /// <param name="tree"></param>
-    public static void SetLang(string lang, SceneTree tree)
+    /// <param name="lang">目标语言</param>
+    /// <param name="tree">场景树</param>
+    public static void SetTargetLang(string lang, SceneTree tree)
     {
+        ReLoadTargetLanguage(lang);
+
         if (TextManages.ContainsKey(lang))
         {
-            usingLang = lang;
+            CurrentLanguage = lang;
             ResetLang(tree.Root);
+            //更新ui管理器中的未场景树被托管的节点
+            foreach (var invs in InventoryManage.Inventorys.Values)
+            {
+                ResetLang(invs);
+            }
         }
         else
         {
@@ -138,7 +173,10 @@ public static class LanguageManage
         {
             if (node is ITranslatable itl)
             {
-                itl.TranslateChange();
+                if (node.IsNodeReady())
+                    itl.TranslateChange();
+                //延迟到场景加载完成时再更新
+                else node.Ready += () => itl.TranslateChange();
             }
 
             ResetLang(node);

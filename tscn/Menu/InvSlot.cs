@@ -54,6 +54,7 @@ public partial class InvSlot : Control
     public override void _Input(InputEvent @event)
     {
         InputActive = true;
+        if (!IsVisibleInTree()) return;
         Vector2 globalMousePos = GetViewport().GetMousePosition();
         Rect2 globalRect = GetGlobalRect();
 
@@ -72,9 +73,9 @@ public partial class InvSlot : Control
                     {
                         Vector2 localPos = globalMousePos - globalRect.Position;
                         if (Input.IsKeyPressed(Key.Shift))
-                            RightClick(index, false, true);
+                            RightClick?.Invoke(index, false, true);
                         else
-                            RightClick(index, false, false);
+                            RightClick?.Invoke(index, false, false);
 
                         locktime = 0.2f;
                         LastFrame = true;
@@ -85,9 +86,9 @@ public partial class InvSlot : Control
                     if (!LastFrame && locktime == 0)
                     {
                         if (Input.IsKeyPressed(Key.Shift))
-                            LeftClick(index, true, true);
+                            LeftClick?.Invoke(index, true, true);
                         else
-                            LeftClick(index, true, false);
+                            LeftClick?.Invoke(index, true, false);
                         locktime = 0.2f;
                         LastFrame = true;
                     }

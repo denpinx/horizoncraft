@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="config\packscene\" />
+    <Folder Include="script\Interface\" />
     <Folder Include="script\Net\SyncDatas\" />
     <Folder Include="script\WorldParials\" />
     <Folder Include="script\Yaml\" />
@@ -55,16 +56,18 @@
     <Content Include="config\item\tool\Tools.json" />
     <Content Include="config\item\wood\logs.json" />
     <Content Include="config\item\wood\planks.json" />
-    <Content Include="config\lang\gui\cn.json" />
-    <Content Include="config\lang\meta\block\cn.json" />
-    <Content Include="config\lang\meta\item\cn.json" />
+    <Content Include="config\lang\cn\blockmetas.json" />
+    <Content Include="config\lang\cn\gui.json" />
+    <Content Include="config\lang\cn\itemmetas.json" />
     <Content Include="config\recipes\Craft\Block\Furnace.json" />
+    <Content Include="config\recipes\Craft\Block\Iron_storage_box.json" />
     <Content Include="config\recipes\Craft\Block\Ladder.json" />
     <Content Include="config\recipes\Craft\Block\Wooden_storage_box.json" />
     <Content Include="config\recipes\Craft\Block\WorkBench.json" />
     <Content Include="config\recipes\Craft\Item\Oak_plank.json" />
     <Content Include="config\recipes\Craft\Item\plank.json" />
     <Content Include="config\recipes\Craft\Item\Stick.json" />
+    <Content Include="config\recipes\Craft\Tool\bukkit\bukkit.json" />
     <Content Include="config\recipes\Craft\Tool\pickaxe\DiamondPickaxe.json" />
     <Content Include="config\recipes\Craft\Tool\pickaxe\IronPickAxe.json" />
     <Content Include="config\recipes\Craft\Tool\pickaxe\StonePickaxe.json" />

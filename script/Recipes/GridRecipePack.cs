@@ -1,9 +1,24 @@
 using System.Collections.Generic;
+using Godot;
+using horizoncraft.script.Inventory;
 
 namespace horizoncraft.script.Recipes;
 
-public class GridRecipePack
+public class GridRecipePack : RecipePack
 {
-    public string Tag = "";
-    public List<GridRecipeItem> recipes = new List<GridRecipeItem>();
+    public List<GridRecipeItem> Recipes = new List<GridRecipeItem>();
+
+    public List<GridRecipeItem> SearchRelated(ItemStack itemStack)
+    {
+        var list = new List<GridRecipeItem>();
+        foreach (var recipe in Recipes)
+        {
+            if (recipe.Related(itemStack))
+            {
+                list.Add(recipe);
+            }
+        }
+
+        return list;
+    }
 }

@@ -14,8 +14,8 @@ public class GridRecipeItem
     {
         if (MatchType == RecipeItemMatchType.TagMatch)
             return ItemTagMatch(items);
-        
-        
+
+
         if (items.GetLength(1) != Cost.GetLength(1) ||
             items.GetLength(0) != Cost.GetLength(0)
            )
@@ -29,12 +29,13 @@ public class GridRecipeItem
                 var b = items[i, j];
                 //如果两个当中有一个不为null则不匹配
                 if ((a == null || b == null) && (a != null || b != null)) return false;
-                if (a != null && b != null && a.Id != b.Id) return false;
+                if (a != null && b != null && a.Name != b.Name) return false;
             }
         }
 
         return true;
     }
+
     /// <summary>
     /// 匹配物品是否满足标签
     /// </summary>
@@ -55,11 +56,38 @@ public class GridRecipeItem
                 var b = items[i, j];
                 //如果两个当中有一个不为null则不匹配
                 if ((a == null || b == null) && (a != null || b != null)) return false;
-                if (a != null &&b.GetItemMeta().GetTag("thesaurus")!=a)
+                if (a != null && b.GetItemMeta().GetTag("thesaurus") != a)
                     return false;
             }
         }
 
         return true;
+    }
+
+    public bool Related(ItemStack itemStack)
+    {
+        if (MatchType == RecipeItemMatchType.ItemMatch)
+        {
+            foreach (var cost in Cost)
+            {
+                if (cost != null && cost.Name == itemStack.Name)
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (MatchType == RecipeItemMatchType.TagMatch)
+        {
+            foreach (var str in CostTagMatch)
+            {
+                if (str == itemStack.GetItemMeta().GetTag("thesaurus"))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

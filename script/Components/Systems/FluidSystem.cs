@@ -6,6 +6,7 @@ public class FluidSystem : TickSystem
 {
     const int FluidLenght = 16;
     BlockMeta air = Materials.Valueof("air");
+
     public override void Ticking(BlockTickEvent e, Component cmp)
     {
         FluidComponent fc = cmp as FluidComponent;
@@ -18,7 +19,7 @@ public class FluidSystem : TickSystem
             e.GetBottomBlock().GetComponent<FluidComponent>("FluidComponent").mobility = true;
             return;
         }
-        
+
         if (e.CheckMeta(e.GetBottomBlock(), blockMeta))
         {
             e.GetBottomBlock().State = 0;
@@ -43,7 +44,7 @@ public class FluidSystem : TickSystem
         }
 
         //顶部没有方块
-        if (!e.CheckMeta(e.GetTopBlock(), blockMeta))
+        if (e.GetTopBlock() != null && !e.CheckMeta(e.GetTopBlock(), blockMeta))
         {
             if (fc.mobility)
             {
@@ -62,7 +63,7 @@ public class FluidSystem : TickSystem
                                                                         e.GetRightBlock().State > 0))
                        )
                     {
-                        e.BlockData.SetMeta("air");
+                        e.BlockData.SetMeta(air);
                         return;
                     }
 

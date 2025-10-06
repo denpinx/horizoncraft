@@ -43,6 +43,33 @@ public abstract class PlayerServiceBase : IDisposable
     public virtual void Ticking()
     {
         PrecessNodeSync();
+        ProcessPlayerHunger();
+    }
+
+    /// <summary>
+    /// 处理玩家饥饿值
+    /// </summary>
+    public virtual void ProcessPlayerHunger()
+    {
+        foreach (var player in Players.Values)
+        {
+            if (player.Live)
+            {
+                //预期每两秒掉落1的血量   
+                if (player.Hunger.Value <= 0f)
+                {
+                    if (Random.Shared.Next(40) == 0)
+                    {
+                        player.Health.Value -= 1f;
+                    }
+                }
+
+                if (player.Health.Value <= 0)
+                {
+                    player.Live = false;
+                }
+            }
+        }
     }
 
     public virtual bool GetPlayerOrLoad(string name, out PlayerData playerData)
@@ -85,8 +112,8 @@ public abstract class PlayerServiceBase : IDisposable
                     };
                     if (Players.TryAdd(name, player))
                     {
+                        SearchSpawnPoint(player);
                         return player;
-                        // SearchSpawnPoint(player);
                     }
                 }
             }
@@ -222,7 +249,11 @@ public abstract class PlayerServiceBase : IDisposable
 
 
     #region 其他
-
+    
+    /// <summary>
+    /// 搜寻随机复活点
+    /// </summary>
+    /// <param name="player"></param>
     public void SearchSpawnPoint(PlayerData player)
     {
         int ChunkX = Random.Shared.Next(-16, 16);

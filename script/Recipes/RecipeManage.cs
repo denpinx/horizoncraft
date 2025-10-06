@@ -19,11 +19,12 @@ public class RecipeManage
     {
         var gr = GridRecipes.Find(gr => gr.Tag == tag);
         if (gr == null) return null;
-        var gri = gr.recipes.Find(gri => gri.Match(items));
+        var gri = gr.Recipes.Find(gri => gri.Match(items));
         return gri;
     }
 
-    public static GridRecipeItem GetRecipe(InventoryBase inventory, int RecipeSize, int start_index = 0)
+    public static GridRecipeItem GetRecipe(InventoryBase inventory, int RecipeSize, int start_index = 0,
+        string tag = "workbench")
     {
         ItemStack[,] PrimeItems = new ItemStack[RecipeSize, RecipeSize];
         for (int x = 0; x < RecipeSize; x++)
@@ -63,7 +64,7 @@ public class RecipeManage
             }
         }
 
-        return RecipeManage.MatchGridRecipe(ResultItems, "player");
+        return RecipeManage.MatchGridRecipe(ResultItems, tag);
     }
 
     public static void RegGridRecipe(GridRecipePack recipePack)
@@ -77,13 +78,13 @@ public class RecipeManage
         var result = GridRecipes.Find(r => r.Tag == recipePack.Tag);
         if (result != null)
         {
-            GD.Print($"[RecipeManage] 添加 {recipePack.Tag} 配方,{recipePack.recipes.Count} 个");
-            foreach (var r in recipePack.recipes)
-                result.recipes.Add(r);
+            GD.Print($"[RecipeManage] 添加 {recipePack.Tag} 配方,{recipePack.Recipes.Count} 个");
+            foreach (var r in recipePack.Recipes)
+                result.Recipes.Add(r);
         }
         else
         {
-            GD.Print($"[RecipeManage] 创建 {recipePack.Tag} 配方,{recipePack.recipes.Count} 个");
+            GD.Print($"[RecipeManage] 创建 {recipePack.Tag} 配方,{recipePack.Recipes.Count} 个");
             GridRecipes.Add(recipePack);
         }
     }
@@ -114,12 +115,10 @@ public class RecipeManage
     {
         GridRecipeItem item = new GridRecipeItem();
 
-        
-        
-        
-        List<object> cost_list= (List<object>)dict["template"];
+
+        List<object> cost_list = (List<object>)dict["template"];
         Dictionary<string, object> Mask_;
-        
+
         if (dict.TryGetValue("mask-tag", out var value))
         {
             item.MatchType = RecipeItemMatchType.TagMatch;
@@ -129,7 +128,7 @@ public class RecipeManage
         {
             Mask_ = (Dictionary<string, object>)dict["mask"];
         }
-        
+
         var result_list = (List<object>)dict["result"];
 
         var result_count = 1;
@@ -146,14 +145,13 @@ public class RecipeManage
         foreach (var r in cost_list)
             strlist.Add((string)r);
 
-        
+
         ItemStack[,] cost = new ItemStack[max, maxy];
         string[,] strs = new string[max, maxy];
         for (int x = 0; x < max; x++)
         {
             for (int y = 0; y < maxy; y++)
             {
-
                 if (item.MatchType == RecipeItemMatchType.TagMatch)
                 {
                     var key = strlist[y][x];
@@ -161,24 +159,24 @@ public class RecipeManage
                     if (tag == "air") strs[x, y] = null;
                     else
                     {
-                        strs[x,y] = tag;
+                        strs[x, y] = tag;
                     }
                 }
+
                 if (item.MatchType == RecipeItemMatchType.ItemMatch)
                 {
                     var key = strlist[y][x];
                     var itemname = mask[key.ToString()];
                     if (itemname == "air") cost[x, y] = null;
                     else
-                        cost[x, y] = Materials.Dictionary_ItemMetas[itemname].GetItemStack();
+                        cost[x, y] = Materials.ItemMetas[itemname].GetItemStack();
                 }
-
             }
         }
 
         item.CostTagMatch = strs;
         item.Cost = cost;
-        item.Result = Materials.Dictionary_ItemMetas[result_name].GetItemStack();
+        item.Result = Materials.ItemMetas[result_name].GetItemStack();
         item.Result.Amount = result_count;
         return item;
     }
@@ -186,8 +184,13 @@ public class RecipeManage
     private static ProcessRecipeItem ParseRecipeItem(Dictionary<string, object> dict)
     {
         ProcessRecipeItem item = new ProcessRecipeItem();
-        
+
         List<object> costList;
+        if (dict.TryGetValue("extended-tag", out var value))
+        {
+            item.ExtendedTag = (Dictionary<string, object>)value;
+        }
+
         if (dict.ContainsKey("cost-tag"))
         {
             item.MatchType = RecipeItemMatchType.TagMatch;
@@ -195,10 +198,8 @@ public class RecipeManage
         }
         else
             costList = (List<object>)dict["cost"];
-        
-        
-        
-        
+
+
         var ResultList = (List<object>)dict["result"];
         if (dict.ContainsKey("process"))
             item.ProcessTick = (int)dict["process"];
@@ -206,7 +207,7 @@ public class RecipeManage
         foreach (var costInfo_ in costList)
         {
             var costInfo = (List<object>)costInfo_;
-            var itemstack = Materials.Dictionary_ItemMetas[(string)costInfo[0]].GetItemStack();
+            var itemstack = Materials.ItemMetas[(string)costInfo[0]].GetItemStack();
             itemstack.Amount = (int)costInfo[1];
             item.Cost.Add(itemstack);
 
@@ -216,7 +217,7 @@ public class RecipeManage
         foreach (var resultInfo_ in ResultList)
         {
             var resultInfo = (List<object>)resultInfo_;
-            var itemstack = Materials.Dictionary_ItemMetas[(string)resultInfo[0]].GetItemStack();
+            var itemstack = Materials.ItemMetas[(string)resultInfo[0]].GetItemStack();
             itemstack.Amount = (int)resultInfo[1];
             item.Result.Add(itemstack);
         }
@@ -233,7 +234,7 @@ public class RecipeManage
 
         var list = (List<object>)dict["recipes"];
         foreach (var recipeItem in list)
-            recipe.recipes.Add(ParseGridRecipeItem((Dictionary<string, object>)recipeItem));
+            recipe.Recipes.Add(ParseGridRecipeItem((Dictionary<string, object>)recipeItem));
 
         return recipe;
     }
@@ -257,7 +258,7 @@ public class RecipeManage
         var path = filename;
         if (!FileAccess.FileExists(path))
         {
-            GD.PrintErr($"[RecipeManage]] {path} 不存在！");
+            GD.PrintErr($"[RecipeManage]] {path} 不存在！");    
             return;
         }
 
@@ -307,7 +308,6 @@ public class RecipeManage
         if (recipe == null) GD.PrintErr($"[RecipeManage] 配方{tag} 不存在!");
         return recipe;
     }
-
     public static ProcessRecipeItem GetProcessRecipe(string tag, Func<ProcessRecipeItem, bool> mathAction)
     {
         var recipe = GetRecipe(tag);
@@ -315,13 +315,20 @@ public class RecipeManage
         var result = recipe.Recipes.Find(rcp => mathAction(rcp));
         return result;
     }
+    /// <summary>
+    /// 获取匹配的物品处理配方
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <param name="Items"></param>
+    /// <returns></returns>
     public static ProcessRecipeItem GetProcessRecipe(string tag, ItemStack[] Items)
     {
         var recipe = GetRecipe(tag);
         if (recipe == null) return null;
-        var result = recipe.Recipes.Find(r=>r.ItemMatch(Items));
+        var result = recipe.Recipes.Find(r => r.ItemMatch(Items));
         return result;
     }
+
     private static void GetAllFiles(string path, List<string> filelist)
     {
         DirAccess dir = DirAccess.Open(path);
@@ -351,5 +358,116 @@ public class RecipeManage
         }
 
         dir.ListDirEnd();
+    }
+    /// <summary>
+    /// 搜寻物品参与合成的配方
+    /// </summary>
+    /// <param name="itemStack"></param>
+    /// <returns></returns>
+    public static Dictionary<string, RecipePack> SearchRecipeByUsefor(ItemStack itemStack)
+    {
+        Dictionary<string, RecipePack> result = new();
+
+        foreach (var recipe in GridRecipes)
+        {
+            var searchRelated = recipe.SearchRelated(itemStack);
+            if (searchRelated.Count > 0)
+            {
+                var pack = new GridRecipePack();
+                pack.Tag = recipe.Tag;
+                pack.Recipes = searchRelated;
+                result.Add(pack.Tag, pack);
+            }
+        }
+
+        foreach (var pack in ProcessRecipes)
+        {
+            var list = pack.SearchRelated(itemStack);
+            if (list.Count > 0)
+            {
+                ProcessRecipePack gridPack = new();
+                gridPack.Tag = pack.Tag;
+                gridPack.Recipes = list;
+                result.Add(gridPack.Tag, gridPack);
+            }
+        }
+
+        GD.Print($"搜索物品作用配方 {itemStack.Name} 结果 {result.Count} 个");
+        return result;
+    }
+    /// <summary>
+    /// 搜寻物品来源
+    /// </summary>
+    /// <param name="itemStack"></param>
+    /// <returns></returns>
+    public static Dictionary<string, RecipePack> SearchRecipeBySource(ItemStack itemStack)
+    {
+        Dictionary<string, RecipePack> result = new();
+        foreach (var pack in GridRecipes)
+        {
+            GridRecipePack gridPack = new();
+            gridPack.Tag = pack.Tag;
+            foreach (var recipe in pack.Recipes)
+            {
+                var item = recipe.Result;
+                if (recipe.MatchType == RecipeItemMatchType.ItemMatch)
+                {
+                    if (item.Name == itemStack.Name)
+                    {
+                        gridPack.Recipes.Add(recipe);
+                        continue;
+                    }
+                }
+
+                if (recipe.MatchType == RecipeItemMatchType.TagMatch)
+                {
+                    if (item.Name == itemStack.GetItemMeta().GetTag("thesaurus"))
+                    {
+                        gridPack.Recipes.Add(recipe);
+                        continue;
+                    }
+                }
+            }
+
+            if (gridPack.Recipes.Count > 0)
+                result.Add(pack.Tag, gridPack);
+        }
+
+        foreach (var pack in ProcessRecipes)
+        {
+            ProcessRecipePack gridPack = new();
+            gridPack.Tag = pack.Tag;
+            foreach (var recipe in pack.Recipes)
+            {
+                foreach (var item in recipe.Result)
+                {
+                    if (item == null) continue;
+
+                    if (recipe.MatchType == RecipeItemMatchType.ItemMatch)
+                    {
+                        if (item.Name == itemStack.Name)
+                        {
+                            gridPack.Recipes.Add(recipe);
+                            continue;
+                        }
+                    }
+
+                    if (recipe.MatchType == RecipeItemMatchType.TagMatch)
+                    {
+                        if (item.Name == itemStack.GetItemMeta().GetTag("thesaurus"))
+                        {
+                            gridPack.Recipes.Add(recipe);
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            if (gridPack.Recipes.Count > 0)
+                result.Add(gridPack.Tag, gridPack);
+        }
+
+        GD.Print($"搜索物品来源配方 {itemStack.Name} 结果 {result.Count} 个");
+        return result;
     }
 }

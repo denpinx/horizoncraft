@@ -47,6 +47,9 @@ namespace horizoncraft.script.WorldControl
         [MemoryPackIgnore] public bool update_tilemap = true;
         [MemoryPackIgnore] public bool update_server = true;
 
+        [MemoryPackIgnore] public double TickUsedTime_μs;
+        [MemoryPackIgnore] public Stopwatch _Stopwatch_tick_used = new Stopwatch();
+
         [MemoryPackIgnore]
         public Godot.Vector2I coord
         {
@@ -62,7 +65,7 @@ namespace horizoncraft.script.WorldControl
         public List<EntityData> Entitys = new();
 
         public BlockData[,,] data = new BlockData[Size, Size, SizeZ];
-        public int SpawnCostTime;
+        public double SpawnCostTime_μs;
 
         public int LoadCostTime;
 
@@ -128,16 +131,6 @@ namespace horizoncraft.script.WorldControl
         public BlockData SetBlock(int x, int y, int z, BlockData blockData, int state = 0)
         {
             var pos = new Vector3(x, y, z);
-            // if (blockData.GetComponent<TickComponent>() != null)
-            // {
-            //     if (!TickList.Contains(pos))
-            //     {
-            //         TickList.Add(pos);
-            //     }    
-            // }
-            // else if (data[x, y, z].BlockMeta.HasComponent<TickComponent>())
-            //     TickList.Remove(pos);
-
             if (blockData.GetComponent<TickComponent>() != null)
             {
                 TickList.Add(pos);
@@ -152,8 +145,10 @@ namespace horizoncraft.script.WorldControl
             return data[x, y, z];
         }
 
+        //50*50*2 2500个tick对象的情况下，平均每个区块最大耗时 1ms
         public void Tick(WorldServiceBase WorldService, World world)
         {
+            _Stopwatch_tick_used.Restart();
             version = WorldService.TickTimes;
 
             UpdateList.Clear();
@@ -190,12 +185,13 @@ namespace horizoncraft.script.WorldControl
                     }
                 }
             }
+
             PassiveTickList.Clear();
 
 
             var coord = new Godot.Vector3I(0, 0, 0);
             var local = new Godot.Vector3I(0, 0, 0);
-            int id;
+            string id;
             int state;
             foreach (var item in TickList.ToArray())
                 //for (int i = 0; i < TickList.Count; i++)
@@ -238,31 +234,36 @@ namespace horizoncraft.script.WorldControl
                     block.SetMeta(block.BlockMeta);
                 }
             }
+
+            _Stopwatch_tick_used.Stop();
+            TickUsedTime_μs = _Stopwatch_tick_used.Elapsed.TotalMicroseconds;
         }
+
         public void SetLight(int light)
         {
             for (int x = 0; x < Chunk.Size; x++)
             for (int y = 0; y < Chunk.Size; y++)
             {
-                
-                data[x, y, 1].OldLight= data[x,y,1].Light;
-                data[x, y, 1].Light= light;
+                data[x, y, 1].OldLight = data[x, y, 1].Light;
+                data[x, y, 1].Light = light;
             }
         }
+
         public bool CheckLightUpdate()
         {
             for (int x = 0; x < Chunk.Size; x++)
             for (int y = 0; y < Chunk.Size; y++)
             {
-
                 if (data[x, y, 1].OldLight != data[x, y, 1].Light)
                 {
                     update_tilemap = true;
                     return true;
                 }
             }
+
             return false;
         }
+
         public HashSet<string> GetAllEntitys()
         {
             HashSet<string> result = new HashSet<string>();

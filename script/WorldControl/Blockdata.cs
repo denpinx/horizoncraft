@@ -13,7 +13,7 @@ namespace horizoncraft.script.WorldControl
         public List<Component> Components = new();
 
         /// <summary>方块id</summary>
-        public int Id;
+        public string Id;
 
         /// <summary>方块状态</summary>
         public int State;
@@ -63,17 +63,13 @@ namespace horizoncraft.script.WorldControl
         public BlockData()
         {
         }
-
-        public void SetMeta(int id) => SetMeta(Materials.Valueof(id));
-
-
         public void SetMeta(string name) => SetMeta(Materials.Valueof(name));
 
 
         public void SetMeta(BlockMeta meta)
         {
             BlockMeta = meta;
-            Id = meta.Id;
+            Id = meta.Name;
             Components.Clear();
             foreach (Func<Component> cmp in meta.Components)
                 Components.Add(cmp());

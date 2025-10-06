@@ -1,0 +1,21 @@
+{
+  "type": "craft",
+  "tag": "workbench",
+  "recipes": [
+    {
+      "template": [
+        "###",
+        "#C#",
+        "###"
+      ],
+      "mask-tag": {
+        "C": "wooden_storage_box",
+        "#": "iron_ingot"
+      },
+      "result": [
+        "iron_storage_box",
+        1
+      ]
+    }
+  ]
+}

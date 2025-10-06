@@ -31,27 +31,34 @@ public partial class PlayerNode : CharacterBody2D
     public const float JumpVelocity = -200.0f;
     public Action OnMoveToChunk;
     public PlayerData playerData;
+    public bool BaseInputable = true;
     public bool Inputable = true;
     public bool MoreInfo = false;
     public bool Stop = false;
     public World world;
 
 
+    [Export] public ChatView ChatView;
+
+    /// <summary>
+    /// 当前打开查看的物品栏节点
+    /// </summary>
+    public InventoryNode OpeningInventoryNode;
+
     //
-    AnimationPlayer animationPlayer_other;
-    AnimationPlayer animationPlayer_move;
-    private HorizonCraft.tscn.Gui.BlockInfoView BlockInfoView;
-    CollisionShape2D collisionShape2D;
-    public CanvasLayer OvrCanvasLayer;
-    public InventoryNode ShowView;
-    public Timer Timer_Tick;
-    Label Label_DEBUG_Right;
-    Label Label_DEBUG_Left;
-    Label Label_PlayerName;
-    Sprite2D sprite2D_body;
-    public Sprite2D Cursor;
-    public HotBar hotBar;
-    Camera2D camera2d;
+    [Export] AnimationPlayer animationPlayer_other;
+    [Export] AnimationPlayer animationPlayer_move;
+    [Export] private HorizonCraft.tscn.Gui.BlockInfoView BlockInfoView;
+    [Export] CollisionShape2D collisionShape2D;
+    [Export] public CanvasLayer OvrCanvasLayer;
+    [Export] public Timer Timer_Tick;
+    [Export] Label Label_DEBUG_Right;
+    [Export] Label Label_DEBUG_Left;
+    [Export] Label Label_PlayerName;
+    [Export] Sprite2D sprite2D_body;
+    [Export] public Sprite2D Cursor;
+    [Export] public HotBar hotBar;
+    [Export] Camera2D camera2d;
     //
 
 
@@ -63,16 +70,16 @@ public partial class PlayerNode : CharacterBody2D
 
     public override void _Process(double delta)
     {
-        if (!Inputable || playerData == null) return;
+        if (!BaseInputable || playerData == null) return;
         if (playerData.FaceLeft) sprite2D_body.SetScale(new Vector2(1, 1));
         else sprite2D_body.SetScale(new Vector2(-1, 1));
-        
+
         Vector2I coord = new(
             (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
         );
 
-        if (Input.IsActionPressed("breakblock") && playerData != null && ShowView == null &&
+        if (Input.IsActionPressed("breakblock") && playerData != null && OpeningInventoryNode == null &&
             OvrCanvasLayer.GetChildCount() == 0)
         {
             OnMouseLeftClick(coord, delta);
@@ -84,7 +91,7 @@ public partial class PlayerNode : CharacterBody2D
             if (BreakProcess.ProcessTime > 0) BreakProcess.ProcessTime = 0;
         }
 
-        if (Input.IsActionPressed("placeblock") && playerData != null && ShowView == null &&
+        if (Input.IsActionPressed("placeblock") && playerData != null && OpeningInventoryNode == null &&
             OvrCanvasLayer.GetChildCount() == 0)
         {
             OnMouseRightClick(coord, delta);
@@ -259,7 +266,22 @@ public partial class PlayerNode : CharacterBody2D
     private void InputHandle(double delta)
     {
         if (playerData == null) return;
+        if (!BaseInputable) return;
+        else
+        {
+            var velocity = Velocity;
+            if (!IsOnFloor() && (!playerData.Fly.Value || !Stop))
+            {
+                velocity += GetGravity() * (float)delta;
+            }
+
+            Velocity = velocity;
+            MoveAndSlide();
+        }
+
         if (!Inputable) return;
+
+
         bool AnyMove = false;
 
         for (int i = 1; i < 10; i++)
@@ -307,12 +329,12 @@ public partial class PlayerNode : CharacterBody2D
 
         if (Input.IsActionJustPressed("e") && OvrCanvasLayer.GetChildCount() == 0)
         {
-            if (ShowView != null)
+            if (OpeningInventoryNode != null)
             {
                 world.Service.PlayerService.Events.CloseInventory(world.Service, playerData.Name);
                 world.PlayerNode.playerData.OpeningBlockInventory = false;
-                RemoveChild(ShowView);
-                ShowView = null;
+                RemoveChild(OpeningInventoryNode);
+                OpeningInventoryNode = null;
             }
             else
                 world.Service.PlayerService.Events.OpenInventory(world, "PlayerInventory");
@@ -325,12 +347,12 @@ public partial class PlayerNode : CharacterBody2D
                 var menu = GD.Load<PackedScene>("res://tscn/Menu/operating_menu.tscn");
                 OvrCanvasLayer.AddChild(menu.Instantiate<OperatingMenu>());
 
-                if (ShowView != null)
+                if (OpeningInventoryNode != null)
                 {
                     world.Service.PlayerService.Events.CloseInventory(world.Service, playerData.Name);
                     world.PlayerNode.playerData.OpeningBlockInventory = false;
-                    RemoveChild(ShowView);
-                    ShowView = null;
+                    RemoveChild(OpeningInventoryNode);
+                    OpeningInventoryNode = null;
                 }
             }
             else
@@ -359,11 +381,6 @@ public partial class PlayerNode : CharacterBody2D
         if (playerData.Mode == 0)
         {
             Vector2 velocity = Velocity;
-            if (!IsOnFloor() && (!playerData.Fly.Value || !Stop))
-            {
-                velocity += GetGravity() * (float)delta;
-            }
-
             if (Input.IsActionPressed("ui_accept") && (IsOnFloor() || playerData.Fly.Value))
             {
                 velocity.Y = JumpVelocity;
@@ -428,26 +445,18 @@ public partial class PlayerNode : CharacterBody2D
             {
             }
 
-            if (Input.IsActionJustPressed("F1") && Inputable)
+            if (Input.IsActionJustPressed("F1") && BaseInputable)
                 playerData.Mode = playerData.Mode == 0 ? 1 : 0;
-            if (Input.IsActionJustPressed("F2") && Inputable)
+            if (Input.IsActionJustPressed("F2") && BaseInputable)
                 DebugView.DEBUG = !DebugView.DEBUG;
-            if (Input.IsActionJustPressed("F3") && Inputable)
+            if (Input.IsActionJustPressed("F3") && BaseInputable)
             {
                 MoreInfo = !MoreInfo;
                 Label_DEBUG_Left.Visible = MoreInfo;
                 Label_DEBUG_Right.Visible = MoreInfo;
             }
 
-            if (Input.IsActionJustPressed("F4") && Inputable)
-            {
-                foreach (var item in Materials.ItemMetas)
-                {
-                    playerData.Inventory.TryAddItem(item.GetItemStack());
-                }
-            }
-
-            if (Input.IsActionJustPressed("F5") && Inputable)
+            if (Input.IsActionJustPressed("F5") && BaseInputable)
             {
                 Position = new Vector2(new Random().Next(100000), Position.Y);
                 OnMoveToChunk?.Invoke();
@@ -514,23 +523,11 @@ public partial class PlayerNode : CharacterBody2D
     public override void _Ready()
     {
         var loadingMenu = GetNode<LoadingMenu>("OvrCanvasLayer/LoadingMenu");
-        Label_DEBUG_Left = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Left");
-        Label_DEBUG_Right = GetNode<Label>("CanvasLayer/Control/Label_DEBUG_Right");
-        animationPlayer_move = GetNode<AnimationPlayer>("AnimationPlayer_Move");
-        animationPlayer_other = GetNode<AnimationPlayer>("AnimationPlayer_Other");
-        collisionShape2D = GetNode<CollisionShape2D>("CollisionShape2D");
-        OvrCanvasLayer = GetNode<CanvasLayer>("OvrCanvasLayer");
-        Label_PlayerName = GetNode<Label>("Label_PlayerName");
-        hotBar = GetNode<HotBar>("GuidCanvasLayer/HotBar");
-        sprite2D_body = GetNode<Sprite2D>("Body");
-        Timer_Tick = GetNode<Timer>("Timer_Tick");
-        camera2d = GetNode<Camera2D>("Camera2D");
-        Cursor = GetNode<Sprite2D>("Cursor");
-        BlockInfoView = GetNode<HorizonCraft.tscn.Gui.BlockInfoView>("CanvasLayer/BlockInfoView");
+        loadingMenu.playerNode = this;
+
         if (playerData != null)
             playerData.PlayerNode = this;
         hotBar.PlayerNode = this;
-        loadingMenu.playerNode = this;
     }
 
     //检查是否和碰撞箱重叠

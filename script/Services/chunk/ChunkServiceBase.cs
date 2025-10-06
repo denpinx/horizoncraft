@@ -61,8 +61,11 @@ public partial class ChunkServiceBase : IDisposable
     private Task _processLoadTask;
 
     Stopwatch _stopwatchTick = new Stopwatch();
+    Stopwatch _stopwatchTick_GroupingTime_ = new Stopwatch();
 
     private long tickConsumed;
+    private double tickConsumed_μs;
+    private double GroupingTime_μs;
 
     public ChunkServiceBase(World world)
     {
@@ -70,7 +73,8 @@ public partial class ChunkServiceBase : IDisposable
         world.timer.Timeout += Ticking;
         PlayerNode.GetInformation[nameof(ChunkServiceBase)] =
             () => $"加载区块:{Chunks.Count}\n" +
-                  $"tick耗时:{tickConsumed} ms\n";
+                  $"Tick:{tickConsumed} ms/t {tickConsumed_μs} μs/t\n"+
+                  $"区块分组耗时:{GroupingTime_μs} μs/t";
 
         _tokenSource = new CancellationTokenSource();
         _processLoadTask = Task.Run(ProcessChunkLoadThread, _tokenSource.Token);
@@ -92,7 +96,11 @@ public partial class ChunkServiceBase : IDisposable
         // }
         //方案二
         //所有相邻的区块组,连续坐标的为一个组
-        var groups = GetProximityChunkGroup();
+        _stopwatchTick_GroupingTime_.Restart();
+        var groups = GetProximityChunkGroup(); //~ 10 μs/t
+        _stopwatchTick_GroupingTime_.Stop();
+        GroupingTime_μs = _stopwatchTick_GroupingTime_.Elapsed.TotalMicroseconds;
+        
         if (groups.Count > 0)
         {
             Parallel.For(0, groups.Count, (i) =>
@@ -115,6 +123,7 @@ public partial class ChunkServiceBase : IDisposable
         // });
         _stopwatchTick.Stop();
         tickConsumed = _stopwatchTick.ElapsedMilliseconds;
+        tickConsumed_μs = _stopwatchTick.Elapsed.TotalMicroseconds;
         UpdateLights();
     }
 
@@ -399,7 +408,7 @@ public partial class ChunkServiceBase : IDisposable
         UpdateBlock(globalPosition + Vector3I.Down);
         UpdateBlock(globalPosition + Vector3I.Left);
         UpdateBlock(globalPosition + Vector3I.Right);
-    }   
+    }
 
     /// <summary>
     /// 设置方块

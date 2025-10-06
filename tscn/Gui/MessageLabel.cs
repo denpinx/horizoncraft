@@ -10,23 +10,24 @@ public partial class MessageLabel : HBoxContainer
 {
     public ChatView ParentChatView;
     public MessageData MessageData;
-    MenuBar _menuBar;
-    PopupMenu _popupMenu;
-    Label _label;
+    [Export] MenuBar _menuBar;
+    [Export] PopupMenu _popupMenu;
+    [Export] Label _label;
 
     public override void _Ready()
     {
-        _menuBar = GetNode<MenuBar>("MenuBar");
-        _popupMenu = GetNode<PopupMenu>("MenuBar/PopupMenu");
-        _label = GetNode<Label>("Message");
     }
-    
-    public override void _Process(double delta)
+
+    public void SetMessageData(MessageData data)
     {
-        if (MessageData != null)
+        if (data == null)
         {
-            _popupMenu.Title = MessageData.Player.Name;
-            _label.Text = MessageData.Message;
+            GD.PrintErr("MessageData is null");
+            return;
         }
+
+        MessageData = data;
+        _popupMenu.Title = MessageData.PlayerName;
+        _label.Text = MessageData.Message;
     }
 }

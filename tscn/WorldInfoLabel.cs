@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using horizoncraft.script.I18N;
 using horizoncraft.script.Net;
 
 public partial class WorldInfoLabel : HBoxContainer
@@ -30,8 +31,8 @@ public partial class WorldInfoLabel : HBoxContainer
     {
         Profile = profile;
         labelWorldName.Text = profile.WorldName;
-        labelCreateDate.Text = "创建日期:" + profile.CreateDate;
-        labelLoadDate.Text = "上次加载日期:" + profile.LoadDate;
-        labelWorldSeed.Text = "地图种子:" + profile.WorldSeed.ToString();
+        labelCreateDate.Text = "create_date".Trprefix("ui", profile.CreateDate);
+        labelLoadDate.Text = "load_date".Trprefix("ui", profile.LoadDate);
+        labelWorldSeed.Text = "world_seed".Trprefix("ui", profile.WorldSeed);
     }
 }

@@ -28,7 +28,7 @@ public partial class DEBUG_INFO : CanvasLayer
             Label_DEBUG_Right.Visible = false;
             return;
         }
-        else if (!_playerNode.MoreInfo || !_playerNode.Inputable)
+        else if (!_playerNode.MoreInfo || !_playerNode.BaseInputable)
         {
             Label_DEBUG_Left.Visible = false;
             Label_DEBUG_Right.Visible = false;

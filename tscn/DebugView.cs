@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Text;
 using Godot;
 using horizoncraft.script.WorldControl;
 
@@ -6,6 +8,7 @@ public partial class DebugView : Node2D
     public Chunk chunk;
     Font font = new SystemFont();
     public static bool DEBUG = false;
+
     public override void _Draw()
     {
         if (!DEBUG) return;
@@ -43,11 +46,19 @@ public partial class DebugView : Node2D
         );
         var biomebase = BiomeManage.GetBiomeAsName(chunk.BiomeType);
         DrawRect(new Rect2(0, 0, new(16 * Chunk.Size, 16 * Chunk.Size)), biomebase.DebugColor);
-        DrawString(font, new(0, 1 * Chunk.Size), $"坐标：{chunk.coord.X}，{chunk.coord.Y} ");
-        DrawString(font, new(0, 2 * Chunk.Size), $"生成耗时：{chunk.SpawnCostTime} ms");
-        DrawString(font, new(0, 3 * Chunk.Size), $"生物群系类型：{chunk.BiomeType} ");
-        DrawString(font, new(0, 4 * Chunk.Size), $"更新时间戳：{chunk.version} ");
-        DrawString(font, new(0, 5 * Chunk.Size), $"Tick数：{chunk.TickList.Count} ");
-        DrawString(font, new(0, 6 * Chunk.Size), $"光源对象：{chunk.LightList.Count} ");
+        List<string> list = new()
+        {
+            $"区块生成耗时：{chunk.SpawnCostTime_μs} μs",
+            $"坐标：{chunk.coord.X}，{chunk.coord.Y} ",
+            $"生物群系类型：{chunk.BiomeType} ",
+            $"更新时间戳：{chunk.version} ",
+            $"光源对象：{chunk.LightList.Count}个 ",
+            $"Tick对象：{chunk.TickList.Count} 个",
+            $"Tick：{chunk.TickUsedTime_μs} μs/t ",
+        };
+
+        int index = 1;
+        foreach (var str in list)
+            DrawString(font, new(0, index++ * Chunk.Size), str);
     }
 }

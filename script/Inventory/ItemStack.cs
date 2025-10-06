@@ -12,12 +12,12 @@ namespace horizoncraft.script.Inventory;
 [MemoryPackable]
 public partial class ItemStack
 {
-    public int Id;
+    public string Name;
     public int Amount;
     public int State;
     public List<Component> Components = new();
 
-    public ItemMeta GetItemMeta() => Materials.ItemMetas[Id];
+    public ItemMeta GetItemMeta() => Materials.ItemMetas[Name];
     public BlockMeta GetBlockMeta() => GetItemMeta().BlockMeta;
 
     //深拷贝
@@ -48,7 +48,7 @@ public partial class ItemStack
 
     public ItemStack TryStackItem(ItemStack item)
     {
-        if (item.Id != Id) return item;
+        if (item.Name != Name) return item;
         int space = GetItemMeta().MaxAmount - Amount;
         if (space >= item.Amount)
         {

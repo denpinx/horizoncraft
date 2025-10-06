@@ -1,0 +1,229 @@
+[gd_scene load_steps=5 format=3 uid="uid://buh8fwmfrtiwa"]
+
+[ext_resource type="Theme" uid="uid://joabf0lpqylf" path="res://thems/InvThem.tres" id="1_hsjpf"]
+[ext_resource type="Script" uid="uid://bp63xxqgn28kh" path="res://tscn/Menu/Inventory/ReciperView.cs" id="2_si8i3"]
+[ext_resource type="PackedScene" uid="uid://bjutbqmtgb304" path="res://tscn/Menu/InvSlot.tscn" id="2_vvt8l"]
+[ext_resource type="Texture2D" uid="uid://kepfvfu11ywr" path="res://texture/item/workbench.png" id="3_vvt8l"]
+
+[node name="ReciperView" type="Control" node_paths=PackedStringArray("_TypeList", "_ProcessPanel", "_GridPanel", "_Process_Container", "_Process_OutPut_Container", "_Grid_Container", "_Grid_OutPut_Container", "_Button_Next", "_Button_Last", "_Label")]
+visible = false
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+mouse_filter = 1
+theme = ExtResource("1_hsjpf")
+script = ExtResource("2_si8i3")
+_TypeList = NodePath("VBoxContainer/TypePreview/HBoxContainer2/TypeList")
+_ProcessPanel = NodePath("VBoxContainer/Process")
+_GridPanel = NodePath("VBoxContainer/Grid")
+_Process_Container = NodePath("VBoxContainer/Process/VBoxContainer/HBoxContainer/CostGrid")
+_Process_OutPut_Container = NodePath("VBoxContainer/Process/VBoxContainer/HBoxContainer/OutputGrid")
+_Grid_Container = NodePath("VBoxContainer/Grid/VBoxContainer/HBoxContainer/CostGrid")
+_Grid_OutPut_Container = NodePath("VBoxContainer/Grid/VBoxContainer/HBoxContainer/OutputGrid")
+_Button_Next = NodePath("VBoxContainer/PanelContainer/HBoxContainer2/Button_Recipe_Last")
+_Button_Last = NodePath("VBoxContainer/PanelContainer/HBoxContainer2/Button_Recipe_Next")
+_Label = NodePath("VBoxContainer/PanelContainer/HBoxContainer2/Label")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="TypePreview" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/TypePreview"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer/TypePreview/HBoxContainer2"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "下一个"
+
+[node name="TypeList" type="HBoxContainer" parent="VBoxContainer/TypePreview/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="InvSlot3" parent="VBoxContainer/TypePreview/HBoxContainer2/TypeList" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot4" parent="VBoxContainer/TypePreview/HBoxContainer2/TypeList" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="Button2" type="Button" parent="VBoxContainer/TypePreview/HBoxContainer2"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = "上一个"
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Process" type="PanelContainer" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Process"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="VBoxContainer/Process/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+text = "处理配方"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Process/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/Process/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "输
+入"
+
+[node name="CostGrid" type="GridContainer" parent="VBoxContainer/Process/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 3
+
+[node name="InvSlot" parent="VBoxContainer/Process/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot2" parent="VBoxContainer/Process/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer/Process/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label2" type="Label" parent="VBoxContainer/Process/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "输
+出"
+
+[node name="OutputGrid" type="GridContainer" parent="VBoxContainer/Process/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 3
+
+[node name="InvSlot" parent="VBoxContainer/Process/VBoxContainer/HBoxContainer/OutputGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot2" parent="VBoxContainer/Process/VBoxContainer/HBoxContainer/OutputGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="Grid" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Grid"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Grid/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+text = "合成"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Grid/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CostGrid" type="GridContainer" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 3
+
+[node name="InvSlot" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot2" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot3" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot4" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot5" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot6" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot7" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot8" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="InvSlot9" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer/CostGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("3_vvt8l")
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="OutputGrid" type="GridContainer" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+columns = 3
+
+[node name="InvSlot10" parent="VBoxContainer/Grid/VBoxContainer/HBoxContainer/OutputGrid" instance=ExtResource("2_vvt8l")]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 6
+
+[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/PanelContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Button_Recipe_Last" type="Button" parent="VBoxContainer/PanelContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "上一个配方"
+
+[node name="Label" type="Label" parent="VBoxContainer/PanelContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0/16"
+horizontal_alignment = 1
+
+[node name="Button_Recipe_Next" type="Button" parent="VBoxContainer/PanelContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "下一个配方"

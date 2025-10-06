@@ -30,8 +30,8 @@ public partial class InventoryComponent : TickComponent
         var formitem = GetInventory().GetItem(formindex);
         return (formitem != null &&
                 recipeItem != null &&
-                formitem.Id == recipeItem.Id &&
-                formitem.Id >= recipeItem.Id
+                formitem.Name == recipeItem.Name &&
+                formitem.Amount >= recipeItem.Amount
             );
     }
 
@@ -69,7 +69,7 @@ public partial class InventoryComponent : TickComponent
             ItemStack item = GetInventory().GetItem(i);
             if (item == null)
                 return true;
-            if (item.Id == additem.Id)
+            if (item.Name == additem.Name)
             {
                 space += item.GetItemMeta().MaxAmount - item.Amount;
             }
@@ -95,7 +95,7 @@ public partial class InventoryComponent : TickComponent
                 GetInventory().OnItemAdd?.Invoke(i, additem);
                 return true;
             }
-            else if (item.Id == additem.Id)
+            else if (item.Name == additem.Name)
             {
                 int max = item.GetItemMeta().MaxAmount;
                 int space = max - item.Amount;
