@@ -43,9 +43,10 @@ font_size = 24
 outline_size = 8
 outline_color = Color(0, 0, 0, 1)
 
-[node name="FurnaceInv" type="CanvasLayer"]
+[node name="FurnaceInv" type="CanvasLayer" node_paths=PackedStringArray("PlayerInventorySlotRoot")]
 layer = 10
 script = ExtResource("1_bxjxm")
+PlayerInventorySlotRoot = NodePath("MarginContainer/VBoxContainer/GridContainer")
 
 [node name="ItemManage" parent="." instance=ExtResource("2_tjfg0")]
 

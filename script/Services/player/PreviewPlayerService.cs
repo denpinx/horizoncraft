@@ -1,5 +1,7 @@
+using Godot;
 using horizoncraft.script;
 using horizoncraft.script.NewProxy.player;
+using horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Services.player;
 
@@ -34,11 +36,25 @@ public class PreviewPlayerService : PlayerServiceBase
         };
     }
 
+    public override void ProcessPlayerState()
+    {
+        foreach (var player in Players.Values)
+        {
+            player.State = PlayerState.Live;
+        }
+    }
+
     public override void SaveAll()
     {
     }
 
     public override void SavePlayer(PlayerData player)
     {
+    }
+
+    public override bool TrySearchSpawn(PlayerData player, Vector2I position)
+    {
+        player.Position = new(position.X * 16, position.Y * 16);
+        return true;
     }
 }

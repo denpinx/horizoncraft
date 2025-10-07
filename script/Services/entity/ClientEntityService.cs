@@ -13,7 +13,7 @@ public class ClientEntityService : EntityServiceBase
     {
     }
 
-    public override void Ticking()
+    protected override void Ticking()
     {
         ProcessEntityNode();
         ProcessEntityNodeUpdate();

@@ -7,8 +7,13 @@
 [ext_resource type="Texture2D" uid="uid://bw0n1le83dnqc" path="res://texture/background/b2.png" id="4_38adb"]
 [ext_resource type="Texture2D" uid="uid://dpfwsxvr3kdye" path="res://texture/background/b1.png" id="5_08a46"]
 
-[node name="World" type="Node2D"]
+[node name="World" type="Node2D" node_paths=PackedStringArray("PlayerNode", "timer", "textureRect", "DirectionalLight2D", "colorRect")]
 script = ExtResource("1_oo2r5")
+PlayerNode = NodePath("Player")
+timer = NodePath("Timer_Tick")
+textureRect = NodePath("CanvasLayer_Back/TextureRect_Sky")
+DirectionalLight2D = NodePath("DirectionalLight2D")
+colorRect = NodePath("CanvasLayer/ColorRect_Top")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -23,8 +28,9 @@ grow_vertical = 2
 mouse_filter = 1
 color = Color(0, 0, 0, 0)
 
-[node name="Player" parent="." instance=ExtResource("2_hb80g")]
+[node name="Player" parent="." node_paths=PackedStringArray("world") instance=ExtResource("2_hb80g")]
 position = Vector2(603, 327)
+world = NodePath("..")
 
 [node name="CanvasLayer_Back" type="CanvasLayer" parent="."]
 layer = -1

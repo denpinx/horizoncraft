@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=4 uid="uid://cw0lhh2hnj66l"]
+[gd_scene load_steps=7 format=3 uid="uid://cw0lhh2hnj66l"]
 
 [ext_resource type="Script" uid="uid://bocbkt0mmo3o4" path="res://tscn/Tools/StructBuildTool.cs" id="1_kpgmv"]
 [ext_resource type="Texture2D" uid="uid://6g7uuvd2ds2a" path="res://texture/block/sand.png" id="1_uqt7y"]
@@ -15,8 +15,11 @@ texture = ExtResource("1_uqt7y")
 [sub_resource type="TileSet" id="TileSet_34fmu"]
 sources/0 = SubResource("TileSetAtlasSource_ce6aj")
 
-[node name="StructBuildTool" type="CanvasLayer"]
+[node name="StructBuildTool" type="CanvasLayer" node_paths=PackedStringArray("EditTileMapView", "TextEdit", "Button_Remove_All")]
 script = ExtResource("1_kpgmv")
+EditTileMapView = NodePath("HBoxContainer/VBoxContainer/PanelContainer/EditTileMapView")
+TextEdit = NodePath("HBoxContainer/VBoxContainer2/PanelContainer2/TextEdit")
+Button_Remove_All = NodePath("HBoxContainer/VBoxContainer/PanelContainer4/HBoxContainer/Button_Remove_All")
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -57,6 +60,7 @@ size_flags_stretch_ratio = 0.5
 
 [node name="TextEdit" type="TextEdit" parent="HBoxContainer/VBoxContainer2/PanelContainer2"]
 layout_mode = 2
+editable = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
 layout_mode = 2
@@ -77,24 +81,45 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 focus_mode = 2
 
-[node name="EditTileMapView" type="TileMapLayer" parent="HBoxContainer/VBoxContainer/PanelContainer"]
-position = Vector2(158, 136)
-tile_map_data = PackedByteArray("AAAJAAgAAAABAAEAAAAIAAcAAAABAAEAAAAHAAcAAAABAAEAAAAJAAUAAAABAAEAAAAHAAgAAAABAAEAAAAKAAgAAAABAAEAAAALAAgAAAABAAEAAAALAAcAAAABAAEAAAAKAAcAAAABAAEAAAAKAAYAAAABAAEAAAAKAAUAAAABAAEAAAAIAAQAAAABAAEAAAAHAAQAAAABAAEAAAAGAAQAAAABAAEAAAAFAAQAAAABAAEAAAAFAAkAAAABAAEAAAAFAAgAAAABAAEAAAAEAAgAAAABAAEAAAAEAAcAAAABAAEAAAAFAAUAAAABAAEAAAAGAAUAAAABAAEAAAAGAAYAAAABAAEAAAAGAAcAAAABAAEAAAAGAAgAAAABAAEAAAAFAAcAAAABAAEAAAAFAAYAAAABAAEAAAAHAAYAAAABAAEAAAAHAAUAAAABAAEAAAAIAAUAAAABAAEAAAAIAAYAAAABAAEAAAAJAAYAAAABAAEAAAAJAAcAAAABAAEAAAAIAAgAAAABAAEAAAAHAAkAAAABAAEAAAAGAAkAAAABAAEAAAA=")
+[node name="EditTileMapView" type="TileMapLayer" parent="HBoxContainer/VBoxContainer/PanelContainer" node_paths=PackedStringArray("BackGround")]
+position = Vector2(590, 352)
 tile_set = SubResource("TileSet_34fmu")
 script = ExtResource("4_ce6aj")
+BackGround = NodePath("BackGroundLayer")
+
+[node name="BackGroundLayer" type="TileMapLayer" parent="HBoxContainer/VBoxContainer/PanelContainer/EditTileMapView"]
+self_modulate = Color(0.5211406, 0.5211406, 0.5211405, 1)
+show_behind_parent = true
 
 [node name="PanelContainer4" type="PanelContainer" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/PanelContainer4"]
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/PanelContainer4"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/PanelContainer4/HBoxContainer"]
 layout_mode = 2
 text = "编辑"
+
+[node name="Button_Remove_All" type="Button" parent="HBoxContainer/VBoxContainer/PanelContainer4/HBoxContainer"]
+layout_mode = 2
+text = "全部清除"
 
 [node name="PanelContainer3" type="PanelContainer" parent="HBoxContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.5
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/PanelContainer3"]
+layout_mode = 2
+size_flags_vertical = 1
+text = "【鼠标左键】放置方块
+【鼠标右键】删除方块
+【TAB键】切换图层
+【ALT键+鼠标左键】选取方块
+【空格键】回到原点
+"
 
 [node name="VBoxContainer3" type="VBoxContainer" parent="HBoxContainer"]
 layout_mode = 2

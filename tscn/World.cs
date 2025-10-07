@@ -19,6 +19,8 @@ namespace horizoncraft.script
     //第三次重构:世界服务策略模式，通过功能服务组合，功能服务也是不同策略模式的实现。
     public partial class World : Node2D
     {
+        private PackedScene chunkPackedScene = GD.Load<PackedScene>("res://tscn/TileMapLayerChunk.tscn");
+
         public enum WorldMode
         {
             Preview, //预览模式,仅生成世界,不保存,不加载
@@ -27,46 +29,62 @@ namespace horizoncraft.script
             MultiplayerHost //联机服主机模式,拥有全部内容
         }
 
+        /// <summary>
+        /// 世界名
+        /// </summary>
         public static string WorldName = "";
+
+        /// <summary>
+        /// 世界种子
+        /// </summary>
         public static long Seed;
 
+        /// <summary>
+        /// 世界模式
+        /// </summary>
         public static WorldMode worldMode = WorldMode.Single;
+
+        /// <summary>
+        /// 世界服务类
+        /// </summary>
         public WorldServiceBase Service;
-        public long tick_use_time = 0;
+
+        /// <summary>
+        /// 世界时刻总耗时 ms
+        /// </summary>
+        public double TimeConsumingμs = 0;
+
+        /// <summary>
+        /// 区块TileMap集合
+        /// </summary>
         public List<TileMapLayerChunk> tileMapLayerChunks = new();
+
+        /// <summary>
+        /// 用于显示的区块集合
+        /// </summary>
         public Dictionary<Vector2I, Chunk> VisibleChunks = new();
-        public Action CilentTicked;
 
-
-        private PackedScene PSTilemapLayerChunk;
 
         //Node
-        public PlayerNode PlayerNode;
-        public Timer timer;
-        public TextureRect textureRect;
-        public DirectionalLight2D DirectionalLight2D;
-        public ColorRect colorRect;
+        [Export] public PlayerNode PlayerNode;
+        [Export] public Timer timer;
+        [Export] public TextureRect textureRect;
+        [Export] public DirectionalLight2D DirectionalLight2D;
+        [Export] public ColorRect colorRect;
+
+        /// <summary>
+        /// Rpc请求冷却
+        /// </summary>
         public double RequeueFreeze = 0;
 
+
+        Stopwatch _stopwatch = new Stopwatch();
 
         public override void _Ready()
         {
             _ = Materials.BlockMetas;
-            PSTilemapLayerChunk =
-                GD.Load<PackedScene>("res://tscn/TileMapLayerChunk.tscn");
-            textureRect =
-                GetNode<TextureRect>("CanvasLayer_Back/TextureRect_Sky");
-            DirectionalLight2D =
-                GetNode<DirectionalLight2D>("DirectionalLight2D");
-            colorRect =
-                GetNode<ColorRect>("CanvasLayer/ColorRect_Top");
-            PlayerNode =
-                GetNode<PlayerNode>("Player");
-            timer =
-                GetNode<Timer>("Timer_Tick");
 
             timer.Timeout += ClientTick;
-            PlayerNode.world = this;
 
             if (worldMode == WorldMode.Single)
                 Service = new SingleWorldService(this);
@@ -80,27 +98,30 @@ namespace horizoncraft.script
 
             if (worldMode == WorldMode.Preview)
             {
-                Seed = System.Random.Shared.NextInt64();
+                Seed = Random.Shared.NextInt64();
                 Service = new PreviewWorldService(this);
             }
 
+            //先初始化世界服务本身，再初始化世界服务对应的功能服务，以免出现循环引用
             Service.InitializeServices();
         }
 
         public override void _ExitTree()
         {
-            Service.ChunkService.SaveAll();
-            Service.PlayerService.SaveAll();
+            Service.Save();
         }
 
         public override void _Process(double delta)
         {
-            textureRect.Modulate = GetSkyChange();
-            colorRect.Color = Color.Color8(0,0,0,GetLightChange());
+            //更新天空背景颜色
+            textureRect.Modulate = Service.GetSkyColor();
+            //更新覆盖的光线明暗度变化
+            colorRect.Color = Color.Color8(0, 0, 0, Service.GetLightChange());
+            //更新请求冷却
             if (RequeueFreeze > 0) RequeueFreeze -= delta;
             else RequeueFreeze = 0;
 
-
+            //重新请求玩家数据
             if (PlayerNode.playerData == null && RequeueFreeze == 0)
             {
                 if (Service.PlayerService.GetPlayerOrLoad(PlayerNode.Profile.Name, out var data))
@@ -117,22 +138,27 @@ namespace horizoncraft.script
             }
         }
 
+        /// <summary>
+        /// 客户端时刻
+        /// </summary>
         public void ClientTick()
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            _stopwatch.Restart();
 
             UpdateTileMap();
-            CilentTicked?.Invoke();
             BlockInterFaceHandle();
-            sw.Stop();
 
+            _stopwatch.Stop();
             Service.TickTimes++;
 
-            tick_use_time = sw.ElapsedMilliseconds;
+            TimeConsumingμs = _stopwatch.Elapsed.TotalMilliseconds;
         }
 
-
+        /// <summary>
+        /// 当前区块坐标的区块是否有TileMap节点，通常用于判断实体所在的区域是否存在TileMap
+        /// </summary>
+        /// <param name="coord">区块坐标</param>
+        /// <returns>是否存在TileMap节点</returns>
         public bool HasTileMap(Vector2I coord)
         {
             for (int i = 0; i < tileMapLayerChunks.Count; i++)
@@ -146,24 +172,15 @@ namespace horizoncraft.script
             return false;
         }
 
-        private void AddTileMap(Chunk chunk)
+        /// <summary>
+        /// 尝试添加新的TileMap
+        /// </summary>
+        /// <param name="chunk"></param>
+        private void TryAddTileMap(Chunk chunk)
         {
-            // for (int i = 0; i < tileMapLayerChunks.Count; i++)
-            // {
-            //     if (tileMapLayerChunks[i].chunk.coord == chunk.coord)
-            //     {
-            //         if (tileMapLayerChunks[i].chunk != chunk)
-            //         {
-            //             chunk.update_tilemap = true;
-            //             tileMapLayerChunks[i].chunk = chunk;
-            //         }
-            //         return;
-            //     }
-            // }
             if (tileMapLayerChunks.Find(a => a.chunk.coord == chunk.coord) != null) return;
-            
-            
-            TileMapLayerChunk tmly = PSTilemapLayerChunk.Instantiate<TileMapLayerChunk>();
+
+            TileMapLayerChunk tmly = chunkPackedScene.Instantiate<TileMapLayerChunk>();
             tmly.chunk = chunk;
             chunk.update_tilemap = true;
             tmly.GlobalPosition = chunk.coord * Chunk.Size * 16;
@@ -173,6 +190,9 @@ namespace horizoncraft.script
             AddChild(tmly);
         }
 
+        /// <summary>
+        /// 更新TileMap
+        /// </summary>
         public void UpdateTileMap()
         {
             if (PlayerNode.playerData == null) return;
@@ -188,7 +208,7 @@ namespace horizoncraft.script
 
             foreach (var key in VisibleChunks.Keys)
             {
-                AddTileMap(VisibleChunks[key]);
+                TryAddTileMap(VisibleChunks[key]);
             }
 
             HashSet<Vector2I> poss = new HashSet<Vector2I>();
@@ -210,7 +230,7 @@ namespace horizoncraft.script
             }
         }
 
-        //TODO 这个功能还不知道怎么移植到服务类中去，目前只能在客户端即时生效如果用网络的话，可能会出现客户端玩家在因为延迟在天上飞的情况，还待研究
+        //TODO 这个功能还不知道怎么移植到服务类中去，目前只能在客户端即时生效如果用网络的话，可能会出现客户端玩家在因为延迟在天上飞的情况，还待研究，不过就这样也行，服务端可以做一个简易的反作弊检测
         public virtual void BlockInterFaceHandle()
         {
             if (PlayerNode?.playerData == null) return;
@@ -243,87 +263,6 @@ namespace horizoncraft.script
                 PlayerNode.playerData.Fly.Value = false;
                 PlayerNode.playerData.Resistance.Value = 1f;
             }
-        }
-
-        public byte GetLightChange()
-        {
-            float hour = Service.GetTimeHour();
-            if (hour < 5f || hour >= 20f)
-                return 200;
-            else if (hour >= 5f && hour < 8f)
-                return (byte)(200 * (1f - (hour - 5f) / 3f));
-            else if (hour >= 8f && hour < 17f)
-                return 0;
-            else
-                return (byte)(200 * ((hour - 17f) / 3f));
-        }
-
-        public Color GetSkyChange()
-        {
-            float hour = Service.GetTimeHour();
-
-            if (hour >= 0 && hour < 6) // 00:00 - 06:00
-            {
-                float p = hour / 6f;
-                byte r = (byte)Math.Clamp(15 + p * (25 - 15), 0, 255);
-                byte g = (byte)Math.Clamp(25 + p * (55 - 25), 0, 255);
-                byte b = (byte)Math.Clamp(55 + p * (135 - 55), 0, 255);
-                return Color.Color8(r, g, b);
-            }
-
-            if (hour >= 6 && hour < 12) // 06:00 - 12:00
-            {
-                float p = (hour - 6f) / 6f;
-                byte r = (byte)Math.Clamp(25 + p * (135 - 25), 0, 255);
-                byte g = (byte)Math.Clamp(55 + p * (175 - 55), 0, 255);
-                byte b = (byte)Math.Clamp(135 + p * (255 - 135), 0, 255);
-                return Color.Color8(r, g, b);
-            }
-
-            if (hour >= 12 && hour < 18) // 12:00 - 18:00
-            {
-                float p = (hour - 12f) / 6f;
-                byte r = (byte)Math.Clamp(135 + p * (255 - 135), 0, 255);
-                byte g = (byte)Math.Clamp(175 + p * (135 - 175), 0, 255);
-                byte b = (byte)Math.Clamp(255 + p * (0 - 255), 0, 255);
-                return Color.Color8(r, g, b);
-            }
-
-            if (hour >= 18 && hour < 24) // 18:00 - 24:00
-            {
-                float p = (hour - 18f) / 6f;
-                byte r = (byte)Math.Clamp(255 + p * (15 - 255), 0, 255);
-                byte g = (byte)Math.Clamp(135 + p * (25 - 135), 0, 255);
-                byte b = (byte)Math.Clamp(0 + p * (55 - 0), 0, 255);
-                return Color.Color8(r, g, b);
-            }
-
-            return Color.Color8(255, 255, 255);
-        }
-
-
-        public static Vector2I MathFloor(Vector2I V2I, int chunkSize)
-        {
-            return new Vector2I(
-                (int)Mathf.Floor((float)V2I.X / chunkSize),
-                (int)Mathf.Floor((float)V2I.Y / chunkSize)
-            );
-        }
-
-        public static Vector2I MathFloor(Vector3I V2I, int chunkSize)
-        {
-            return new Vector2I(
-                (int)Mathf.Floor((float)V2I.X / chunkSize),
-                (int)Mathf.Floor((float)V2I.Y / chunkSize)
-            );
-        }
-
-        public static Vector2I Remainder(Vector3I V3I, int chunkSize)
-        {
-            return new Vector2I(
-                (V3I.X % chunkSize + chunkSize) % chunkSize,
-                (V3I.Y % chunkSize + chunkSize) % chunkSize
-            );
         }
     }
 }

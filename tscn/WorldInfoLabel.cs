@@ -5,8 +5,8 @@ using horizoncraft.script.Net;
 
 public partial class WorldInfoLabel : HBoxContainer
 {
-    Label labelWorldName, labelCreateDate, labelLoadDate, labelWorldSeed;
-    private Button button;
+    [Export] Label labelWorldName, labelCreateDate, labelLoadDate, labelWorldSeed;
+    [Export] private Button button;
     private bool MoseIn = false;
     public WorldListMenu Parent;
     public Texture2D Noramle, Select;
@@ -14,14 +14,6 @@ public partial class WorldInfoLabel : HBoxContainer
 
     public override void _Ready()
     {
-        Noramle = GD.Load<Texture2D>("res://texture/Gui/panel6.png");
-        Select = GD.Load<Texture2D>("res://texture/Gui/panel7.png");
-        button = GetNode<Button>("Button");
-        labelWorldName = GetNode<Label>("Button/HBoxContainer/LabelWorldName");
-        labelCreateDate = GetNode<Label>("Button/HBoxContainer/LabelCreateDate");
-        labelLoadDate = GetNode<Label>("Button/HBoxContainer/LabelLoadDate");
-        labelWorldSeed = GetNode<Label>("Button/HBoxContainer/LabelWorldSeed");
-
         button.MouseEntered += () => MoseIn = true;
         button.MouseExited += () => MoseIn = false;
         button.Pressed += () => Parent.SelectedWorld = Profile;

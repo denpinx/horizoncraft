@@ -70,9 +70,11 @@ _data = {
 &"loadover": SubResource("Animation_55sw6")
 }
 
-[node name="LoadingMenu" type="CanvasLayer"]
+[node name="LoadingMenu" type="CanvasLayer" node_paths=PackedStringArray("animationPlayer", "label")]
 layer = 11
 script = ExtResource("1_ps4g2")
+animationPlayer = NodePath("AnimationPlayer")
+label = NodePath("TextureRect/VBoxContainer/Label")
 
 [node name="TextureRect" type="TextureRect" parent="."]
 anchors_preset = 15

@@ -243,7 +243,7 @@ public class PlayerEvents
     /// <returns></returns>
     public virtual bool BreakBlock(PlayerBreakblockEvent e)
     {
-        if (!e.Player.Live) return false;
+        if (e.Player.State == PlayerState.Dead) return false;
 
         var targetblock = e.GetBlockData();
 
@@ -276,8 +276,7 @@ public class PlayerEvents
             targetblock.DropBlockInventoryItems(e.world, new Vector2I(e.Position.X, e.Position.Y));
         }
 
-        
-        
+
         e.ChunkService.SetBlock(e.Position, Materials.Valueof("air"));
         e.ChunkService.PassiveUpdateNeighborBlock(e.Position);
         e.Player.Inventory.update = true;

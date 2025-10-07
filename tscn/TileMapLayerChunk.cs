@@ -10,22 +10,19 @@ public partial class TileMapLayerChunk : Node2D
     [Export] public bool DEBUG = true;
     public Chunk chunk;
     public PlayerNode PlayerNode;
-    TileMapLayer tileMapLayer_font;
-    TileMapLayer tileMapLayer_back;
-    TileMapLayer tileMapLayer_shadow;
-    DebugView debugView;
+    [Export] TileMapLayer tileMapLayer_font;
+    [Export] TileMapLayer tileMapLayer_back;
+    [Export] TileMapLayer tileMapLayer_shadow;
+    [Export] DebugView debugView;
     //[Export] private float perspectiveOffsetFactor = 0.1f;
 
     private long time;
 
     public override void _Ready()
     {
-        tileMapLayer_font = GetNode<TileMapLayer>("TileMapLayer_font");
-        tileMapLayer_back = GetNode<TileMapLayer>("TileMapLayer_back");
-        tileMapLayer_shadow = GetNode<TileMapLayer>("TileMapLayer_shadow");
-        debugView = GetNode<DebugView>("DebugView");
-        tileMapLayer_font.TileSet = Materials.CreateTileSet();
-        tileMapLayer_back.TileSet = Materials.CreateTileSet();
+        var result = Materials.CreateTileSet();
+        tileMapLayer_font.TileSet = result;
+        tileMapLayer_back.TileSet = result;
     }
 
 
@@ -36,13 +33,13 @@ public partial class TileMapLayerChunk : Node2D
             QueueFree();
             return;
         }
-        
+
         if (debugView.Visible)
         {
             debugView.chunk = chunk;
             debugView.QueueRedraw();
         }
-        
+
         if (chunk.update_tilemap)
         {
             for (int x = 0; x < Chunk.Size; x++)
@@ -51,7 +48,6 @@ public partial class TileMapLayerChunk : Node2D
                 {
                     for (int z = 0; z < Chunk.SizeZ && z < 2; z++)
                     {
-                        
                         var pos = new Vector2I(x, y);
                         BlockData block = chunk.GetBlock(x, y, z);
                         BlockData block_back = chunk.GetBlock(x, y, 0);
@@ -111,8 +107,8 @@ public partial class TileMapLayerChunk : Node2D
                             {
                                 if (tileMapLayer_shadow.GetCellSourceId(pos) != -1)
                                     tileMapLayer_shadow.SetCell(new(x, y), -1);
-                            }else
-                            if (tileMapLayer_shadow.GetCellAtlasCoords(pos) != new Vector2I(block_font.Light, 0))
+                            }
+                            else if (tileMapLayer_shadow.GetCellAtlasCoords(pos) != new Vector2I(block_font.Light, 0))
                                 tileMapLayer_shadow.SetCell(new(x, y), 0, new Vector2I(block_font.Light, 0));
 
                             if (bts != null && bts.scene)

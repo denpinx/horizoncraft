@@ -3,6 +3,7 @@ using System.Linq;
 using Godot;
 using horizoncraft.script;
 using horizoncraft.script.Components;
+using horizoncraft.script.Expand;
 using horizoncraft.script.Inventory;
 using horizoncraft.script.Net;
 using horizoncraft.script.rpc;
@@ -39,7 +40,7 @@ public class HostPlayerService : PlayerServiceBase
             PlayerData player = Fs.Value;
             if (player.Name == PlayerNode.Profile.Name) continue;
 
-            var List = GetPlayersByRange(player, World.Service.ChunkService._loadrange);
+            var List = GetPlayersByRange(player, World.Service.ChunkService.LoadHorizon);
             foreach (var target in List)
             {
                 if (target.Update)
@@ -120,6 +121,20 @@ public class HostPlayerService : PlayerServiceBase
                     inv.GetInventory().update = false;
                 }
             }
+        }
+    }
+
+    public override void OnPlayerRespawn(PlayerData playerData)
+    {
+        if (playerData.Name == PlayerNode.Profile.Name)
+        {
+            World.PlayerNode.Position = playerData.Position.ToGodotVector2();
+        }
+        else
+        {
+            var snap = new PlayerDataSnapshot(playerData);
+            World.Service.PlayerServiceNode.RpcId(playerData.PeerId, nameof(PlayerServiceNode.UpdataPlayer),
+                ByteTool.ToBytes(snap));
         }
     }
 }

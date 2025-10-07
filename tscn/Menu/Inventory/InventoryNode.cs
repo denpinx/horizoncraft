@@ -12,8 +12,13 @@ using horizoncraft.script.WorldControl;
 [Tool]
 public partial class InventoryNode : CanvasLayer
 {
-    public int TargetNodeCount = 0;
-    public int PlayerNodeCount = 36;
+    [Export] public int TargetNodeCount = 0;
+    [Export] public int PlayerNodeCount = 36;
+    [Export] public Control TargetInventorySlotRoot;
+    [Export] public string TargetInventorySlotName = "TargetInvSlot";
+    [Export] public Control PlayerInventorySlotRoot;
+    [Export] public string PlayerInventorySlotName = "PlayerInvSlot";
+
     public string TargetNodePath = "MarginContainer/VBoxContainer/TargetInvBase/TargetInvSlot";
     public string PlayerNodePath = "MarginContainer/GridContainer/PlayerInvSlot";
     public List<string> TargetNodePaths = new();
@@ -28,14 +33,14 @@ public partial class InventoryNode : CanvasLayer
     public List<InvSlot> TargetSlots = new();
     public Sprite2D HandItem;
 
-    private CanvasLayer playerNode;
+    //private CanvasLayer playerNode;
 
     public override void _Ready()
     {
         SetLayer(10);
-        
+
         Timer timer = new Timer();
-        timer.Autostart = true; 
+        timer.Autostart = true;
         timer.SetWaitTime(0.05);
         timer.Timeout += UpdateGui;
         AddChild(timer);
@@ -68,7 +73,8 @@ public partial class InventoryNode : CanvasLayer
         {
             for (int i = 0; i < TargetNodeCount; i++)
             {
-                InvSlot s = GetNode<InvSlot>(TargetNodePath + i);
+                InvSlot s = TargetInventorySlotRoot.GetNode<InvSlot>(TargetInventorySlotName + i);
+
                 s.index = i;
                 s.LeftClick += OnTargetButtonPressed;
                 s.RightClick += OnTargetButtonPressed;
@@ -79,7 +85,7 @@ public partial class InventoryNode : CanvasLayer
 
         for (int i = 0; i < PlayerNodeCount; i++)
         {
-            InvSlot s = GetNode<InvSlot>(PlayerNodePath + i);
+            InvSlot s = PlayerInventorySlotRoot.GetNode<InvSlot>(PlayerInventorySlotName + i);
             s.index = i;
             s.LeftClick += OnPlayerButtonPressed;
             s.RightClick += OnPlayerButtonPressed;
@@ -187,7 +193,7 @@ public partial class InventoryNode : CanvasLayer
 
     public void UpdateGui()
     {
-        if (playerNode != null) playerNode.Visible = Visible;
+        if (PlayerNode != null) PlayerNode.Visible = Visible;
         if (PlayerNode?.playerData?.Inventory != null)
         {
             if (PlayerNode?.playerData?.Inventory.GetHandItemStack() != null)

@@ -12,19 +12,20 @@ using HorizonCraft.script.Services.chunk;
 public partial class ItemManage : HBoxContainer, ITranslatable
 {
     private PackedScene _packedSceneInvSlot = GD.Load<PackedScene>("res://tscn/Menu/InvSlot.tscn");
-    private GridContainer _GridContainer;
     private PlayerNode _player;
-    private Button _buttonMode0;
-    private Button _buttonMode1;
-    private Button _buttonClear;
-    private Button _buttonSort;
-    private Button _buttonLight0;
-    private Button _buttonLight1;
-    private Button _buttonLight2;
-    private Button _NextPage;
-    private Button _LastPage;
-    private LineEdit _LineEdit_FilterText;
-    private ReciperView _RecipeView;
+    [Export]private GridContainer _GridContainer;
+    [Export]private Button _buttonMode0;
+    [Export]private Button _buttonMode1;
+    [Export]private Button _buttonClear;
+    [Export]private Button _buttonSort;
+    [Export]private Button _buttonLight0;
+    [Export]private Button _buttonLight1;
+    [Export]private Button _buttonLight2;
+    [Export]private Button _NextPage;
+    [Export]private Button _LastPage;
+    [Export]private LineEdit _LineEdit_FilterText;
+    [Export]private ReciperView _RecipeView;
+    
     private int _page_Columnh = 16;
     private int _page = 0;
     private string FilterText = "";
@@ -32,19 +33,6 @@ public partial class ItemManage : HBoxContainer, ITranslatable
     public override void _Ready()
     {
         _player = GetParent<InventoryNode>().PlayerNode;
-        _RecipeView = GetNode<ReciperView>("ReciperView");
-        _buttonMode0 = GetNode<Button>("PanelContainer2/VBoxContainer/HBoxContainer/Button_mod_0");
-        _buttonMode1 = GetNode<Button>("PanelContainer2/VBoxContainer/HBoxContainer/Button_mod_1");
-        _buttonClear = GetNode<Button>("PanelContainer2/VBoxContainer/HBoxContainer2/Button_clear");
-        _buttonSort = GetNode<Button>("PanelContainer2/VBoxContainer/HBoxContainer2/Button_sort");
-        _buttonLight0 = GetNode<Button>("PanelContainer2/VBoxContainer/HBoxContainer3/Button_Light_0");
-        _buttonLight1 = GetNode<Button>("PanelContainer2/VBoxContainer/HBoxContainer3/Button_Light_1");
-        _buttonLight2 = GetNode<Button>("PanelContainer2/VBoxContainer/HBoxContainer3/Button_Light_2");
-        _NextPage = GetNode<Button>("PanelContainer/VBoxContainer/HBoxContainer/Button_Next_Page");
-        _LastPage = GetNode<Button>("PanelContainer/VBoxContainer/HBoxContainer/Button_Last_Page");
-        _GridContainer = GetNode<GridContainer>("PanelContainer/VBoxContainer/GridContainer");
-        _LineEdit_FilterText = GetNode<LineEdit>("PanelContainer/VBoxContainer/PanelContainer/LineEdit");
-
         _RecipeView.ItemManage = this;
         _buttonMode0.Pressed += () =>
         {

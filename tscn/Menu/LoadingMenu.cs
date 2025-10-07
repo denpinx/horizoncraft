@@ -5,17 +5,15 @@ using HorizonCraft.script.Services.world;
 
 public partial class LoadingMenu : CanvasLayer
 {
-    public PlayerNode playerNode;
-    private AnimationPlayer animationPlayer;
-    private Label label;
+    [Export] public PlayerNode playerNode;
+    [Export] private AnimationPlayer animationPlayer;
+    [Export] private Label label;
     private bool quit = false;
     private double loadingTimer = 0;
 
     public override void _Ready()
     {
         Visible = true;
-        animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        label = GetNode<Label>("TextureRect/VBoxContainer/Label");
         animationPlayer.Play("loading");
         animationPlayer.AnimationFinished += (name =>
         {

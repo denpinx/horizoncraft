@@ -6,14 +6,8 @@ public partial class ProgressItem : PanelContainer
     public string name;
     public int value;
     public int max;
-    public TextureProgressBar ProgressBar;
-    public Label Label;
-
-    public override void _Ready()
-    {
-        ProgressBar = GetNode<TextureProgressBar>("TextureProgressBar");
-        Label = GetNode<Label>("Label");
-    }
+    [Export] public TextureProgressBar ProgressBar;
+    [Export] public Label Label;
 
     public override void _Process(double delta)
     {

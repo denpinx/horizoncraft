@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Godot.Collections;
 
@@ -19,6 +20,33 @@ public class PreBuildStruct
             ["name"] = name,
             ["blocks"] = array
         };
+    }
+
+    public Vector2I GetMaxPos()
+    {
+        if (blocks.Count == 0) return new Vector2I();
+        var first = blocks.Keys.First();
+        Vector2I result = new Vector2I(first.X, first.Y);
+        foreach (var pos in blocks.Keys)
+        {
+            if (pos.X > result.X) result.X = pos.X;
+            if (pos.Y > result.Y) result.Y = pos.Y;
+        }
+
+        return result + new Vector2I(1, 1);
+    }
+
+    public Vector2I GetMinPos()
+    {
+        var first = blocks.Keys.First();
+        Vector2I result = new Vector2I(first.X, first.Y);
+        foreach (var pos in blocks.Keys)
+        {
+            if (pos.X < result.X) result.X = pos.X;
+            if (pos.Y < result.Y) result.Y = pos.Y;
+        }
+
+        return result;
     }
 }
 

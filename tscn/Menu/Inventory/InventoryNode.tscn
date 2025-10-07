@@ -5,9 +5,10 @@
 [ext_resource type="PackedScene" uid="uid://bjutbqmtgb304" path="res://tscn/Menu/InvSlot.tscn" id="3_2u815"]
 [ext_resource type="Theme" uid="uid://joabf0lpqylf" path="res://thems/InvThem.tres" id="4_25mba"]
 
-[node name="InventoryNode" type="CanvasLayer"]
+[node name="InventoryNode" type="CanvasLayer" node_paths=PackedStringArray("PlayerInventorySlotRoot")]
 layer = 10
 script = ExtResource("1_2u815")
+PlayerInventorySlotRoot = NodePath("MarginContainer/GridContainer")
 metadata/_edit_horizontal_guides_ = [324.0, 540.0]
 metadata/_edit_vertical_guides_ = [576.0, 960.0]
 metadata/_edit_use_anchors_ = true

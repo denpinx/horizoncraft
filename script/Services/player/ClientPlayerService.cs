@@ -28,7 +28,7 @@ public class ClientPlayerService : PlayerServiceBase
                 var snap = new PlayerDataSnapshot(player);
                 World.Service.PlayerServiceNode.RpcId(1,
                     nameof(PlayerServiceNode.UpdataPlayer),
-                    player.PlayerNode.Name,
+                    World.PlayerNode.Name,
                     ByteTool.ToBytes(snap));
             }
 

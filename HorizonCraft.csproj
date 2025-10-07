@@ -57,6 +57,7 @@
     <Content Include="config\item\wood\logs.json" />
     <Content Include="config\item\wood\planks.json" />
     <Content Include="config\lang\cn\blockmetas.json" />
+    <Content Include="config\lang\cn\deathrattle.json" />
     <Content Include="config\lang\cn\gui.json" />
     <Content Include="config\lang\cn\itemmetas.json" />
     <Content Include="config\recipes\Craft\Block\Furnace.json" />

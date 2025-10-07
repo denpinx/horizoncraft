@@ -4,22 +4,11 @@ using horizoncraft.script;
 
 public partial class CreateWorldConfig : Control
 {
-    private LineEdit lineEditWorldName, lineEditWorldSeed;
-    private TextureButton buttonCreateWorld, buttonCancel;
+    [Export]private LineEdit lineEditWorldName, lineEditWorldSeed;
+    [Export]private TextureButton buttonCreateWorld, buttonCancel;
 
     public override void _Ready()
     {
-        lineEditWorldName =
-            GetNode<LineEdit>("HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/LineEdit_WorldName");
-        lineEditWorldSeed =
-            GetNode<LineEdit>("HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/LineEdit_WorldSeed");
-        buttonCreateWorld =
-            GetNode<TextureButton>(
-                "HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/Button_CreateWorld");
-        buttonCancel =
-            GetNode<TextureButton>(
-                "HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/Button_Cancel");
-
         buttonCancel.Pressed += () => { QueueFree(); };
         buttonCreateWorld.Pressed += () =>
         {

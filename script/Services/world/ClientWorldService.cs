@@ -43,11 +43,11 @@ public class ClientWorldService : WorldServiceBase
 
     public override void InitializeServices()
     {
-        EntityBehavior = new ClientEntityBehavior();
-        ChunkService = new ClientChunkService(World);
-        PlayerService = new ClientPlayerService(World);
-        EntityService = new ClientEntityService(World);
-        MessageService = new ClientMessageService(World);
+        EntityBehavior = new ClientEntityBehavior(); ;
+        ChunkService = AddService<ClientChunkService>(new ClientChunkService(World));
+        PlayerService = AddService<ClientPlayerService>(new ClientPlayerService(World));
+        EntityService = AddService<ClientEntityService>(new ClientEntityService(World));
+        MessageService = AddService<ClientMessageService>(new ClientMessageService(World)); 
         InitializeNode();
 
         GD.Print($"[初始化完成]{nameof(ClientWorldService)}");

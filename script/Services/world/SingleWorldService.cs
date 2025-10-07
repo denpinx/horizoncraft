@@ -18,10 +18,10 @@ public class SingleWorldService : WorldServiceBase
     public override void InitializeServices()
     {
         EntityBehavior = new EntityBehaviorBase();
-        ChunkService = new SingleChunkService(World);
-        PlayerService = new SinglePlayerService(World);
-        EntityService = new HostEntityService(World);
-        MessageService = new SingleMessageService(World);
+        ChunkService = AddService<SingleChunkService>(new SingleChunkService(World));
+        PlayerService = AddService<SinglePlayerService>(new SinglePlayerService(World));
+        EntityService = AddService<HostEntityService>(new HostEntityService(World));
+        MessageService = AddService<SingleMessageService>(new SingleMessageService(World));
         InitializeNode();
 
         GD.Print($"[初始化完成]{nameof(SingleWorldService)}");

@@ -5,18 +5,12 @@ using horizoncraft.script;
 public partial class PlayerDataView : Control
 {
     private PlayerNode Player;
-    private TextureProgressBar HealthBar, HungerBar, ThirstBar, ExpBar;
-    private Timer _timer;
+    [Export]private TextureProgressBar HealthBar, HungerBar, ThirstBar, ExpBar;
+    [Export]private Timer _timer;
 
     public override void _Ready()
     {
         Player = GetParent().GetParent<PlayerNode>();
-        _timer = GetNode<Timer>("Timer");
-        HealthBar = GetNode<TextureProgressBar>("VBoxContainer/Progress_Health");
-        HungerBar = GetNode<TextureProgressBar>("VBoxContainer/Progress_Hunger");
-        ThirstBar = GetNode<TextureProgressBar>("VBoxContainer/Progress_Thirst");
-        ExpBar = GetNode<TextureProgressBar>("VBoxContainer/Progress_Exp");
-
         _timer.Timeout += Update;
     }
 

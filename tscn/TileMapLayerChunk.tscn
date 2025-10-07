@@ -20,9 +20,13 @@ texture = ExtResource("2_61nbq")
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_wribj")
 
-[node name="TileMapLayerChunk" type="Node2D"]
+[node name="TileMapLayerChunk" type="Node2D" node_paths=PackedStringArray("tileMapLayer_font", "tileMapLayer_back", "tileMapLayer_shadow", "debugView")]
 top_level = true
 script = ExtResource("1_2arkn")
+tileMapLayer_font = NodePath("TileMapLayer_font")
+tileMapLayer_back = NodePath("TileMapLayer_back")
+tileMapLayer_shadow = NodePath("TileMapLayer_shadow")
+debugView = NodePath("DebugView")
 
 [node name="TileMapLayer_back" type="TileMapLayer" parent="."]
 modulate = Color(0.41598, 0.41598, 0.41598, 1)

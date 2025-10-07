@@ -17,8 +17,8 @@ public partial class PlayerServiceNode : Node
     private World World;
 
     private WorldServiceBase WorldService => World.Service;
-    private PlayerServiceBase PlayerService => World.Service.PlayerService; 
-    private ChunkServiceBase ChunkService => World.Service.ChunkService; 
+    private PlayerServiceBase PlayerService => World.Service.PlayerService;
+    private ChunkServiceBase ChunkService => World.Service.ChunkService;
 
     public PlayerServiceNode(World world)
     {
@@ -75,7 +75,6 @@ public partial class PlayerServiceNode : Node
             if (World.PlayerNode.playerData == null)
             {
                 World.PlayerNode.playerData = playerData;
-                World.PlayerNode.playerData.PlayerNode = World.PlayerNode;
                 if (World.Service is ClientWorldService)
                 {
                     World.PlayerNode.Position = playerData.Position_v2;

@@ -11,32 +11,16 @@ using FileAccess = Godot.FileAccess;
 public partial class WorldListMenu : Control, ITranslatable
 {
     public WorldProfile SelectedWorld;
-    private VBoxContainer ListRoot;
-    private VBoxContainer Root;
-    private List<WorldProfile> worldList = new List<WorldProfile>();
+    private PackedScene WorldCreateScene = GD.Load<PackedScene>("res://tscn/Menu/create_world_config.tscn");
+
+    [Export] private Button buttonBackMainMenu, buttonLoadWorld, buttonMultiplayer, buttonCreateWorld, buttonRemove;
+    [Export] private VBoxContainer ListRoot;
+    [Export] private VBoxContainer Root;
     private List<WorldInfoLabel> worldInfoLabels = new List<WorldInfoLabel>();
-    private Button buttonBackMainMenu, buttonLoadWorld, buttonMultiplayer, buttonCreateWorld, buttonRemove;
-    private Label buttonRemoveLabel;
-    private PackedScene WorldCreateScene;
-    private bool ConfirmDel = false;
+    private List<WorldProfile> worldList = new List<WorldProfile>();
 
     public override void _Ready()
     {
-        WorldCreateScene = GD.Load<PackedScene>("res://tscn/Menu/create_world_config.tscn");
-        var WorldProfilesScene = GD.Load<PackedScene>("res://tscn/Menu/WorldListMenu.tscn");
-        ListRoot = (VBoxContainer)GetNode(
-            "VBoxContainer/HBoxContainer/PanelContainer3/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer");
-        Root = GetNode<VBoxContainer>("VBoxContainer");
-        buttonLoadWorld =
-            GetNode<Button>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_LoadGame");
-        buttonBackMainMenu =
-            GetNode<Button>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_BackMainMenu");
-        buttonCreateWorld =
-            GetNode<Button>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_CreateWorld");
-        buttonMultiplayer =
-            GetNode<Button>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_Multiplayer");
-        buttonRemove =
-            GetNode<Button>("VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2/Button_Remove");
         worldList = GetWorldFiles();
         UpdateWorldList();
 
@@ -61,40 +45,11 @@ public partial class WorldListMenu : Control, ITranslatable
         buttonRemove.Pressed += () =>
         {
             if (SelectedWorld == null) return;
-            if (!ConfirmDel)
-            {
-                ConfirmDel = true;
-                buttonRemoveLabel.Text = $"确定删除世界 {SelectedWorld.WorldName}";
-                return;
-            }
-
-            ConfirmDel = false;
-
             //先用手动删除代替
             if (Directory.Exists("save"))
             {
                 OS.ShellOpen("save");
             }
-
-
-            // TODO 有问题，删不掉
-            // string path = $"save/{SelectedWorld.WorldName}";
-            // if (Directory.Exists(path))
-            // {
-            //     Directory.Delete(path, true);
-            //     foreach (var wil in worldInfoLabels)
-            //     {
-            //         wil.QueueFree();
-            //     }
-            //
-            //     // worldInfoLabels.Clear();
-            //     // worldList = GetWorldFiles();
-            //     // UpdateWorldList();
-            //     GD.Print($"删除世界{path}");
-            // }
-            // SelectedWorld = null;
-            // ConfirmDel = false;
-            // buttonRemoveLabel.Text = $"删除世界";
         };
     }
 

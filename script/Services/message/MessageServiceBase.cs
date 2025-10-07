@@ -10,9 +10,9 @@ namespace horizoncraft.script.Services.message;
 /// 消息管理服务
 /// 不存储消息日志
 /// </summary>
-public abstract class MessageServiceBase
+public abstract class MessageServiceBase : ServiceBase
 {
-    PackedScene MessageLabelScene = GD.Load<PackedScene>("res://tscn/Gui/MessageLabel.tscn");
+    protected PackedScene MessageLabelScene = GD.Load<PackedScene>("res://tscn/Gui/MessageLabel.tscn");
 
     /// <summary>
     /// 驻留显示的最大消息数
@@ -26,26 +26,25 @@ public abstract class MessageServiceBase
 
     public int VisibleTick = 0;
 
-    protected World World;
     protected PlayerNode Player;
 
     protected List<MessageData> Messages = new();
     protected Dictionary<Guid, MessageLabel> MessageLabels = new();
 
 
-    public MessageServiceBase(World world)
+    public MessageServiceBase(World world) : base(world)
     {
-        this.World = world;
         this.Player = World.PlayerNode;
         world.timer.Timeout += Tick;
     }
 
     /// <summary>
-    /// 时刻
+    /// 时刻更新
     /// </summary>
     protected virtual void Tick()
     {
         UpdateMessages();
+        
         if (Player.ChatView.LineEdit.Visible)
         {
             Player.Inputable = false;
@@ -142,7 +141,11 @@ public abstract class MessageServiceBase
         //留空
     }
 
-
+    /// <summary>
+    /// 检查消息是否已经存在
+    /// </summary>
+    /// <param name="guid"></param>
+    /// <returns></returns>
     public bool HasMessage(Guid guid)
     {
         return Messages.Find((message) => message.Id == guid) != null;

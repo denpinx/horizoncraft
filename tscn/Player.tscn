@@ -339,9 +339,13 @@ layer = 2
 size_flags_horizontal = 4
 Player = NodePath("../..")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("Label_DEBUG_Right", "Label_DEBUG_Left", "_playerNode", "_timer")]
 layer = 2
 script = ExtResource("4_knoa1")
+Label_DEBUG_Right = NodePath("Control/Label_DEBUG_Right")
+Label_DEBUG_Left = NodePath("Control/Label_DEBUG_Left")
+_playerNode = NodePath("..")
+_timer = NodePath("../Timer_Tick")
 
 [node name="Control" type="Control" parent="CanvasLayer"]
 z_index = 2
@@ -467,5 +471,6 @@ libraries = {
 [node name="OvrCanvasLayer" type="CanvasLayer" parent="."]
 layer = 11
 
-[node name="LoadingMenu" parent="OvrCanvasLayer" instance=ExtResource("11_qpm1p")]
+[node name="LoadingMenu" parent="OvrCanvasLayer" node_paths=PackedStringArray("playerNode") instance=ExtResource("11_qpm1p")]
 visible = false
+playerNode = NodePath("../..")

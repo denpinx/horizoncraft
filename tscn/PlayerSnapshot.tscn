@@ -134,9 +134,12 @@ _data = {
 &"moving": SubResource("Animation_mhjhb")
 }
 
-[node name="PlayerSnapshot" type="Node2D"]
+[node name="PlayerSnapshot" type="Node2D" node_paths=PackedStringArray("_label", "sprite2D", "animation")]
 z_index = 10
 script = ExtResource("1_f2pik")
+_label = NodePath("Label")
+sprite2D = NodePath("Body")
+animation = NodePath("AnimationPlayer")
 
 [node name="Label" type="Label" parent="."]
 anchors_preset = 8

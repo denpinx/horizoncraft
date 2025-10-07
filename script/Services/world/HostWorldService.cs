@@ -28,10 +28,11 @@ public class HostWorldService : WorldServiceBase
     public override void InitializeServices()
     {
         EntityBehavior = new EntityBehaviorBase();
-        ChunkService = new HostChunkService(World);
-        PlayerService = new HostPlayerService(World);
-        EntityService = new HostEntityService(World);
-        MessageService = new HostMessageService(World);
+        ChunkService = AddService<HostChunkService>(new HostChunkService(World));
+        PlayerService = AddService<HostPlayerService>(new HostPlayerService(World));
+        EntityService = AddService<HostEntityService>(new HostEntityService(World));
+        MessageService = AddService<HostMessageService>(new HostMessageService(World)); 
+        
         InitializeNode();
 
         GD.Print($"[初始化完成]{nameof(HostWorldService)}");

@@ -21,7 +21,6 @@ public partial class PlayerData
     [MemoryPackIgnore] public EntityUuidPack LastFarmeEntityUuidPack = new EntityUuidPack();
     [MemoryPackIgnore] public Vector2 LastPosition = Vector2.Zero;
 
-
     [MemoryPackAllowSerialize] private Vector2 _position;
     [MemoryPackAllowSerialize] private bool _faceLeft;
     [MemoryPackAllowSerialize] private bool _openingBlockInventory;
@@ -29,21 +28,56 @@ public partial class PlayerData
 
     //连接id
     public int PeerId = 0;
-    public bool Live = true;
-    public ConfigSet<float> Health = new() { Value = 20f, Default = 20f };
-    public ConfigSet<float> Hunger = new() { Value = 20f, Default = 20f };
+
+    public PlayerState State = PlayerState.Respawning;
+    public string Deathrattle = "";
+
+    public bool HasSpawnPoint = false;
+    public Vector2 SpawnPoint;
     
+    /// <summary>
+    /// 生命值
+    /// </summary>
+    public ConfigSet<float> Health = new() { Value = 20f, Default = 20f };
+
+    /// <summary>
+    /// 饥饿值
+    /// </summary>
+    public ConfigSet<float> Hunger = new() { Value = 20f, Default = 20f };
+
+    /// <summary>
+    /// 阻力
+    /// </summary>
     public ConfigSet<float> Resistance = new() { Value = 1f, Default = 1f };
+
+    /// <summary>
+    /// 移动速度
+    /// </summary>
     public ConfigSet<float> MoveSpeed = new() { Value = 16 * 5f, Default = 16 * 5f };
+
+    /// <summary>
+    /// 是否处于飞行
+    /// </summary>
     public ConfigSet<bool> Fly = new() { Value = false, Default = false };
+
+    /// <summary>
+    /// 卸载计时器
+    /// </summary>
     public int RemoveCount = 0;
 
+    /// <summary>
+    /// 数据是否有更新
+    /// </summary>
     public bool Update = false;
 
-    //玩家名
+    /// <summary>
+    /// 玩家名
+    /// </summary>
     public String Name;
 
-    //位置
+    /// <summary>
+    /// 玩家坐标
+    /// </summary>
     public Vector2 Position
     {
         get => _position;
@@ -55,7 +89,9 @@ public partial class PlayerData
         }
     }
 
-    //面朝方向
+    /// <summary>
+    /// 面朝方向
+    /// </summary>
     public bool FaceLeft
     {
         get => _faceLeft;
@@ -67,7 +103,9 @@ public partial class PlayerData
         }
     }
 
-    //是否打开容器，这里相当于是是否订阅
+    /// <summary>
+    ///是否打开容器，这里相当于是否订阅方块的组件更新
+    /// </summary>
     public bool OpeningBlockInventory
     {
         get => _openingBlockInventory;
@@ -79,13 +117,19 @@ public partial class PlayerData
         }
     }
 
-    //当前打开容器的坐标
+    /// <summary>
+    /// 当前打开的容器坐标
+    /// </summary>
     public Vector3 OpenInventory;
 
-    //物品栏
+    /// <summary>
+    /// 物品栏
+    /// </summary>
     public PlayerInventory Inventory = new();
 
-    //
+    /// <summary>
+    /// 玩家模式
+    /// </summary>
     public int Mode
     {
         get => _mode;
@@ -97,16 +141,20 @@ public partial class PlayerData
         }
     }
 
-
-    [MemoryPackIgnore] public PlayerNode PlayerNode;
-
-    [MemoryPackIgnore] public Vector2I Coord => _position.MathFloor(16);
+    /// <summary>
+    /// 玩家所在的方块全局坐标
+    /// </summary>
+    [MemoryPackIgnore]
+    public Vector2I Coord => _position.MathFloor(16);
 
     [MemoryPackIgnore] public Vector2I Position_v2i => _position.ToVector2I();
-
     [MemoryPackIgnore] public Godot.Vector2 Position_v2 => _position.ToGodotVector2();
 
-    [MemoryPackIgnore] public Vector2I ChunkCoord => _position.MathFloor(Chunk.Size * 16);
+    /// <summary>
+    ///玩家所在的区块全局坐标
+    /// </summary>
+    [MemoryPackIgnore]
+    public Vector2I ChunkCoord => _position.MathFloor(Chunk.Size * 16);
 
     public PlayerData()
     {

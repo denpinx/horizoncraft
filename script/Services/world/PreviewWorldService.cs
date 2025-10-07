@@ -18,10 +18,11 @@ public class PreviewWorldService : WorldServiceBase
     public override void InitializeServices()
     {
         EntityBehavior = new EntityBehaviorBase();
-        ChunkService = new PreviewChunkService(World);
-        PlayerService = new PreviewPlayerService(World);
-        EntityService = new ClientEntityService(World);
-        MessageService = new SingleMessageService(World);
+        ChunkService = AddService<PreviewChunkService>(new PreviewChunkService(World));
+        PlayerService = AddService<PreviewPlayerService>(new PreviewPlayerService(World));
+        EntityService = AddService<ClientEntityService>(new ClientEntityService(World));
+        MessageService = AddService<SingleMessageService>(new SingleMessageService(World));
+        
         InitializeNode();
 
         GD.Print($"[初始化完成]{nameof(PreviewWorldService)}");

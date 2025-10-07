@@ -19,7 +19,7 @@ region = Rect2(0, 2, 16, 2)
 atlas = ExtResource("5_2obk7")
 region = Rect2(0, 0, 16, 2)
 
-[node name="Slot" type="Control"]
+[node name="Slot" type="Control" node_paths=PackedStringArray("TextureRect_Item", "TextureRect_Selected", "Label_Amount", "ProgressBar")]
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 3
 anchor_left = -0.004
@@ -33,6 +33,10 @@ offset_bottom = -7.56
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_kfvcn")
+TextureRect_Item = NodePath("TextureRect_Item")
+TextureRect_Selected = NodePath("TextureRect_Selected")
+Label_Amount = NodePath("Label_Amount")
+ProgressBar = NodePath("TextureProgressBar")
 
 [node name="TextureRect_BackRound" type="TextureRect" parent="."]
 visible = false

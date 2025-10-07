@@ -9,20 +9,17 @@ using horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.tscn.Menu;
 
-public partial class MainMenu : horizoncraft.script.World,ITranslatable
+public partial class MainMenu : horizoncraft.script.World, ITranslatable
 {
-    private CanvasLayer TopCanvasLayer, GuiCanvasLayer;
-    private Button ButtonSingle, buttonExit, ButtonConnect;
-    private TextEdit TextEdit;
+    [Export] private CanvasLayer TopCanvasLayer, GuiCanvasLayer;
+    [Export] private Button ButtonSingle, buttonExit, ButtonConnect;
+    [Export] private TextEdit TextEdit;
 
-    private PackedScene WorldProfilesScene;
+    private PackedScene WorldProfilesScene = GD.Load<PackedScene>("res://tscn/Menu/WorldListMenu.tscn");
+    private PackedScene WorldScene = GD.Load<PackedScene>("res://tscn/world.tscn");
 
     public override void _Ready()
     {
-        WorldProfilesScene = GD.Load<PackedScene>("res://tscn/Menu/WorldListMenu.tscn");
-
-        GuiCanvasLayer = GetNode<CanvasLayer>("GuiCanvasLayer");
-        TopCanvasLayer = GetNode<CanvasLayer>("TopCanvasLayer");
         worldMode = WorldMode.Preview;
         LoadProfile();
 
@@ -37,12 +34,6 @@ public partial class MainMenu : horizoncraft.script.World,ITranslatable
         base._Ready();
         PlayerNode.hotBar.Visible = false;
 
-        ButtonSingle = GetNode<Button>("GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Single");
-        buttonExit = GetNode<Button>("GuiCanvasLayer/VBoxContainer/HBoxContainer2/Button_Exit");
-        ButtonConnect = GetNode<Button>("GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Connect");
-        TextEdit = GetNode<TextEdit>("GuiCanvasLayer/TextEdit");
-
-        var worldScene = GD.Load<PackedScene>("res://tscn/world.tscn");
         ButtonSingle.Pressed += () =>
         {
             if (TopCanvasLayer.GetChildCount() == 0)
@@ -51,15 +42,11 @@ public partial class MainMenu : horizoncraft.script.World,ITranslatable
                 TopCanvasLayer.AddChild(WorldProfilesScene.Instantiate());
             }
         };
-        buttonExit.Pressed += () =>
-        {
-            GetTree().Quit();
-        };
+        buttonExit.Pressed += () => { GetTree().Quit(); };
         ButtonConnect.Pressed += () =>
         {
             worldMode = WorldMode.MultiplayerClient;
-            worldScene.SetName("客户端模式");
-            GetTree().ChangeSceneToPacked(worldScene);
+            GetTree().ChangeSceneToPacked(WorldScene);
         };
         TextEdit.Text = PlayerNode.Profile.Name;
         TextEdit.TextChanged += () =>
@@ -67,10 +54,11 @@ public partial class MainMenu : horizoncraft.script.World,ITranslatable
             PlayerNode.Profile.Name = TextEdit.Text;
             SaveProfile();
         };
-        
-        
-        LanguageManage.SetTargetLang("cn",GetTree());
+
+
+        LanguageManage.SetTargetLang("cn", GetTree());
     }
+
     public override void _PhysicsProcess(double delta)
     {
         PlayerNode.Visible = false;
@@ -140,8 +128,8 @@ public partial class MainMenu : horizoncraft.script.World,ITranslatable
 
     public void TranslateChange()
     {
-        buttonExit.Text = "ui.Exit".Trprefix();
-        ButtonSingle.Text = "ui.Single Play".Trprefix();
-        ButtonConnect.Text="ui.Connect Server".Trprefix();
+        buttonExit.Text = "Exit".Trprefix("ui");
+        ButtonSingle.Text = "Single Play".Trprefix("ui");
+        ButtonConnect.Text = "Connect Server".Trprefix("ui");
     }
 }

@@ -23,21 +23,36 @@ namespace horizoncraft.script;
 
 public partial class PlayerNode : CharacterBody2D
 {
+    private PackedScene PackedSceneDeadView = GD.Load<PackedScene>("res://tscn/Gui/DeadView.tscn");
     private const bool TEST_MODE = true;
+
+    /// <summary>
+    /// 获取调试信息委托集合
+    /// </summary>
     public static System.Collections.Generic.Dictionary<string, Func<string>> GetInformation = new();
+
+    /// <summary>
+    /// 本地玩家文档
+    /// </summary>
     public static LocalProfile Profile;
 
+    /// <summary>
+    /// 方块挖掘进度
+    /// </summary>
     public PlayerBreakProcess BreakProcess = new();
+
+    /// <summary>
+    /// 跳跃高度
+    /// </summary>
     public const float JumpVelocity = -200.0f;
+
     public Action OnMoveToChunk;
     public PlayerData playerData;
     public bool BaseInputable = true;
     public bool Inputable = true;
     public bool MoreInfo = false;
     public bool Stop = false;
-    public World world;
-
-
+    [Export] public World world;
     [Export] public ChatView ChatView;
 
     /// <summary>
@@ -122,9 +137,34 @@ public partial class PlayerNode : CharacterBody2D
         UpdatePlayerPosition();
         AntiOnChunkUnload(chunkCoord);
         InputHandle(delta);
+        UpdateViews();
     }
 
-    //鼠标左键
+    private void UpdateViews()
+    {
+        if (playerData.State == PlayerState.Dead)
+        {
+            if (OvrCanvasLayer.GetChildCount() == 0)
+            {
+                var dv = PackedSceneDeadView.Instantiate<DeadView>();
+                dv.Ready += () => { dv.SetPlayerDead(this); };
+                OvrCanvasLayer.AddChild(dv);
+            }
+        }
+
+        if (playerData.State == PlayerState.Live && OvrCanvasLayer.GetChildCount() > 0)
+        {
+            foreach (var node in OvrCanvasLayer.GetChildren())
+            {
+                if (node is DeadView dv)
+                {
+                    dv.QueueFree();
+                }
+            }
+        }
+    }
+
+//鼠标左键
     private void OnMouseLeftClick(Vector2I coord, double delta)
     {
         var pos = coord;
@@ -267,7 +307,7 @@ public partial class PlayerNode : CharacterBody2D
     {
         if (playerData == null) return;
         if (!BaseInputable) return;
-        else
+        else if (playerData.Mode == 0)
         {
             var velocity = Velocity;
             if (!IsOnFloor() && (!playerData.Fly.Value || !Stop))
@@ -522,11 +562,6 @@ public partial class PlayerNode : CharacterBody2D
 
     public override void _Ready()
     {
-        var loadingMenu = GetNode<LoadingMenu>("OvrCanvasLayer/LoadingMenu");
-        loadingMenu.playerNode = this;
-
-        if (playerData != null)
-            playerData.PlayerNode = this;
         hotBar.PlayerNode = this;
     }
 

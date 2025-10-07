@@ -5,9 +5,13 @@
 [ext_resource type="Theme" uid="uid://joabf0lpqylf" path="res://thems/InvThem.tres" id="3_d41ng"]
 [ext_resource type="PackedScene" uid="uid://bjutbqmtgb304" path="res://tscn/Menu/InvSlot.tscn" id="4_80ijk"]
 
-[node name="CraftingTableInventory" type="CanvasLayer"]
+[node name="CraftingTableInventory" type="CanvasLayer" node_paths=PackedStringArray("TargetInventorySlotRoot", "PlayerInventorySlotRoot")]
 layer = 11
 script = ExtResource("1_ft4ti")
+TargetNodeCount = 9
+TargetInventorySlotRoot = NodePath("VBoxContainer/PanelContainer_Craft/HBoxContainer/GridContainer")
+TargetInventorySlotName = "InvSlot"
+PlayerInventorySlotRoot = NodePath("VBoxContainer/PanelContainer_Inv/GridContainer")
 
 [node name="ItemManage" parent="." instance=ExtResource("2_q8413")]
 

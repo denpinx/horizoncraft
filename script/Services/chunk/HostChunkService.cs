@@ -46,8 +46,8 @@ public class HostChunkService : ChunkServiceBase
                 PlayerData pd1 = playerset.Value;
                 //按距离同步
                 if (
-                    Math.Abs(chunk.X - pd1.ChunkCoord.X) <= _loadrange &&
-                    Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= _loadrange
+                    Math.Abs(chunk.X - pd1.ChunkCoord.X) <= LoadHorizon &&
+                    Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= LoadHorizon
                 )
                 {
                     if (!diffUpdate.ContainsKey(pd1.PeerId))
@@ -81,8 +81,8 @@ public class HostChunkService : ChunkServiceBase
                     PlayerData pd1 = playerset.Value;
                     //按距离同步
                     if (
-                        Math.Abs(chunk.X - pd1.ChunkCoord.X) <= _loadrange &&
-                        Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= _loadrange
+                        Math.Abs(chunk.X - pd1.ChunkCoord.X) <= LoadHorizon &&
+                        Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= LoadHorizon
                     )
                     {
                         if (pd1.Name != PlayerNode.Profile.Name)

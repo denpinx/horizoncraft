@@ -4,9 +4,10 @@ using horizoncraft.script;
 
 public partial class PlayerSnapshot : Node2D
 {
-    private Label _label;
-    private Sprite2D sprite2D;
-    private AnimationPlayer animation;
+    [Export]private Label _label;
+    [Export]private Sprite2D sprite2D;
+    [Export]private AnimationPlayer animation;
+    
     private Vector2 LastPosition;
     private double cooldown = 0.25f;
     private bool FaceLeft = true;

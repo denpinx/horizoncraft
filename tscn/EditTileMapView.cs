@@ -10,12 +10,16 @@ public partial class EditTileMapView : Godot.TileMapLayer
         Remove,
     }
 
+    [Export] public TileMapLayer BackGround;
     public Action<Vector2I> OnSetCell;
     public Action<Vector2I> OnRemoveCell;
+    public Action<Vector2I> PickCell;
     private bool LastFrame;
     private Vector2 offsetPos;
     public PenMode Mode;
     private bool focus = false;
+    public Vector2I MaxPos;
+    public Vector2I MinPos;
 
     public override void _Ready()
     {
@@ -44,11 +48,25 @@ public partial class EditTileMapView : Godot.TileMapLayer
 
         if (Input.IsMouseButtonPressed(MouseButton.Left))
         {
-            var pos = LocalToMap(GetLocalMousePosition());
-            if (Mode == PenMode.Draw) OnSetCell?.Invoke(pos);
-            if (Mode == PenMode.Remove) OnRemoveCell?.Invoke(pos);
+            if (Input.IsActionPressed("alt"))
+            {
+                var pos = LocalToMap(GetLocalMousePosition());
+                PickCell?.Invoke(pos);
+            }
+            else
+            {
+                var pos = LocalToMap(GetLocalMousePosition());
+                OnSetCell?.Invoke(pos);
+            }
         }
-        else if (Input.IsMouseButtonPressed(MouseButton.Right))
+
+        if (Input.IsMouseButtonPressed(MouseButton.Right))
+        {
+            var pos = LocalToMap(GetLocalMousePosition());
+            OnRemoveCell?.Invoke(pos);
+        }
+
+        else if (Input.IsMouseButtonPressed(MouseButton.Middle))
         {
             if (LastFrame == false)
             {
@@ -58,6 +76,12 @@ public partial class EditTileMapView : Godot.TileMapLayer
             GlobalPosition = GetGlobalMousePosition() - offsetPos;
             LastFrame = true;
             return;
+        }
+
+        if (Input.IsKeyPressed(Key.Space))
+        {
+            var pos = GetViewport().GetVisibleRect().Size;
+            GlobalPosition = pos / 2;
         }
 
         offsetPos = GetLocalMousePosition() * GlobalScale;
@@ -86,5 +110,15 @@ public partial class EditTileMapView : Godot.TileMapLayer
         DrawLine(new Vector2(-Chunk.Size * 16, 0), new Vector2(Chunk.Size * 16, 0), Color.Color8(255, 255, 255));
         var pos = LocalToMap(GetLocalMousePosition());
         DrawRect(new Rect2(pos * 16, 16, 16), Color.Color8(255, 255, 255, 192));
+
+        var w = (MaxPos.X - MinPos.X) * 16f;
+        var h = (MaxPos.Y - MinPos.Y) * 16f;
+        //DrawRect(new Rect2(MinPos * 16, w, h), Color.Color8(0, 255, 0));
+
+        DrawLine(MinPos * 16, new Vector2I(MaxPos.X, MinPos.Y) * 16, Color.Color8(255, 255, 255));
+        DrawLine(MinPos * 16, new Vector2I(MinPos.X, MaxPos.Y) * 16, Color.Color8(255, 255, 255));
+
+        DrawLine(MaxPos * 16, new Vector2I(MaxPos.X, MinPos.Y) * 16, Color.Color8(255, 255, 255));
+        DrawLine(MaxPos * 16, new Vector2I(MinPos.X, MaxPos.Y) * 16, Color.Color8(255, 255, 255));
     }
 }

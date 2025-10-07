@@ -7,9 +7,9 @@ using horizoncraft.script.WorldControl.Struct;
 public partial class StructBuildTool : CanvasLayer
 {
     public PreBuildStruct PreBuildStruct = new PreBuildStruct();
-    EditTileMapView EditTileMapView;
-    TextEdit TextEdit;
-
+    [Export] EditTileMapView EditTileMapView;
+    [Export] TextEdit TextEdit;
+    [Export] Button Button_Remove_All;
     public int layer = 0;
     public string SelectedBlock = "stone";
 
@@ -18,6 +18,7 @@ public partial class StructBuildTool : CanvasLayer
         EditTileMapView = GetNode<EditTileMapView>("HBoxContainer/VBoxContainer/PanelContainer/EditTileMapView");
         TextEdit = GetNode<TextEdit>("HBoxContainer/VBoxContainer2/PanelContainer2/TextEdit");
         EditTileMapView.TileSet = Materials.CreateTileSet();
+        EditTileMapView.BackGround.TileSet = Materials.CreateTileSet();
 
         EditTileMapView.OnSetCell += (pos) =>
         {
@@ -31,7 +32,18 @@ public partial class StructBuildTool : CanvasLayer
             UpdateTileMap();
             GenerateJson();
         };
-
+        EditTileMapView.PickCell += (pos) =>
+        {
+            if (PreBuildStruct.blocks.TryGetValue(new Vector3I(pos.X, pos.Y, layer), out var block))
+            {
+                SelectedBlock = block.name;
+            }
+        };
+        Button_Remove_All.Pressed += () =>
+        {
+            PreBuildStruct.blocks.Clear();
+            UpdateTileMap();
+        };
         var GridContainer = GetNode<GridContainer>("HBoxContainer/VBoxContainer3/PanelContainer2/GridContainer");
         PackedScene ps = GD.Load<PackedScene>("res://tscn/Menu/InvSlot.tscn");
         int i = 0;
@@ -47,25 +59,51 @@ public partial class StructBuildTool : CanvasLayer
         }
     }
 
+    public override void _Input(InputEvent @event)
+    {
+        if (Input.IsActionJustReleased("tab"))
+        {
+            if (layer == 0) layer = 1;
+            else layer = 0;
+
+            if (layer == 0)
+            {
+                EditTileMapView.SelfModulate = Color.Color8(255, 255, 255, 32);
+            }
+            else
+            {
+                EditTileMapView.SelfModulate = Color.Color8(255, 255, 255, 255);
+            }
+            
+            EditTileMapView.GetParent<Control>().GrabFocus();
+        }
+    }
 
     public override void _Process(double delta)
     {
-        if (Input.IsKeyPressed(Key.E))
-            EditTileMapView.Mode = EditTileMapView.PenMode.Draw;
-        if (Input.IsKeyPressed(Key.R))
-            EditTileMapView.Mode = EditTileMapView.PenMode.Remove;
     }
 
     public void UpdateTileMap()
     {
         EditTileMapView.Clear();
+        EditTileMapView.BackGround.Clear();
+        EditTileMapView.MaxPos = PreBuildStruct.GetMaxPos();
+        EditTileMapView.MinPos = PreBuildStruct.GetMinPos();
+        
         foreach (var block in PreBuildStruct.blocks.Values)
         {
-            if (block.z <= layer)
+            if (block.z == 1)
             {
                 var meta = Materials.BlockMetas[block.name];
                 var bts = meta.GetBlockTileSet(0);
                 EditTileMapView.SetCell(new(block.x, block.y), bts.tile_id, new Vector2I(0, 0));
+            }
+
+            if (block.z == 0)
+            {
+                var meta = Materials.BlockMetas[block.name];
+                var bts = meta.GetBlockTileSet(0);
+                EditTileMapView.BackGround.SetCell(new(block.x, block.y), bts.tile_id, new Vector2I(0, 0));
             }
         }
     }
@@ -78,6 +116,8 @@ public partial class StructBuildTool : CanvasLayer
 
     public void AddBlock(Vector3I pos, string name)
     {
+        if (name == "") return;
+        if(!Materials.BlockMetas.ContainsKey(name))return;
         if (!PreBuildStruct.blocks.ContainsKey(pos))
         {
             PreBuildStruct.blocks.Add(pos, new PreBuildStructItem()

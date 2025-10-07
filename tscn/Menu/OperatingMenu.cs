@@ -4,13 +4,14 @@ using horizoncraft.script;
 
 public partial class OperatingMenu : Control
 {
+    [Export] private Button Button_Continue;
+    [Export] private Button Button_Setting;
+    [Export] private Button Button_Exit;
+
     public override void _Ready()
     {
-        var buttonContinue = GetNode<TextureButton>("HBoxContainer/VBoxContainer/Button_Continue");
-        var buttonSetting = GetNode<TextureButton>("HBoxContainer/VBoxContainer/Button_Setting");
-        var buttonExit = GetNode<TextureButton>("HBoxContainer/VBoxContainer/Button_Exit");
-        buttonContinue.Pressed += QueueFree;
-        buttonSetting.Pressed += () => { QueueFree(); };
-        buttonExit.Pressed += () => { GetTree().ChangeSceneToFile("res://tscn/Menu/MainMenu.tscn"); };
+        Button_Continue.Pressed += QueueFree;
+        Button_Setting.Pressed += () => { QueueFree(); };
+        Button_Exit.Pressed += () => { GetTree().ChangeSceneToFile("res://tscn/Menu/MainMenu.tscn"); };
     }
 }

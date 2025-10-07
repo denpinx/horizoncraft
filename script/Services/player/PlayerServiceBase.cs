@@ -9,30 +9,56 @@ using horizoncraft.script;
 using horizoncraft.script.Events;
 using horizoncraft.script.Expand;
 using horizoncraft.script.Net;
+using horizoncraft.script.Services;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Tool;
 
 namespace HorizonCraft.script.Services.player;
 
-public abstract class PlayerServiceBase : IDisposable
+/// <summary>
+/// 基础玩家服务
+/// 拥有功能：
+///     玩家管理
+///     生命周期管理
+///     玩家事件处理
+///     异步玩家资源加载
+/// </summary>
+public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
 {
+    /// <summary>
+    /// 玩家事件处理
+    /// </summary>
     public PlayerEvents Events;
+
+    /// <summary>
+    /// 已加载玩家集合
+    /// </summary>
     public ConcurrentDictionary<string, PlayerData> Players = new();
+
+    /// <summary>
+    /// 已加载的玩家节点集合
+    /// </summary>
     public Dictionary<string, PlayerSnapshot> PlayerNodes = new();
+
+    /// <summary>
+    /// 待加载或创建的玩家数据集合
+    /// </summary>
     private ConcurrentQueue<string> _loadingqueue = new();
+
+    /// <summary>
+    /// 每次加载的等待延迟
+    /// </summary>
     private const int ProcessDleay = 100;
-    protected World World;
-    private PackedScene PlayerSnapshot_ps;
+
+    private PackedScene PlayerSnapshot_ps = GD.Load<PackedScene>("res://tscn/PlayerSnapshot.tscn");
     private CancellationTokenSource _tokenSource;
     private Task _processTask;
 
-    public PlayerServiceBase(World world)
+    public PlayerServiceBase(World world) : base(world)
     {
-        this.World = world;
         world.timer.Timeout += Ticking;
         PlayerNode.GetInformation[nameof(PlayerServiceBase)] =
             () => $"在线玩家:{Players.Count}";
-        PlayerSnapshot_ps = GD.Load<PackedScene>("res://tscn/PlayerSnapshot.tscn");
         Events = new PlayerEvents();
         _tokenSource = new CancellationTokenSource();
         _processTask = Task.Run(ProcessPlayerLoadThread, _tokenSource.Token);
@@ -40,20 +66,23 @@ public abstract class PlayerServiceBase : IDisposable
 
     #region 外部实现
 
+    /// <summary>
+    /// 时刻处理
+    /// </summary>
     public virtual void Ticking()
     {
         PrecessNodeSync();
-        ProcessPlayerHunger();
+        ProcessPlayerState();
     }
 
     /// <summary>
     /// 处理玩家饥饿值
     /// </summary>
-    public virtual void ProcessPlayerHunger()
+    public virtual void ProcessPlayerState()
     {
         foreach (var player in Players.Values)
         {
-            if (player.Live)
+            if (player.State == PlayerState.Live)
             {
                 //预期每两秒掉落1的血量   
                 if (player.Hunger.Value <= 0f)
@@ -66,12 +95,46 @@ public abstract class PlayerServiceBase : IDisposable
 
                 if (player.Health.Value <= 0)
                 {
-                    player.Live = false;
+                    player.State = PlayerState.Dead;
+                }
+            }
+
+            //复活中
+            if (player.State == PlayerState.Respawning)
+            {
+                if (player.HasSpawnPoint)
+                {
+                    Vector2 pos = player.SpawnPoint.ToGodotVector2();
+                    if (TrySearchSpawn(player, pos.ToVector2I()))
+                    {
+                        player.State = PlayerState.Live;
+                        player.Update = true;
+                        OnPlayerRespawn(player);
+                    }
+                }
+                else
+                {
+                    if (SearchSpawnPoint(player))
+                    {
+                        player.State = PlayerState.Live;
+                        player.Update = true;
+                        OnPlayerRespawn(player);
+                    }
                 }
             }
         }
     }
 
+    public virtual void OnPlayerRespawn(PlayerData playerData)
+    {
+    }
+
+    /// <summary>
+    /// 获取玩家或加入待加载列表，使用方法是定时调用直到被加载或创建
+    /// </summary>
+    /// <param name="name">玩家名称</param>
+    /// <param name="playerData">玩家数据</param>
+    /// <returns>该玩家是否已存在</returns>
     public virtual bool GetPlayerOrLoad(string name, out PlayerData playerData)
     {
         if (Players.TryGetValue(name, out var player))
@@ -90,6 +153,11 @@ public abstract class PlayerServiceBase : IDisposable
         return false;
     }
 
+    /// <summary>
+    /// 加载玩家
+    /// </summary>
+    /// <param name="name">玩家名</param>
+    /// <returns>玩家数据</returns>
     public virtual PlayerData LoadPlayer(string name)
     {
         try
@@ -112,7 +180,6 @@ public abstract class PlayerServiceBase : IDisposable
                     };
                     if (Players.TryAdd(name, player))
                     {
-                        SearchSpawnPoint(player);
                         return player;
                     }
                 }
@@ -127,6 +194,10 @@ public abstract class PlayerServiceBase : IDisposable
         return null;
     }
 
+    /// <summary>
+    /// 保存玩家
+    /// </summary>
+    /// <param name="player">玩家数据</param>
     public virtual void SavePlayer(PlayerData player)
     {
         using (var conn = SqliteTool.InitSqlite(World.WorldName))
@@ -138,6 +209,9 @@ public abstract class PlayerServiceBase : IDisposable
         }
     }
 
+    /// <summary>
+    /// 持久化接口实现
+    /// </summary>
     public virtual void SaveAll()
     {
         using (var conn = SqliteTool.InitSqlite(World.WorldName))
@@ -177,6 +251,9 @@ public abstract class PlayerServiceBase : IDisposable
         return null;
     }
 
+    /// <summary>
+    /// 处理玩家节点同步
+    /// </summary>
     public void PrecessNodeSync()
     {
         foreach (var name in Players.Keys.ToArray())
@@ -228,6 +305,9 @@ public abstract class PlayerServiceBase : IDisposable
         }
     }
 
+    /// <summary>
+    /// 处理玩家加载的持久线程
+    /// </summary>
     public async Task ProcessPlayerLoadThread()
     {
         while (!_tokenSource.Token.IsCancellationRequested)
@@ -249,21 +329,90 @@ public abstract class PlayerServiceBase : IDisposable
 
 
     #region 其他
-    
+
     /// <summary>
     /// 搜寻随机复活点
     /// </summary>
-    /// <param name="player"></param>
-    public void SearchSpawnPoint(PlayerData player)
+    /// <param name="player">玩家数据</param>
+    public virtual bool SearchSpawnPoint(PlayerData player)
     {
         int ChunkX = Random.Shared.Next(-16, 16);
         var map = WorldGenerator.GetHighMap(ChunkX);
         int randx = Random.Shared.Next(0, Chunk.Size);
-        int y = map[randx, 1];
-        player.Position = new(ChunkX * Chunk.Size * 16 + randx * 16, y * 16);
-        GD.Print($"寻找到复活点：{player.Position}");
+        int gy = map[randx, 1];
+
+        return TrySearchSpawn(player, new Vector2I(ChunkX * Chunk.Size + randx, gy));
     }
 
+    public virtual bool TrySearchSpawn(PlayerData player, Vector2I position)
+    {
+        var local = position.Remainder(Chunk.Size);
+        var coord = position.MathFloor(Chunk.Size);
+
+        bool Found = true;
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                var pos = new Vector2I(coord.X + local.X + x, coord.Y + local.Y + y);
+                if (World.Service.ChunkService.Chunks.ContainsKey(pos))
+                {
+                }
+                else
+                {
+                    if (Found)
+                        Found = false;
+                    World.Service.ChunkService.LoadChunkQueue.Add(pos);
+                }
+            }
+        }
+
+        if (Found)
+        {
+            //自中心向四周查询
+            for (int i = 0; i < Chunk.Size; i++)
+            {
+                for (int y = 0; y < Chunk.Size; y++)
+                {
+                    if (FundPoint(i, y)) return true;
+                    if (FundPoint(-i, y)) return true;
+
+                    if (FundPoint(i, -y)) return true;
+                    if (FundPoint(-i, -y)) return true;
+                }
+            }
+        }
+
+        return false;
+
+        bool FundPoint(int x, int y)
+        {
+            int gx = coord.X * Chunk.Size + x;
+            int gy = coord.Y * Chunk.Size + y;
+            var block = World.Service.ChunkService.GetBlock(new Vector3I(gx, gy, 1));
+            if (block != null)
+            {
+                if (!block.BlockMeta.Collide)
+                {
+                    var down = World.Service.ChunkService.GetBlock(new Vector3I(gx, gy + 1, 1));
+                    if (down != null && down.BlockMeta.Collide)
+                    {
+                        player.Position = new(gx * 16, gy * 16 - 16);
+                        GD.Print($"寻找到复活点: {player.Position.ToString()}");
+                        GD.Print($"方块坐标: {gx},{gy}");
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 重置指定区块内的所有玩家的更新状态
+    /// </summary>
+    /// <param name="coord"></param>
     public void ResetPlayerMoveStateByChunk(Vector2I coord)
     {
         foreach (var player in Players.Values)
@@ -271,6 +420,12 @@ public abstract class PlayerServiceBase : IDisposable
                 player.Update = true;
     }
 
+    /// <summary>
+    /// 获取指定玩家区块半径内的其它玩家集合
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
     public List<PlayerData> GetPlayersByRange(PlayerData from, int range)
     {
         return Players.Values.Where(player =>
@@ -280,6 +435,10 @@ public abstract class PlayerServiceBase : IDisposable
             .ToList();
     }
 
+    /// <summary>
+    /// 用玩家快照数据更新玩家数据。来源可能是服务端，也可能是客户端
+    /// </summary>
+    /// <param name="snapshot">玩家快照信息</param>
     public void UpdatePlayer(PlayerDataSnapshot snapshot)
     {
         if (Players.TryGetValue(snapshot.Name, out var player))

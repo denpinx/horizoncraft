@@ -12,13 +12,25 @@ bg_color = Color(1, 1, 1, 0.0941176)
 [sub_resource type="LabelSettings" id="LabelSettings_xt4xo"]
 font_size = 32
 
-[node name="ItemManage" type="HBoxContainer"]
+[node name="ItemManage" type="HBoxContainer" node_paths=PackedStringArray("_GridContainer", "_buttonMode0", "_buttonMode1", "_buttonClear", "_buttonSort", "_buttonLight0", "_buttonLight1", "_buttonLight2", "_NextPage", "_LastPage", "_LineEdit_FilterText", "_RecipeView")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_x2ne4")
+_GridContainer = NodePath("PanelContainer/VBoxContainer/GridContainer")
+_buttonMode0 = NodePath("PanelContainer2/VBoxContainer/HBoxContainer/Button_mod_0")
+_buttonMode1 = NodePath("PanelContainer2/VBoxContainer/HBoxContainer/Button_mod_1")
+_buttonClear = NodePath("PanelContainer2/VBoxContainer/HBoxContainer2/Button_clear")
+_buttonSort = NodePath("PanelContainer2/VBoxContainer/HBoxContainer2/Button_sort")
+_buttonLight0 = NodePath("PanelContainer2/VBoxContainer/HBoxContainer3/Button_Light_0")
+_buttonLight1 = NodePath("PanelContainer2/VBoxContainer/HBoxContainer3/Button_Light_1")
+_buttonLight2 = NodePath("PanelContainer2/VBoxContainer/HBoxContainer3/Button_Light_2")
+_NextPage = NodePath("PanelContainer/VBoxContainer/HBoxContainer/Button_Next_Page")
+_LastPage = NodePath("PanelContainer/VBoxContainer/HBoxContainer/Button_Last_Page")
+_LineEdit_FilterText = NodePath("PanelContainer/VBoxContainer/PanelContainer/LineEdit")
+_RecipeView = NodePath("ReciperView")
 
 [node name="PanelContainer2" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(256, 512)

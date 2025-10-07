@@ -7,19 +7,10 @@ public partial class Slot : Control
 {
     public ItemStack ShowItem;
     public bool LastHoverState = false;
-    public TextureRect TextureRect_Item;
-    public TextureRect TextureRect_Selected;
-    public Label Label_Amount;
-    public TextureProgressBar ProgressBar;
-
-    public override void _Ready()
-    {
-        TextureRect_Item = GetNode<TextureRect>("TextureRect_Item");
-        TextureRect_Selected = GetNode<TextureRect>("TextureRect_Selected");
-        Label_Amount = GetNode<Label>("Label_Amount");
-        ProgressBar = GetNode<TextureProgressBar>("TextureProgressBar");
-    }
-
+    [Export]public TextureRect TextureRect_Item;
+    [Export]public TextureRect TextureRect_Selected;
+    [Export]public Label Label_Amount;
+    [Export]public TextureProgressBar ProgressBar;
     public void SetShowItem(ItemStack itemStack)
     {
         ShowItem = itemStack;

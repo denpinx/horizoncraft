@@ -44,8 +44,14 @@ load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.cte
 atlas = SubResource("CompressedTexture2D_wwbxd")
 region = Rect2(0, 48, 16, 16)
 
-[node name="World" instance=ExtResource("1_n4w62")]
+[node name="World" node_paths=PackedStringArray("TopCanvasLayer", "GuiCanvasLayer", "ButtonSingle", "buttonExit", "ButtonConnect", "TextEdit") instance=ExtResource("1_n4w62")]
 script = ExtResource("2_lvpjg")
+TopCanvasLayer = NodePath("TopCanvasLayer")
+GuiCanvasLayer = NodePath("GuiCanvasLayer")
+ButtonSingle = NodePath("GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Single")
+buttonExit = NodePath("GuiCanvasLayer/VBoxContainer/HBoxContainer2/Button_Exit")
+ButtonConnect = NodePath("GuiCanvasLayer/VBoxContainer/HBoxContainer/Button_Connect")
+TextEdit = NodePath("GuiCanvasLayer/TextEdit")
 metadata/_edit_horizontal_guides_ = [372.0]
 metadata/_edit_vertical_guides_ = [448.0, 704.0]
 

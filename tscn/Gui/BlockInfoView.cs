@@ -12,17 +12,14 @@ namespace HorizonCraft.tscn.Gui;
 public partial class BlockInfoView : Control
 {
     private List<ProgressItem> _progressItems = new();
-    private PackedScene _progressItemPack;
-    private TextureRect _textureRect;
-    private VBoxContainer _listNode;
-    private Label _label;
+    private PackedScene _progressItemPack=GD.Load<PackedScene>("res://tscn/Gui/ProgressItem.tscn");
+    [Export]private TextureRect _textureRect;
+    [Export]private VBoxContainer _listNode;
+    [Export] private Label _label;
 
     public override void _Ready()
     {
-        _textureRect = GetNode<TextureRect>("PanelContainer/List/HBoxContainer/TextureRect");
-        _progressItemPack = GD.Load<PackedScene>("res://tscn/Gui/ProgressItem.tscn");
-        _label = GetNode<Label>("PanelContainer/List/HBoxContainer/Label");
-        _listNode = GetNode<VBoxContainer>("PanelContainer/List");
+        
     }
 
     /// <summary>

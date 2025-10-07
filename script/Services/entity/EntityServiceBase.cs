@@ -10,23 +10,29 @@ using horizoncraft.script.Entity;
 using horizoncraft.script.Events.SystemEvents;
 using horizoncraft.script.Expand;
 using horizoncraft.script.Net;
+using horizoncraft.script.Services;
 using horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Services.entity;
 
-public class EntityServiceBase : IDisposable
+/// <summary>
+/// 基础实体服务
+/// 提供完整的实体管理，实体视图同步，实体组件处理。实体生命周期管理服务。
+/// </summary>
+public class EntityServiceBase : ServiceBase
 {
-    protected World World;
-
-    //异步集合
+    /// <summary>
+    /// 已加载的实体模型集合
+    /// </summary>
     public ConcurrentDictionary<Guid, EntityData> EntityDatas = new();
 
-    //主线程同步
+    /// <summary>
+    /// 已加载的实体视图集合
+    /// </summary>
     public Dictionary<Guid, IEntityNode> EntityNodes = new();
 
-    public EntityServiceBase(World world)
+    public EntityServiceBase(World world) : base(world)
     {
-        World = world;
         world.timer.Timeout += Ticking;
         world.Service.ChunkService.OnChunkLoaded += OnChunkLoad;
         world.Service.ChunkService.OnChunkSaving += ExtractEntitiesFromChunk;
@@ -45,7 +51,10 @@ public class EntityServiceBase : IDisposable
         };
     }
 
-    public virtual void Ticking()
+    /// <summary>
+    /// 时刻处理
+    /// </summary>
+    protected virtual void Ticking()
     {
         ProcessEntityNode();
         ProcessEntityNodeUpdate();
@@ -67,11 +76,15 @@ public class EntityServiceBase : IDisposable
         }
     }
 
-    public virtual void OnChunkLoad(Chunk chunk)
+    protected virtual void OnChunkLoad(Chunk chunk)
     {
         ReleaseChunkEntity(chunk);
     }
 
+    /// <summary>
+    /// 接收可能来自服务端或则客户端的实体快照更新包
+    /// </summary>
+    /// <param name="entityPack"></param>
     public virtual void ReceiveEntityPack(EntityPack entityPack)
     {
         List<EntityDataSnapShot> call_back = new();
@@ -79,7 +92,11 @@ public class EntityServiceBase : IDisposable
             UpdateEntityData(entity, call_back);
     }
 
-
+    /// <summary>
+    /// 获取指定区块范围内的所有实体的guid
+    /// </summary>
+    /// <param name="coord">区块坐标</param>
+    /// <returns></returns>
     public List<Guid> GetUuidByChunk(Vector2I coord)
     {
         var list = new List<Guid>();
@@ -95,6 +112,13 @@ public class EntityServiceBase : IDisposable
         return list;
     }
 
+    /// <summary>
+    /// 获取指定坐标范围内的指定名称的实体集合
+    /// </summary>
+    /// <param name="coord">全局像素坐标</param>
+    /// <param name="range">范围</param>
+    /// <param name="name">实体名称</param>
+    /// <returns>实体集合,不会为null，但是可能数量为0</returns>
     public List<EntityData> GetEntityInRangeByName(Vector2I coord, int range, string name)
     {
         var list = new List<EntityData>();
@@ -112,6 +136,12 @@ public class EntityServiceBase : IDisposable
         return list;
     }
 
+    /// <summary>
+    /// 获取指定坐标半径内的实体集合
+    /// </summary>
+    /// <param name="coord">像素坐标</param>
+    /// <param name="range">半径</param>
+    /// <returns>实体集合,不会为null，但是可能数量为0</returns>
     public List<EntityData> GetEntityInRange(Vector2I coord, int range)
     {
         var list = new List<EntityData>();
@@ -127,6 +157,11 @@ public class EntityServiceBase : IDisposable
         return list;
     }
 
+    /// <summary>
+    /// 获取指定区块坐标内的所有实体
+    /// </summary>
+    /// <param name="coord">区块坐标</param>
+    /// <returns>集合可能为空，不会为null</returns>
     public List<EntityData> GetEntityByChunk(Vector2I coord)
     {
         var list = new List<EntityData>();
@@ -137,6 +172,10 @@ public class EntityServiceBase : IDisposable
         return list;
     }
 
+    /// <summary>
+    /// 提取实体到区块中
+    /// </summary>
+    /// <param name="chunk">区块</param>
     public void ExtractEntitiesFromChunk(Chunk chunk)
     {
         chunk.Entitys.Clear();
@@ -152,6 +191,10 @@ public class EntityServiceBase : IDisposable
         }
     }
 
+    /// <summary>
+    /// 释放区块实体到实体服务中
+    /// </summary>
+    /// <param name="chunk"></param>
     public void ReleaseChunkEntity(Chunk chunk)
     {
         foreach (var entity in chunk.Entitys)
@@ -159,6 +202,11 @@ public class EntityServiceBase : IDisposable
         chunk.Entitys.Clear();
     }
 
+    /// <summary>
+    /// 获取指定区块内移动或更新过的实体
+    /// </summary>
+    /// <param name="coord"></param>
+    /// <returns>集合可能为空，但不会为null</returns>
     public List<EntityData> GetChunkMovedEntity(Vector2I coord)
     {
         var list = new List<EntityData>();
@@ -181,6 +229,9 @@ public class EntityServiceBase : IDisposable
         return list;
     }
 
+    /// <summary>
+    /// 处理实体节点
+    /// </summary>
     public void ProcessEntityNode()
     {
         //删除不存在的节点
@@ -195,6 +246,9 @@ public class EntityServiceBase : IDisposable
         }
     }
 
+    /// <summary>
+    /// 处理实体节点更新
+    /// </summary>
     public virtual void ProcessEntityNodeUpdate()
     {
         foreach (var uuid in EntityDatas.Keys.ToArray())
@@ -247,6 +301,11 @@ public class EntityServiceBase : IDisposable
         }
     }
 
+    /// <summary>
+    /// 创建实体
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
     protected IEntityNode SpawnEntity(EntityData data)
     {
         if (Materials.DictionaryEntityMetas.TryGetValue(data.Name, out var meta))
@@ -260,6 +319,10 @@ public class EntityServiceBase : IDisposable
         return null;
     }
 
+    /// <summary>
+    /// 重置给予的uuid的实体的所属权
+    /// </summary>
+    /// <param name="uuidPack"></param>
     public void ResetEntityOwned(UUIDPack uuidPack)
     {
         foreach (var uuid in uuidPack.uuids)
@@ -271,6 +334,11 @@ public class EntityServiceBase : IDisposable
         }
     }
 
+    /// <summary>
+    /// 更新实体数据
+    /// </summary>
+    /// <param name="data">实体快照</param>
+    /// <param name="CallBack">更新失败回调</param>
     public virtual void UpdateEntityData(EntityDataSnapShot data, List<EntityDataSnapShot> CallBack = null)
     {
         //默认是主机玩家
@@ -353,10 +421,5 @@ public class EntityServiceBase : IDisposable
         {
             entity.Owned = "";
         }
-    }
-
-    public void Dispose()
-    {
-        World.timer.Timeout -= Ticking;
     }
 }

@@ -20,7 +20,7 @@ texture_margin_top = 16.0
 texture_margin_right = 16.0
 texture_margin_bottom = 16.0
 
-[node name="WorldListMenu" type="Control"]
+[node name="WorldListMenu" type="Control" node_paths=PackedStringArray("buttonBackMainMenu", "buttonLoadWorld", "buttonMultiplayer", "buttonCreateWorld", "buttonRemove", "ListRoot", "Root")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,8 +28,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ael5y")
+buttonBackMainMenu = NodePath("Root/HBoxContainer3/PanelContainer/HBoxContainer2/Button_BackMainMenu")
+buttonLoadWorld = NodePath("Root/HBoxContainer3/PanelContainer/HBoxContainer2/Button_LoadGame")
+buttonMultiplayer = NodePath("Root/HBoxContainer3/PanelContainer/HBoxContainer2/Button_Multiplayer")
+buttonCreateWorld = NodePath("Root/HBoxContainer3/PanelContainer/HBoxContainer2/Button_CreateWorld")
+buttonRemove = NodePath("Root/HBoxContainer3/PanelContainer/HBoxContainer2/Button_Remove")
+ListRoot = NodePath("Root/HBoxContainer/PanelContainer3/VBoxContainer/HBoxContainer2/ScrollContainer/ListRoot")
+Root = NodePath("Root")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="Root" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -37,123 +44,123 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="AspectRatioContainer4" type="AspectRatioContainer" parent="VBoxContainer"]
+[node name="AspectRatioContainer4" type="AspectRatioContainer" parent="Root"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="AspectRatioContainer5" type="AspectRatioContainer" parent="VBoxContainer"]
+[node name="AspectRatioContainer5" type="AspectRatioContainer" parent="Root"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.05
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Root"]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 9.5
 
-[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="Root/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.05
 
-[node name="PanelContainer3" type="PanelContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="PanelContainer3" type="PanelContainer" parent="Root/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxTexture_swtcb")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/PanelContainer3"]
+[node name="VBoxContainer" type="VBoxContainer" parent="Root/HBoxContainer/PanelContainer3"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/PanelContainer3/VBoxContainer"]
+[node name="Label" type="Label" parent="Root/HBoxContainer/PanelContainer3/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "世界选择"
 label_settings = SubResource("LabelSettings_efr7w")
 horizontal_alignment = 1
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/PanelContainer3/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="Root/HBoxContainer/PanelContainer3/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/HBoxContainer/PanelContainer3/VBoxContainer/HBoxContainer2"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/PanelContainer3/VBoxContainer/HBoxContainer2/ScrollContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Root/HBoxContainer/PanelContainer3/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="AspectRatioContainer3" type="AspectRatioContainer" parent="VBoxContainer/HBoxContainer"]
+[node name="ListRoot" type="VBoxContainer" parent="Root/HBoxContainer/PanelContainer3/VBoxContainer/HBoxContainer2/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="AspectRatioContainer3" type="AspectRatioContainer" parent="Root/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.05
 
-[node name="AspectRatioContainer6" type="AspectRatioContainer" parent="VBoxContainer"]
+[node name="AspectRatioContainer6" type="AspectRatioContainer" parent="Root"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.05
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="Root"]
 layout_mode = 2
 size_flags_vertical = 10
 
-[node name="AspectRatioContainer3" type="AspectRatioContainer" parent="VBoxContainer/HBoxContainer3"]
+[node name="AspectRatioContainer3" type="AspectRatioContainer" parent="Root/HBoxContainer3"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.05
 
-[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/HBoxContainer3"]
+[node name="PanelContainer" type="PanelContainer" parent="Root/HBoxContainer3"]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxTexture_nwfqu")
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/HBoxContainer3/PanelContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="Root/HBoxContainer3/PanelContainer"]
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.2
 
-[node name="Button_LoadGame" type="Button" parent="VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2"]
+[node name="Button_LoadGame" type="Button" parent="Root/HBoxContainer3/PanelContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "加载世界"
 
-[node name="Button_Multiplayer" type="Button" parent="VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2"]
+[node name="Button_Multiplayer" type="Button" parent="Root/HBoxContainer3/PanelContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "创建多人游戏"
 
-[node name="Button_Remove" type="Button" parent="VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2"]
+[node name="Button_Remove" type="Button" parent="Root/HBoxContainer3/PanelContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "删除世界"
+text = "打开存档目录"
 
-[node name="Button_BackMainMenu" type="Button" parent="VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2"]
+[node name="Button_BackMainMenu" type="Button" parent="Root/HBoxContainer3/PanelContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "返回主菜单"
 
-[node name="Button_CreateWorld" type="Button" parent="VBoxContainer/HBoxContainer3/PanelContainer/HBoxContainer2"]
+[node name="Button_CreateWorld" type="Button" parent="Root/HBoxContainer3/PanelContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "创建新的世界"
 
-[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="VBoxContainer/HBoxContainer3"]
+[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="Root/HBoxContainer3"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.05
 
-[node name="AspectRatioContainer3" type="AspectRatioContainer" parent="VBoxContainer"]
+[node name="AspectRatioContainer3" type="AspectRatioContainer" parent="Root"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
