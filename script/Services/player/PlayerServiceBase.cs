@@ -73,10 +73,12 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
     {
         PrecessNodeSync();
         ProcessPlayerState();
+        if (World.PlayerNode.playerData != null)
+            SyncPlayerNodePositionToData(World.PlayerNode, World.PlayerNode.playerData);
     }
 
     /// <summary>
-    /// 处理玩家饥饿值
+    /// 处理玩家状态
     /// </summary>
     public virtual void ProcessPlayerState()
     {
@@ -107,7 +109,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                     Vector2 pos = player.SpawnPoint.ToGodotVector2();
                     if (TrySearchSpawn(player, pos.ToVector2I()))
                     {
-                        player.State = PlayerState.Live;
+                        player.State = PlayerState.WaitSpawn;
                         player.Update = true;
                         OnPlayerRespawn(player);
                     }
@@ -116,7 +118,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                 {
                     if (SearchSpawnPoint(player))
                     {
-                        player.State = PlayerState.Live;
+                        player.State = PlayerState.WaitSpawn;
                         player.Update = true;
                         OnPlayerRespawn(player);
                     }
@@ -192,6 +194,43 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// 同步玩家的节点坐标和数据坐标
+    /// 决定狙击玩家或则客户端玩家的同步方法的。
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="playerData"></param>
+    public virtual void SyncPlayerNodePositionToData(PlayerNode player, PlayerData playerData)
+    {
+        if (World.Service.ChunkService.Chunks.ContainsKey(playerData.ChunkCoord))
+        {
+            if (playerData.Mode == 0 && player.Stop)
+            {
+                player.Stop = false;
+            }
+        }
+        else
+        {
+            player.Stop = true;
+        }
+
+        if (playerData.State == PlayerState.Live)
+        {
+            var pos = player.Position.ToSystemVector2();
+            if (pos != playerData.Position)
+            {
+                playerData.Position = pos;
+                playerData.Update = true;
+            }
+        }
+
+        if (playerData.State == PlayerState.WaitSpawn)
+        {
+            player.Position = playerData.Position_v2;
+            playerData.State = PlayerState.Live;
+        }
     }
 
     /// <summary>

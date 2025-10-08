@@ -1,5 +1,6 @@
 using Godot;
 using horizoncraft.script;
+using horizoncraft.script.Expand;
 using horizoncraft.script.NewProxy.player;
 using horizoncraft.script.WorldControl;
 
@@ -22,25 +23,19 @@ public class PreviewPlayerService : PlayerServiceBase
     {
         playerData = new PlayerData()
         {
-            Name = PlayerNode.Profile.Name
+            Name = PlayerNode.Profile.Name,
+            State = PlayerState.Live
         };
         Players.TryAdd(playerData.Name, playerData);
         return true;
     }
 
-    public override PlayerData LoadPlayer(string name)
-    {
-        return new PlayerData()
-        {
-            Name = PlayerNode.Profile.Name
-        };
-    }
-
     public override void ProcessPlayerState()
     {
-        foreach (var player in Players.Values)
+        //补丁一
+        if (World.PlayerNode.playerData != null)
         {
-            player.State = PlayerState.Live;
+            World.PlayerNode.playerData.Position = World.PlayerNode.Position.ToSystemVector2();
         }
     }
 

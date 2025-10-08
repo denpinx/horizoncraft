@@ -134,7 +134,6 @@ public partial class PlayerNode : CharacterBody2D
 
         Vector2I chunkCoord = Position.ToVector2I().MathFloor(Chunk.Size);
         UpdateCursor();
-        UpdatePlayerPosition();
         AntiOnChunkUnload(chunkCoord);
         InputHandle(delta);
         UpdateViews();
@@ -164,7 +163,7 @@ public partial class PlayerNode : CharacterBody2D
         }
     }
 
-//鼠标左键
+    //鼠标左键
     private void OnMouseLeftClick(Vector2I coord, double delta)
     {
         var pos = coord;
@@ -307,7 +306,8 @@ public partial class PlayerNode : CharacterBody2D
     {
         if (playerData == null) return;
         if (!BaseInputable) return;
-        else if (playerData.Mode == 0)
+
+        if (playerData.Mode == 0)
         {
             var velocity = Velocity;
             if (!IsOnFloor() && (!playerData.Fly.Value || !Stop))
@@ -507,27 +507,12 @@ public partial class PlayerNode : CharacterBody2D
     //防止卡在未加载区块里面
     private void AntiOnChunkUnload(Vector2I coord)
     {
-        if (world == null || !world.Service.ChunkService.Chunks.ContainsKey(coord))
-        {
-            Stop = true;
-        }
-        else if (playerData.Mode == 0)
-            Stop = false;
-    }
-
-    //更新玩家节点位置到Data
-    private void UpdatePlayerPosition()
-    {
-        var pos = new System.Numerics.Vector2(Position.X, Position.Y);
-        if (playerData.LastPosition != pos) playerData.Update = true;
-        playerData.LastPosition = Position.ToSystemVector2();
-        playerData.Position = pos;
-        if (world.Service.PlayerService.Players.TryGetValue(playerData.Name, out var data))
-        {
-            data.Position = playerData.Position;
-            data.Update = playerData.Update;
-            data.FaceLeft = playerData.FaceLeft;
-        }
+        // if (world == null || !world.Service.ChunkService.Chunks.ContainsKey(coord))
+        // {
+        //     Stop = true;
+        // }
+        // else if (playerData.Mode == 0)
+        //     Stop = false;
     }
 
     //更新挖掘进度条

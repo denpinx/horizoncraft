@@ -243,7 +243,7 @@ public class PlayerEvents
     /// <returns></returns>
     public virtual bool BreakBlock(PlayerBreakblockEvent e)
     {
-        if (e.Player.State == PlayerState.Dead) return false;
+        if (e.Player.State != PlayerState.Live) return false;
 
         var targetblock = e.GetBlockData();
 

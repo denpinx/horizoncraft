@@ -331,7 +331,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
         HashSet<Vector2I> loadqueue = new HashSet<Vector2I>();
         foreach (var player in World.Service.PlayerService.Players.Values)
         {
-            if (player.State == PlayerState.Live||player.State == PlayerState.Dead)
+            if (player.State == PlayerState.Live || player.State == PlayerState.Dead)
                 GetLoadRangeChunks(player.ChunkCoord, loadqueue);
         }
 
