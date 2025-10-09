@@ -25,16 +25,27 @@ public partial class PlayerData
     [MemoryPackAllowSerialize] private bool _faceLeft;
     [MemoryPackAllowSerialize] private bool _openingBlockInventory;
     [MemoryPackAllowSerialize] private int _mode;
+    [MemoryPackAllowSerialize] private PlayerState _state = PlayerState.Respawning;
 
     //连接id
     public int PeerId = 0;
 
-    public PlayerState State = PlayerState.Respawning;
+    public PlayerState State
+    {
+        get { return _state; }
+        set
+        {
+            _state = value;
+            if (value == PlayerState.Respawning && !HasSpawnPoint)
+                SpawnPoint = GetFuzzySpawnPoint();
+        }
+    }
+
     public string Deathrattle = "";
 
     public bool HasSpawnPoint = false;
     public Vector2 SpawnPoint;
-    
+
     /// <summary>
     /// 生命值
     /// </summary>
@@ -158,5 +169,19 @@ public partial class PlayerData
 
     public PlayerData()
     {
+    }
+
+    /// <summary>
+    /// 搜寻模糊随机复活点
+    /// </summary>
+    /// <param name="player">玩家数据</param>
+    public Vector2 GetFuzzySpawnPoint()
+    {
+        int ChunkX = Random.Shared.Next(-16, 16);
+        var map = WorldGenerator.GetHighMap(ChunkX);
+        int randx = Random.Shared.Next(0, Chunk.Size);
+        int gy = map[randx, 1];
+
+        return new Vector2(ChunkX * Chunk.Size + randx, gy);
     }
 }

@@ -104,24 +104,17 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
             //复活中
             if (player.State == PlayerState.Respawning)
             {
-                if (player.HasSpawnPoint)
+                Vector2 pos = player.SpawnPoint.ToGodotVector2();
+                if (TrySearchSpawn(player, pos.ToVector2I()))
                 {
-                    Vector2 pos = player.SpawnPoint.ToGodotVector2();
-                    if (TrySearchSpawn(player, pos.ToVector2I()))
-                    {
-                        player.State = PlayerState.WaitSpawn;
-                        player.Update = true;
-                        OnPlayerRespawn(player);
-                    }
+                    player.State = PlayerState.WaitSpawn;
+                    player.Update = true;
+                    OnPlayerRespawn(player);
+                    GD.Print($"寻找复活点成功{pos.ToString()}");
                 }
                 else
                 {
-                    if (SearchSpawnPoint(player))
-                    {
-                        player.State = PlayerState.WaitSpawn;
-                        player.Update = true;
-                        OnPlayerRespawn(player);
-                    }
+                    GD.Print($"寻找复活点失败{pos.ToString()}");
                 }
             }
         }
@@ -369,20 +362,6 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
 
     #region 其他
 
-    /// <summary>
-    /// 搜寻随机复活点
-    /// </summary>
-    /// <param name="player">玩家数据</param>
-    public virtual bool SearchSpawnPoint(PlayerData player)
-    {
-        int ChunkX = Random.Shared.Next(-16, 16);
-        var map = WorldGenerator.GetHighMap(ChunkX);
-        int randx = Random.Shared.Next(0, Chunk.Size);
-        int gy = map[randx, 1];
-
-        return TrySearchSpawn(player, new Vector2I(ChunkX * Chunk.Size + randx, gy));
-    }
-
     public virtual bool TrySearchSpawn(PlayerData player, Vector2I position)
     {
         var local = position.Remainder(Chunk.Size);
@@ -393,15 +372,12 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
         {
             for (int y = -1; y <= 1; y++)
             {
-                var pos = new Vector2I(coord.X + local.X + x, coord.Y + local.Y + y);
-                if (World.Service.ChunkService.Chunks.ContainsKey(pos))
-                {
-                }
-                else
+                var around_chunk_pos = new Vector2I(coord.X + x, coord.Y + y);
+                if (!World.Service.ChunkService.Chunks.ContainsKey(around_chunk_pos))
                 {
                     if (Found)
                         Found = false;
-                    World.Service.ChunkService.LoadChunkQueue.Add(pos);
+                    World.Service.ChunkService.LoadChunkQueue.Enqueue(around_chunk_pos);
                 }
             }
         }
@@ -420,14 +396,18 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                     if (FundPoint(-i, -y)) return true;
                 }
             }
+
+            //修改状态重新尝试
+            player.State = PlayerState.Respawning;
+            //GD.Print($"空间无法生成{position.ToString()}");
         }
 
         return false;
 
         bool FundPoint(int x, int y)
         {
-            int gx = coord.X * Chunk.Size + x;
-            int gy = coord.Y * Chunk.Size + y;
+            int gx = coord.X * Chunk.Size + local.X + x;
+            int gy = coord.Y * Chunk.Size + local.Y + y;
             var block = World.Service.ChunkService.GetBlock(new Vector3I(gx, gy, 1));
             if (block != null)
             {
@@ -437,8 +417,8 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                     if (down != null && down.BlockMeta.Collide)
                     {
                         player.Position = new(gx * 16, gy * 16 - 16);
-                        GD.Print($"寻找到复活点: {player.Position.ToString()}");
-                        GD.Print($"方块坐标: {gx},{gy}");
+                        // GD.Print($"寻找到复活点: {player.Position.ToString()}");
+                        // GD.Print($"方块坐标: {gx},{gy}");
                         return true;
                     }
                 }

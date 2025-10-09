@@ -95,7 +95,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     /// <summary>
     /// 待加载区块的请求集合
     /// </summary>
-    public HashSet<Vector2I> LoadChunkQueue = new();
+    public ConcurrentQueue<Vector2I> LoadChunkQueue = new();
 
     /// <summary>
     /// 区块加载视距半径
@@ -123,6 +123,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
 
         PlayerNode.GetInformation[nameof(ChunkServiceBase)] =
             () => $"加载区块:{Chunks.Count}\n" +
+                  $"待加载区块:{LoadChunkQueue.Count}\n" +
                   $"Tick:{tickConsumed} ms/t {tickConsumed_μs} μs/t\n" +
                   $"区块分组耗时:{GroupingTime_μs} μs/t";
 
@@ -262,21 +263,19 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                 {
                     if (!Chunks.ContainsKey(chunkpos))
                     {
+                        if (LoadChunkQueue.Contains(chunkpos))
+                            continue;
+
                         tasks.Add(LoadChunk(chunkpos));
                     }
                 }
 
                 //加载区块队列
-                foreach (var key in LoadChunkQueue.ToArray())
+                while (LoadChunkQueue.TryDequeue(out var pos))
                 {
-                    if (Chunks.ContainsKey(key))
-                    {
-                        LoadChunkQueue.Remove(key);
-                        return;
-                    }
-
-                    tasks.Add(LoadChunk(key));
-                    LoadChunkQueue.Remove(key);
+                    if (Chunks.ContainsKey(pos))
+                        continue;
+                    tasks.Add(LoadChunk(pos));
                 }
 
 
@@ -297,7 +296,11 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                     {
                         var chunk = Chunks[chunkpos];
                         //延迟卸载，防止玩家故意卡在两个区块之间
-                        if (chunk.RemoveCount++ > 100)
+                        if (LoadChunkQueue.Contains(chunkpos))
+                        {
+                            chunk.RemoveCount = 0;
+                        }
+                        else if (chunk.RemoveCount++ > 20)
                         {
                             chunk.RemoveCount = 0;
                             OnChunkSaving?.Invoke(chunk);

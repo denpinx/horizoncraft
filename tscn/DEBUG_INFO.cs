@@ -65,7 +65,7 @@ public partial class DEBUG_INFO : CanvasLayer
         {
             var player = sets.Value;
             right.AppendLine(
-                $"在线玩家[{sets.Key}] 坐标:[{player.ChunkCoord.X},{player.ChunkCoord.Y}],id{player.PeerId}");
+                $"在线玩家[{sets.Key}]状态:{player.State}, 坐标:[{player.ChunkCoord.X},{player.ChunkCoord.Y}],id{player.PeerId}");
         }
 
 

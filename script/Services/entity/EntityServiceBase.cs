@@ -71,7 +71,7 @@ public class EntityServiceBase : ServiceBase
             //尝试加载该区块
             if (!World.Service.ChunkService.Chunks.ContainsKey(entity.ChunkCoord))
             {
-                World.Service.ChunkService.LoadChunkQueue.Add(entity.ChunkCoord);
+                World.Service.ChunkService.LoadChunkQueue.Enqueue(entity.ChunkCoord);
             }
         }
     }

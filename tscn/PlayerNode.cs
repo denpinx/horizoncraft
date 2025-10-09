@@ -498,8 +498,9 @@ public partial class PlayerNode : CharacterBody2D
 
             if (Input.IsActionJustPressed("F5") && BaseInputable)
             {
-                Position = new Vector2(new Random().Next(100000), Position.Y);
-                OnMoveToChunk?.Invoke();
+                playerData.State = PlayerState.Dead;
+                // Position = new Vector2(new Random().Next(100000), Position.Y);
+                // OnMoveToChunk?.Invoke();
             }
         }
     }
@@ -565,4 +566,5 @@ public partial class PlayerNode : CharacterBody2D
             return false;
         }
     }
+    
 }
