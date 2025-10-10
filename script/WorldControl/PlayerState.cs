@@ -6,6 +6,5 @@ public enum PlayerState
 {
     Dead,
     Live,
-    Respawning,
-    WaitSpawn,
+    Respawning
 }

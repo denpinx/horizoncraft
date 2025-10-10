@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Godot.Collections;
 using horizoncraft.script;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Struct;
@@ -9,16 +10,19 @@ public partial class StructBuildTool : CanvasLayer
     public PreBuildStruct PreBuildStruct = new PreBuildStruct();
     [Export] EditTileMapView EditTileMapView;
     [Export] TextEdit TextEdit;
+    [Export] LineEdit LineEdit_BuildName;
     [Export] Button Button_Remove_All;
+    [Export] Button Button_Import;
     public int layer = 0;
     public string SelectedBlock = "stone";
 
     public override void _Ready()
     {
-        EditTileMapView = GetNode<EditTileMapView>("HBoxContainer/VBoxContainer/PanelContainer/EditTileMapView");
-        TextEdit = GetNode<TextEdit>("HBoxContainer/VBoxContainer2/PanelContainer2/TextEdit");
-        EditTileMapView.TileSet = Materials.CreateTileSet();
-        EditTileMapView.BackGround.TileSet = Materials.CreateTileSet();
+        _ = Materials.BlockMetas;
+        Materials.tileSet = null;
+
+        EditTileMapView.TileSet = Materials.CreateTileSet(true);
+        EditTileMapView.BackGround.TileSet = Materials.CreateTileSet(true);
 
         EditTileMapView.OnSetCell += (pos) =>
         {
@@ -43,7 +47,27 @@ public partial class StructBuildTool : CanvasLayer
         {
             PreBuildStruct.blocks.Clear();
             UpdateTileMap();
+            GenerateJson();
         };
+        LineEdit_BuildName.TextChanged += (t) =>
+        {
+            PreBuildStruct.name = LineEdit_BuildName.Text;
+            GenerateJson();
+        };
+        Button_Import.Pressed += () =>
+        {
+            if (DisplayServer.ClipboardHas())
+            {
+                var json_text = DisplayServer.ClipboardGet();
+                Dictionary dict = (Dictionary)Json.ParseString(json_text);
+
+                PreBuildStruct.blocks.Clear();
+                PreBuildStruct.ParseDictionary(dict);
+                UpdateTileMap();
+                GenerateJson();
+            }
+        };
+
         var GridContainer = GetNode<GridContainer>("HBoxContainer/VBoxContainer3/PanelContainer2/GridContainer");
         PackedScene ps = GD.Load<PackedScene>("res://tscn/Menu/InvSlot.tscn");
         int i = 0;
@@ -74,7 +98,7 @@ public partial class StructBuildTool : CanvasLayer
             {
                 EditTileMapView.SelfModulate = Color.Color8(255, 255, 255, 255);
             }
-            
+
             EditTileMapView.GetParent<Control>().GrabFocus();
         }
     }
@@ -89,7 +113,7 @@ public partial class StructBuildTool : CanvasLayer
         EditTileMapView.BackGround.Clear();
         EditTileMapView.MaxPos = PreBuildStruct.GetMaxPos();
         EditTileMapView.MinPos = PreBuildStruct.GetMinPos();
-        
+
         foreach (var block in PreBuildStruct.blocks.Values)
         {
             if (block.z == 1)
@@ -117,7 +141,7 @@ public partial class StructBuildTool : CanvasLayer
     public void AddBlock(Vector3I pos, string name)
     {
         if (name == "") return;
-        if(!Materials.BlockMetas.ContainsKey(name))return;
+        if (!Materials.BlockMetas.ContainsKey(name)) return;
         if (!PreBuildStruct.blocks.ContainsKey(pos))
         {
             PreBuildStruct.blocks.Add(pos, new PreBuildStructItem()

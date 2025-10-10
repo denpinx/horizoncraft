@@ -6,7 +6,7 @@ using Godot;
 
 namespace horizoncraft.script.WorldControl
 {
-    public class BlockStructItem
+    public struct BlockStructItem
     {
         public Vector3I Coord;
         public BlockMeta BlockMeta;

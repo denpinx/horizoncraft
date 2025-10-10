@@ -107,6 +107,17 @@ namespace horizoncraft.script
                     meta.ItemMeta = ItemMetas[meta.Name];
                 }
             }
+            else
+            {
+                ItemMeta itemMeta = new ItemMeta()
+                {
+                    Name = meta.Name,
+                    HasBlock = true
+                };
+                itemMeta.Itemset.TextureNames.Add(meta.Name);
+                RegItemMeta(itemMeta);
+                meta.ItemMeta = itemMeta;
+            }
 
             return meta;
         }
@@ -138,7 +149,15 @@ namespace horizoncraft.script
                     Id = -1,
                     Cube = false,
                     Collide = false,
-                    Replaceable = true
+                    Replaceable = true,
+                    blockTileDatas = new List<BlockTileSet>()
+                    {
+                        new  BlockTileSet()
+                        {
+                            texture_name = "air",
+                            tile_size = 1,
+                        }
+                    }
                 }
             );
 
@@ -557,7 +576,8 @@ namespace horizoncraft.script
         /// 创建 TileSet
         /// </summary>
         /// <returns></returns>
-        public static TileSet CreateTileSet()
+        public static TileSet CreateTileSet(bool ShowAir = false)
+
         {
             _ = BlockMetas;
 
@@ -572,7 +592,7 @@ namespace horizoncraft.script
             tileSet.SetTerrainSetMode(0, TileSet.TerrainMode.Sides);
             foreach (var meta in BlockMetas.Values)
             {
-                if (meta.Name == "air") continue;
+                if (!ShowAir && meta.Name == "air") continue;
 
                 for (int state_index = 0; state_index < meta.blockTileDatas.Count; state_index++)
                 {
@@ -601,7 +621,7 @@ namespace horizoncraft.script
 
                         atlasSource.Texture = image;
                         atlasSource.TextureRegionSize = new Vector2I(16, 16);
-                        GD.Print($"创建图集{blockTileSet.tile_id}");
+                        GD.Print($"创建图集{blockTileSet.texture_name},{blockTileSet.tile_id}");
 
                         int mask = 0;
                         for (int y = 0; y < tilesY; y++)

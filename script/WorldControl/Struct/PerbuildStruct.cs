@@ -22,6 +22,24 @@ public class PreBuildStruct
         };
     }
 
+    public void ParseDictionary(Dictionary dictionary)
+    {
+        if (dictionary.ContainsKey("name"))
+        {
+            name = (string)dictionary["name"];
+            if (dictionary.ContainsKey("blocks"))
+            {
+                Array<Dictionary> array = (Array<Dictionary>)dictionary["blocks"];
+                foreach (var dict in array)
+                {
+                    PreBuildStructItem block = new PreBuildStructItem();
+                    block.ParseDictionary(dict);
+                    blocks.Add(new Vector3I(block.x, block.y, block.z), block);
+                }
+            }
+        }
+    }
+
     public Vector2I GetMaxPos()
     {
         if (blocks.Count == 0) return new Vector2I();
@@ -38,6 +56,7 @@ public class PreBuildStruct
 
     public Vector2I GetMinPos()
     {
+        if (blocks.Count == 0) return new Vector2I();
         var first = blocks.Keys.First();
         Vector2I result = new Vector2I(first.X, first.Y);
         foreach (var pos in blocks.Keys)
@@ -66,5 +85,13 @@ public class PreBuildStructItem
             ["z"] = z,
             ["name"] = name,
         };
+    }
+
+    public void ParseDictionary(Dictionary dictionary)
+    {
+        x = (int)dictionary["x"];
+        y = (int)dictionary["y"];
+        z = (int)dictionary["z"];
+        name = (string)dictionary["name"];
     }
 }

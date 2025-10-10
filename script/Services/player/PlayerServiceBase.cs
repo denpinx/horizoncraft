@@ -107,7 +107,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                 Vector2 pos = player.SpawnPoint.ToGodotVector2();
                 if (TrySearchSpawn(player, pos.ToVector2I()))
                 {
-                    player.State = PlayerState.WaitSpawn;
+                    player.State = PlayerState.Live;
                     player.Update = true;
                     OnPlayerRespawn(player);
                     GD.Print($"寻找复活点成功{pos.ToString()}");
@@ -122,6 +122,8 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
 
     public virtual void OnPlayerRespawn(PlayerData playerData)
     {
+        if (playerData.Name == PlayerNode.Profile.Name)
+            World.PlayerNode.Position = playerData.Position.ToGodotVector2();
     }
 
     /// <summary>
@@ -191,7 +193,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
 
     /// <summary>
     /// 同步玩家的节点坐标和数据坐标
-    /// 决定狙击玩家或则客户端玩家的同步方法的。
+    /// 决定本地玩家或则客户端玩家的同步方法的。
     /// </summary>
     /// <param name="player"></param>
     /// <param name="playerData"></param>
@@ -217,12 +219,6 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                 playerData.Position = pos;
                 playerData.Update = true;
             }
-        }
-
-        if (playerData.State == PlayerState.WaitSpawn)
-        {
-            player.Position = playerData.Position_v2;
-            playerData.State = PlayerState.Live;
         }
     }
 
@@ -362,11 +358,20 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
 
     #region 其他
 
+    /// <summary>
+    /// 玩家处于 Respawning 状态 时，每Tick尝试寻找复活点。最大2*n次Tick内寻找完成,但是不可能多次搜索都完全没有复活点
+    /// Tick 1:加载复活点区块
+    /// Tick 2:区块加载完成，搜索复活点
+    /// </summary>
+    /// <param name="player">玩家</param>
+    /// <param name="position">玩家位置</param>
+    /// <returns></returns>
     public virtual bool TrySearchSpawn(PlayerData player, Vector2I position)
     {
         var local = position.Remainder(Chunk.Size);
         var coord = position.MathFloor(Chunk.Size);
 
+        //加载复活点周围的3x3区块
         bool Found = true;
         for (int x = -1; x <= 1; x++)
         {
@@ -384,27 +389,28 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
 
         if (Found)
         {
+            //因为区块已经加载完成，接下来的GetBlock只要在加载区块以内，就不会出现null的问题。
             //自中心向四周查询
             for (int i = 0; i < Chunk.Size; i++)
             {
                 for (int y = 0; y < Chunk.Size; y++)
                 {
-                    if (FundPoint(i, y)) return true;
-                    if (FundPoint(-i, y)) return true;
-
-                    if (FundPoint(i, -y)) return true;
-                    if (FundPoint(-i, -y)) return true;
+                    if (FindPoint(i, y)) return true;
+                    if (FindPoint(-i, y)) return true;
+                    if (FindPoint(i, -y)) return true;
+                    if (FindPoint(-i, -y)) return true;
                 }
             }
 
-            //修改状态重新尝试
+            //完全空间不满足生成生成条件，更新玩家状态
             player.State = PlayerState.Respawning;
             //GD.Print($"空间无法生成{position.ToString()}");
         }
 
+        //区块未加载或没找到，下一Tick重新找，
         return false;
 
-        bool FundPoint(int x, int y)
+        bool FindPoint(int x, int y)
         {
             int gx = coord.X * Chunk.Size + local.X + x;
             int gy = coord.Y * Chunk.Size + local.Y + y;

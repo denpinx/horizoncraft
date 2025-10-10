@@ -1,4 +1,7 @@
 using Godot;
+using horizoncraft.script.WorldControl.Context;
+using horizoncraft.script.WorldControl.Struct;
+using horizoncraft.script.WorldControl.Struct.structs;
 using static horizoncraft.script.WorldControl.BiomeManage;
 
 namespace horizoncraft.script.WorldControl.worldbiomes

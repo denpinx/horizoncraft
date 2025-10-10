@@ -251,6 +251,8 @@ namespace horizoncraft.script.WorldControl
                         biomeTerrainContext.GlobalY = gy;
                         biomeTerrainContext.Noise = FastNoiseLite.GetNoise2D(gx, gy);
                         biomeTerrainContext.BlockData = chunk.GetBlock(x, y, z);
+                        
+                        
                         if (gy > highmap[x, z] && FastNoiseLite.GetNoise2D(gx / 0.5f, gy) > 0.3f && z == 1)
                             chunk.SetBlock(x, y, z, Materials.Valueof("air"));
                         else if (biomeType == BiomeType.Deep) chunk.SetBlock(x, y, z, Materials.Valueof("stone"));

@@ -92,7 +92,11 @@ public partial class TileMapLayerChunk : Node2D
 
                         if (z == 0 && !block_font.BlockMeta.Cube)
                         {
-                            if (bts != null && bts.scene)
+                            if (block.BlockMeta.Name == "air")
+                            {
+                                tileMapLayer_back.SetCell(new(x, y), -1);
+                            }
+                            else if (bts != null && bts.scene)
                             {
                                 if (tileMapLayer_back.GetCellSourceId(pos) != tile_id)
                                     tileMapLayer_back.SetCell(pos, tile_id, Vector2I.Zero, bts.id);
@@ -111,7 +115,11 @@ public partial class TileMapLayerChunk : Node2D
                             else if (tileMapLayer_shadow.GetCellAtlasCoords(pos) != new Vector2I(block_font.Light, 0))
                                 tileMapLayer_shadow.SetCell(new(x, y), 0, new Vector2I(block_font.Light, 0));
 
-                            if (bts != null && bts.scene)
+                            if (block.BlockMeta.Name == "air")
+                            {
+                                tileMapLayer_font.SetCell(new(x, y), -1);
+                            }
+                            else if (bts != null && bts.scene)
                                 tileMapLayer_font.SetCell(new Vector2I(x, y), tile_id, Vector2I.Zero, bts.id);
                             else tileMapLayer_font.SetCell(new(x, y), tile_id, coord);
                         }

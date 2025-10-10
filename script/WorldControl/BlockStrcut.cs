@@ -44,7 +44,7 @@ namespace horizoncraft.script.WorldControl
             });
         }
 
-        public (BlockMeta, int) GetBlockMeta(int X, int Y, int Z)
+        public virtual (BlockMeta, int) GetBlockMeta(int X, int Y, int Z)
         {
             if (X < min.X || X > max.X || Y < min.Y || Y > max.Y) return (null, 0);
             var pos = new Vector3I(X, Y, Z);

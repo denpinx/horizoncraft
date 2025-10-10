@@ -260,15 +260,15 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                 var rangeChunks = GetAllLoadRangeChunks();
                 var tasks = new List<Task<Chunk>>();
                 foreach (var chunkpos in rangeChunks)
-                {
                     if (!Chunks.ContainsKey(chunkpos))
                     {
+                        //如果和加载队列重叠，先跳过当前的加载。
                         if (LoadChunkQueue.Contains(chunkpos))
                             continue;
 
                         tasks.Add(LoadChunk(chunkpos));
                     }
-                }
+
 
                 //加载区块队列
                 while (LoadChunkQueue.TryDequeue(out var pos))
@@ -296,11 +296,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                     {
                         var chunk = Chunks[chunkpos];
                         //延迟卸载，防止玩家故意卡在两个区块之间
-                        if (LoadChunkQueue.Contains(chunkpos))
-                        {
-                            chunk.RemoveCount = 0;
-                        }
-                        else if (chunk.RemoveCount++ > 20)
+                        if (chunk.RemoveCount++ > 20)
                         {
                             chunk.RemoveCount = 0;
                             OnChunkSaving?.Invoke(chunk);
