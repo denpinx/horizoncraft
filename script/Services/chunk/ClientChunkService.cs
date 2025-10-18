@@ -39,7 +39,7 @@ public class ClientChunkService : ChunkServiceBase
 
     public override void Ticking()
     {
-        base.Ticking();
+        UpdateLights();
         AsyncOwnedEntities();
         foreach (var pos in RegetList.Keys.ToArray())
         {
@@ -64,6 +64,7 @@ public class ClientChunkService : ChunkServiceBase
     public void AsyncOwnedEntities()
     {
         EntityPack entityPack = new EntityPack();
+        entityPack.From = PlayerNode.Profile.Name;
         foreach (var entity in World.Service.EntityService.EntityDatas.Values)
         {
             if (entity.Owned == PlayerNode.Profile.Name)

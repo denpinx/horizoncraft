@@ -198,6 +198,18 @@ public class PlayerBreakblockEvent : PlayerEvent
     public List<ItemStack> DropLoots = new();
 }
 
+public class PlayerUseItemEvent : PlayerEvent
+{
+    /// <summary>
+    /// 使用的物品
+    /// </summary>
+    public ItemStack UseItemStack;
+    /// <summary>
+    /// 使用物品时的目标方块
+    /// </summary>
+    public Vector3I Position;
+}
+
 /// <summary>
 /// 玩家交互方块事件
 /// </summary>

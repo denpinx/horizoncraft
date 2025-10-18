@@ -38,6 +38,7 @@ public partial class PlayerData
             _state = value;
             if (value == PlayerState.Respawning && !HasSpawnPoint)
                 SpawnPoint = GetFuzzySpawnPoint();
+            Update = true;
         }
     }
 

@@ -55,6 +55,7 @@ public partial class DebugView : Node2D
             $"光源对象：{chunk.LightList.Count}个 ",
             $"Tick对象：{chunk.TickList.Count} 个",
             $"Tick：{chunk.TickUsedTime_μs} μs/t ",
+            $"LightUpdateTime：{chunk.LightUpdateTime} tick ",
         };
 
         int index = 1;

@@ -40,6 +40,41 @@ public static class ComponentManager
 
         return true;
     }
+    /// <summary>
+    /// 执行指定类型的物品组件。
+    /// </summary>
+    /// <param name="playerEvent"></param>
+    /// <param name="itemStack"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static bool ExecuteItemComponents<T>(PlayerEvent playerEvent, ItemStack itemStack)
+    {
+        string start_id = itemStack.Name;
+        for (int i = 0; i < itemStack.Components.Count; i++)
+        {
+            Component component = itemStack.Components[i];
+            if (component == null)
+            {
+                GD.PrintErr("组件被异常删除!");
+                itemStack.Components.RemoveAt(i);
+                return false;
+            }
+
+            if (component is not T) continue;
+
+            if (ComponentSets.TryGetValue(component.Name, out var value))
+            {
+                //如果有任意一个组件取消了事件，之后的组件都不执行了
+                var s = value.system.ExecuteItemComponent(playerEvent, component);
+                if (!s) return false;
+            }
+
+            if (itemStack.Name != start_id)
+                return false;
+        }
+
+        return true;
+    }
 
     /// <summary>
     /// 处理物品组件事件

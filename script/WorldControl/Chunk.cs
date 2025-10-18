@@ -41,6 +41,7 @@ namespace horizoncraft.script.WorldControl
         public HashSet<Vector3> TickList = new();
         public HashSet<Vector3> PassiveTickList = new();
         public List<Vector2> LightList = new();
+        [MemoryPackIgnore] public int LightUpdateTime = 0;
         [MemoryPackIgnore] public List<Vector3I> UpdateList = new(32);
         [MemoryPackIgnore] public List<Vector3I> UpdateList_buffer = new();
 
@@ -256,6 +257,7 @@ namespace horizoncraft.script.WorldControl
             {
                 if (data[x, y, 1].OldLight != data[x, y, 1].Light)
                 {
+                    LightUpdateTime++;
                     update_tilemap = true;
                     return true;
                 }

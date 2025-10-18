@@ -39,7 +39,7 @@ public partial class PlayerNode : CharacterBody2D
     /// <summary>
     /// 方块挖掘进度
     /// </summary>
-    public PlayerBreakProcess BreakProcess = new();
+    public PlayerActionProcess ActionProcess = new();
 
     /// <summary>
     /// 跳跃高度
@@ -103,7 +103,8 @@ public partial class PlayerNode : CharacterBody2D
         else
         {
             LastFramIsLeft = false;
-            if (BreakProcess.ProcessTime > 0) BreakProcess.ProcessTime = 0;
+            if (ActionProcess.State == PlayerAction.BreakBlock && ActionProcess.ProcessTime > 0)
+                ActionProcess.ProcessTime = 0;
         }
 
         if (Input.IsActionPressed("placeblock") && playerData != null && OpeningInventoryNode == null &&
@@ -118,7 +119,7 @@ public partial class PlayerNode : CharacterBody2D
         }
 
 
-        if (BreakProcess.ProcessTime > 0)
+        if (ActionProcess.ProcessTime > 0)
         {
             if (animationPlayer_other.CurrentAnimation != "break")
                 animationPlayer_other.Play("break");
@@ -179,7 +180,7 @@ public partial class PlayerNode : CharacterBody2D
         var block2 = world.Service.ChunkService.GetBlock(pos1);
         if (block1 == null || block2 == null)
         {
-            BreakProcess.Reset();
+            ActionProcess.Reset();
             return;
         }
 
@@ -208,27 +209,30 @@ public partial class PlayerNode : CharacterBody2D
 
         if (InterfaceBlock.IsMeta("air"))
         {
-            BreakProcess.Reset();
+            ActionProcess.Reset();
             return;
         }
 
-        if (BreakProcess.ProcessTime >= BreakProcess.FinalTime)
+        if (ActionProcess.State == PlayerAction.BreakBlock)
         {
-            var bbe = new PlayerBreakblockEvent()
+            if (ActionProcess.ProcessTime >= ActionProcess.FinalTime)
             {
-                world = world,
-                Player = playerData,
-                Position = BreakProcess.Position,
-            };
-            world.Service.PlayerService.Events.BreakBlock(bbe);
-            BreakProcess.ProcessTime = 0;
-            BreakProcess.FinalTime = 2;
-        }
-        else if (BreakProcess.ProcessTime > 0)
-        {
-            BreakProcess.ProcessTime += (float)delta;
-            if (BreakProcess.Position != finalpos)
-                BreakProcess.Reset();
+                var bbe = new PlayerBreakblockEvent()
+                {
+                    world = world,
+                    Player = playerData,
+                    Position = ActionProcess.Position,
+                };
+                world.Service.PlayerService.Events.BreakBlock(bbe);
+                ActionProcess.ProcessTime = 0;
+                ActionProcess.FinalTime = 2;
+            }
+            else if (ActionProcess.ProcessTime > 0)
+            {
+                ActionProcess.ProcessTime += (float)delta;
+                if (ActionProcess.Position != finalpos)
+                    ActionProcess.Reset();
+            }
         }
         else
         {
@@ -254,11 +258,11 @@ public partial class PlayerNode : CharacterBody2D
 
                 //工具等级差距过大
                 if (gap > 1) return;
-
-                BreakProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity / efficiency;
-                BreakProcess.Position = finalpos;
-                BreakProcess.ProcessTime += (float)delta;
-                if (playerData.Mode == 1) BreakProcess.FinalTime = 0;
+                ActionProcess.State = PlayerAction.BreakBlock;
+                ActionProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity / efficiency;
+                ActionProcess.Position = finalpos;
+                ActionProcess.ProcessTime += (float)delta;
+                if (playerData.Mode == 1) ActionProcess.FinalTime = 0;
             }
             else
             {
@@ -299,6 +303,38 @@ public partial class PlayerNode : CharacterBody2D
                 Player = playerData,
                 Position = targetpos,
             });
+
+        //使用物品和放置方块不冲突，如果物品在放置方块时被消耗了，这个正常是不会触发的。
+        var handitem = playerData.Inventory.GetHandItemStack();
+        if (handitem != null)
+        {
+            var cmp = handitem.GetComponent<ItemUsefulComponent>();
+            if (cmp != null)
+            {
+                if (ActionProcess.State == PlayerAction.UseItem)
+                {
+                    ActionProcess.ProcessTime += (float)delta;
+                    if (ActionProcess.ProcessTime >= ActionProcess.FinalTime)
+                    {
+                        var puie = new PlayerUseItemEvent()
+                        {
+                            world = world,
+                            Player = playerData,
+                            UseItemStack = handitem,
+                            Position = ActionProcess.Position
+                        };
+                        world.Service.PlayerService.Events.UseItem(puie);
+                        ActionProcess.Reset();
+                    }
+                }
+                else
+                {
+                    ActionProcess.State = PlayerAction.UseItem;
+                    ActionProcess.FinalTime = cmp.UseTime;
+                    ActionProcess.ProcessTime = 0;
+                }
+            }
+        }
     }
 
     //处理输入
@@ -334,8 +370,8 @@ public partial class PlayerNode : CharacterBody2D
                         nameof(PlayerInventoryServiceNode.SetHandSlot),
                         playerData.Name, playerData.Inventory.ToolBarIndex
                     );
-                if (BreakProcess.ProcessTime > 0)
-                    BreakProcess.ProcessTime = 0;
+                if (ActionProcess.ProcessTime > 0)
+                    ActionProcess.ProcessTime = 0;
             }
 
 
@@ -349,8 +385,8 @@ public partial class PlayerNode : CharacterBody2D
                     nameof(PlayerInventoryServiceNode.SetHandSlot),
                     playerData.Name, playerData.Inventory.ToolBarIndex
                 );
-            if (BreakProcess.ProcessTime > 0)
-                BreakProcess.ProcessTime = 0;
+            if (ActionProcess.ProcessTime > 0)
+                ActionProcess.ProcessTime = 0;
         }
 
         if (Input.IsActionJustPressed("roller_down"))
@@ -363,8 +399,8 @@ public partial class PlayerNode : CharacterBody2D
                     nameof(PlayerInventoryServiceNode.SetHandSlot),
                     playerData.Name, playerData.Inventory.ToolBarIndex
                 );
-            if (BreakProcess.ProcessTime > 0)
-                BreakProcess.ProcessTime = 0;
+            if (ActionProcess.ProcessTime > 0)
+                ActionProcess.ProcessTime = 0;
         }
 
         if (Input.IsActionJustPressed("e") && OvrCanvasLayer.GetChildCount() == 0)
@@ -526,9 +562,9 @@ public partial class PlayerNode : CharacterBody2D
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
         );
 
-        float progress = BreakProcess.ProcessTime / BreakProcess.FinalTime;
+        float progress = ActionProcess.ProcessTime / ActionProcess.FinalTime;
         if (progress > 1) progress = 1;
-        if (BreakProcess.ProcessTime > 0)
+        if (ActionProcess.ProcessTime > 0)
             Cursor.Frame = 1 + (int)(8 * progress);
         else Cursor.Frame = 0;
         Cursor.GlobalPosition = new Vector2(coord.X, coord.Y) * 16;
@@ -566,5 +602,4 @@ public partial class PlayerNode : CharacterBody2D
             return false;
         }
     }
-    
 }

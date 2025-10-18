@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using horizoncraft.script.Components;
 using horizoncraft.script.Components.EntityComponents;
+using horizoncraft.script.Components.Item;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Events.player;
 using horizoncraft.script.Expand;
@@ -329,6 +330,14 @@ public class PlayerEvents
         e.PlayerService.Events.OpenBlockView(pobve);
         return true;
     }
+
+    public virtual bool UseItem(PlayerUseItemEvent e)
+    {
+        var cmp = e.UseItemStack.GetComponent<ItemUsefulComponent>();
+
+        return ComponentManager.ExecuteItemComponents<ItemUsefulComponent>(e, e.UseItemStack);
+    }
+
 
     /// <summary>
     /// 关闭物品栏订阅

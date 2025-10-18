@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -14,18 +15,76 @@ namespace horizoncraft.script.Components
         const string TypeNamespace = "horizoncraft.script.Components";
 
         /// <summary>
-        /// 通过表达式创建lambda
-        /// 内容为: ()=>new TypeName{属性};
-        /// 除了第一次调用之外，之后的调用都会接近原生创建对象
+        /// 获取对象的表达式
         /// </summary>
-        /// <param name="typename">类型名</param>
-        /// <param name="cfg">属性字典</param>
-        /// <returns>lambda表达式</returns>
-        public static Func<Component> CreateLambda(string typename, Dict cfg, bool lowercase = false)
+        /// <param name="collection"></param>
+        /// <returns></returns>
+        private static Expression GetObjcetExpression(object collection)
         {
-            Type type = null;
-            List<Type> types = FindTypesInNamespaceGlobally(typename, TypeNamespace);
-            if (types.Count > 0) type = types.First();
+            if (collection is List<object> ls)
+            {
+                List<Expression> items = new();
+                foreach (var item in ls)
+                {
+                    items.Add(GetObjcetExpression(item));
+                }
+
+                var exp = Expression.ListInit(Expression.New(ls.GetType()), items.ToArray<Expression>());
+                return exp;
+            }
+            else if (collection is Dictionary<string, object> map)
+            {
+                var addmethod = map.GetType().GetMethod("Add");
+                List<ElementInit> items = new();
+                foreach (var key in map.Keys)
+                {
+                    var value = map[key];
+                    items.Add(
+                        Expression.ElementInit(addmethod, Expression.Constant(key),
+                            GetObjcetExpression(value))
+                    );
+                }
+
+                var exp = Expression.ListInit(Expression.New(map.GetType()), items.ToArray());
+                return exp;
+            }
+            //非集合类型
+            else
+            {
+                return Expression.Constant(collection);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// 通过字典和表达式创建lambda，支持内部的字典和List嵌套，
+        /// 字典内部集合类型只支持 list<string> 和 dictionar<string,objcet> 两个集合
+        /// 
+        /// 因为字典会导致字段和类型名无法分辩，除非添加自定义的类型/类名解析，但是会增加复杂度。
+        ///
+        /// 
+        /// 列一: ()=>new TypeName{属性};
+        ///
+        /// 列二: ()=>new TypeName{list = new List<string>(){
+        ///         "aa","bb","cc"
+        ///     },//这里的list类型会根据主类型的字段类型的实际情况自动转换
+        ///     dict = new dictionary<string,objcet>(){
+        ///         {"a","a"},
+        ///         {"b","a"},
+        ///         {"list",new list(){...}},
+        ///     }  //这里也是字典的值也会根据真实情况自动转换
+        /// };
+        /// 
+        /// 用labmda构建对象只会相比原生new对象慢了20%。
+        /// 
+        /// </summary>
+        /// <param name="typename"></param>
+        /// <param name="cfg"></param>
+        /// <param name="lowercase"></param>
+        /// <returns></returns>
+        public static Func<T> CreateLambda<T>(string typename, Dict cfg, bool lowercase = false)
+        {
+            Type type = FindTypesInNamespaceGlobally(typename, TypeNamespace);
             if (type == null)
             {
                 GD.PrintErr($"{typename} 不存在于命名空间{TypeNamespace}中");
@@ -73,24 +132,96 @@ namespace horizoncraft.script.Components
                     ResultValue = Convert.ChangeType(value, targetType);
                 }
 
-                bindings.Add(Expression.Bind(member, Expression.Constant(ResultValue, targetType)));
+                bindings.Add(Expression.Bind(member, GetObjcetExpression(ResultValue)));
             }
 
             var body = Expression.MemberInit(newExpr, bindings);
-            var lambda = Expression.Lambda<Func<Component>>(body);
+            var lambda = Expression.Lambda<Func<T>>(body);
             GD.Print(lambda.ToString());
             var result = lambda.Compile();
-            _ = result();
+
+            //第一次调用lambda会非常耗时，可能是因为jit的原因，所以我先在这里调用一次之后就不会出现耗时问题了。
+            result();
             return result;
         }
 
+
         /// <summary>
-        /// 获取命名空间下的指定名称的类型，非常耗时！ 150ms左右
+        /// 通过表达式创建lambda
+        /// 内容为: ()=>new TypeName{属性};
+        /// 除了第一次调用之外，之后的调用都会接近原生创建对象
+        /// </summary>
+        /// <param name="typename">类型名</param>
+        /// <param name="cfg">属性字典</param>
+        /// <returns>lambda表达式</returns>
+        // public static Func<Component> CreateLambda(string typename, Dict cfg, bool lowercase = false)
+        // {
+        //     Type type = FindTypesInNamespaceGlobally(typename, TypeNamespace);
+        //     if (type == null)
+        //     {
+        //         GD.PrintErr($"{typename} 不存在于命名空间{TypeNamespace}中");
+        //         return null;
+        //     }
+        //
+        //     var newExpr = Expression.New(type);
+        //     var bindings = new List<MemberBinding>();
+        //     foreach (var kv in cfg)
+        //     {
+        //         var key = kv.Key.ToString();
+        //         var value = kv.Value;
+        //         MemberInfo member = null;
+        //         if (lowercase)
+        //         {
+        //             member = (MemberInfo)type.GetLowercaseField(key) ?? type.GetLowercaseProperty(key);
+        //             if (member == null)
+        //             {
+        //                 member = (MemberInfo)type.GetField(key) ?? type.GetProperty(key);
+        //             }
+        //         }
+        //         else
+        //         {
+        //             member = (MemberInfo)type.GetField(key) ?? type.GetProperty(key);
+        //             if (member == null)
+        //             {
+        //                 member = (MemberInfo)type.GetLowercaseField(key) ?? type.GetLowercaseProperty(key);
+        //             }
+        //         }
+        //
+        //         if (member == null) continue;
+        //
+        //         var targetType = member switch
+        //         {
+        //             FieldInfo f => f.FieldType,
+        //             PropertyInfo p => p.PropertyType,
+        //             _ => null
+        //         };
+        //         if (targetType == null) continue;
+        //
+        //         //防止输入类型和实际类型不符
+        //         object ResultValue = value;
+        //         if (value.GetType() != targetType)
+        //         {
+        //             ResultValue = Convert.ChangeType(value, targetType);
+        //         }
+        //
+        //         bindings.Add(Expression.Bind(member, Expression.Constant(ResultValue, targetType)));
+        //     }
+        //
+        //     var body = Expression.MemberInit(newExpr, bindings);
+        //     var lambda = Expression.Lambda<Func<Component>>(body);
+        //     GD.Print(lambda.ToString());
+        //     var result = lambda.Compile();
+        //     _ = result();
+        //     return result;
+        // }
+
+        /// <summary>
+        /// 获取命名空间下的指定名称的类型.
         /// </summary>
         /// <param name="typeName"></param>
         /// <param name="namespacePrefix"></param>
         /// <returns></returns>
-        public static List<Type> FindTypesInNamespaceGlobally(
+        public static Type FindTypesInNamespaceGlobally(
             string typeName,
             string namespacePrefix)
         {
@@ -118,7 +249,7 @@ namespace horizoncraft.script.Components
                 }
             }
 
-            return results;
+            return results?.First();
         }
 
         /// <summary>
@@ -130,10 +261,11 @@ namespace horizoncraft.script.Components
         public static FieldInfo GetLowercaseField(this Type type, string name)
         {
             foreach (var fi in type.GetFields())
-            {
-                GD.Print(fi.Name, "==", name);
-                if (string.Equals(fi.Name, name, StringComparison.CurrentCultureIgnoreCase)) return fi;
-            }
+
+                if (string.Equals(fi.Name, name, StringComparison.CurrentCultureIgnoreCase))
+
+                    return fi;
+
 
             return null;
         }

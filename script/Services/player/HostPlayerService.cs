@@ -133,7 +133,7 @@ public class HostPlayerService : PlayerServiceBase
         else
         {
             var snap = new PlayerDataSnapshot(playerData);
-            World.Service.PlayerServiceNode.RpcId(playerData.PeerId, nameof(PlayerServiceNode.UpdataPlayer),
+            World.Service.PlayerServiceNode.RpcId(playerData.PeerId, nameof(PlayerServiceNode.UpdataPlayer), snap.Name,
                 ByteTool.ToBytes(snap));
         }
     }

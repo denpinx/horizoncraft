@@ -468,6 +468,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
     {
         if (Players.TryGetValue(snapshot.Name, out var player))
         {
+            player.State = snapshot.State;
             player.Position = snapshot.GetVector2();
             player.Update = true;
             player.FaceLeft = snapshot.FaceLeft;
@@ -477,6 +478,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
             var p = new PlayerData()
             {
                 Name = snapshot.Name,
+                State = snapshot.State,
                 Position = snapshot.GetVector2(),
                 FaceLeft = snapshot.FaceLeft,
                 Update = true

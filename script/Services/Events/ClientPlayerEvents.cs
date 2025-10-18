@@ -54,6 +54,18 @@ public class ClientPlayerEvents : PlayerEvents
         return base.PlaceBlock(e);
     }
 
+    public override bool UseItem(PlayerUseItemEvent e)
+    {
+        e.world.Service.PlayerServiceNode.RpcId(1,
+            nameof(PlayerServiceNode.PlayerUseItemEvent),
+            e.Player.Name,
+            e.Position.X,
+            e.Position.Y,
+            e.Position.Z
+        );
+        return base.UseItem(e);
+    }
+
     public override bool OpenBlockView(PlayerOpenBlockViewEvent e)
     {
         e.world.Service.PlayerInventoryServiceNode.RpcId(1,

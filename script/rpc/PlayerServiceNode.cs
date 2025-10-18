@@ -143,6 +143,23 @@ public partial class PlayerServiceNode : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void PlayerUseItemEvent(string player, int x, int y, int z)
+    {
+        if (WorldService.PlayerService.Players.TryGetValue(player, out var playerdata))
+        {
+            var puie = new PlayerUseItemEvent()
+            {
+                world = WorldService.World,
+                Player = playerdata,
+                UseItemStack = playerdata.Inventory.GetHandItemStack(),
+                Position = new(x, y, z)
+            };
+            WorldService.PlayerService.Events.UseItem(puie);
+        }
+    }
+
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void DropItemEvent(string player, bool all)
     {
         if (all) WorldService.PlayerService.Events.DropAllItem(WorldService, player);

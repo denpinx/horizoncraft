@@ -28,10 +28,10 @@ namespace horizoncraft.script.WorldControl.worldbiomes
                 if (StructManage.StaticBuildStructs.TryGetValue("mine_mini_room", out StaticBuildStruct staticBuildStruct))
                 {
                     Vector3I pos = new Vector3I(
-                        landBiomeStructContext.GlobalX + landBiomeStructContext.Random.Next(Chunk.Size / 4),
-                        landBiomeStructContext.GlobalY + landBiomeStructContext.Random.Next(Chunk.Size / 4), 0);
+                        landBiomeStructContext.GlobalX + landBiomeStructContext.Random.Next(Chunk.Size),
+                        landBiomeStructContext.GlobalY + landBiomeStructContext.Random.Next(Chunk.Size), 0);
                     var build = staticBuildStruct.GetBlockStruct(pos.X, pos.Y, pos.Z);
-
+                    
                     landBiomeStructContext.BlockStructs.Add(build);
                 }
                 else

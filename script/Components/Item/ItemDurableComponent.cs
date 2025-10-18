@@ -2,7 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using MemoryPack;
 
 namespace horizoncraft.script.Components.Item;
-
+/// <summary>
+/// 物品工具/耐久组件
+/// </summary>
 [MemoryPackable]
 public partial class ItemDurableComponent : ItemComponent
 {

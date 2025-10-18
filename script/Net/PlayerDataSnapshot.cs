@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using horizoncraft.script.WorldControl;
 using MemoryPack;
 
 namespace horizoncraft.script.Net;
@@ -8,6 +9,7 @@ namespace horizoncraft.script.Net;
 public partial class PlayerDataSnapshot
 {
     public String Name;
+    public PlayerState State;
     public float X;
     public float Y;
     public bool FaceLeft = false;
@@ -21,6 +23,7 @@ public partial class PlayerDataSnapshot
     public PlayerDataSnapshot(PlayerData playerData)
     {
         Name = playerData.Name;
+        State = playerData.State;
         X = playerData.Position.X;
         Y = playerData.Position.Y;
         FaceLeft = playerData.FaceLeft;

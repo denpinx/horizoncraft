@@ -237,7 +237,7 @@ namespace horizoncraft.script
                     {
                         Dictionary<string, object> cmp_dict =
                             (Dictionary<string, object>)((Dictionary<string, object>)item_dict["components"])[cmp_name];
-                        itemMeta.Components.Add(LambdaCreater.CreateLambda(cmp_name, cmp_dict));
+                        itemMeta.Components.Add(LambdaCreater.CreateLambda<Component>(cmp_name, cmp_dict));
                     }
                 }
 
@@ -315,7 +315,7 @@ namespace horizoncraft.script
                         GD.Print("组件:" + cmp_name);
                         Dictionary<string, object> cmp_dict =
                             (Dictionary<string, object>)((Dictionary<string, object>)config["components"])[cmp_name];
-                        components.Add(LambdaCreater.CreateLambda(cmp_name, cmp_dict));
+                        components.Add(LambdaCreater.CreateLambda<Component>(cmp_name, cmp_dict));
                     }
                 }
 

@@ -24,7 +24,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     /// <summary>
     /// 下标映射贴图坐标集
     /// </summary>
-    private readonly Vector2I[] _terrainCoord =
+    protected readonly Vector2I[] _terrainCoord =
     [
         new Vector2I(3, 3), //无0
         new Vector2I(3, 2), //下1
@@ -70,12 +70,12 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     /// <summary>
     /// 默认光源光照强度
     /// </summary>
-    private int LightSize = 8;
+    protected int LightSize = 8;
 
     /// <summary>
     /// 默认天空光照强度
     /// </summary>
-    private int SkyLight = 8;
+    protected int SkyLight = 8;
 
     /// <summary>
     /// 区块加载事件
@@ -102,17 +102,17 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     /// </summary>
     public int LoadHorizon = 1;
 
-    private CancellationTokenSource _tokenSource;
-    private Task _processLoadTask;
+    protected CancellationTokenSource _tokenSource;
+    protected Task _processLoadTask;
 
     #region 性能分析
 
-    private Stopwatch _stopwatchTick = new Stopwatch();
-    private Stopwatch _stopwatchTick_GroupingTime_ = new Stopwatch();
+    protected Stopwatch _stopwatchTick = new Stopwatch();
+    protected Stopwatch _stopwatchTick_GroupingTime_ = new Stopwatch();
 
-    private long tickConsumed;
-    private double tickConsumed_μs;
-    private double GroupingTime_μs;
+    protected long tickConsumed;
+    protected double tickConsumed_μs;
+    protected double GroupingTime_μs;
 
     #endregion
 

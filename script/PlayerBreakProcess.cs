@@ -2,8 +2,9 @@ using Godot;
 
 namespace horizoncraft.script;
 
-public class PlayerBreakProcess
+public class PlayerActionProcess
 {
+    public PlayerAction State = PlayerAction.BreakBlock;
     public float FinalTime = 2;
     public float ProcessTime;
     public Vector3I Position;
@@ -12,4 +13,10 @@ public class PlayerBreakProcess
     {
         ProcessTime = 0;
     }
+}
+
+public enum PlayerAction
+{
+    BreakBlock,
+    UseItem
 }
