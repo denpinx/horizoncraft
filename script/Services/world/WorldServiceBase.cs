@@ -13,6 +13,7 @@ using HorizonCraft.script.Services.chunk;
 using HorizonCraft.script.Services.entity;
 using horizoncraft.script.Services.message;
 using HorizonCraft.script.Services.player;
+using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Tool;
 
 namespace HorizonCraft.script.Services.world;
@@ -67,6 +68,7 @@ public abstract class WorldServiceBase
     {
         this.World = world;
         LoadWorldProfile();
+        BiomeManage.Reset();
     }
 
     public void InitializeNode()

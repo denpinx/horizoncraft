@@ -126,7 +126,6 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                   $"待加载区块:{LoadChunkQueue.Count}\n" +
                   $"Tick:{tickConsumed} ms/t {tickConsumed_μs} μs/t\n" +
                   $"区块分组耗时:{GroupingTime_μs} μs/t";
-
         _tokenSource = new CancellationTokenSource();
         _processLoadTask = Task.Run(ProcessChunkLoadThread, _tokenSource.Token);
     }

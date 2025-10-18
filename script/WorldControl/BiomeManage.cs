@@ -76,6 +76,7 @@ namespace horizoncraft.script.WorldControl
         //将群戏放大化，使得权重分配更随机
         private static void Amplification()
         {
+            MixinLandbiomes.Clear();
             //步骤一 混合与放大
             // 2-4-8-16-32
             Random random = new Random((int)World.Seed);
@@ -295,6 +296,12 @@ namespace horizoncraft.script.WorldControl
             Register(new SkyLayerBiome());
             //
             //Register(new MountainsBiome());
+        }
+
+        public static void Reset()
+        {
+            BiomeNoise.Seed = (int)World.Seed;
+            Amplification();
         }
 
         static BiomeManage()

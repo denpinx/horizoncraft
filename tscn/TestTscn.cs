@@ -97,7 +97,7 @@ public partial class TestTscn : Node2D
         for (int i = 0; i < count; i++)
         {
             StructManage.GetStruct("oak_tree", i, 0, 0, random);
-        }
+        }   
 
         stopwatch.Stop();
         Log($"单线程生成 {count} 结构{stopwatch.Elapsed.TotalMilliseconds} ms");
