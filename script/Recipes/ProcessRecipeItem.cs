@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using horizoncraft.script.Inventory;
-using YamlDotNet.Core.Tokens;
 
 namespace horizoncraft.script.Recipes;
 

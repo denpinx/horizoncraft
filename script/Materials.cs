@@ -9,7 +9,6 @@ using horizoncraft.script.Inventory;
 using horizoncraft.script.Utility;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Struct;
-using YamlDotNet;
 
 namespace horizoncraft.script
 {
