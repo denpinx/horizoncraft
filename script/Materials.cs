@@ -13,14 +13,12 @@ using horizoncraft.script.WorldControl.Struct;
 namespace horizoncraft.script
 {
     /// <summary>
-    /// 更新:使用 tres作为配置文件，放弃json
+    /// 各种元数据
     /// </summary>
     public class Materials
     {
         public static TileSet tileSet;
-        // public static List<BlockMeta> BlockMetas = new();
-        // public static List<ItemMeta> ItemMetas = new();
-
+        
         public static Dictionary<string, ItemMeta> ItemMetas = new();
         public static Dictionary<string, BlockMeta> BlockMetas = new();
 

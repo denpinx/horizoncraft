@@ -9,10 +9,10 @@ namespace horizoncraft.script.Recipes;
 /// 支持把不同目录的json文件，的相同配方类型给自动合并，一个json既支持只写一个，多个json也可以对同一个类型添加
 /// 本质上每个json文件都是对某个配方类型的追加，不会重复。
 /// </summary>
-public class RecipeManage
+public static class RecipeManage
 {
-    private static List<ProcessRecipePack> ProcessRecipes = new List<ProcessRecipePack>();
-    private static List<GridRecipePack> GridRecipes = new List<GridRecipePack>();
+    private static readonly List<ProcessRecipePack> ProcessRecipes = new List<ProcessRecipePack>();
+    private static readonly List<GridRecipePack> GridRecipes = new List<GridRecipePack>();
 
 
     public static GridRecipeItem MatchGridRecipe(ItemStack[,] items, string tag)

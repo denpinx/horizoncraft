@@ -26,7 +26,7 @@ public static class ComponentManager
     /// 处理实体组件事件
     /// </summary>
     /// <param name="entitySystemEvent">实体事件</param>
-    /// <returns></returns>
+    /// <returns>是否有组件的系统取消事件</returns>
     public static bool ExecuteEntityComponents(EntitySystemEvent entitySystemEvent)
     {
         foreach (var com in entitySystemEvent.EntityData.Components)
@@ -48,7 +48,7 @@ public static class ComponentManager
     /// <param name="playerEvent">玩家事件</param>
     /// <param name="itemStack">物品</param>
     /// <typeparam name="T">类型</typeparam>
-    /// <returns></returns>
+    /// <returns>是否有组件的系统取消事件</returns>
     public static bool ExecuteItemComponents<T>(PlayerEvent playerEvent, ItemStack itemStack)
     {
         string start_id = itemStack.Name;
@@ -83,7 +83,7 @@ public static class ComponentManager
     /// </summary>
     /// <param name="playerEvent">玩家事件</param>
     /// <param name="itemStack">物品</param>
-    /// <returns></returns>
+    /// <returns>是否有组件的系统取消事件</returns>
     public static bool ExecuteItemComponents(PlayerEvent playerEvent, ItemStack itemStack)
     {
         string primName = itemStack.Name;
@@ -114,7 +114,7 @@ public static class ComponentManager
     /// </summary>
     /// <param name="worldEvent">方块事件</param>
     /// <param name="blockData">方块</param>
-    /// <returns></returns>
+    /// <returns>是否有组件的系统取消事件或执行失败</returns>
     public static bool ExecuteBlockComponents(WorldEvent worldEvent, BlockData blockData)
     {
         string start_id = blockData.Id;
@@ -144,7 +144,7 @@ public static class ComponentManager
     }
 
     /// <summary>
-    /// 设置方块组件数据
+    /// 设置方块组件数据,通常用来给客户端玩家用菜单远程配置服务端的某个组件值用的。
     /// </summary>
     /// <param name="player">玩家</param>
     /// <param name="blockData">方块</param>
@@ -177,7 +177,7 @@ public static class ComponentManager
     /// 注册组件功能
     /// </summary>
     /// <param name="key">功能名</param>
-    /// <param name="func">组件</param>
+    /// <param name="func">组件，目前没有任何作用，只是用来声明这个system只支持这个类型用的，并不会用这个来构建组件</param>
     /// <param name="System">处理方法</param>
     public static void Register(String key, Func<Component> func, IComponentSystem System)
     {
@@ -185,7 +185,7 @@ public static class ComponentManager
         {
             GetComponect = func,
             system = System,
-        }); 
+        });
     }
 
     //绑定组件功能和组件类型

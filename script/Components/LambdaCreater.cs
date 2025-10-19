@@ -10,6 +10,9 @@ using Expression = System.Linq.Expressions.Expression;
 
 namespace horizoncraft.script.Components
 {
+    /// <summary>
+    /// 用于使用集合配置来构建含有初始化配置的对象，获取极致的可配置性，以及高性能。
+    /// </summary>
     public static class LambdaCreater
     {
         const string TypeNamespace = "horizoncraft.script.Components";
@@ -17,11 +20,11 @@ namespace horizoncraft.script.Components
         /// <summary>
         /// 获取对象的表达式
         /// </summary>
-        /// <param name="collection"></param>
+        /// <param name="FromObject">对象，只能是 list<object> 和 Dictionary<string, object> 和一些基本类型</param>
         /// <returns></returns>
-        private static Expression GetObjcetExpression(object collection)
+        private static Expression GetObjcetExpression(object FromObject)
         {
-            if (collection is List<object> ls)
+            if (FromObject is List<object> ls)
             {
                 List<Expression> items = new();
                 foreach (var item in ls)
@@ -32,7 +35,8 @@ namespace horizoncraft.script.Components
                 var exp = Expression.ListInit(Expression.New(ls.GetType()), items.ToArray<Expression>());
                 return exp;
             }
-            else if (collection is Dictionary<string, object> map)
+
+            if (FromObject is Dictionary<string, object> map)
             {
                 var addmethod = map.GetType().GetMethod("Add");
                 List<ElementInit> items = new();
@@ -48,11 +52,9 @@ namespace horizoncraft.script.Components
                 var exp = Expression.ListInit(Expression.New(map.GetType()), items.ToArray());
                 return exp;
             }
+
             //非集合类型
-            else
-            {
-                return Expression.Constant(collection);
-            }
+            return Expression.Constant(FromObject);
         }
 
         /// <summary>
@@ -78,9 +80,9 @@ namespace horizoncraft.script.Components
         /// 用labmda构建对象只会相比原生new对象慢了20%。
         /// 
         /// </summary>
-        /// <param name="typename"></param>
-        /// <param name="cfg"></param>
-        /// <param name="lowercase"></param>
+        /// <param name="typename">类型名</param>
+        /// <param name="cfg">配置字典</param>
+        /// <param name="lowercase">是否忽略大小写</param>
         /// <returns></returns>
         public static Func<T> CreateLambda<T>(string typename, Dict cfg, bool lowercase = false)
         {
@@ -144,76 +146,6 @@ namespace horizoncraft.script.Components
             result();
             return result;
         }
-
-
-        /// <summary>
-        /// 通过表达式创建lambda
-        /// 内容为: ()=>new TypeName{属性};
-        /// 除了第一次调用之外，之后的调用都会接近原生创建对象
-        /// </summary>
-        /// <param name="typename">类型名</param>
-        /// <param name="cfg">属性字典</param>
-        /// <returns>lambda表达式</returns>
-        // public static Func<Component> CreateLambda(string typename, Dict cfg, bool lowercase = false)
-        // {
-        //     Type type = FindTypesInNamespaceGlobally(typename, TypeNamespace);
-        //     if (type == null)
-        //     {
-        //         GD.PrintErr($"{typename} 不存在于命名空间{TypeNamespace}中");
-        //         return null;
-        //     }
-        //
-        //     var newExpr = Expression.New(type);
-        //     var bindings = new List<MemberBinding>();
-        //     foreach (var kv in cfg)
-        //     {
-        //         var key = kv.Key.ToString();
-        //         var value = kv.Value;
-        //         MemberInfo member = null;
-        //         if (lowercase)
-        //         {
-        //             member = (MemberInfo)type.GetLowercaseField(key) ?? type.GetLowercaseProperty(key);
-        //             if (member == null)
-        //             {
-        //                 member = (MemberInfo)type.GetField(key) ?? type.GetProperty(key);
-        //             }
-        //         }
-        //         else
-        //         {
-        //             member = (MemberInfo)type.GetField(key) ?? type.GetProperty(key);
-        //             if (member == null)
-        //             {
-        //                 member = (MemberInfo)type.GetLowercaseField(key) ?? type.GetLowercaseProperty(key);
-        //             }
-        //         }
-        //
-        //         if (member == null) continue;
-        //
-        //         var targetType = member switch
-        //         {
-        //             FieldInfo f => f.FieldType,
-        //             PropertyInfo p => p.PropertyType,
-        //             _ => null
-        //         };
-        //         if (targetType == null) continue;
-        //
-        //         //防止输入类型和实际类型不符
-        //         object ResultValue = value;
-        //         if (value.GetType() != targetType)
-        //         {
-        //             ResultValue = Convert.ChangeType(value, targetType);
-        //         }
-        //
-        //         bindings.Add(Expression.Bind(member, Expression.Constant(ResultValue, targetType)));
-        //     }
-        //
-        //     var body = Expression.MemberInit(newExpr, bindings);
-        //     var lambda = Expression.Lambda<Func<Component>>(body);
-        //     GD.Print(lambda.ToString());
-        //     var result = lambda.Compile();
-        //     _ = result();
-        //     return result;
-        // }
 
         /// <summary>
         /// 获取命名空间下的指定名称的类型.
