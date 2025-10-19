@@ -13,19 +13,22 @@ public partial class ItemManage : HBoxContainer, ITranslatable
 {
     private PackedScene _packedSceneInvSlot = GD.Load<PackedScene>("res://tscn/Menu/InvSlot.tscn");
     private PlayerNode _player;
-    [Export]private GridContainer _GridContainer;
-    [Export]private Button _buttonMode0;
-    [Export]private Button _buttonMode1;
-    [Export]private Button _buttonClear;
-    [Export]private Button _buttonSort;
-    [Export]private Button _buttonLight0;
-    [Export]private Button _buttonLight1;
-    [Export]private Button _buttonLight2;
-    [Export]private Button _NextPage;
-    [Export]private Button _LastPage;
-    [Export]private LineEdit _LineEdit_FilterText;
-    [Export]private ReciperView _RecipeView;
-    
+    [Export] private GridContainer _GridContainer;
+    [Export] private Button _buttonMode0;
+    [Export] private Button _buttonMode1;
+    [Export] private Button _buttonClear;
+    [Export] private Button _buttonSort;
+    [Export] private Button _buttonLight0;
+    [Export] private Button _buttonLight1;
+    [Export] private Button _buttonLight2;
+
+    [Export] private Button _buttonHungerClear;
+    [Export] private Button _buttonHealthClear;
+
+    [Export] private Button _NextPage;
+    [Export] private Button _LastPage;
+    [Export] private LineEdit _LineEdit_FilterText;
+    [Export] private ReciperView _RecipeView;
     private int _page_Columnh = 16;
     private int _page = 0;
     private string FilterText = "";
@@ -119,6 +122,10 @@ public partial class ItemManage : HBoxContainer, ITranslatable
             FilterText = _LineEdit_FilterText.Text;
             UpdatePage();
         };
+
+        _buttonHungerClear.Pressed += () => { _player.playerData.Hunger.Value = 0; };
+        _buttonHealthClear.Pressed += () => { _player.playerData.Health.Value = 0; };
+
         _LineEdit_FilterText.FocusEntered += () => _player.Inputable = false;
         _LineEdit_FilterText.FocusExited += () => _player.Inputable = true;
         UpdatePage();

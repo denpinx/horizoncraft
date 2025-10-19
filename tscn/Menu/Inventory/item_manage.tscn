@@ -12,7 +12,7 @@ bg_color = Color(1, 1, 1, 0.0941176)
 [sub_resource type="LabelSettings" id="LabelSettings_xt4xo"]
 font_size = 32
 
-[node name="ItemManage" type="HBoxContainer" node_paths=PackedStringArray("_GridContainer", "_buttonMode0", "_buttonMode1", "_buttonClear", "_buttonSort", "_buttonLight0", "_buttonLight1", "_buttonLight2", "_NextPage", "_LastPage", "_LineEdit_FilterText", "_RecipeView")]
+[node name="ItemManage" type="HBoxContainer" node_paths=PackedStringArray("_GridContainer", "_buttonMode0", "_buttonMode1", "_buttonClear", "_buttonSort", "_buttonLight0", "_buttonLight1", "_buttonLight2", "_buttonHungerClear", "_buttonHealthClear", "_NextPage", "_LastPage", "_LineEdit_FilterText", "_RecipeView")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -27,6 +27,8 @@ _buttonSort = NodePath("PanelContainer2/VBoxContainer/HBoxContainer2/Button_sort
 _buttonLight0 = NodePath("PanelContainer2/VBoxContainer/HBoxContainer3/Button_Light_0")
 _buttonLight1 = NodePath("PanelContainer2/VBoxContainer/HBoxContainer3/Button_Light_1")
 _buttonLight2 = NodePath("PanelContainer2/VBoxContainer/HBoxContainer3/Button_Light_2")
+_buttonHungerClear = NodePath("PanelContainer2/VBoxContainer/HBoxContainer4/Button_Hunger_Clear")
+_buttonHealthClear = NodePath("PanelContainer2/VBoxContainer/HBoxContainer4/Button_Health_Clear")
 _NextPage = NodePath("PanelContainer/VBoxContainer/HBoxContainer/Button_Next_Page")
 _LastPage = NodePath("PanelContainer/VBoxContainer/HBoxContainer/Button_Last_Page")
 _LineEdit_FilterText = NodePath("PanelContainer/VBoxContainer/PanelContainer/LineEdit")
@@ -90,6 +92,21 @@ text = "光线投射"
 layout_mode = 2
 size_flags_horizontal = 3
 text = "深度优先"
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="PanelContainer2/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="Button_Hunger_Clear" type="Button" parent="PanelContainer2/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "饥饿值清空"
+
+[node name="Button_Health_Clear" type="Button" parent="PanelContainer2/VBoxContainer/HBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "生命值清空
+"
 
 [node name="AspectRatioContainer" type="AspectRatioContainer" parent="."]
 layout_mode = 2

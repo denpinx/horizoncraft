@@ -1,0 +1,29 @@
+using Godot;
+using Godot.NativeInterop;
+using horizoncraft.script.Components.Item;
+using horizoncraft.script.Events.player;
+
+namespace horizoncraft.script.Components.Systems.ItemSystems;
+
+public class ItemEatableSystem : ItemComponentSystem
+{
+    public override bool OnItemUse(PlayerUseItemEvent playerUseItemEvent, ItemComponent itemComponent)
+    {
+        var player = playerUseItemEvent.Player;
+        if (itemComponent is ItemEatableComponent iec)
+        {
+            if (player.Hunger.Value >= player.Hunger.Default)
+            {
+                GD.Print("状态已满，不需要食用");
+                return false;
+            }
+
+            player.Hunger.Value += iec.Hunger;
+            playerUseItemEvent.UseItemStack.Amount -= 1;
+            GD.Print("食用物品");
+            return true;
+        }
+
+        return false;
+    }
+}

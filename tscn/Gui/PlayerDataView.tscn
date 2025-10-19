@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://nthrohnlpkux"]
+[gd_scene load_steps=16 format=3 uid="uid://nthrohnlpkux"]
 
 [ext_resource type="Script" uid="uid://qcrt4g08ahc3" path="res://tscn/Gui/PlayerDataView.cs" id="1_7ag6m"]
 [ext_resource type="Texture2D" uid="uid://c3qeypa70wjub" path="res://texture/Gui/icos.png" id="1_hj48k"]
@@ -18,11 +18,8 @@ load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.cte
 atlas = SubResource("CompressedTexture2D_fmem7")
 region = Rect2(80, 0, 16, 16)
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_adf8v"]
-load_path = "res://.godot/imported/icos.png-1e6567c6e17902735c7f3d24574d7bad.ctex"
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_6fmhx"]
-atlas = SubResource("CompressedTexture2D_adf8v")
+atlas = ExtResource("1_hj48k")
 region = Rect2(64, 0, 16, 16)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_hj48k"]
@@ -111,6 +108,7 @@ texture_under = SubResource("AtlasTexture_0dmg8")
 texture_progress = SubResource("AtlasTexture_6fmhx")
 
 [node name="Progress_Thirst" type="TextureProgressBar" parent="VBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_horizontal = 0
@@ -123,6 +121,7 @@ texture_under = SubResource("AtlasTexture_fmem7")
 texture_progress = SubResource("AtlasTexture_adf8v")
 
 [node name="Progress_Exp" type="TextureProgressBar" parent="VBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(512, 32)
 layout_mode = 2
 tooltip_text = "口渴值"

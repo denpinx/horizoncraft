@@ -28,6 +28,11 @@ public class ItemComponentSystem : IComponentSystem
             {
                 return OnPlaceBlock(pbe, ic);
             }
+
+            if (playerEvent is PlayerUseItemEvent puie)
+            {
+                return OnItemUse(puie, ic);
+            }
         }
 
         return true;
@@ -44,10 +49,17 @@ public class ItemComponentSystem : IComponentSystem
 
     public virtual bool OnBreakBlock(PlayerBreakblockEvent bbe, ItemComponent itemComponent)
     {
+        var block = bbe.GetBlockData();
+        if (block != null) bbe.DropLoots = (block.BlockMeta.LootTable.TryTakeItem(block.State));
         return true;
     }
 
     public virtual bool OnPlaceBlock(PlayerPlaceBlockEvent pbe, ItemComponent itemComponent)
+    {
+        return true;
+    }
+
+    public virtual bool OnItemUse(PlayerUseItemEvent playerUseItemEvent, ItemComponent itemComponent)
     {
         return true;
     }

@@ -38,8 +38,11 @@ public class ItemMeta
             Name = Name,
             Amount = 1,
         };
-        foreach (var component in Components)
-            item.Components.Add(component());
+        foreach (var func in Components)
+        {
+            var result = func();
+            item.Components.Add(result);
+        }
         return item;
     }
 
@@ -47,5 +50,22 @@ public class ItemMeta
     {
         if (Tags.ContainsKey(name)) return Tags[name];
         return null;
+    }
+
+    public bool AddItemComponentBuildFunc(Func<Component> func)
+    {
+        //构建-预览
+        var result = func();
+        if (result is ItemComponent)
+        {
+            var result_type = result.GetType();
+            var itemcmp = Components.Find(cmp => cmp().GetType() == result_type);
+            if (itemcmp != null) return false;
+            GD.Print($"方块组件 to 物品组件 {result.Name} {result}");
+            Components.Add(func);
+            return true;
+        }
+        
+        return false;
     }
 }

@@ -99,12 +99,18 @@ namespace horizoncraft.script
                     RegItemMeta(itemMeta);
                     itemMeta.BlockMeta = meta;
                     meta.ItemMeta = itemMeta;
+
+                    foreach (var func in meta.Components)
+                        itemMeta.AddItemComponentBuildFunc(func);
                 }
                 else
                 {
                     //更新
                     ItemMetas[meta.Name].BlockMeta = meta;
                     meta.ItemMeta = ItemMetas[meta.Name];
+                    
+                    foreach (var func in meta.Components)
+                        ItemMetas[meta.Name].AddItemComponentBuildFunc(func);
                 }
             }
             else
@@ -152,7 +158,7 @@ namespace horizoncraft.script
                     Replaceable = true,
                     blockTileDatas = new List<BlockTileSet>()
                     {
-                        new  BlockTileSet()
+                        new BlockTileSet()
                         {
                             texture_name = "air",
                             tile_size = 1,

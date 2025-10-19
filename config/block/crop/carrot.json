@@ -13,6 +13,15 @@
         "GroupChance": 0.5,
         "StateMax": 8,
         "GrowthMax": 16
+      },
+      "ItemEatableComponent": {
+        "Name": "ItemEatableComponent",
+        "UseTime": 1,
+        "Hunger": 5
+      },
+      "BlockRelyOnComponent": {
+        "Name": "BottomMatch",
+        "RelyOnBlockName": "farmland"
       }
     },
     "loot": [

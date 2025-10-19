@@ -226,8 +226,14 @@ public class PlayerEvents
         BlockMeta bm = item.GetBlockMeta();
         if (bm == null) return false;
 
+        e.Position = pos;
+        
+        if (item.Components.Count > 0)
+            if (!ComponentManager.ExecuteItemComponents(e, item))
+                return false;
+
         e.ChunkService.SetBlock(pos, bm);
-        e.ChunkService.PassiveUpdateNeighborBlock(e.Position);
+        e.ChunkService.PassiveUpdateNeighborBlock(pos);
 
         if (e.Player.Mode == 0)
         {

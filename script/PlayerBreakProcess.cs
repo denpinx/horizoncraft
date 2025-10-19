@@ -17,6 +17,7 @@ public class PlayerActionProcess
 
 public enum PlayerAction
 {
+    None,
     BreakBlock,
     UseItem
 }

@@ -72,6 +72,7 @@ public partial class PlayerNode : CharacterBody2D
     [Export] Label Label_PlayerName;
     [Export] Sprite2D sprite2D_body;
     [Export] public Sprite2D Cursor;
+    [Export] public Sprite2D Use_Process;
     [Export] public HotBar hotBar;
     [Export] Camera2D camera2d;
     //
@@ -110,11 +111,18 @@ public partial class PlayerNode : CharacterBody2D
         if (Input.IsActionPressed("placeblock") && playerData != null && OpeningInventoryNode == null &&
             OvrCanvasLayer.GetChildCount() == 0)
         {
-            OnMouseRightClick(coord, delta);
+            if (!OnMouseRightClick(coord, delta))
+            {
+            }
+
             LastFramIsRight = true;
         }
         else
         {
+            if (ActionProcess.State == PlayerAction.UseItem && ActionProcess.ProcessTime > 0)
+            {
+                ActionProcess.ProcessTime = 0;
+            }
             LastFramIsRight = false;
         }
 
@@ -226,53 +234,53 @@ public partial class PlayerNode : CharacterBody2D
                 world.Service.PlayerService.Events.BreakBlock(bbe);
                 ActionProcess.ProcessTime = 0;
                 ActionProcess.FinalTime = 2;
+                return;
             }
             else if (ActionProcess.ProcessTime > 0)
             {
                 ActionProcess.ProcessTime += (float)delta;
                 if (ActionProcess.Position != finalpos)
                     ActionProcess.Reset();
+                return;
             }
+        }
+
+        if (!world.Service.ChunkService.CheckIsCloseBlock(finalpos))
+        {
+            var meta = InterfaceBlock.BlockMeta;
+            float efficiency = 1f;
+            float gap = meta.BreakLevel;
+
+            var durable = playerData.Inventory.GetToolBarItem()?.GetComponent<ItemDurableComponent>();
+            if (durable != null)
+            {
+                string tag = InterfaceBlock.GetTag("type");
+                if ((tag != null && durable.HasTag(tag)) || durable.HasTag("any"))
+                    efficiency = 1f + durable.Efficiency * 0.25f;
+                else
+                {
+                    GD.Print("not has tag");
+                }
+
+                gap = meta.BreakLevel - durable.ToolLevel;
+            }
+
+            //工具等级差距过大
+            if (gap > 1) return;
+            ActionProcess.State = PlayerAction.BreakBlock;
+            ActionProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity / efficiency;
+            ActionProcess.Position = finalpos;
+            ActionProcess.ProcessTime += (float)delta;
+            if (playerData.Mode == 1) ActionProcess.FinalTime = 0;
         }
         else
         {
-            if (!world.Service.ChunkService.CheckIsCloseBlock(finalpos))
-            {
-                var meta = InterfaceBlock.BlockMeta;
-                float efficiency = 1f;
-                float gap = meta.BreakLevel;
-
-                var durable = playerData.Inventory.GetToolBarItem()?.GetComponent<ItemDurableComponent>();
-                if (durable != null)
-                {
-                    string tag = InterfaceBlock.GetTag("type");
-                    if ((tag != null && durable.HasTag(tag)) || durable.HasTag("any"))
-                        efficiency = 1f + durable.Efficiency * 0.25f;
-                    else
-                    {
-                        GD.Print("not has tag");
-                    }
-
-                    gap = meta.BreakLevel - durable.ToolLevel;
-                }
-
-                //工具等级差距过大
-                if (gap > 1) return;
-                ActionProcess.State = PlayerAction.BreakBlock;
-                ActionProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity / efficiency;
-                ActionProcess.Position = finalpos;
-                ActionProcess.ProcessTime += (float)delta;
-                if (playerData.Mode == 1) ActionProcess.FinalTime = 0;
-            }
-            else
-            {
-                Cursor.Frame = 1;
-            }
+            Cursor.Frame = 1;
         }
     }
 
     //鼠标右键
-    private void OnMouseRightClick(Vector2I coord, double delta)
+    private bool OnMouseRightClick(Vector2I coord, double delta)
     {
         var targetpos = new Vector3I(coord.X, coord.Y, 0);
         bool coercivePlace = false;
@@ -305,7 +313,7 @@ public partial class PlayerNode : CharacterBody2D
             });
 
         //使用物品和放置方块不冲突，如果物品在放置方块时被消耗了，这个正常是不会触发的。
-        var handitem = playerData.Inventory.GetHandItemStack();
+        var handitem = playerData.Inventory.GetToolBarItem();
         if (handitem != null)
         {
             var cmp = handitem.GetComponent<ItemUsefulComponent>();
@@ -325,16 +333,22 @@ public partial class PlayerNode : CharacterBody2D
                         };
                         world.Service.PlayerService.Events.UseItem(puie);
                         ActionProcess.Reset();
+                        return true;
                     }
                 }
                 else
                 {
+                    GD.Print(ActionProcess.State);
                     ActionProcess.State = PlayerAction.UseItem;
                     ActionProcess.FinalTime = cmp.UseTime;
                     ActionProcess.ProcessTime = 0;
+                    return true;
                 }
             }
         }
+
+        //ActionProcess.State = PlayerAction.None;
+        return false;
     }
 
     //处理输入
@@ -562,12 +576,40 @@ public partial class PlayerNode : CharacterBody2D
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
         );
 
+
         float progress = ActionProcess.ProcessTime / ActionProcess.FinalTime;
         if (progress > 1) progress = 1;
-        if (ActionProcess.ProcessTime > 0)
-            Cursor.Frame = 1 + (int)(8 * progress);
-        else Cursor.Frame = 0;
-        Cursor.GlobalPosition = new Vector2(coord.X, coord.Y) * 16;
+
+        if (ActionProcess.State == PlayerAction.BreakBlock)
+        {
+            Use_Process.Visible = false;
+            if (ActionProcess.ProcessTime > 0)
+            {
+                Cursor.Visible = true;
+                Cursor.Frame = 1 + (int)(8 * progress);
+            }
+            else Cursor.Frame = 0;
+
+            Cursor.GlobalPosition = new Vector2(coord.X, coord.Y) * 16;
+        }
+
+        if (ActionProcess.State == PlayerAction.UseItem)
+        {
+            Cursor.Visible = false;
+            if (ActionProcess.ProcessTime > 0)
+            {
+                Use_Process.Visible = true;
+                Use_Process.Frame = (int)(14 * progress);
+            }
+            else
+            {
+                Use_Process.Visible = false;
+                Use_Process.Frame = 0;
+            }
+
+            Use_Process.GlobalPosition = new Vector2(coord.X, coord.Y) * 16;
+        }
+
 
         var blockBack = world.Service.ChunkService.GetBlock(new Vector3I(coord.X, coord.Y, 0));
         var BlockFont = world.Service.ChunkService.GetBlock(new Vector3I(coord.X, coord.Y, 1));

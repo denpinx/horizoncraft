@@ -94,6 +94,17 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                         player.Health.Value -= 1f;
                     }
                 }
+                else
+                {
+                    //缓慢回复血量
+                    if (player.Health.Value < player.Health.Default)
+                    {
+                        if (Random.Shared.Next(40) == 0)
+                        {
+                            player.Health.Value += 0.5f;
+                        }
+                    }
+                }
 
                 if (player.Health.Value <= 0)
                 {
@@ -108,6 +119,20 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                 if (TrySearchSpawn(player, pos.ToVector2I()))
                 {
                     player.State = PlayerState.Live;
+                    GD.Print("Hunger" + player.Hunger.Value);
+                    GD.Print("Health" + player.Health.Value);
+                    GD.Print("Fly" + player.Fly.Value);
+
+
+                    player.Hunger.Reset();
+                    player.Health.Reset();
+                    player.Fly.Reset();
+                    player.Resistance.Reset();
+
+                    GD.Print("Hunger" + player.Hunger.Value);
+                    GD.Print("Health" + player.Health.Value);
+                    GD.Print("Fly" + player.Fly.Value);
+
                     player.Update = true;
                     OnPlayerRespawn(player);
                     GD.Print($"寻找复活点成功{pos.ToString()}");

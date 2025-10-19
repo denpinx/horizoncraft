@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://dlka0sc4kl0vb"]
+[gd_scene load_steps=33 format=3 uid="uid://dlka0sc4kl0vb"]
 
 [ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/PlayerNode.cs" id="1_knoa1"]
 [ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="1_qob58"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://bjob2f4yubx5t" path="res://tscn/Body.cs" id="7_7twa1"]
 [ext_resource type="PackedScene" uid="uid://nthrohnlpkux" path="res://tscn/Gui/PlayerDataView.tscn" id="7_34em8"]
 [ext_resource type="Texture2D" uid="uid://yv22qd68ymlw" path="res://texture/item/stone_pickaxe.png" id="9_knoa1"]
+[ext_resource type="Texture2D" uid="uid://dl1tr8hwuxdbl" path="res://texture/use_process.png" id="10_56q24"]
 [ext_resource type="PackedScene" uid="uid://c6e02cn0ir7nl" path="res://tscn/Menu/LoadingMenu.tscn" id="11_qpm1p"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_rnaqb"]
@@ -269,7 +270,7 @@ _data = {
 &"break": SubResource("Animation_7twa1")
 }
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("ChatView", "animationPlayer_other", "animationPlayer_move", "BlockInfoView", "collisionShape2D", "OvrCanvasLayer", "Timer_Tick", "Label_DEBUG_Right", "Label_DEBUG_Left", "Label_PlayerName", "sprite2D_body", "Cursor", "hotBar", "camera2d")]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("ChatView", "animationPlayer_other", "animationPlayer_move", "BlockInfoView", "collisionShape2D", "OvrCanvasLayer", "Timer_Tick", "Label_DEBUG_Right", "Label_DEBUG_Left", "Label_PlayerName", "sprite2D_body", "Cursor", "Use_Process", "hotBar", "camera2d")]
 top_level = true
 z_index = 10
 collision_layer = 2
@@ -285,7 +286,8 @@ Label_DEBUG_Right = NodePath("CanvasLayer/Control/Label_DEBUG_Right")
 Label_DEBUG_Left = NodePath("CanvasLayer/Control/Label_DEBUG_Left")
 Label_PlayerName = NodePath("Label_PlayerName")
 sprite2D_body = NodePath("Body")
-Cursor = NodePath("Cursor")
+Cursor = NodePath("Break_Process")
+Use_Process = NodePath("Use_Process")
 hotBar = NodePath("GuidCanvasLayer/HotBar")
 camera2d = NodePath("Camera2D")
 metadata/_edit_vertical_guides_ = [575.0]
@@ -407,11 +409,19 @@ text = "提示: 按住[shift],可以仅在背景墙放置方块，和仅破坏�
 target_position = Vector2(128, 0)
 metadata/_edit_lock_ = true
 
-[node name="Cursor" type="Sprite2D" parent="."]
+[node name="Break_Process" type="Sprite2D" parent="."]
 position = Vector2(-20, -191)
 texture = ExtResource("5_gqu4d")
 centered = false
 hframes = 10
+metadata/_edit_lock_ = true
+
+[node name="Use_Process" type="Sprite2D" parent="."]
+position = Vector2(-20, -191)
+texture = ExtResource("10_56q24")
+centered = false
+hframes = 15
+frame = 14
 metadata/_edit_lock_ = true
 
 [node name="Body" type="Sprite2D" parent="."]

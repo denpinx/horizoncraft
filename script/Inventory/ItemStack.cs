@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using horizoncraft.script.Components;
 using horizoncraft.script.Components.EntityComponents;
+using horizoncraft.script.Components.Interfaces;
 using horizoncraft.script.Entity;
 using horizoncraft.script.Net;
 using MemoryPack;
@@ -20,29 +22,33 @@ public partial class ItemStack
     public ItemMeta GetItemMeta() => Materials.ItemMetas[Name];
     public BlockMeta GetBlockMeta() => GetItemMeta().BlockMeta;
 
-    //深拷贝
+    //拷贝
     public ItemStack Copy(int amount = 0)
     {
         var item = GetItemMeta().GetItemStack();
         item.Amount = amount == 0 ? Amount : amount;
         item.State = State;
-        item.Components.Clear();
-        foreach (var component in this.Components)
-            item.Components.Add(((ItemComponent)component).Copy());
+        //todo 组件是否应该支持运行时状态复制？还是不应该复制组件？直接重构？
+        //item.Components.Clear();
+        // foreach (var component in Components)
+        //     if (component is ICopy copy)
+        //         item.Components.Add(copy.Copy());
         return item;
     }
 
     public T GetComponent<T>() where T : Component
     {
-        var result = Components.Find(cmp => cmp is T);
-        if (result != null) return result as T;
+        foreach (var cmp in Components)
+            if (cmp is T t)
+                return t;
         return null;
     }
 
     public T GetComponent<T>(string name) where T : Component
     {
-        var result = Components.Find(cmp => cmp is T && cmp.Name == name);
-        if (result != null) return result as T;
+        foreach (var cmp in Components)
+            if (cmp is T t && t.Name == name)
+                return t;
         return null;
     }
 

@@ -9,7 +9,7 @@ public partial class ConfigSet<T>
     public T Default;
     public void Reset()
     {
-        Value = default;
+        Value = Default;
     }
 
     public bool IsDefault()

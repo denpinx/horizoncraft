@@ -1,12 +1,14 @@
 using System.ComponentModel.DataAnnotations;
+using horizoncraft.script.Components.Interfaces;
 using MemoryPack;
 
 namespace horizoncraft.script.Components.Item;
+
 /// <summary>
-/// 物品工具/耐久组件
+/// 物品工具/耐久组件   
 /// </summary>
 [MemoryPackable]
-public partial class ItemDurableComponent : ItemComponent
+public partial class ItemDurableComponent : ItemComponent, ICopy
 {
     public int Max;
     public int Value;
@@ -22,7 +24,7 @@ public partial class ItemDurableComponent : ItemComponent
 
     [MemoryPackIgnore] public string[] _tag_;
 
-    public override ItemComponent Copy()
+    public Component Copy()
     {
         return new ItemDurableComponent()
         {

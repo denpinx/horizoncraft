@@ -24,6 +24,8 @@ namespace horizoncraft.script.Components
     [MemoryPackUnion(11, typeof(ReactiveComponent))]
     [MemoryPackUnion(12, typeof(CropGrowComponent))]
     [MemoryPackUnion(13, typeof(ItemUsefulComponent))]
+    [MemoryPackUnion(14, typeof(ItemEatableComponent))]
+    [MemoryPackUnion(15, typeof(BlockRelyOnComponent))]
     public abstract partial class Component
     {
         public string Name;
