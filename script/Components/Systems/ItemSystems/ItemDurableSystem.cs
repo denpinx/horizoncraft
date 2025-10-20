@@ -13,16 +13,9 @@ public class ItemDurableSystem : ItemComponentSystem
         var durable = itemComponent as ItemDurableComponent;
         GD.Print($"[方块挖掘] 当前耐久{durable.Value}/{durable.Max}");
         if (bbe.GetBlockData().BlockMeta.BreakLevel <= durable.ToolLevel)
-        {
             //正常掉落
             bbe.DropLoots = bbe.GetBlockData().BlockMeta.LootTable.TryTakeItem(bbe.GetBlockData().State);
-            //bbe.DropItem = bbe.GetBlockData().BlockMeta.ItemMeta.GetItemStack();
-        }
-        else
-        {
-            //无掉落物
-            //bbe.DropItem = null;
-        }
+
 
         durable.Value -= 1;
         //这里Itemstack.Amount<=0时之后被获取时会被直接替换成null的

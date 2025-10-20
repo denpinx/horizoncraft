@@ -20,7 +20,7 @@ namespace horizoncraft.script.Components;
 
 public static class ComponentManager
 {
-    private static readonly Dictionary<string, ComponentAndSystem> ComponentSets = new();
+    private static readonly Dictionary<SystemEnum, ComponentAndSystem> ComponentSets = new();
 
     /// <summary>
     /// 处理实体组件事件
@@ -31,7 +31,7 @@ public static class ComponentManager
     {
         foreach (var com in entitySystemEvent.EntityData.Components)
         {
-            if (ComponentSets.TryGetValue(com.Name, out var value))
+            if (ComponentSets.TryGetValue(com.EnumId, out var value))
             {
                 entitySystemEvent.EntityComponent = com as EntityComponent;
                 var result = value.system.ExecuteEntityComponent(entitySystemEvent);
@@ -64,7 +64,7 @@ public static class ComponentManager
 
             if (component is not T) continue;
 
-            if (ComponentSets.TryGetValue(component.Name, out var value))
+            if (ComponentSets.TryGetValue(component.EnumId, out var value))
             {
                 //如果有任意一个组件取消了事件，之后的组件都不执行了
                 var s = value.system.ExecuteItemComponent(playerEvent, component);
@@ -96,7 +96,7 @@ public static class ComponentManager
                 return false;
             }
 
-            if (ComponentSets.TryGetValue(component.Name, out var value))
+            if (ComponentSets.TryGetValue(component.EnumId, out var value))
             {
                 var s = value.system.ExecuteItemComponent(playerEvent, component);
                 if (!s) return false;
@@ -128,9 +128,9 @@ public static class ComponentManager
                 return false;
             }
 
-            if (ComponentSets.ContainsKey(component.Name))
+            if (ComponentSets.ContainsKey(component.EnumId))
             {
-                var s = ComponentSets[component.Name].system.ExecuteBlockComponent(worldEvent, component);
+                var s = ComponentSets[component.EnumId].system.ExecuteBlockComponent(worldEvent, component);
                 //取消事件
                 if (!s) return false;
             }
@@ -164,7 +164,7 @@ public static class ComponentManager
 
             if (setComponentData.ComponentSets.TryGetValue(component.Name, out var dict))
             {
-                ComponentSets[component.Name].system.SetComponentValue(player, component, dict);
+                ComponentSets[component.EnumId].system.SetComponentValue(player, component, dict);
             }
             else
             {
@@ -176,14 +176,14 @@ public static class ComponentManager
     /// <summary>
     /// 注册组件功能
     /// </summary>
-    /// <param name="key">功能名</param>
-    /// <param name="func">组件，目前没有任何作用，只是用来声明这个system只支持这个类型用的，并不会用这个来构建组件</param>
-    /// <param name="System">处理方法</param>
-    public static void Register(String key, Func<Component> func, IComponentSystem System)
+    /// <param name="EnumId">枚举Id</param>
+    /// <param name="ComponentType">功能服务的组件类型</param>
+    /// <param name="System">系统</param>
+    public static void Register(SystemEnum EnumId, Type ComponentType, IComponentSystem System)
     {
-        ComponentSets.Add(key, new ComponentAndSystem()
+        ComponentSets.Add(EnumId, new ComponentAndSystem()
         {
-            GetComponect = func,
+            ComponentType = ComponentType,
             system = System,
         });
     }
@@ -192,90 +192,88 @@ public static class ComponentManager
     static ComponentManager()
     {
         //顶部方块覆盖组件
-        Register("BlockCover",
-            () => new ExpandComponent(),
+        Register(SystemEnum.BlockCover,
+            typeof(ExpandComponent),
             new BlockCoverSystem()
         );
         //方块扩散组件
-        Register("BlockSpread",
-            () => new ExpandComponent(),
+        Register(SystemEnum.BlockSpread,
+            typeof(ExpandComponent),
             new BlockSpreadSystem()
         );
         //底部检查组件
-        Register("BottomCheck",
-            () => new TickComponent(),
+        Register(SystemEnum.BottomCheck,
+            typeof(TickComponent),
             new BottomCheckSystem()
         );
         //流体组件，水流扩散
-        Register("FluidComponent",
-            () => new FluidComponent(),
+        Register(SystemEnum.FluidComponent,
+            typeof(FluidComponent),
             new FluidSystem()
         );
         //物理组件,模拟沙子掉落
-        Register("PhysicsComponent",
-            () => new PhysicsComponent(),
+        Register(SystemEnum.PhysicsComponent,
+            typeof(PhysicsComponent),
             new PhysicsSystem()
         );
         //箱子容器组件
-        Register("BoxComponent",
-            () => new InventoryComponent(),
+        Register(SystemEnum.BoxComponent,
+            typeof(InventoryComponent),
             new InventorySystem()
         );
         //熔炉组件
-        Register("FurnaceComponent",
-            () => new FurnaceComponent(),
+        Register(SystemEnum.FurnaceComponent,
+            typeof(FurnaceComponent),
             new FurnaceSystem()
         );
         //物流输入组件
-        Register("LogisticsInputComponent",
-            () => new TickComponent(),
+        Register(SystemEnum.LogisticsInputComponent,
+            typeof(TickComponent),
             new LogisticsInputSystem()
         );
         //工作台组件
-        Register("WorkBenchComponent",
-            () => new InventoryComponent(),
+        Register(SystemEnum.WorkBenchComponent,
+            typeof(InventoryComponent),
             new WorkBenchSystem()
         );
         //物品耐久&工具组件
-        Register("ItemDurableComponent",
-            () => new ItemDurableComponent(),
+        Register(SystemEnum.ItemDurableComponent,
+            typeof(ItemDurableComponent),
             new ItemDurableSystem()
         );
         //物品实体组件
-        Register("ItemEntityComponent",
-            () => new ItemEntityComponent(),
+        Register(SystemEnum.ItemEntityComponent,
+            typeof(ItemEntityComponent),
             new ItemEntitySystem()
         );
         //太阳能板组件
-        Register("SolarGenerator",
-            () => new EnergyUnitComponent(),
+        Register(SystemEnum.SolarGenerator,
+            typeof(EnergyUnitComponent),
             new SolarGeneratorSystem()
         );
         //能量线缆组件
-        Register("EnergyCable",
-            () => new EnergyUnitComponent(),
+        Register(SystemEnum.EnergyCable,
+            typeof(EnergyUnitComponent),
             new EnergyCableSystem()
         );
         //植作物生长组件
-        Register("CropGrowComponent",
-            () => new CropGrowComponent(),
+        Register(SystemEnum.CropGrowComponent,
+            typeof(CropGrowComponent),
             new CropGrowthSystem()
         );
         //可食用物品组件
         Register(
-            "ItemEatableComponent",
-            () => new ItemEatableComponent(),
+            SystemEnum.ItemEatableComponent,
+            typeof(ItemEatableComponent),
             new ItemEatableSystem()
         );
 
         //放置方块时的底部方块检查，确保方块被放置在了正确的方块之上。
-        Register("BottomMatch",
-            () => new BlockRelyOnComponent(),
+        Register(SystemEnum.BottomMatch,
+            typeof(BlockRelyOnComponent),
             new PlaceBlockBottomMatchSystem()
         );
-
-
         //被动测试组件
-        Register("TestReactiveSystem", () => new ReactiveComponent(), new TestReactiveSystem());
+        Register(SystemEnum.TestReactiveSystem, typeof(ReactiveComponent), new TestReactiveSystem());
     }
 }

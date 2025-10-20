@@ -119,19 +119,12 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                 if (TrySearchSpawn(player, pos.ToVector2I()))
                 {
                     player.State = PlayerState.Live;
-                    GD.Print("Hunger" + player.Hunger.Value);
-                    GD.Print("Health" + player.Health.Value);
-                    GD.Print("Fly" + player.Fly.Value);
 
-
+                    //重置玩家属性
                     player.Hunger.Reset();
                     player.Health.Reset();
                     player.Fly.Reset();
                     player.Resistance.Reset();
-
-                    GD.Print("Hunger" + player.Hunger.Value);
-                    GD.Print("Health" + player.Health.Value);
-                    GD.Print("Fly" + player.Fly.Value);
 
                     player.Update = true;
                     OnPlayerRespawn(player);

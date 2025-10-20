@@ -1,6 +1,7 @@
 using System;
 using MemoryPack;
 using System.Collections.Generic;
+using Godot.NativeInterop;
 using horizoncraft.script.Components.BlockComponents;
 using horizoncraft.script.Components.EnergyBlocks;
 using horizoncraft.script.Components.EntityComponents;
@@ -28,6 +29,22 @@ namespace horizoncraft.script.Components
     [MemoryPackUnion(15, typeof(BlockRelyOnComponent))]
     public abstract partial class Component
     {
-        public string Name;
+        [MemoryPackAllowSerialize] private string _name;
+
+        [MemoryPackIgnore]
+        public string Name
+        {
+            get => _name;
+            init
+            {
+                _name = value;
+                if (SystemEnum.TryParse<SystemEnum>(value, out var id))
+                {
+                    EnumId = id;
+                }
+            }
+        }
+
+        public SystemEnum EnumId;
     }
 }

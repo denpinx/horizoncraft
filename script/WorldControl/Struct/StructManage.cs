@@ -65,10 +65,6 @@ public class StructManage
 
                     StaticBuildStructs.Add(staticBuildStruct.Name, staticBuildStruct);
                     GD.Print($"加载结构: {staticBuildStruct.Name},方块数量:{staticBuildStruct.blockStructItems.Count}");
-                    foreach (var block in staticBuildStruct.blockStructItems)
-                    {
-                        GD.Print($"{block.Key.ToString()} {block.Value.BlockMeta.Name}");
-                    }
                 }
             }
         }

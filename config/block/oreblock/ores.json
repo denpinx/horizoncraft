@@ -55,7 +55,7 @@
     "tag": {
       "type": "pickaxe"
     }
-  },  
+  },
   "gold_ore": {
     "rigidity": 1,
     "break-level": 2,
@@ -81,9 +81,11 @@
     "tag": {
       "type": "pickaxe"
     },
-    "loot": [{
-      "name": "diamond",
-      "drop-chance": 1
-    }]
+    "loot": [
+      {
+        "name": "diamond",
+        "drop-chance": 1
+      }
+    ]
   }
 }

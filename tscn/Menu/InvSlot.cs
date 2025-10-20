@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Text;
+using horizoncraft.script.Components.Interfaces;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.I18N;
 using horizoncraft.script.Inventory;
@@ -122,17 +123,19 @@ public partial class InvSlot : Control
                     ProgressBar.Visible = true;
                 }
                 else
-                {
                     ProgressBar.Visible = false;
-                }
-
-                stringBuilder.AppendLine("tip_item_tool_level".Trprefix("ui", durable.ToolLevel));
-                stringBuilder.AppendLine("tip_item_tool_type".Trprefix("ui", durable.Tag));
-                stringBuilder.AppendLine("tip_item_tool_durable".Trprefix("ui", durable.Value, durable.Max));
             }
             else
             {
                 ProgressBar.Visible = false;
+            }
+
+            foreach (var cmp in itemStack.Components)
+            {
+                if (cmp is ITip tip)
+                {
+                    stringBuilder.Append(tip.GetTip());
+                }
             }
 
             foreach (var kvp in itemStack.GetItemMeta().Tags)

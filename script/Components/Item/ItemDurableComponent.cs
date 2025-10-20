@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using horizoncraft.script.Components.Interfaces;
+using horizoncraft.script.I18N;
 using MemoryPack;
 
 namespace horizoncraft.script.Components.Item;
@@ -8,7 +9,7 @@ namespace horizoncraft.script.Components.Item;
 /// 物品工具/耐久组件   
 /// </summary>
 [MemoryPackable]
-public partial class ItemDurableComponent : ItemComponent, ICopy
+public partial class ItemDurableComponent : ItemComponent, ICopy, ITip
 {
     public int Max;
     public int Value;
@@ -17,8 +18,6 @@ public partial class ItemDurableComponent : ItemComponent, ICopy
 
     public int Efficiency;
 
-    // List<string> Tag;
-    // "ore|wood|others"
     public string Tag;
 
 
@@ -55,5 +54,13 @@ public partial class ItemDurableComponent : ItemComponent, ICopy
             if (str == tag)
                 return true;
         return false;
+    }
+
+    public string GetTip()
+    {
+        return
+            "tip_item_tool_level".Trprefix("ui", ToolLevel) + "\n" +
+            "tip_item_tool_type".Trprefix("ui", Tag) + "\n" +
+            "tip_item_tool_durable".Trprefix("ui", Value, Max) + "\n";
     }
 }
