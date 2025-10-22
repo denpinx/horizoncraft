@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.Threading.Tasks;
 using Godot;
 using Godot.NativeInterop;
 using horizoncraft.script;
 using horizoncraft.script.Entity;
+using horizoncraft.script.I18N;
 using horizoncraft.script.Net;
 using horizoncraft.script.NewProxy.player;
 using horizoncraft.script.rpc;
@@ -30,6 +33,8 @@ public abstract class WorldServiceBase
     /// 定义多少Tick为一天
     /// </summary>
     const int DayTicks = 20 * 60;
+
+    const int AutoSaveSeconds = 15;
 
     /// <summary>
     /// 当前世界的总时刻
@@ -64,12 +69,25 @@ public abstract class WorldServiceBase
     /// <summary>实体节点行为,定义不同策略下的实体同步行为</summary>
     public EntityBehaviorBase EntityBehavior;
 
+
+    private Stopwatch _stopwatch = new Stopwatch();
+
     public WorldServiceBase(World world)
     {
         this.World = world;
         LoadWorldProfile();
         BiomeManage.Reset();
+        world.timer.Timeout += WorldServiceTick;
     }
+
+
+    private void WorldServiceTick()
+    {
+        //自动保存
+        if (TickTimes % (20 * AutoSaveSeconds) == 1)
+            Save();
+    }
+
 
     public void InitializeNode()
     {
@@ -94,18 +112,28 @@ public abstract class WorldServiceBase
         return (T)service;
     }
 
+
     /// <summary>
     /// 保存所有实现了 ISave接口的服务。
     /// </summary>
-    public void Save()
+    public async void Save()
     {
+        List<Task> tasks = new();
+        _stopwatch.Restart();
         foreach (ServiceBase service in Services)
         {
             if (service is ISave save)
             {
-                save.SaveAll();
+                Task task = new Task(() => save.SaveAll());
+                tasks.Add(task);
+                task.Start();
             }
         }
+
+        await Task.WhenAll(tasks.ToArray());
+        _stopwatch.Stop();
+
+        GD.Print($"[{GetTime()}]保存结束。用时:{_stopwatch.Elapsed.Milliseconds}μs");
     }
 
     /// <summary>
@@ -120,7 +148,6 @@ public abstract class WorldServiceBase
             {
                 Profile = conn.GetWorldProfileByteData("WorldProfile");
                 Profile.LoadDate = DateTime.Now.ToString(CultureInfo.InvariantCulture);
-                GD.Print("加载WorldProfile");
                 conn.UpdateWorldProfileByteData("WorldProfile", Profile);
             }
             else
@@ -148,6 +175,11 @@ public abstract class WorldServiceBase
         return h is >= 6 and < 20;
     }
 
+    public float GetTimeMinute()
+    {
+        return (float)(TickTimes % ((float)DayTicks / 24));
+    }
+
     /// <summary>
     /// 获取当前的世界小时数
     /// </summary>
@@ -164,6 +196,11 @@ public abstract class WorldServiceBase
     public int GetTimeDay()
     {
         return (int)(((float)TickTimes / (float)DayTicks));
+    }
+
+    public string GetTime()
+    {
+        return "world_time".Trprefix("debug", GetTimeDay(), (int)GetTimeHour(), (int)GetTimeMinute());
     }
 
     /// <summary>

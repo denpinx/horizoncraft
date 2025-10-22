@@ -120,6 +120,29 @@
           }
         }
       },
+      "over-collide": {
+        "type": "array",
+        "description": "覆盖collide的具体到单个贴图的碰撞配置",
+        "items": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "integer"
+            },
+            "y": {
+              "type": "integer"
+            },
+            "collide": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "x",
+            "y",
+            "collide"
+          ]
+        }
+      },
       "state": {
         "type": "object",
         "description": "不同状态的不同贴图",

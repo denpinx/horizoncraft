@@ -21,5 +21,7 @@ public enum SystemEnum
     CropGrowComponent,
     ItemEatableComponent,
     BottomMatch,
+    DoorLinkPlace,
+    DoorLinkUpdate,
     TestReactiveSystem
 }

@@ -34,7 +34,6 @@ public class LootTable
 
                 foreach (var ac in item.AmountChances)
                 {
-                    GD.Print(ac.Amount, ac.Chance);
                     var amount_chance = System.Random.Shared.NextSingle();
                     if (ac.Chance * luck >= amount_chance)
                         amount += ac.Amount;

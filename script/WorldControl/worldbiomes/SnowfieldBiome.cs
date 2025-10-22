@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.WorldControl.Context;
-using horizoncraft.script.WorldControl.work;
-
 namespace horizoncraft.script.WorldControl.worldbiomes
 {
     public class SnowfieldBiome : LandBiome

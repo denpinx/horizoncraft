@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using horizoncraft.script.Components.BlockComponents;
 using horizoncraft.script.Components.EnergyBlocks;
 using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Components.Systems;
+using horizoncraft.script.Components.Systems.BlockSystems;
 using horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
 using horizoncraft.script.Components.Systems.BlockSystems.Reactive;
 using horizoncraft.script.Components.Systems.ItemSystems;
@@ -18,9 +20,12 @@ using horizoncraft.script.WorldControl;
 
 namespace horizoncraft.script.Components;
 
+/// <summary>
+/// 组件的系统管理器
+/// </summary>
 public static class ComponentManager
 {
-    private static readonly Dictionary<SystemEnum, ComponentAndSystem> ComponentSets = new();
+    private static readonly Dictionary<SystemEnum, SystemConfig> ComponentSets = new();
 
     /// <summary>
     /// 处理实体组件事件
@@ -34,7 +39,7 @@ public static class ComponentManager
             if (ComponentSets.TryGetValue(com.EnumId, out var value))
             {
                 entitySystemEvent.EntityComponent = com as EntityComponent;
-                var result = value.system.ExecuteEntityComponent(entitySystemEvent);
+                var result = value.System.ExecuteEntityComponent(entitySystemEvent);
                 if (!result) return false;
             }
         }
@@ -57,9 +62,11 @@ public static class ComponentManager
             Component component = itemStack.Components[i];
             if (component == null)
             {
-                GD.PrintErr("组件被异常删除!");
-                itemStack.Components.RemoveAt(i);
-                return false;
+                GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
+                GD.PrintErr($"\t item-name:\t{itemStack.Name}");
+                GD.PrintErr($"\t item-state:\t{itemStack.State}");
+                GD.PrintErr($"\t item-components:\t{string.Join(",", itemStack.Components.Select(c => c.Name))}");
+                continue;
             }
 
             if (component is not T) continue;
@@ -67,7 +74,7 @@ public static class ComponentManager
             if (ComponentSets.TryGetValue(component.EnumId, out var value))
             {
                 //如果有任意一个组件取消了事件，之后的组件都不执行了
-                var s = value.system.ExecuteItemComponent(playerEvent, component);
+                var s = value.System.ExecuteItemComponent(playerEvent, component);
                 if (!s) return false;
             }
 
@@ -92,13 +99,16 @@ public static class ComponentManager
             Component component = itemStack.Components[i];
             if (component == null)
             {
-                itemStack.Components.RemoveAt(i);
-                return false;
+                GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
+                GD.PrintErr($"\t item-name:\t{itemStack.Name}");
+                GD.PrintErr($"\t item-state:\t{itemStack.State}");
+                GD.PrintErr($"\t item-components:\t{string.Join(",", itemStack.Components.Select(c => c.Name))}");
+                continue;
             }
 
             if (ComponentSets.TryGetValue(component.EnumId, out var value))
             {
-                var s = value.system.ExecuteItemComponent(playerEvent, component);
+                var s = value.System.ExecuteItemComponent(playerEvent, component);
                 if (!s) return false;
             }
 
@@ -123,14 +133,20 @@ public static class ComponentManager
             Component component = blockData.Components[i];
             if (component == null)
             {
-                GD.PrintErr("组件被异常删除!");
-                blockData.Components.RemoveAt(i);
-                return false;
+                GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
+                GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
+                GD.PrintErr($"\t block-state:\t{blockData.State}");
+                GD.PrintErr(
+                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Name))}");
+                GD.PrintErr(
+                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Name))}");
+
+                continue;
             }
 
             if (ComponentSets.ContainsKey(component.EnumId))
             {
-                var s = ComponentSets[component.EnumId].system.ExecuteBlockComponent(worldEvent, component);
+                var s = ComponentSets[component.EnumId].System.ExecuteBlockComponent(worldEvent, component);
                 //取消事件
                 if (!s) return false;
             }
@@ -157,18 +173,25 @@ public static class ComponentManager
             Component component = blockData.Components[i];
             if (component == null)
             {
-                GD.PrintErr("组件被异常删除!");
-                blockData.Components.RemoveAt(i);
-                return;
+                GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(SetBlockComponentData)} 方块组件被意外删除。");
+                GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
+                GD.PrintErr($"\t block-state:\t{blockData.State}");
+                GD.PrintErr(
+                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Name))}");
+                GD.PrintErr(
+                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Name))}");
+                continue;
             }
 
             if (setComponentData.ComponentSets.TryGetValue(component.Name, out var dict))
             {
-                ComponentSets[component.EnumId].system.SetComponentValue(player, component, dict);
-            }
-            else
-            {
-                GD.Print("修改失败！不存在组件");
+                if (ComponentSets.TryGetValue(component.EnumId, out var cmp))
+                    cmp.System.SetComponentValue(player, component, dict);
+                else
+                {
+                    GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(SetBlockComponentData)} 没有对应的组件处理该方法。");
+                    GD.PrintErr($"\t component-name:\t{component.Name}");
+                }
             }
         }
     }
@@ -176,19 +199,19 @@ public static class ComponentManager
     /// <summary>
     /// 注册组件功能
     /// </summary>
-    /// <param name="EnumId">枚举Id</param>
-    /// <param name="ComponentType">功能服务的组件类型</param>
-    /// <param name="System">系统</param>
-    public static void Register(SystemEnum EnumId, Type ComponentType, IComponentSystem System)
+    /// <param name="enumId">枚举Id</param>
+    /// <param name="componentType">功能服务的组件类型</param>
+    /// <param name="system">系统</param>
+    private static void Register(SystemEnum enumId, Type componentType, IComponentSystem system)
     {
-        ComponentSets.Add(EnumId, new ComponentAndSystem()
+        ComponentSets.Add(enumId, new SystemConfig()
         {
-            ComponentType = ComponentType,
-            system = System,
+            MatchType = componentType,
+            System = system,
         });
     }
 
-    //绑定组件功能和组件类型
+    //绑定组件功能和组件类型，注意：不是所有组件都相互兼容。
     static ComponentManager()
     {
         //顶部方块覆盖组件
@@ -267,12 +290,23 @@ public static class ComponentManager
             typeof(ItemEatableComponent),
             new ItemEatableSystem()
         );
-
         //放置方块时的底部方块检查，确保方块被放置在了正确的方块之上。
         Register(SystemEnum.BottomMatch,
             typeof(BlockRelyOnComponent),
             new PlaceBlockBottomMatchSystem()
         );
+        //门-联动更新系统，门的状态被更新时，自动一起关系，门的结构被破坏时自动消失另一部分。
+        Register(SystemEnum.DoorLinkPlace,
+            typeof(ItemComponent),
+            new DoorLinkPlaceSystem()
+        );
+        //门-联动放置系统，放置门时自动防止上半部分。
+        Register(SystemEnum.DoorLinkUpdate,
+            typeof(ReactiveComponent),
+            new DoorLinkUpdateSystem()
+        );
+
+
         //被动测试组件
         Register(SystemEnum.TestReactiveSystem, typeof(ReactiveComponent), new TestReactiveSystem());
     }

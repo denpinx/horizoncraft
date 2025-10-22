@@ -4,7 +4,6 @@ using horizoncraft.script;
 using horizoncraft.script.Components;
 using horizoncraft.script.Events.player;
 using horizoncraft.script.Net;
-using horizoncraft.script.WorldControl.work;
 
 [Tool]
 public partial class StorageBoxInv : InventoryNode

@@ -9,15 +9,15 @@ public partial class CropGrowComponent : TickComponent
     //是否必须含水
     public bool Water = true;
     
-    //生成几率
-    public Single GroupChance = 1.0f;
+    //每tick事件生长的几率
+    public Single GrowChance = 1.0f;
 
-    //最大状态
-    public int StateMax = 8;
+    //生长的最大状态
+    public byte GrowState = 8;
 
-    //生长总次数
-    public int GrowthMax = 1;
+    //生长总次数，决定生长次数每满多少次就增长一次生长状态
+    public byte GrowCount = 1;
 
     //生长次数
-    public int GrowthValue = 0;
+    public byte GrowValue = 0;
 }

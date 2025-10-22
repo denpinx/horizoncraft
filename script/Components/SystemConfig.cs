@@ -2,16 +2,16 @@ using System;
 
 namespace horizoncraft.script.Components
 {
-    public class ComponentAndSystem
+    public class SystemConfig
     {
         /// <summary>
         /// 系统支持的组件类型
         /// </summary>
-        public Type ComponentType;
+        public Type MatchType;
 
         /// <summary>
         /// 组件对应的系统
         /// </summary>
-        public IComponentSystem system;
+        public IComponentSystem System;
     }
 }

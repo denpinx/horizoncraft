@@ -11,7 +11,7 @@ public static class OreManage
 
     public static void Registry(OreConfig config)
     {
-        GD.Print("注册:" + config.Name);
+        GD.Print($"[{nameof(OreManage)}] 注册矿脉结构: {config.Name} \t #{ores.Count}");
         ores.Add(config.Name, config);
     }
 

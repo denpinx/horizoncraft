@@ -43,20 +43,20 @@ public partial class PlayerServiceNode : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void GetPlayer(string name, int peerid)
     {
-        GD.Print($"[请求获取玩家信息]{name},{peerid}");
         PlayerData playerData;
+        GD.Print($"[{nameof(PlayerServiceNode)}] 服务端收到玩家数据获取请求 @{name,16} #{peerid,8}");
         if (World.Service is HostWorldService)
         {
             if (PlayerService.GetPlayerOrLoad(name, out playerData))
             {
                 playerData.PeerId = peerid;
                 var bytes = ByteTool.ToBytes(playerData);
-                GD.Print("已传回玩家数据");
                 RpcId(peerid, nameof(ReceivePlayer), bytes);
+                GD.Print($"[{nameof(PlayerServiceNode)}] 服务端已传回玩家数据");
             }
             else
             {
-                GD.Print("无玩家数据");
+                GD.Print($"[{nameof(PlayerServiceNode)}] 服务端暂无该玩家数据");
             }
         }
     }
@@ -68,8 +68,8 @@ public partial class PlayerServiceNode : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void ReceivePlayer(byte[] data)
     {
-        GD.Print("ReceivePlayer 接收到来自服务端的玩家数据");
         PlayerData playerData = ByteTool.FromBytes<PlayerData>(data);
+        GD.Print($"[{nameof(PlayerServiceNode)}] 客户端收到玩家数据 @{playerData.Name}");
         if (playerData.Name == PlayerNode.Profile.Name)
         {
             if (World.PlayerNode.playerData == null)

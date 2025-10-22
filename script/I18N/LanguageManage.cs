@@ -21,7 +21,6 @@ public static class LanguageManage
             TextManages.Add(lang, new TextManage());
         }
 
-        GD.Print($"注册文本: {lang} - {key} : {value}");
         TextManages[lang].Texts[key] = value;
     }
 

@@ -25,7 +25,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
         {
             if (landBiomeStructContext.Random.Next(10) == 1)
             {
-                if (StructManage.StaticBuildStructs.TryGetValue("mine_mini_room", out StaticBuildStruct staticBuildStruct))
+                if (BlockStructManager.StaticBuildStructs.TryGetValue("mine_mini_room", out StaticBuildStruct staticBuildStruct))
                 {
                     Vector3I pos = new Vector3I(
                         landBiomeStructContext.GlobalX + landBiomeStructContext.Random.Next(Chunk.Size),

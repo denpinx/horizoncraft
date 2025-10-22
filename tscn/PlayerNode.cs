@@ -338,7 +338,6 @@ public partial class PlayerNode : CharacterBody2D
                 }
                 else
                 {
-                    GD.Print(ActionProcess.State);
                     ActionProcess.State = PlayerAction.UseItem;
                     ActionProcess.FinalTime = cmp.UseTime;
                     ActionProcess.ProcessTime = 0;

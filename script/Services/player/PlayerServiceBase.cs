@@ -130,10 +130,6 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                     OnPlayerRespawn(player);
                     GD.Print($"寻找复活点成功{pos.ToString()}");
                 }
-                else
-                {
-                    GD.Print($"寻找复活点失败{pos.ToString()}");
-                }
             }
         }
     }
@@ -154,13 +150,11 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
     {
         if (Players.TryGetValue(name, out var player))
         {
-            GD.Print("玩家存在，返回");
             playerData = player;
             return true;
         }
         else
         {
-            GD.Print($"加入队列{name}");
             _loadingqueue.Enqueue(name);
         }
 
@@ -181,7 +175,6 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
             {
                 if (conn.CheckPlayerExists(name))
                 {
-                    GD.Print("玩家存在,已加载");
                     PlayerData player = conn.GetPlayerByteData(name);
                     player.Name = name;
                     Players[player.Name] = player;
@@ -258,7 +251,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
     /// <summary>
     /// 持久化接口实现
     /// </summary>
-    public virtual void SaveAll()
+    public virtual async void SaveAll()
     {
         using (var conn = SqliteTool.InitSqlite(World.WorldName))
         {
@@ -316,7 +309,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                     player.RemoveCount = 0;
                     SavePlayer(player);
                     Players.TryRemove(name, out _);
-                    GD.Print($"玩家所在区块不存在{player.ChunkCoord}");
+                    GD.Print($"[{nameof(PlayerServiceBase)}] 玩家被移出服务器 @{player.Name,-8} #{player.PeerId,-8}");
                 }
             }
             //不给主机玩家创建对等体，且区块的视图被加载
@@ -363,7 +356,6 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                 var player = LoadPlayer(name);
                 if (player != null)
                 {
-                    GD.Print("加载玩家", name, player);
                     Players.TryAdd(name, player);
                 }
             }
@@ -425,6 +417,8 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
             //GD.Print($"空间无法生成{position.ToString()}");
         }
 
+        GD.Print(
+            $"[{nameof(PlayerServiceBase)}] #{World.Service.TickTimes,8}t 复活点周边区块未加载 @chunk({coord.X},{coord.Y})");
         //区块未加载或没找到，下一Tick重新找，
         return false;
 

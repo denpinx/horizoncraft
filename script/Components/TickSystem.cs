@@ -16,25 +16,31 @@ namespace horizoncraft.script.Components
     {
         public bool ExecuteBlockComponent(WorldEvent worldEvent, Component component)
         {
-            if (component is InventoryComponent ic)
-                ProcessTick(worldEvent as BlockTickEvent, ic);
-            else if (component is TickComponent tc)
+            if (worldEvent is BlockTickEvent)
             {
-                if (tc.Current == tc.Max)
+                if (component is InventoryComponent ic)
+                    ProcessTick(worldEvent as BlockTickEvent, ic);
+                else if (component is TickComponent tc)
                 {
-                    Ticking(worldEvent as BlockTickEvent, tc);
-                    tc.Current = 0;
+                    if (tc.Current == tc.Max)
+                    {
+                        Ticking(worldEvent as BlockTickEvent, tc);
+                        tc.Current = 0;
+                    }
+                    else if (tc.Current < tc.Max)
+                    {
+                        tc.Current++;
+                    }
                 }
-                else if (tc.Current < tc.Max)
+                else if (component is ReactiveComponent rc)
                 {
-                    tc.Current++;
+                    GD.Print("ReactiveComponent");
+                    ReactiveTick(worldEvent as BlockTickEvent, rc);
                 }
             }
-            else if (component is ReactiveComponent rc)
-            {
-                GD.Print("ReactiveComponent");
-                ReactiveTick(worldEvent as BlockTickEvent, rc);
-            }
+
+            if (worldEvent is PlayerRightClickBlockEvent worldEvent2)
+                return OnRightClick(worldEvent2, component);
 
             return true;
         }
@@ -82,6 +88,11 @@ namespace horizoncraft.script.Components
 
         public virtual void ReactiveTick(BlockTickEvent blockTickEvent, ReactiveComponent component)
         {
+        }
+
+        public virtual bool OnRightClick(PlayerRightClickBlockEvent playerRightClickBlockEvent, Component component)
+        {
+            return true;
         }
     }
 }

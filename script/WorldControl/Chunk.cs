@@ -166,11 +166,14 @@ namespace horizoncraft.script.WorldControl
                 Service = WorldService,
                 Chunk = this,
             };
+            var passiveticklist = PassiveTickList.ToArray();
+            PassiveTickList.Clear();
 
             //TODO 同时拥有被动更新和主动更新会导致主动更新被更新两次
-            foreach (var pos in PassiveTickList)
+            foreach (var pos in passiveticklist)
             {
                 var block = GetBlock((int)pos.X, (int)pos.Y, (int)pos.Z);
+                if (block?.Components == null) continue;
                 foreach (var cmp in block.Components)
                 {
                     var globale = new Vector3I((int)(this.coord.X * Chunk.Size + pos.X)
@@ -181,13 +184,22 @@ namespace horizoncraft.script.WorldControl
                         blockTickEvnet.BlockData = block;
                         blockTickEvnet.GlobalePos = globale;
                         blockTickEvnet.LocalPos = pos.ToVector3I();
-                        ComponentManager.ExecuteBlockComponents(blockTickEvnet, block);
+                        var state_start = block.State;
+                        if (!ComponentManager.ExecuteBlockComponents(blockTickEvnet, block)) goto brek_out;
+                        if (state_start != block.State)
+                        {
+                            update_tilemap = true;
+                            UpdateList_buffer.Add(blockTickEvnet.LocalPos);
+                        }
+
                         blockTickEvnet.Reset();
                     }
                 }
-            }
 
-            PassiveTickList.Clear();
+                brek_out:
+                {
+                }
+            }
 
 
             var coord = new Godot.Vector3I(0, 0, 0);

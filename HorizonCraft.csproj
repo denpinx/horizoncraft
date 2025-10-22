@@ -31,6 +31,7 @@
     <Folder Include="script\Yaml\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="config\block\buildblock\door.json" />
     <Content Include="config\block\buildblock\HasComponentBlocks.json" />
     <Content Include="config\block\buildblock\NoComponentBlocks.json" />
     <Content Include="config\block\EraofEnergy\cables.json" />
@@ -58,6 +59,7 @@
     <Content Include="config\item\wood\planks.json" />
     <Content Include="config\lang\cn\blockmetas.json" />
     <Content Include="config\lang\cn\deathrattle.json" />
+    <Content Include="config\lang\cn\debug.json" />
     <Content Include="config\lang\cn\gui.json" />
     <Content Include="config\lang\cn\itemmetas.json" />
     <Content Include="config\recipes\Craft\Block\Furnace.json" />

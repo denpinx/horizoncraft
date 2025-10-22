@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Godot;
 using horizoncraft.script.WorldControl.Context;
 using horizoncraft.script.WorldControl.Struct;
-using horizoncraft.script.WorldControl.work;
 
 namespace horizoncraft.script.WorldControl.worldbiomes
 {
@@ -29,7 +28,7 @@ namespace horizoncraft.script.WorldControl.worldbiomes
             if (lbsc.GlobalY < 0)
             {
                 BlockStruct blockStrcut =
-                    StructManage.GetStruct("oak_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ, lbsc.Random);
+                    BlockStructManager.GetStruct("oak_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ, lbsc.Random);
                 lbsc.BlockStructs.Add(blockStrcut);
             }
         }

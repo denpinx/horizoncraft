@@ -30,7 +30,9 @@ namespace horizoncraft.script
 
         /// <summary>决定不同方块状态的不同tile</summary>
         public List<BlockTileSet> blockTileDatas = new();
-
+        
+        public List<OverCollideSet> overCollideDatas = new();
+        
         /// <summary>其他扩展属性和标签</summary>
         public Dictionary Tags = new();
 

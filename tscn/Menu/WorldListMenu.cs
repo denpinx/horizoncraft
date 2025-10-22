@@ -92,7 +92,7 @@ public partial class WorldListMenu : Control, ITranslatable
         {
             if (FileAccess.FileExists($"save/{dir}/data.db"))
             {
-                GD.Print("世界名" + dir);
+                GD.Print($"识别到存档：{dir}");
 
                 using (var conn = SqliteTool.InitSqlite(dir))
                 {

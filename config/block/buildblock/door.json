@@ -1,0 +1,27 @@
+{
+  "oak_door": {
+    "cube": false,
+    "collide": false,
+    "tiletype": "atlas",
+    "over-collide": [
+      {
+        "x": 1,
+        "y": 0,
+        "collide": true
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "collide": true
+      }
+    ],
+    "components": {
+      "ReactiveComponent": {
+        "Name": "DoorLinkUpdate"
+      },
+      "ItemComponent": {
+        "Name": "DoorLinkPlace"
+      }
+    }
+  }
+}

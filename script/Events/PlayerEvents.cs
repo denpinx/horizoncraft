@@ -227,7 +227,7 @@ public class PlayerEvents
         if (bm == null) return false;
 
         e.Position = pos;
-        
+
         if (item.Components.Count > 0)
             if (!ComponentManager.ExecuteItemComponents(e, item))
                 return false;
@@ -323,7 +323,29 @@ public class PlayerEvents
         var blockinv = InterfaceBlock.GetComponent<InventoryComponent>();
         if (blockinv == null)
         {
-            return false;
+            PlayerRightClickBlockEvent prcbe = new PlayerRightClickBlockEvent()
+            {
+                World = e.world,
+                Service = e.world.Service,
+                Player = e.Player,
+                Position = finalpos,
+                blockData = InterfaceBlock
+            };
+
+            var state = InterfaceBlock.State;
+            var result = ComponentManager.ExecuteBlockComponents(prcbe, InterfaceBlock);
+            if (InterfaceBlock.State != state)
+            {
+                var pos = finalpos.MathFloor(Chunk.Size);
+                if (e.world.Service.ChunkService.Chunks.TryGetValue(pos, out var chunk))
+                {
+                    var local_pos = finalpos.Remainder(Chunk.Size);
+                    chunk.update_tilemap = true;
+                    chunk.UpdateList_buffer.Add(new Vector3I(local_pos.X, local_pos.Y, finalpos.Z));
+                }
+            }
+
+            return result;
         }
 
         var pobve = new PlayerOpenBlockViewEvent()

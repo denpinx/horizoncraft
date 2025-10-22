@@ -49,7 +49,7 @@ public partial class DEBUG_INFO : CanvasLayer
         Label_DEBUG_Left.Text = "";
         StringBuilder Text = new StringBuilder();
 
-        Text.AppendLine($"当前时间：{world?.Service?.GetTimeDay()}天,{world?.Service?.GetTimeHour()}时");
+        Text.AppendLine($"当前时间：{world?.Service.GetTime()}");
         Text.AppendLine($"全局坐标：{_playerNode.playerData.Coord.X},{_playerNode.playerData.Coord.Y}");
         Text.AppendLine($"区块坐标：{_playerNode.playerData.ChunkCoord.X},{_playerNode.playerData.ChunkCoord.Y}");
         Text.AppendLine($"鼠标位置: {mouseBlockPos.X},{mouseBlockPos.Y} ");

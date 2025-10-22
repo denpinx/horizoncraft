@@ -252,10 +252,10 @@ namespace horizoncraft.script
                 }
 
                 //防止卡墙里
-                if (CurrentBlock.BlockMeta.Collide && PlayerNode.playerData.Mode == 0)
-                {
-                    PlayerNode.Position += new Vector2(0, -17);
-                }
+                // if (CurrentBlock.BlockMeta.Collide && PlayerNode.playerData.Mode == 0)
+                // {
+                //     PlayerNode.Position += new Vector2(0, -17);
+                // }
             }
 
             if (PlayerNode.playerData.Mode == 0)

@@ -1,3 +1,5 @@
+#define DEBUG
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,6 +9,7 @@ using System.Reflection;
 using Godot;
 using Dict = System.Collections.Generic.Dictionary<string, object>;
 using Expression = System.Linq.Expressions.Expression;
+
 
 namespace horizoncraft.script.Components
 {
@@ -139,7 +142,17 @@ namespace horizoncraft.script.Components
 
             var body = Expression.MemberInit(newExpr, bindings);
             var lambda = Expression.Lambda<Func<T>>(body);
-            GD.Print(lambda.ToString());
+
+#if DEBUG
+            GD.Print(
+                $"[{nameof(LambdaCreater)}]\n" +
+                $"\tCreateLambda :\t {lambda} \n " +
+                $"\tFromJson: \n{System.Text.Json.JsonSerializer.Serialize(cfg, options: new System.Text.Json.JsonSerializerOptions()
+                {
+                    WriteIndented = true
+                })}\n");
+#endif
+
             var result = lambda.Compile();
 
             //第一次调用lambda会非常耗时，可能是因为jit的原因，所以我先在这里调用一次之后就不会出现耗时问题了。
@@ -212,7 +225,7 @@ namespace horizoncraft.script.Components
         {
             foreach (var fi in type.GetProperties())
             {
-                GD.Print(fi.Name, "==", name);
+                //GD.Print(fi.Name, "==", name);
                 if (string.Equals(fi.Name, name, StringComparison.CurrentCultureIgnoreCase)) return fi;
             }
 

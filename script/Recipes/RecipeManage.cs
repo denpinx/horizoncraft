@@ -71,20 +71,21 @@ public static class RecipeManage
     {
         if (recipePack == null)
         {
-            GD.PrintErr($"[RecipeManage] 注册失败! recipe 为 null");
+            GD.PrintErr($"[{nameof(RecipeManage)}] 注册失败,配方异常为null。");
             return;
         }
 
         var result = GridRecipes.Find(r => r.Tag == recipePack.Tag);
         if (result != null)
         {
-            GD.Print($"[RecipeManage] 添加 {recipePack.Tag} 配方,{recipePack.Recipes.Count} 个");
+            GD.Print(
+                $"[{nameof(RecipeManage)}] 添加配方项 {recipePack.Tag,-16} #{result.Recipes.Count,-4} + {recipePack.Recipes.Count,-4}");
             foreach (var r in recipePack.Recipes)
                 result.Recipes.Add(r);
         }
         else
         {
-            GD.Print($"[RecipeManage] 创建 {recipePack.Tag} 配方,{recipePack.Recipes.Count} 个");
+            GD.Print($"[{nameof(RecipeManage)}] 创建配方组 {recipePack.Tag,-16} #{recipePack.Recipes.Count,-4}");
             GridRecipes.Add(recipePack);
         }
     }
@@ -210,8 +211,6 @@ public static class RecipeManage
             var itemstack = Materials.ItemMetas[(string)costInfo[0]].GetItemStack();
             itemstack.Amount = (int)costInfo[1];
             item.Cost.Add(itemstack);
-
-            GD.Print($"{itemstack.GetItemMeta().Name},{itemstack.Amount}");
         }
 
         foreach (var resultInfo_ in ResultList)
@@ -258,7 +257,7 @@ public static class RecipeManage
         var path = filename;
         if (!FileAccess.FileExists(path))
         {
-            GD.PrintErr($"[RecipeManage]] {path} 不存在！");    
+            GD.PrintErr($"[RecipeManage]] {path} 不存在！");
             return;
         }
 
@@ -308,6 +307,7 @@ public static class RecipeManage
         if (recipe == null) GD.PrintErr($"[RecipeManage] 配方{tag} 不存在!");
         return recipe;
     }
+
     public static ProcessRecipeItem GetProcessRecipe(string tag, Func<ProcessRecipeItem, bool> mathAction)
     {
         var recipe = GetRecipe(tag);
@@ -315,6 +315,7 @@ public static class RecipeManage
         var result = recipe.Recipes.Find(rcp => mathAction(rcp));
         return result;
     }
+
     /// <summary>
     /// 获取匹配的物品处理配方
     /// </summary>
@@ -359,6 +360,7 @@ public static class RecipeManage
 
         dir.ListDirEnd();
     }
+
     /// <summary>
     /// 搜寻物品参与合成的配方
     /// </summary>
@@ -395,6 +397,7 @@ public static class RecipeManage
         GD.Print($"搜索物品作用配方 {itemStack.Name} 结果 {result.Count} 个");
         return result;
     }
+
     /// <summary>
     /// 搜寻物品来源
     /// </summary>

@@ -5,6 +5,9 @@ using Godot.Collections;
 
 namespace horizoncraft.script.WorldControl.Struct;
 
+/// <summary>
+/// 预制建筑结构
+/// </summary>
 public class PreBuildStruct
 {
     public string name;

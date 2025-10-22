@@ -5,6 +5,13 @@ using System.Threading.Tasks;
 
 namespace horizoncraft.script.WorldControl
 {
+    public enum CollideState
+    {
+        None,
+        True,
+        False
+    }
+
     public class BlockTileSet
     {
         //state：   什么状态时使用这个tile_id

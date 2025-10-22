@@ -11,7 +11,7 @@ public class CropGrowthSystem:TickSystem
     {
         if (cmp is CropGrowComponent cgc)
         {
-            if (e.BlockData.State >= cgc.StateMax - 1)
+            if (e.BlockData.State >= cgc.GrowState - 1)
             {
                 return;
             }
@@ -23,14 +23,14 @@ public class CropGrowthSystem:TickSystem
                     return;
             }
 
-            if (Random.Shared.NextSingle() < cgc.GroupChance)
+            if (Random.Shared.NextSingle() < cgc.GrowChance)
             {
-                cgc.GrowthValue++;
+                cgc.GrowValue++;
             }
             
-            if (cgc.GrowthValue >= cgc.GrowthMax)
+            if (cgc.GrowValue >= cgc.GrowCount)
             {
-                cgc.GrowthValue = 0;
+                cgc.GrowValue = 0;
                 e.BlockData.State += 1;
             }
         }

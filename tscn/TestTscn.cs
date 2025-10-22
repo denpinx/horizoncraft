@@ -96,7 +96,7 @@ public partial class TestTscn : Node2D
         Random random = new Random();
         for (int i = 0; i < count; i++)
         {
-            StructManage.GetStruct("oak_tree", i, 0, 0, random);
+            BlockStructManager.GetStruct("oak_tree", i, 0, 0, random);
         }   
 
         stopwatch.Stop();

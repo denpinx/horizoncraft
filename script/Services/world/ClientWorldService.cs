@@ -19,20 +19,20 @@ public class ClientWorldService : WorldServiceBase
         world.Multiplayer.PeerConnected += id =>
         {
             Connected = true;
-            GD.Print($"[客户端] 连接成功{id}");
+            GD.Print($"[客户端] 连接成功 #{id}");
             //world.RpcId(1, "ConnectDone", PlayerNode.Profile.Name, world.Multiplayer.GetUniqueId());
         };
         world.Multiplayer.ConnectionFailed += () =>
         {
             Connected = false;
             ConnectFailed();
-            GD.PrintErr($"[客户端] 连接失败！");
+            GD.PrintErr($"[客户端] 连接失败.");
         };
         world.Multiplayer.ServerDisconnected += () =>
         {
             Connected = false;
             ConnectFailed();
-            GD.Print("【客户端】服务器断开");
+            GD.Print("[客户端] 服务器断开.");
         };
 
 
@@ -43,11 +43,12 @@ public class ClientWorldService : WorldServiceBase
 
     public override void InitializeServices()
     {
-        EntityBehavior = new ClientEntityBehavior(); ;
+        EntityBehavior = new ClientEntityBehavior();
+        ;
         ChunkService = AddService<ClientChunkService>(new ClientChunkService(World));
         PlayerService = AddService<ClientPlayerService>(new ClientPlayerService(World));
         EntityService = AddService<ClientEntityService>(new ClientEntityService(World));
-        MessageService = AddService<ClientMessageService>(new ClientMessageService(World)); 
+        MessageService = AddService<ClientMessageService>(new ClientMessageService(World));
         InitializeNode();
 
         GD.Print($"[初始化完成]{nameof(ClientWorldService)}");

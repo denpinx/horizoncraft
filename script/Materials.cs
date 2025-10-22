@@ -18,7 +18,7 @@ namespace horizoncraft.script
     public class Materials
     {
         public static TileSet tileSet;
-        
+
         public static Dictionary<string, ItemMeta> ItemMetas = new();
         public static Dictionary<string, BlockMeta> BlockMetas = new();
 
@@ -55,7 +55,7 @@ namespace horizoncraft.script
                 ItemMetas.Add(meta.Name, meta);
             }
 
-            GD.Print($"[注册物品]{meta.Id} >{meta.Name}");
+            GD.Print($"[Materials] 注册物品 {meta.Name,-16} \t#{meta.Id,-5}");
             return meta;
         }
 
@@ -63,7 +63,7 @@ namespace horizoncraft.script
         {
             meta.Id = BlockMetas.Count;
             BlockMetas.Add(meta.Name, meta);
-            GD.Print($"[注册方块]{meta.Id} >{meta.Name}");
+            GD.Print($"[Materials] 注册方块 {meta.Name,-16} \t#{meta.Id,-5}");
 
             if (meta.OreConfig != null)
             {
@@ -72,17 +72,6 @@ namespace horizoncraft.script
 
             if (meta.Name != "air")
             {
-                if (meta.IsLiquid)
-                {
-                    ItemMeta itemMeta = new ItemMeta()
-                    {
-                        Name = meta.Name + "_liquid",
-                        MaxAmount = 1000
-                    };
-
-                    //TODO 待完成，还没想好用什么方案
-                }
-
                 if (!ItemMetas.ContainsKey(meta.Name))
                 {
                     //添加
@@ -105,7 +94,7 @@ namespace horizoncraft.script
                     //更新
                     ItemMetas[meta.Name].BlockMeta = meta;
                     meta.ItemMeta = ItemMetas[meta.Name];
-                    
+
                     foreach (var func in meta.Components)
                         ItemMetas[meta.Name].AddItemComponentBuildFunc(func);
                 }
@@ -195,7 +184,6 @@ namespace horizoncraft.script
                     loot_item.AmountChances = ls.AmountChances;
                     loot_item.DropState = ls.DropState;
                     meta.LootTable.LootItems.Add(loot_item);
-                    GD.Print($"[后处理] 添加战利品 {loot_item.Item.GetItemMeta().Name},战利品数{loot_item.AmountChances.Count}");
                 }
             }
         }
@@ -240,6 +228,8 @@ namespace horizoncraft.script
                     {
                         Dictionary<string, object> cmp_dict =
                             (Dictionary<string, object>)((Dictionary<string, object>)item_dict["components"])[cmp_name];
+
+                        GD.Print("[Materials] 创建组件构造Lambda:" + cmp_name);
                         itemMeta.Components.Add(LambdaCreater.CreateLambda<Component>(cmp_name, cmp_dict));
                     }
                 }
@@ -283,7 +273,6 @@ namespace horizoncraft.script
         /// <summary>
         /// 加载所有方块配置
         /// </summary>
-        [Obsolete]
         private static void LoadAllBlockConfigs()
         {
             var list = new List<string>();
@@ -315,9 +304,10 @@ namespace horizoncraft.script
                 {
                     foreach (string cmp_name in ((Dictionary<string, object>)config["components"]).Keys)
                     {
-                        GD.Print("组件:" + cmp_name);
                         Dictionary<string, object> cmp_dict =
                             (Dictionary<string, object>)((Dictionary<string, object>)config["components"])[cmp_name];
+
+                        GD.Print("[Materials] 创建组件构造Lambda:" + cmp_name);
                         components.Add(LambdaCreater.CreateLambda<Component>(cmp_name, cmp_dict));
                     }
                 }
@@ -473,6 +463,24 @@ namespace horizoncraft.script
                     }
                 }
 
+                if (config.TryGetValue("over-collide", out var list_objcet))
+                {
+                    var list = (List<object>)list_objcet;
+                    List<OverCollideSet> overCollideSets = new();
+                    ;
+                    foreach (var dict_objcet in list)
+                    {
+                        var overCollide_dict = (Dictionary<string, object>)dict_objcet;
+                        OverCollideSet overCollideSet = new();
+                        overCollideSet.x = (int)overCollide_dict["x"];
+                        overCollideSet.y = (int)overCollide_dict["y"];
+                        overCollideSet.Collide = (bool)overCollide_dict["collide"];
+                        overCollideSets.Add(overCollideSet);
+                    }
+
+                    blockmeta.overCollideDatas = overCollideSets;
+                }
+
                 //配置不同状态下的Tile贴图
                 if (config.ContainsKey("state"))
                 {
@@ -487,7 +495,6 @@ namespace horizoncraft.script
                             state = state_id,
                         };
 
-                        GD.Print($"创建贴图状态{state_name} -> {state_id}");
                         //定义了详细的名称就用定义的
                         if (sdict.ContainsKey("texture"))
                         {
@@ -503,6 +510,18 @@ namespace horizoncraft.script
                         {
                             tile.scene = (bool)sdict["scene"];
                         }
+
+                        // if (sdict.TryGetValue("collide", out var collide_object))
+                        // {
+                        //     if (CollideState.TryParse<CollideState>((string)collide_object, out var collide_state))
+                        //         tile.collide_state = collide_state;
+                        // }
+                        //
+                        // if (tile.collide_state == CollideState.None)
+                        // {
+                        //     if (blockmeta.Collide) tile.collide_state = CollideState.True;
+                        //     else tile.collide_state = CollideState.False;
+                        // }
 
                         blockTileSets.Add(tile);
                         state_id++;
@@ -609,8 +628,6 @@ namespace horizoncraft.script
                         blockTileSet.id = ts.CreateSceneTile(ps);
                         blockTileSet.tile_count = 1;
                         blockTileSet.tile_size = 1;
-                        GD.Print(
-                            $"创建场景集合 {meta.Name},{blockTileSet.tile_id},{blockTileSet.scene} id:{blockTileSet.id}");
                     }
                     else
                     {
@@ -624,7 +641,6 @@ namespace horizoncraft.script
 
                         atlasSource.Texture = image;
                         atlasSource.TextureRegionSize = new Vector2I(16, 16);
-                        GD.Print($"创建图集{blockTileSet.texture_name},{blockTileSet.tile_id}");
 
                         int mask = 0;
                         for (int y = 0; y < tilesY; y++)
@@ -633,8 +649,16 @@ namespace horizoncraft.script
                             var id = new Vector2I(x, y);
                             atlasSource.CreateTile(id);
                             var tileData = atlasSource.GetTileData(id, 0);
+                            bool result = false;
+                            var result_object = meta.overCollideDatas.Find(c => c.x == x && c.y == y);
+                            if (result_object != null)
+                            {
+                                result = result_object.Collide;
+                                if (!result) continue;
+                            }
 
-                            if (meta.Collide)
+
+                            if (meta.Collide || result)
                             {
                                 var half = 16 / 2.0f;
                                 Vector2[] polygon = new Vector2[]

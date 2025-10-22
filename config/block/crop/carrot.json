@@ -10,9 +10,9 @@
         "Name": "CropGrowComponent",
         "Max": 20,
         "Water": false,
-        "GroupChance": 0.5,
-        "StateMax": 8,
-        "GrowthMax": 16
+        "GrowState": 8,
+        "GrowChance": 0.5,
+        "GrowCount": 16
       },
       "ItemEatableComponent": {
         "Name": "ItemEatableComponent",

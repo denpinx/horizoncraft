@@ -59,7 +59,6 @@ namespace horizoncraft.script.WorldControl
             Random random = new Random(x * 3 + y * 7 + z * 11);
             List<BlockStruct> structs = new();
             BiomeType biomeType = BiomeManage.CheckRange(highmap, x, y);
-            //structs.Add(OreManage.GeneratorOre(random, x, y));
 
             if (biomeType == BiomeType.LandBiome)
             {
@@ -98,7 +97,6 @@ namespace horizoncraft.script.WorldControl
                     GlobalY = y * Chunk.Size
                 };
                 Biome biome = BiomeManage.GetDeepBiome(x, y);
-                biome.GeneratorOre(biomeStructContext);
                 biome.GeneratorStruct(biomeStructContext);
                 if (structs.Count > 0)
                     return structs;
