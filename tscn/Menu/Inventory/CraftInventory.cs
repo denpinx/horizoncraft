@@ -30,11 +30,11 @@ public partial class CraftInventory : InventoryNode
         ResultItem =
             GetNode<InvSlot>(
                 "VBoxContainer/PanelContainer_Craft/HBoxContainer/InvSlot_result");
-        ResultItem.LeftClick += OnPlayerLeftClickItem;
-        ResultItem.RightClick += OnPlayerRightClickItem;
+        ResultItem.LeftClick += OnCraftButtonPressed;
+        ResultItem.RightClick += OnCraftButtonPressed;
     }
 
-    public void OnCraftButtonPressed(int index, bool isLeft, bool isShift)
+    public void OnCraftButtonPressed(int index, bool isShift)
     {
         if (PlayerNode?.world == null) return;
         var cgri = new PlayerCraftItemEvent()
