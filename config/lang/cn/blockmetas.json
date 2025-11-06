@@ -39,6 +39,7 @@
     "big_logistics_pipeline": "大型物流管道",
     "input_block": "物流输入口",
     "output_block": "物流输出口",
-    "interface_block": "接口方块"
+    "interface_block": "接口方块",
+    "oak_door": "橡木门"
   }
 }

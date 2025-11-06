@@ -22,6 +22,9 @@
       "ItemComponent": {
         "Name": "DoorLinkPlace"
       }
+    },
+    "tags": {
+      "type": "axe"
     }
   }
 }

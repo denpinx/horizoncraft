@@ -14,17 +14,23 @@ namespace horizoncraft.script.Components
 {
     public class TickSystem : IComponentSystem
     {
+        /// <summary>
+        /// 处理放方块组件
+        /// </summary>
+        /// <param name="worldEvent"></param>
+        /// <param name="component"></param>
+        /// <returns></returns>
         public bool ExecuteBlockComponent(WorldEvent worldEvent, Component component)
         {
             if (worldEvent is BlockTickEvent)
             {
                 if (component is InventoryComponent ic)
-                    ProcessTick(worldEvent as BlockTickEvent, ic);
+                    InventoryTick(worldEvent as BlockTickEvent, ic);
                 else if (component is TickComponent tc)
                 {
                     if (tc.Current == tc.Max)
                     {
-                        Ticking(worldEvent as BlockTickEvent, tc);
+                        BlockTick(worldEvent as BlockTickEvent, tc);
                         tc.Current = 0;
                     }
                     else if (tc.Current < tc.Max)
@@ -34,7 +40,6 @@ namespace horizoncraft.script.Components
                 }
                 else if (component is ReactiveComponent rc)
                 {
-                    GD.Print("ReactiveComponent");
                     ReactiveTick(worldEvent as BlockTickEvent, rc);
                 }
             }
@@ -44,7 +49,7 @@ namespace horizoncraft.script.Components
 
             return true;
         }
-
+        //接口原因，这里没用,
         public bool ExecuteItemComponent(PlayerEvent playerEvent, Component component)
         {
             return true;
@@ -63,33 +68,64 @@ namespace horizoncraft.script.Components
                         EntityData = ese.EntityData,
                         EntityComponent = (EntityComponent)cmp,
                     };
-                    Tick(e);
+                    EntityTick(e);
                 }
             }
 
             return false;
         }
 
+        /// <summary>
+        /// 设置组件值事件
+        /// </summary>
+        /// <param name="player">玩家</param>
+        /// <param name="component">组件</param>
+        /// <param name="value">值</param>
         public virtual void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)
         {
         }
 
-        public virtual void Ticking(BlockTickEvent blockTickEvent, Component component)
+        /// <summary>
+        /// 方块时刻更新
+        /// </summary>
+        /// <param name="blockTickEvent"></param>
+        /// <param name="component"></param>
+        public virtual void BlockTick(BlockTickEvent blockTickEvent, Component component)
         {
         }
 
-        public virtual void ProcessTick(BlockTickEvent blockTickEvent, InventoryComponent component)
+        /// <summary>
+        /// 容器的处理时刻
+        /// </summary>
+        /// <param name="blockTickEvent"></param>
+        /// <param name="component"></param>
+        public virtual void InventoryTick(BlockTickEvent blockTickEvent, InventoryComponent component)
         {
         }
 
-        public virtual void Tick(EntityTickEvent e)
+        /// <summary>
+        /// 实体时刻更新
+        /// </summary>
+        /// <param name="e"></param>
+        public virtual void EntityTick(EntityTickEvent e)
         {
         }
 
+        /// <summary>
+        /// 被动更新
+        /// </summary>
+        /// <param name="blockTickEvent"></param>
+        /// <param name="component"></param>
         public virtual void ReactiveTick(BlockTickEvent blockTickEvent, ReactiveComponent component)
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="playerRightClickBlockEvent"></param>
+        /// <param name="component"></param>
+        /// <returns></returns>
         public virtual bool OnRightClick(PlayerRightClickBlockEvent playerRightClickBlockEvent, Component component)
         {
             return true;

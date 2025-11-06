@@ -7,7 +7,7 @@ namespace horizoncraft.script.Components.Systems;
 public class CropGrowthSystem:TickSystem
 {
     private static BlockMeta farmland = Materials.Valueof("farmland");
-    public override void Ticking(BlockTickEvent e, Component cmp)
+    public override void BlockTick(BlockTickEvent e, Component cmp)
     {
         if (cmp is CropGrowComponent cgc)
         {

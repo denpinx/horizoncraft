@@ -123,6 +123,7 @@ public partial class PlayerNode : CharacterBody2D
             {
                 ActionProcess.ProcessTime = 0;
             }
+
             LastFramIsRight = false;
         }
 
@@ -245,38 +246,46 @@ public partial class PlayerNode : CharacterBody2D
             }
         }
 
-        if (!world.Service.ChunkService.CheckIsCloseBlock(finalpos))
+        if (playerData.Mode == 0)
         {
-            var meta = InterfaceBlock.BlockMeta;
-            float efficiency = 1f;
-            float gap = meta.BreakLevel;
-
-            var durable = playerData.Inventory.GetToolBarItem()?.GetComponent<ItemDurableComponent>();
-            if (durable != null)
+            if (!world.Service.ChunkService.CheckIsCloseBlock(finalpos))
             {
-                string tag = InterfaceBlock.GetTag("type");
-                if ((tag != null && durable.HasTag(tag)) || durable.HasTag("any"))
-                    efficiency = 1f + durable.Efficiency * 0.25f;
-                else
+                var meta = InterfaceBlock.BlockMeta;
+                float efficiency = 1f;
+                float gap = meta.BreakLevel;
+
+                var durable = playerData.Inventory.GetToolBarItem()?.GetComponent<ItemDurableComponent>();
+                if (durable != null)
                 {
-                    GD.Print("not has tag");
+                    string tag = InterfaceBlock.GetTag("type");
+                    if ((tag != null && durable.HasTag(tag)) || durable.HasTag("any"))
+                        efficiency = 1f + durable.Efficiency * 0.25f;
+                    else
+                    {
+                        GD.Print("not has tag");
+                    }
+
+                    gap = meta.BreakLevel - durable.ToolLevel;
                 }
 
-                gap = meta.BreakLevel - durable.ToolLevel;
+                //工具等级差距过大
+                if (gap > 1) return;
+                ActionProcess.State = PlayerAction.BreakBlock;
+                ActionProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity / efficiency;
+                ActionProcess.Position = finalpos;
+                ActionProcess.ProcessTime += (float)delta;
+                if (playerData.Mode == 1) ActionProcess.FinalTime = 0;
             }
-
-            //工具等级差距过大
-            if (gap > 1) return;
-            ActionProcess.State = PlayerAction.BreakBlock;
-            ActionProcess.FinalTime = InterfaceBlock.BlockMeta.Rigidity / efficiency;
-            ActionProcess.Position = finalpos;
-            ActionProcess.ProcessTime += (float)delta;
-            if (playerData.Mode == 1) ActionProcess.FinalTime = 0;
+            else
+                Cursor.Frame = 1;
         }
         else
         {
-            Cursor.Frame = 1;
-        }
+            ActionProcess.State = PlayerAction.BreakBlock;
+            ActionProcess.FinalTime = 1;
+            ActionProcess.Position = finalpos;
+            ActionProcess.ProcessTime = 1;
+        } 
     }
 
     //鼠标右键

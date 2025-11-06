@@ -8,7 +8,7 @@ namespace horizoncraft.script.Components.Systems;
 
 public class FurnaceSystem : TickSystem
 {
-    public override void ProcessTick(BlockTickEvent evnet, InventoryComponent component)
+    public override void InventoryTick(BlockTickEvent evnet, InventoryComponent component)
     {
         FurnaceComponent furnace = component as FurnaceComponent;
         var input = furnace.GetInventory().GetItem(0);

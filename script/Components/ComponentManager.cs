@@ -77,7 +77,7 @@ public static class ComponentManager
                 var s = value.System.ExecuteItemComponent(playerEvent, component);
                 if (!s) return false;
             }
-
+            
             if (itemStack.Name != start_id)
                 return false;
         }
@@ -211,7 +211,8 @@ public static class ComponentManager
         });
     }
 
-    //绑定组件功能和组件类型，注意：不是所有组件都相互兼容。
+    //绑定组件功能和组件类型，
+    //注意：有些组件会在事件触发时修改物品或方块状态，不是所有组件都能够相互兼容。
     static ComponentManager()
     {
         //顶部方块覆盖组件

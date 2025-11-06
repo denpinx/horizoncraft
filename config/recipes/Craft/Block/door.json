@@ -1,0 +1,20 @@
+{
+  "type": "craft",
+  "tag": "workbench",
+  "recipes": [
+    {
+      "template": [
+        "##",
+        "##",
+        "##"
+      ],
+      "mask": {
+        "#": "oak_plank"
+      },
+      "result": [
+        "oak_door",
+        3
+      ]
+    }
+  ]
+}

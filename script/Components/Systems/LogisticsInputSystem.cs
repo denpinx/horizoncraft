@@ -7,7 +7,7 @@ namespace horizoncraft.script.Components.Systems;
 
 public class LogisticsInputSystem : TickSystem
 {
-    public override void Ticking(BlockTickEvent e, Component component)
+    public override void BlockTick(BlockTickEvent e, Component component)
     {
         HashSet<Vector3I> finded = new HashSet<Vector3I>();
         var formblock = GetInventoryBlock(e, e.GlobalePos, true);

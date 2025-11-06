@@ -10,7 +10,7 @@ namespace horizoncraft.script.Components.Systems;
 
 public class ItemEntitySystem : EntitySystem
 {
-    public override void Tick(EntityTickEvent e)
+    public override void EntityTick(EntityTickEvent e)
     {
         var component = e.GetComponent<ItemEntityComponent>();
         if (component.ItemStack == null)

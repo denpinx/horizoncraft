@@ -4,7 +4,7 @@ namespace horizoncraft.script.Components.Systems;
 
 public class PhysicsSystem : TickSystem
 {
-    public override void Ticking(BlockTickEvent e, Component cmp)
+    public override void BlockTick(BlockTickEvent e, Component cmp)
     {
         PhysicsComponent pc = cmp as PhysicsComponent;
         BlockMeta pcmeta = Materials.Valueof(pc.BlockName);

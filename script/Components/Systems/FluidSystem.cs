@@ -1,4 +1,7 @@
+using System.Runtime.InteropServices.ComTypes;
 using horizoncraft.script.Events;
+using horizoncraft.script.Events.player;
+using horizoncraft.script.Inventory;
 
 namespace horizoncraft.script.Components.Systems;
 
@@ -7,7 +10,29 @@ public class FluidSystem : TickSystem
     const int FluidLenght = 16;
     BlockMeta air = Materials.Valueof("air");
 
-    public override void Ticking(BlockTickEvent e, Component cmp)
+    public override bool OnRightClick(PlayerRightClickBlockEvent playerRightClickBlockEvent, Component component)
+    {
+        var inventory = playerRightClickBlockEvent.Player.Inventory;
+        var item = inventory.GetToolBarItem();
+        if (item == null) return true;
+        if (item.GetItemMeta().Name == "iron_bukkit")
+        {
+            if (Materials.ItemMetas.TryGetValue($"iron_bukkit_{playerRightClickBlockEvent.blockData.BlockMeta.Name}",
+                    out var meta))
+            {
+                if (inventory.TryAddItem(meta.GetItemStack()))
+                {
+                    item.Amount -= 1;
+                    playerRightClickBlockEvent.Player.Inventory.update = true;
+                    playerRightClickBlockEvent.Service.ChunkService.SetBlock(playerRightClickBlockEvent.Position, air);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public override void BlockTick(BlockTickEvent e, Component cmp)
     {
         FluidComponent fc = cmp as FluidComponent;
         BlockMeta blockMeta = Materials.Valueof(fc.BlockName);

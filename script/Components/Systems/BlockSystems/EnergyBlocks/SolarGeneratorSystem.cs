@@ -7,7 +7,7 @@ namespace horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
 
 public class SolarGeneratorSystem : TickSystem
 {
-    public override void Ticking(BlockTickEvent blockTickEvent, Component component)
+    public override void BlockTick(BlockTickEvent blockTickEvent, Component component)
     {
         if (component is EnergyUnitComponent energy)
         {

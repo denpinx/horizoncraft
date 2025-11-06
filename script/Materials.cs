@@ -86,8 +86,14 @@ namespace horizoncraft.script
                     itemMeta.BlockMeta = meta;
                     meta.ItemMeta = itemMeta;
 
-                    foreach (var func in meta.Components)
-                        itemMeta.AddItemComponentBuildFunc(func);
+                    foreach (var func in meta.Components.ToArray())
+                    {
+                        if (func() is ItemComponent)
+                        {
+                            itemMeta.AddItemComponentBuildFunc(func);
+                            meta.Components.Remove(func);
+                        }
+                    }
                 }
                 else
                 {
@@ -95,8 +101,14 @@ namespace horizoncraft.script
                     ItemMetas[meta.Name].BlockMeta = meta;
                     meta.ItemMeta = ItemMetas[meta.Name];
 
-                    foreach (var func in meta.Components)
-                        ItemMetas[meta.Name].AddItemComponentBuildFunc(func);
+                    foreach (var func in meta.Components.ToArray())
+                    {
+                        if (func() is ItemComponent)
+                        {
+                            ItemMetas[meta.Name].AddItemComponentBuildFunc(func);
+                            meta.Components.Remove(func);
+                        }
+                    }
                 }
             }
             else
@@ -300,9 +312,9 @@ namespace horizoncraft.script
 
                 Dictionary<string, object> config = (Dictionary<string, object>)dict[item_name];
                 List<Func<Component>> components = new();
-                if (config.ContainsKey("components"))
+                if (config.TryGetValue("components", out var componentsObject))
                 {
-                    foreach (string cmp_name in ((Dictionary<string, object>)config["components"]).Keys)
+                    foreach (string cmp_name in ((Dictionary<string, object>)componentsObject).Keys)
                     {
                         Dictionary<string, object> cmp_dict =
                             (Dictionary<string, object>)((Dictionary<string, object>)config["components"])[cmp_name];
@@ -333,39 +345,39 @@ namespace horizoncraft.script
                     blockmeta.BreakLevel = (int)vbl;
                 }
 
-                if (config.ContainsKey("tiletype"))
+                if (config.TryGetValue("tiletype", out var titletypeObject))
                 {
-                    blockmeta.TileType = (string)config["tiletype"];
+                    blockmeta.TileType = (string)titletypeObject;
                 }
 
-                if (config.ContainsKey("light"))
+                if (config.TryGetValue("light", out var lightOjbect))
                 {
-                    blockmeta.Light = (bool)config["light"];
+                    blockmeta.Light = (bool)lightOjbect;
                 }
 
-                if (config.ContainsKey("ore"))
+                if (config.TryGetValue("ore", out var oreObject))
                 {
                     blockmeta.OreConfig = new OreConfig() { Name = blockmeta.Name };
-                    var dict_ore = (Dictionary<string, object>)config["ore"];
-                    if (dict_ore.ContainsKey("size")) blockmeta.OreConfig.Size = (int)dict_ore["size"];
-                    if (dict_ore.ContainsKey("range")) blockmeta.OreConfig.Range = (int)dict_ore["range"];
-                    if (dict_ore.ContainsKey("count")) blockmeta.OreConfig.Count = (int)dict_ore["count"];
-                    if (dict_ore.ContainsKey("deep")) blockmeta.OreConfig.Deep = (int)dict_ore["deep"];
+                    var dict_ore = (Dictionary<string, object>)oreObject;
+                    if (dict_ore.TryGetValue("size", out var size)) blockmeta.OreConfig.Size = (int)size;
+                    if (dict_ore.TryGetValue("range", out var range)) blockmeta.OreConfig.Range = (int)range;
+                    if (dict_ore.TryGetValue("count", out var count)) blockmeta.OreConfig.Count = (int)count;
+                    if (dict_ore.TryGetValue("deep", out var deep)) blockmeta.OreConfig.Deep = (int)deep;
                 }
 
-                if (config.ContainsKey("rigidity"))
+                if (config.TryGetValue("rigidity", out var rigidityObject))
                 {
-                    blockmeta.Rigidity = (float)Convert.ToDouble(config["rigidity"]);
+                    blockmeta.Rigidity = (float)Convert.ToDouble(rigidityObject);
                 }
 
-                if (config.ContainsKey("replace"))
+                if (config.TryGetValue("replace", out var replaceObject))
                 {
-                    blockmeta.Replaceable = (bool)config["replace"];
+                    blockmeta.Replaceable = (bool)replaceObject;
                 }
 
-                if (config.ContainsKey("tags"))
+                if (config.TryGetValue("tags", out var tagsObject))
                 {
-                    var dict_attr = (Dictionary<string, object>)config["tags"];
+                    var dict_attr = (Dictionary<string, object>)tagsObject;
                     foreach (var v in dict_attr)
                         blockmeta.Tags.Add(v.Key, (string)v.Value);
                 }
@@ -375,9 +387,9 @@ namespace horizoncraft.script
                     blockmeta.Tags.Add("thesaurus", blockmeta.Name);
                 }
 
-                if (config.ContainsKey("loot"))
+                if (config.TryGetValue("loot", out var lootObject))
                 {
-                    var loot_list = (List<object>)config["loot"];
+                    var loot_list = (List<object>)lootObject;
                     foreach (var v in loot_list)
                     {
                         var loot_dict = (Dictionary<string, object>)v;
@@ -386,30 +398,31 @@ namespace horizoncraft.script
                         if (loot_dict.TryGetValue("drop-state", out var value1))
                             item.DropState = (int)value1;
 
-                        if (loot_dict.ContainsKey("name")) item.Name = (string)loot_dict["name"];
+                        if (loot_dict.TryGetValue("name", out var nameObject)) item.Name = (string)nameObject;
                         else item.Name = blockmeta.Name;
 
-                        if (loot_dict.ContainsKey("drop-chance"))
+                        if (loot_dict.TryGetValue("drop-chance", out var drop_chanceObject))
                         {
-                            item.DropChance = (float)Convert.ToDouble(loot_dict["drop-chance"]);
+                            item.DropChance = (float)Convert.ToDouble(drop_chanceObject);
                         }
                         else
                         {
                             item.DropChance = 1f;
                         }
 
-                        if (loot_dict.ContainsKey("amount-chance"))
+                        if (loot_dict.TryGetValue("amount-chance", out var amount_chanceObject))
                         {
-                            var amount_chance = (List<object>)loot_dict["amount-chance"];
+                            var amount_chance = (List<object>)amount_chanceObject;
                             foreach (var ac in amount_chance)
                             {
                                 var acitem = (Dictionary<string, object>)ac;
                                 var AmountChance = new AmountChance();
-                                if (acitem.ContainsKey("amount")) AmountChance.Amount = (int)acitem["amount"];
+                                if (acitem.TryGetValue("amount", out var amountOjbect))
+                                    AmountChance.Amount = (int)amountOjbect;
                                 else AmountChance.Amount = 1;
 
-                                if (acitem.ContainsKey("chance"))
-                                    AmountChance.Chance = (float)Convert.ToDouble(acitem["chance"]);
+                                if (acitem.TryGetValue("chance", out var chanceObject))
+                                    AmountChance.Chance = (float)Convert.ToDouble(chanceObject);
                                 else AmountChance.Chance = 1;
                                 item.AmountChances.Add(AmountChance);
                             }
@@ -445,19 +458,19 @@ namespace horizoncraft.script
                     blockmeta._LootItemSnapshots_.Add(loot_item);
                 }
 
-                if (config.ContainsKey("mask"))
+                if (config.TryGetValue("mask", out var mask_object))
                 {
-                    var dict_mask = (Dictionary<string, object>)config["mask"];
-                    if (dict_mask.ContainsKey("input"))
+                    var dict_mask = (Dictionary<string, object>)mask_object;
+                    if (dict_mask.TryGetValue("input", out var input_object))
                     {
-                        var list = (List<object>)dict_mask["input"];
+                        var list = (List<object>)input_object;
                         foreach (var i in list)
                             blockmeta.InputMask.Add((int)i);
                     }
 
-                    if (dict_mask.ContainsKey("output"))
+                    if (dict_mask.TryGetValue("output", out var output_object))
                     {
-                        var list = (List<object>)dict_mask["output"];
+                        var list = (List<object>)output_object;
                         foreach (var i in list)
                             blockmeta.OutputMask.Add((int)i);
                     }
@@ -482,10 +495,10 @@ namespace horizoncraft.script
                 }
 
                 //配置不同状态下的Tile贴图
-                if (config.ContainsKey("state"))
+                if (config.TryGetValue("state", out var state_objcet))
                 {
                     List<BlockTileSet> blockTileSets = new List<BlockTileSet>();
-                    Dictionary<string, object> state_dicts = (Dictionary<string, object>)config["state"];
+                    Dictionary<string, object> state_dicts = (Dictionary<string, object>)state_objcet;
                     int state_id = 0;
                     foreach (string state_name in state_dicts.Keys)
                     {
@@ -496,9 +509,9 @@ namespace horizoncraft.script
                         };
 
                         //定义了详细的名称就用定义的
-                        if (sdict.ContainsKey("texture"))
+                        if (sdict.TryGetValue("texture", out var texture_objcet))
                         {
-                            tile.texture_name = (string)sdict["texture"];
+                            tile.texture_name = (string)texture_objcet;
                         }
                         //没有定义就用默认格式
                         else
@@ -506,22 +519,9 @@ namespace horizoncraft.script
                             tile.texture_name = $"{blockmeta.Name}_{state_name}";
                         }
 
-                        if (sdict.ContainsKey("scene"))
-                        {
-                            tile.scene = (bool)sdict["scene"];
-                        }
+                        if (sdict.TryGetValue("scene", out var scene_object))
+                            tile.scene = (bool)scene_object;
 
-                        // if (sdict.TryGetValue("collide", out var collide_object))
-                        // {
-                        //     if (CollideState.TryParse<CollideState>((string)collide_object, out var collide_state))
-                        //         tile.collide_state = collide_state;
-                        // }
-                        //
-                        // if (tile.collide_state == CollideState.None)
-                        // {
-                        //     if (blockmeta.Collide) tile.collide_state = CollideState.True;
-                        //     else tile.collide_state = CollideState.False;
-                        // }
 
                         blockTileSets.Add(tile);
                         state_id++;
