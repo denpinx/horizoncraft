@@ -9,7 +9,6 @@ using horizoncraft.script.WorldControl;
 /// <summary>
 /// 通用菜单节点,根据节点自定义
 /// </summary>
-[Tool]
 public partial class InventoryNode : CanvasLayer
 {
     [Export] public int TargetNodeCount = 0;

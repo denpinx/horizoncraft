@@ -86,7 +86,10 @@ public partial class ReciperView : Control, ITranslatable
             UpdateView();
         }
     }
-
+    /// <summary>
+    /// 设置当前菜单预览的配方集合
+    /// </summary>
+    /// <param name="recipePacks"></param>
     public void SetPerviewRecipePack(Dictionary<String, RecipePack> recipePacks)
     {
         Index = 0;
@@ -228,24 +231,24 @@ public partial class ReciperView : Control, ITranslatable
             if (result_wide == 0) result_wide = recipe.Cost.Count;
             _Process_OutPut_Container.Columns = result_wide;
             _Label.Text = $"{Index}/{prp.Recipes.Count}";
-
+            
             for (int i = 0; i < recipe.Cost.Count; i++)
             {
                 var Slot = _packedSceneInvSlot.Instantiate<InvSlot>();
                 var itemstack = recipe.Cost[i].Copy();
-                Slot.LeftClick = (i, b) => LeftClick(Slot, i, b);
-                Slot.RightClick = (i, b) => RightClick(Slot, i, b);
+                Slot.LeftClick = (index, shift) => LeftClick(Slot, index, shift);
+                Slot.RightClick = (index, shift) => RightClick(Slot, index, shift);
 
                 Slot.Ready += () => Slot.SetShowItem(itemstack);
                 _Process_Container.AddChild(Slot);
             }
-
+            
             for (int i = 0; i < recipe.Result.Count; i++)
             {
                 var Slot = _packedSceneInvSlot.Instantiate<InvSlot>();
                 var itemstack = recipe.Result[i].Copy();
-                Slot.LeftClick = (i, b) => LeftClick(Slot, i, b);
-                Slot.RightClick = (i, b) => RightClick(Slot, i, b);
+                Slot.LeftClick = (index, shift) => LeftClick(Slot, index, shift);
+                Slot.RightClick = (index, shift) => RightClick(Slot, index, shift);
                 Slot.Ready += () => Slot.SetShowItem(itemstack);
                 _Process_OutPut_Container.AddChild(Slot);
             }

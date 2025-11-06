@@ -8,7 +8,7 @@ using horizoncraft.script.Recipes;
 public partial class CraftInventory : InventoryNode
 {
     private List<InvSlot> CraftSlots = new List<InvSlot>();
-    private InvSlot ResultItem;
+    [Export] private InvSlot ResultItem;
 
     public override void _Ready()
     {
@@ -21,15 +21,10 @@ public partial class CraftInventory : InventoryNode
                 GetNode<InvSlot>(
                     "VBoxContainer/PanelContainer_Craft/HBoxContainer/GridContainer/InvSlot" + i);
             invslot.index = 36 + i;
-
             invslot.LeftClick += OnPlayerLeftClickItem;
             invslot.RightClick += OnPlayerRightClickItem;
             CraftSlots.Add(invslot);
         }
-
-        ResultItem =
-            GetNode<InvSlot>(
-                "VBoxContainer/PanelContainer_Craft/HBoxContainer/InvSlot_result");
         ResultItem.LeftClick += OnCraftButtonPressed;
         ResultItem.RightClick += OnCraftButtonPressed;
     }

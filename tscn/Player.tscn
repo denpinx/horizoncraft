@@ -270,17 +270,18 @@ _data = {
 &"break": SubResource("Animation_7twa1")
 }
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("ChatView", "animationPlayer_other", "animationPlayer_move", "BlockInfoView", "collisionShape2D", "OvrCanvasLayer", "Timer_Tick", "Label_DEBUG_Right", "Label_DEBUG_Left", "Label_PlayerName", "sprite2D_body", "Cursor", "Use_Process", "hotBar", "camera2d")]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("ChatView", "animationPlayer_other", "animationPlayer_move", "BlockInfoView", "collisionShape2D", "OvrCanvasLayer", "GuiCanvasLayer", "Timer_Tick", "Label_DEBUG_Right", "Label_DEBUG_Left", "Label_PlayerName", "sprite2D_body", "Cursor", "Use_Process", "hotBar", "camera2d")]
 top_level = true
 z_index = 10
 collision_layer = 2
 script = ExtResource("1_knoa1")
-ChatView = NodePath("GuidCanvasLayer/ChatView")
+ChatView = NodePath("GudCanvasLayer/ChatView")
 animationPlayer_other = NodePath("AnimationPlayer_Other")
 animationPlayer_move = NodePath("AnimationPlayer_Move")
 BlockInfoView = NodePath("CanvasLayer/BlockInfoView")
 collisionShape2D = NodePath("CollisionShape2D")
 OvrCanvasLayer = NodePath("OvrCanvasLayer")
+GuiCanvasLayer = NodePath("GudCanvasLayer")
 Timer_Tick = NodePath("Timer_Tick")
 Label_DEBUG_Right = NodePath("CanvasLayer/Control/Label_DEBUG_Right")
 Label_DEBUG_Left = NodePath("CanvasLayer/Control/Label_DEBUG_Left")
@@ -288,7 +289,7 @@ Label_PlayerName = NodePath("Label_PlayerName")
 sprite2D_body = NodePath("Body")
 Cursor = NodePath("Break_Process")
 Use_Process = NodePath("Use_Process")
-hotBar = NodePath("GuidCanvasLayer/HotBar")
+hotBar = NodePath("GudCanvasLayer/HotBar")
 camera2d = NodePath("Camera2D")
 metadata/_edit_vertical_guides_ = [575.0]
 
@@ -330,14 +331,14 @@ label_settings = SubResource("LabelSettings_hdrus")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GuidCanvasLayer" type="CanvasLayer" parent="."]
+[node name="GudCanvasLayer" type="CanvasLayer" parent="."]
 layer = 2
 
-[node name="HotBar" parent="GuidCanvasLayer" instance=ExtResource("4_kghmo")]
+[node name="HotBar" parent="GudCanvasLayer" instance=ExtResource("4_kghmo")]
 
-[node name="PlayerDataView" parent="GuidCanvasLayer" instance=ExtResource("7_34em8")]
+[node name="PlayerDataView" parent="GudCanvasLayer" instance=ExtResource("7_34em8")]
 
-[node name="ChatView" parent="GuidCanvasLayer" node_paths=PackedStringArray("Player") instance=ExtResource("6_34em8")]
+[node name="ChatView" parent="GudCanvasLayer" node_paths=PackedStringArray("Player") instance=ExtResource("6_34em8")]
 size_flags_horizontal = 4
 Player = NodePath("../..")
 

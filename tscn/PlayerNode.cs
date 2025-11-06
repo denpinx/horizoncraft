@@ -1,23 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using Godot;
-using Godot.Collections;
-using horizoncraft.script;
-using horizoncraft.script.Components;
-using horizoncraft.script.Components.EntityComponents;
 using horizoncraft.script.Components.Item;
 using horizoncraft.script.Config;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Events;
 using horizoncraft.script.Events.player;
 using horizoncraft.script.Expand;
-using horizoncraft.script.Inventory;
 using horizoncraft.script.rpc;
 using HorizonCraft.script.Services.world;
 using horizoncraft.script.WorldControl;
-using Vector3 = System.Numerics.Vector3;
 
 namespace horizoncraft.script;
 
@@ -66,6 +55,7 @@ public partial class PlayerNode : CharacterBody2D
     [Export] private HorizonCraft.tscn.Gui.BlockInfoView BlockInfoView;
     [Export] CollisionShape2D collisionShape2D;
     [Export] public CanvasLayer OvrCanvasLayer;
+    [Export] public CanvasLayer GuiCanvasLayer;
     [Export] public Timer Timer_Tick;
     [Export] Label Label_DEBUG_Right;
     [Export] Label Label_DEBUG_Left;
@@ -86,10 +76,16 @@ public partial class PlayerNode : CharacterBody2D
 
     public override void _Process(double delta)
     {
+        //自身不可见时隐藏gui
+        if (!Visible)
+        {
+            if (GuiCanvasLayer.Visible) GuiCanvasLayer.Visible = false;
+        }
+        else if (!GuiCanvasLayer.Visible) GuiCanvasLayer.Visible = true;
         if (!BaseInputable || playerData == null) return;
         if (playerData.FaceLeft) sprite2D_body.SetScale(new Vector2(1, 1));
         else sprite2D_body.SetScale(new Vector2(-1, 1));
-
+        
         Vector2I coord = new(
             (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
@@ -285,7 +281,7 @@ public partial class PlayerNode : CharacterBody2D
             ActionProcess.FinalTime = 1;
             ActionProcess.Position = finalpos;
             ActionProcess.ProcessTime = 1;
-        } 
+        }
     }
 
     //鼠标右键

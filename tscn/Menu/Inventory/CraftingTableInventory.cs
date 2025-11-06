@@ -26,6 +26,7 @@ public partial class CraftingTableInventory : InventoryNode
     public void OnCraftButtonPressed(int index, bool isShit)
     {
         if (PlayerNode?.world == null) return;
+        
         //本地兼远程方法,如果当前是本地或则服务端则自动调用本地方法，如果当前是客户端则调用客户端方法，修改组件内容
         var scd = new SetComponentData();
         if (isShit) scd.AddComponentSet("WorkBenchComponent", "Action", "Craft-All");

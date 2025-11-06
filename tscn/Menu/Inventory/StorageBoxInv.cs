@@ -5,7 +5,7 @@ using horizoncraft.script.Components;
 using horizoncraft.script.Events.player;
 using horizoncraft.script.Net;
 
-[Tool]
+
 public partial class StorageBoxInv : InventoryNode
 {
     LineEdit lineEdit;
