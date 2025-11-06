@@ -3,6 +3,12 @@
     "max": 16
   },
   "iron_bukkit_water": {
+    "components": {
+      "ItemFluidComponent": {
+        "Name": "PlaceFluidSystem",
+        "FluidName": "water"
+      }
+    },
     "max": 4
   }
 }

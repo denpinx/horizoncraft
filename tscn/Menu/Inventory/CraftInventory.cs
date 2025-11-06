@@ -29,7 +29,7 @@ public partial class CraftInventory : InventoryNode
         ResultItem.RightClick += OnCraftButtonPressed;
     }
 
-    public void OnCraftButtonPressed(int index, bool isShift)
+    private void OnCraftButtonPressed(int index, bool isShift)
     {
         if (PlayerNode?.world == null) return;
         var cgri = new PlayerCraftItemEvent()

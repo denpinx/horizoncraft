@@ -11,6 +11,7 @@ using horizoncraft.script.Components.Systems.BlockSystems;
 using horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
 using horizoncraft.script.Components.Systems.BlockSystems.Reactive;
 using horizoncraft.script.Components.Systems.ItemSystems;
+using HorizonCraft.script.Components.Systems.ItemSystems;
 using horizoncraft.script.Events;
 using horizoncraft.script.Events.player;
 using horizoncraft.script.Events.SystemEvents;
@@ -77,7 +78,7 @@ public static class ComponentManager
                 var s = value.System.ExecuteItemComponent(playerEvent, component);
                 if (!s) return false;
             }
-            
+
             if (itemStack.Name != start_id)
                 return false;
         }
@@ -305,6 +306,11 @@ public static class ComponentManager
         Register(SystemEnum.DoorLinkUpdate,
             typeof(ReactiveComponent),
             new DoorLinkUpdateSystem()
+        );
+        //让物品能够消耗自己放置流体.
+        Register(SystemEnum.PlaceFluidSystem,
+            typeof(ItemFluidComponent),
+            new PlaceFluidSystem()
         );
 
 

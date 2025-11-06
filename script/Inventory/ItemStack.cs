@@ -28,7 +28,7 @@ public partial class ItemStack
         var item = GetItemMeta().GetItemStack();
         item.Amount = amount == 0 ? Amount : amount;
         item.State = State;
-        //todo 组件是否应该支持运行时状态复制？还是不应该复制组件？直接重构？
+        //todo 待定,组件是否应该支持运行时状态复制？还是不应该复制组件？直接重构？
         //item.Components.Clear();
         // foreach (var component in Components)
         //     if (component is ICopy copy)

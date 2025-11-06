@@ -82,10 +82,11 @@ public partial class PlayerNode : CharacterBody2D
             if (GuiCanvasLayer.Visible) GuiCanvasLayer.Visible = false;
         }
         else if (!GuiCanvasLayer.Visible) GuiCanvasLayer.Visible = true;
+
         if (!BaseInputable || playerData == null) return;
         if (playerData.FaceLeft) sprite2D_body.SetScale(new Vector2(1, 1));
         else sprite2D_body.SetScale(new Vector2(-1, 1));
-        
+
         Vector2I coord = new(
             (int)Mathf.Floor(GetGlobalMousePosition().X / 16),
             (int)Mathf.Floor(GetGlobalMousePosition().Y / 16)
@@ -326,26 +327,36 @@ public partial class PlayerNode : CharacterBody2D
             {
                 if (ActionProcess.State == PlayerAction.UseItem)
                 {
-                    ActionProcess.ProcessTime += (float)delta;
-                    if (ActionProcess.ProcessTime >= ActionProcess.FinalTime)
+                    var pos = new Vector3I(coord.X, coord.Y, 0);
+                    if (pos != ActionProcess.Position)
                     {
-                        var puie = new PlayerUseItemEvent()
-                        {
-                            world = world,
-                            Player = playerData,
-                            UseItemStack = handitem,
-                            Position = ActionProcess.Position
-                        };
-                        world.Service.PlayerService.Events.UseItem(puie);
-                        ActionProcess.Reset();
-                        return true;
+                        ActionProcess.State = PlayerAction.None;
                     }
+                    else
+                    {
+                        ActionProcess.ProcessTime += (float)delta;
+                        if (ActionProcess.ProcessTime >= ActionProcess.FinalTime)
+                        {
+                            var puie = new PlayerUseItemEvent()
+                            {
+                                world = world,
+                                Player = playerData,
+                                UseItemStack = handitem,
+                                Position = ActionProcess.Position
+                            };
+                            world.Service.PlayerService.Events.UseItem(puie);
+                            ActionProcess.Reset();
+                            return true;
+                        }
+                    }
+
                 }
                 else
                 {
                     ActionProcess.State = PlayerAction.UseItem;
                     ActionProcess.FinalTime = cmp.UseTime;
                     ActionProcess.ProcessTime = 0;
+                    ActionProcess.Position = new Vector3I(coord.X, coord.Y, 0);
                     return true;
                 }
             }
@@ -559,18 +570,23 @@ public partial class PlayerNode : CharacterBody2D
         }
     }
 
-    //防止卡在未加载区块里面
+    /// <summary>
+    /// 防止卡在未加载区块里面。
+    /// </summary>
+    /// <param name="coord"></param>
     private void AntiOnChunkUnload(Vector2I coord)
     {
-        // if (world == null || !world.Service.ChunkService.Chunks.ContainsKey(coord))
-        // {
-        //     Stop = true;
-        // }
-        // else if (playerData.Mode == 0)
-        //     Stop = false;
+        if (world == null || !world.Service.ChunkService.Chunks.ContainsKey(coord))
+        {
+            Stop = true;
+        }
+        else if (playerData.Mode == 0)
+            Stop = false;
     }
 
-    //更新挖掘进度条
+    /// <summary>
+    /// 更新挖掘进度条
+    /// </summary>
     private void UpdateCursor()
     {
         Label_PlayerName.Text = Profile.Name;

@@ -4,7 +4,9 @@ using Godot.Collections;
 using horizoncraft.script;
 using horizoncraft.script.WorldControl;
 using horizoncraft.script.WorldControl.Struct;
-
+/// <summary>
+/// 建筑蓝图绘制工具。
+/// </summary>
 public partial class StructBuildTool : CanvasLayer
 {
     public PreBuildStruct PreBuildStruct = new PreBuildStruct();

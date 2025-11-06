@@ -27,6 +27,7 @@ namespace horizoncraft.script.Components
     [MemoryPackUnion(13, typeof(ItemUsefulComponent))]
     [MemoryPackUnion(14, typeof(ItemEatableComponent))]
     [MemoryPackUnion(15, typeof(BlockRelyOnComponent))]
+    [MemoryPackUnion(16, typeof(ItemFluidComponent))]
     public abstract partial class Component
     {
         [MemoryPackAllowSerialize] private string _name;
