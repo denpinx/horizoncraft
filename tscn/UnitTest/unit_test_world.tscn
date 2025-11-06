@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://84dwic2rc0o3"]
+
+[ext_resource type="PackedScene" uid="uid://bem5bibh4ch2d" path="res://tscn/world.tscn" id="1_njtak"]
+[ext_resource type="Script" uid="uid://b50b78pfscrj3" path="res://tscn/UnitTest/UnitTestWorld.cs" id="2_cjoe2"]
+
+[node name="UnitTestWorld" instance=ExtResource("1_njtak")]
+script = ExtResource("2_cjoe2")

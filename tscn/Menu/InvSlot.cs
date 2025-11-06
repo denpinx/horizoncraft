@@ -9,8 +9,8 @@ using horizoncraft.script.Inventory;
 public partial class InvSlot : Control
 {
     [Export] public bool HideBackGround = false;
-    public Action<int, bool, bool> LeftClick;
-    public Action<int, bool, bool> RightClick;
+    public Action<int, bool> LeftClick;
+    public Action<int, bool> RightClick;
     public int index = 0;
     public ItemStack ShowItem;
     public bool LastHoverState = false;
@@ -74,9 +74,9 @@ public partial class InvSlot : Control
                     {
                         Vector2 localPos = globalMousePos - globalRect.Position;
                         if (Input.IsKeyPressed(Key.Shift))
-                            RightClick?.Invoke(index, false, true);
+                            RightClick?.Invoke(index, true);
                         else
-                            RightClick?.Invoke(index, false, false);
+                            RightClick?.Invoke(index, false);
 
                         locktime = 0.2f;
                         LastFrame = true;
@@ -87,9 +87,9 @@ public partial class InvSlot : Control
                     if (!LastFrame && locktime == 0)
                     {
                         if (Input.IsKeyPressed(Key.Shift))
-                            LeftClick?.Invoke(index, true, true);
+                            LeftClick?.Invoke(index, true);
                         else
-                            LeftClick?.Invoke(index, true, false);
+                            LeftClick?.Invoke(index, false);
                         locktime = 0.2f;
                         LastFrame = true;
                     }

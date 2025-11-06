@@ -162,7 +162,7 @@ public partial class ItemManage : HBoxContainer, ITranslatable
                 var invslot = _packedSceneInvSlot.Instantiate<InvSlot>();
                 invslot.index = start;
                 invslot.HideBackGround = true;
-                invslot.LeftClick += (index, isleft, isshift) =>
+                invslot.LeftClick += (index, isshift) =>
                 {
                     if (_player != null && _player.playerData != null && _player.playerData.Mode == 1 &&
                         invslot.ShowItem != null)
@@ -179,7 +179,7 @@ public partial class ItemManage : HBoxContainer, ITranslatable
                         }
                     }
                 };
-                invslot.RightClick += (index, isleft, isshift) =>
+                invslot.RightClick += (index, isshift) =>
                 {
                     if (invslot.ShowItem != null)
                     {

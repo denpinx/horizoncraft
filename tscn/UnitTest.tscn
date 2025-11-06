@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cwg7ajqnntrfm"]
+
+[ext_resource type="Script" uid="uid://d1hvo1g7s4g13" path="res://tscn/UnitTest.cs" id="1_ktvph"]
+
+[node name="UnitTest" type="Node2D"]
+script = ExtResource("1_ktvph")

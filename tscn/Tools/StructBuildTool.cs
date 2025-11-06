@@ -77,7 +77,7 @@ public partial class StructBuildTool : CanvasLayer
             var invslot = ps.Instantiate<InvSlot>();
             invslot.index = i;
             invslot.HideBackGround = true;
-            invslot.LeftClick += (index, isleft, isshift) => { SelectedBlock = meta.Name; };
+            invslot.LeftClick += (index, isshift) => { SelectedBlock = meta.Name; };
             GridContainer.AddChild(invslot);
             invslot.SetShowItem(meta.ItemMeta.GetItemStack());
         }

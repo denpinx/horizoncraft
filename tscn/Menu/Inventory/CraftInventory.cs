@@ -22,16 +22,16 @@ public partial class CraftInventory : InventoryNode
                     "VBoxContainer/PanelContainer_Craft/HBoxContainer/GridContainer/InvSlot" + i);
             invslot.index = 36 + i;
 
-            invslot.LeftClick += OnPlayerButtonPressed;
-            invslot.RightClick += OnPlayerButtonPressed;
+            invslot.LeftClick += OnPlayerLeftClickItem;
+            invslot.RightClick += OnPlayerRightClickItem;
             CraftSlots.Add(invslot);
         }
 
         ResultItem =
             GetNode<InvSlot>(
                 "VBoxContainer/PanelContainer_Craft/HBoxContainer/InvSlot_result");
-        ResultItem.LeftClick += OnCraftButtonPressed;
-        ResultItem.RightClick += OnCraftButtonPressed;
+        ResultItem.LeftClick += OnPlayerLeftClickItem;
+        ResultItem.RightClick += OnPlayerRightClickItem;
     }
 
     public void OnCraftButtonPressed(int index, bool isLeft, bool isShift)

@@ -122,7 +122,7 @@ public partial class ReciperView : Control, ITranslatable
             slot.Ready += () =>
                 slot.SetShowItem(item.GetItemStack());
             slot.index = i++;
-            slot.LeftClick += (index, b, arg3) =>
+            slot.LeftClick += (index, arg3) =>
             {
                 var rp = recipePacks.ToArray()[index];
                 SelectedRecipePack = rp.Value;
@@ -193,16 +193,16 @@ public partial class ReciperView : Control, ITranslatable
                 for (int x = 0; x < Max; x++)
                 {
                     var Slot = _packedSceneInvSlot.Instantiate<InvSlot>();
-                    Slot.LeftClick = (i, s, b) => LeftClick(Slot, i, s, b);
-                    Slot.RightClick = (i, s, b) => RightClick(Slot, i, s, b);
+                    Slot.LeftClick = (i, b) => LeftClick(Slot, i, b);
+                    Slot.RightClick = (i, b) => RightClick(Slot, i, b);
                     Slot.Ready += () => Slot.SetShowItem(Items[x, y]);
                     _Grid_Container.AddChild(Slot);
                 }
             }
 
             var Slot_output = _packedSceneInvSlot.Instantiate<InvSlot>();
-            Slot_output.LeftClick = (i, s, b) => LeftClick(Slot_output, i, s, b);
-            Slot_output.RightClick = (i, s, b) => RightClick(Slot_output, i, s, b);
+            Slot_output.LeftClick = (i, b) => LeftClick(Slot_output, i, b);
+            Slot_output.RightClick = (i, b) => RightClick(Slot_output, i, b);
             Slot_output.Ready += () => Slot_output.SetShowItem(recipe.Result.Copy());
             _Grid_OutPut_Container.AddChild(Slot_output);
 
@@ -233,8 +233,8 @@ public partial class ReciperView : Control, ITranslatable
             {
                 var Slot = _packedSceneInvSlot.Instantiate<InvSlot>();
                 var itemstack = recipe.Cost[i].Copy();
-                Slot.LeftClick = (i, s, b) => LeftClick(Slot, i, s, b);
-                Slot.RightClick = (i, s, b) => RightClick(Slot, i, s, b);
+                Slot.LeftClick = (i, b) => LeftClick(Slot, i, b);
+                Slot.RightClick = (i, b) => RightClick(Slot, i, b);
 
                 Slot.Ready += () => Slot.SetShowItem(itemstack);
                 _Process_Container.AddChild(Slot);
@@ -244,8 +244,8 @@ public partial class ReciperView : Control, ITranslatable
             {
                 var Slot = _packedSceneInvSlot.Instantiate<InvSlot>();
                 var itemstack = recipe.Result[i].Copy();
-                Slot.LeftClick = (i, s, b) => LeftClick(Slot, i, s, b);
-                Slot.RightClick = (i, s, b) => RightClick(Slot, i, s, b);
+                Slot.LeftClick = (i, b) => LeftClick(Slot, i, b);
+                Slot.RightClick = (i, b) => RightClick(Slot, i, b);
                 Slot.Ready += () => Slot.SetShowItem(itemstack);
                 _Process_OutPut_Container.AddChild(Slot);
             }
@@ -272,7 +272,7 @@ public partial class ReciperView : Control, ITranslatable
     }
 
 
-    public void LeftClick(InvSlot invslot, int index, bool isleft, bool isshift)
+    public void LeftClick(InvSlot invslot, int index, bool isshift)
     {
         if (invslot.ShowItem != null)
         {
@@ -280,7 +280,7 @@ public partial class ReciperView : Control, ITranslatable
         }
     }
 
-    public void RightClick(InvSlot invslot, int index, bool isleft, bool isshift)
+    public void RightClick(InvSlot invslot, int index, bool isshift)
     {
         if (invslot.ShowItem != null)
         {
