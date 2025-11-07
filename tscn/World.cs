@@ -153,7 +153,7 @@ namespace horizoncraft.script
             _stopwatch.Stop();
             Service.TickTimes++;
 
-            TimeConsumingμs = _stopwatch.Elapsed.TotalMilliseconds;
+            TimeConsumingμs = _stopwatch.Elapsed.TotalMicroseconds;
         }
 
         /// <summary>
