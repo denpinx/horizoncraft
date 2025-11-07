@@ -43,11 +43,6 @@
     "tags": {
       "type": "any",
       "link": "net"
-    },
-    "components": {
-      "ReactiveComponent": {
-        "Name": "TestReactiveSystem"
-      }
     }
   }
 }

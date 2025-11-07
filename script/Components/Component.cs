@@ -9,7 +9,9 @@ using horizoncraft.script.Components.Item;
 
 namespace horizoncraft.script.Components
 {
-    //Data Only
+    /// <summary>
+    /// 所有凡是继承了 Component 的组件都要在这里配置Union，否则无法序列化
+    /// </summary>
     [MemoryPackable]
     [MemoryPackUnion(0, typeof(TickComponent))]
     [MemoryPackUnion(1, typeof(ExpandComponent))]

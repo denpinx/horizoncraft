@@ -3,7 +3,9 @@ using Godot;
 using horizoncraft.script.Events;
 
 namespace horizoncraft.script.Components.Systems;
-
+/// <summary>
+/// 物品栏系统
+/// </summary>
 public class InventorySystem : TickSystem
 {
     // public override void Ticking(BlockTickEvent blockTickEvent, Component component)

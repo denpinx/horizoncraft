@@ -3,7 +3,10 @@ using horizoncraft.script.Components.EnergyBlocks;
 using horizoncraft.script.Events;
 
 namespace horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
-
+/// <summary>
+/// 能量线缆系统
+/// 每Tick向周围传输能量
+/// </summary>
 public class EnergyCableSystem : TickSystem
 {
     public override void BlockTick(BlockTickEvent blockTickEvent, Component component)

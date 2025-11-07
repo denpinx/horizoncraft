@@ -7,7 +7,11 @@ using horizoncraft.script.Events;
 using horizoncraft.script.Expand;
 
 namespace horizoncraft.script.Components.Systems;
-
+/// <summary>
+/// 物品实体系统
+/// 自动合并相同物品的实体。
+/// 当玩家靠经时被玩家拾取。
+/// </summary>
 public class ItemEntitySystem : EntitySystem
 {
     public override void EntityTick(EntityTickEvent e)

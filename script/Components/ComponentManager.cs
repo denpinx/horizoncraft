@@ -312,9 +312,5 @@ public static class ComponentManager
             typeof(ItemFluidComponent),
             new PlaceFluidSystem()
         );
-
-
-        //被动测试组件
-        Register(SystemEnum.TestReactiveSystem, typeof(ReactiveComponent), new TestReactiveSystem());
     }
 }

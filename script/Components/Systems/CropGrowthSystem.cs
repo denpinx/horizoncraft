@@ -3,7 +3,10 @@ using horizoncraft.script.Components.BlockComponents;
 using horizoncraft.script.Events;
 
 namespace horizoncraft.script.Components.Systems;
-
+/// <summary>
+/// 作物生长系统
+/// 每Tick尝试随机生长一次，累计N次后增加一次生长状态。
+/// </summary>
 public class CropGrowthSystem:TickSystem
 {
     private static BlockMeta farmland = Materials.Valueof("farmland");

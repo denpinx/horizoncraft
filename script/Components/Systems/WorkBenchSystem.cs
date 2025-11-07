@@ -5,7 +5,10 @@ using horizoncraft.script.Inventory;
 using horizoncraft.script.Recipes;
 
 namespace horizoncraft.script.Components.Systems;
-
+/// <summary>
+/// 工作台系统
+/// 接收玩家的合成指令，消耗物品栏物品合成。
+/// </summary>
 public class WorkBenchSystem : TickSystem
 {
     public override void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)

@@ -2,6 +2,10 @@ using horizoncraft.script.Events;
 
 namespace horizoncraft.script.Components.Systems;
 
+/// <summary>
+/// 伪物理系统
+/// 模拟沙子物理等。
+/// </summary>
 public class PhysicsSystem : TickSystem
 {
     public override void BlockTick(BlockTickEvent e, Component cmp)

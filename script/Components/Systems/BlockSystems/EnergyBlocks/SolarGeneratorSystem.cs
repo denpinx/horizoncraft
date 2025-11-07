@@ -4,7 +4,10 @@ using horizoncraft.script.Components.EnergyBlocks;
 using horizoncraft.script.Events;
 
 namespace horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
-
+/// <summary>
+/// 太阳能系统
+/// 仅在白天工作，自动向周围传输能能量。
+/// </summary>
 public class SolarGeneratorSystem : TickSystem
 {
     public override void BlockTick(BlockTickEvent blockTickEvent, Component component)

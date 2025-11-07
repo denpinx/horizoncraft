@@ -20,7 +20,6 @@ public class ClientWorldService : WorldServiceBase
         {
             Connected = true;
             GD.Print($"[客户端] 连接成功 #{id}");
-            //world.RpcId(1, "ConnectDone", PlayerNode.Profile.Name, world.Multiplayer.GetUniqueId());
         };
         world.Multiplayer.ConnectionFailed += () =>
         {

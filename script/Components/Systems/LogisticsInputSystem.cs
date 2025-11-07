@@ -4,9 +4,17 @@ using horizoncraft.script.Events;
 using horizoncraft.script.WorldControl;
 
 namespace horizoncraft.script.Components.Systems;
-
+/// <summary>
+/// 物流输入系统
+/// 在1tick内dfs周围的物流管道传输物品，没有缓存。
+/// </summary>
 public class LogisticsInputSystem : TickSystem
 {
+    /// <summary>
+    /// 主动轮询Tick
+    /// </summary>
+    /// <param name="e"></param>
+    /// <param name="component"></param>
     public override void BlockTick(BlockTickEvent e, Component component)
     {
         HashSet<Vector3I> finded = new HashSet<Vector3I>();
@@ -27,7 +35,11 @@ public class LogisticsInputSystem : TickSystem
         if (target_inv.TryPushItem(targetmeta, item))
             input_inv.GetInventory().ReduceItemAmount(index, 1);
     }
-
+    /// <summary>
+    /// 被动触发Tick
+    /// </summary>
+    /// <param name="e"></param>
+    /// <param name="component"></param>
     public override void ReactiveTick(BlockTickEvent e, ReactiveComponent component)
     {
         HashSet<Vector3I> finded = new HashSet<Vector3I>();

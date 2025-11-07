@@ -2,7 +2,10 @@ using System;
 using horizoncraft.script.Events;
 
 namespace horizoncraft.script.Components.Systems;
-
+/// <summary>
+/// 方块被蔓延系统
+/// 当左右有指定的方块的时候被蔓延。
+/// </summary>
 public class BlockSpreadSystem : TickSystem
 {
     Random _Random = new Random();

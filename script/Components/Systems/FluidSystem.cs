@@ -4,7 +4,11 @@ using horizoncraft.script.Events.player;
 using horizoncraft.script.Inventory;
 
 namespace horizoncraft.script.Components.Systems;
-
+/// <summary>
+/// 流体系统
+/// 当被手持铁桶右键时会被替换成空气，并基给予玩家一个水桶。
+/// 每Tick会向周围蔓延，直到最大限制。
+/// </summary>
 public class FluidSystem : TickSystem
 {
     const int FluidLenght = 16;

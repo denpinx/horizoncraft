@@ -45,6 +45,7 @@ public class HostWorldService : WorldServiceBase
             if (player.PeerId == id)
             {
                 PlayerService.Players.TryRemove(player.Name, out var _);
+                PlayerService.SavePlayer(player);
                 return;
             }
         }

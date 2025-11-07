@@ -5,7 +5,10 @@ using horizoncraft.script.Inventory;
 using horizoncraft.script.Recipes;
 
 namespace horizoncraft.script.Components.Systems;
-
+/// <summary>
+/// 熔炉系统
+/// 处理熔炉配方
+/// </summary>
 public class FurnaceSystem : TickSystem
 {
     public override void InventoryTick(BlockTickEvent evnet, InventoryComponent component)

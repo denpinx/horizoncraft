@@ -2,6 +2,9 @@ using horizoncraft.script.Events;
 
 namespace horizoncraft.script.Components.Systems.BlockSystems.Reactive;
 
+/// <summary>
+/// 门的联动更新系统，用于同步相邻门的打开状态的
+/// </summary>
 public class DoorLinkUpdateSystem : TickSystem
 {
     private BlockMeta air = Materials.BlockMetas["air"];

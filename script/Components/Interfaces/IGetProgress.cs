@@ -1,5 +1,7 @@
 namespace horizoncraft.script.Components.Interfaces;
-
+/// <summary>
+/// 获取进度值
+/// </summary>
 public interface IGetProgress
 {
     public ProgressValue GetProgress();
