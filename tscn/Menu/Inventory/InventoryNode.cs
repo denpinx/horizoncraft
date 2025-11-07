@@ -63,8 +63,8 @@ public partial class InventoryNode : CanvasLayer
             {
                 InvSlot s = GetNode<InvSlot>(path);
                 s.index = i++;
-                s.LeftClick += OnPlayerLeftClickItem;
-                s.RightClick += OnPlayerRightClickItem;
+                s.LeftClick += OnTargetButtonLeftPressed;
+                s.RightClick += OnTargetButtonRightPressed;
                 TargetSlots.Add(s);
             }
         }
@@ -75,8 +75,8 @@ public partial class InventoryNode : CanvasLayer
                 InvSlot s = TargetInventorySlotRoot.GetNode<InvSlot>(TargetInventorySlotName + i);
 
                 s.index = i;
-                s.LeftClick += OnPlayerLeftClickItem;
-                s.RightClick += OnPlayerRightClickItem;
+                s.LeftClick += OnTargetButtonLeftPressed;
+                s.RightClick += OnTargetButtonRightPressed;
                 TargetSlots.Add(s);
             }
         }
@@ -109,12 +109,14 @@ public partial class InventoryNode : CanvasLayer
 
     public void OnPlayerLeftClickItem(int index, bool Shift)
     {
-        OnPlayerButtonPressed(index,true, Shift);
+        OnPlayerButtonPressed(index, true, Shift);
     }
+
     public void OnPlayerRightClickItem(int index, bool Shift)
     {
-        OnPlayerButtonPressed(index, false,Shift);
+        OnPlayerButtonPressed(index, false, Shift);
     }
+
     public void OnPlayerButtonPressed(int index, bool isLeft, bool isShift)
     {
         if (PlayerNode?.world == null) return;
@@ -163,6 +165,16 @@ public partial class InventoryNode : CanvasLayer
         {
             events.PickItem(ppi);
         }
+    }
+
+    public void OnTargetButtonLeftPressed(int index, bool Shift)
+    {
+        OnTargetButtonPressed(index, true, Shift);
+    }
+
+    public void OnTargetButtonRightPressed(int index, bool Shift)
+    {
+        OnTargetButtonPressed(index, false, Shift);
     }
 
     public void OnTargetButtonPressed(int index, bool isLeft, bool isShift)

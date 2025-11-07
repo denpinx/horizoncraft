@@ -22,9 +22,10 @@ public class ProcessRecipeItem
         {
             var result = Cost.Find(stack => item.GetItemMeta().GetTag("thesaurus") == stack.Name);
             if (result == null)
-            {
                 return false;
-            }
+
+            if (item.Amount < result.Amount)
+                return false;
         }
 
         return true;
@@ -40,7 +41,7 @@ public class ProcessRecipeItem
         foreach (var cost in Cost)
         {
             if (item == null) return false;
-            if (item.Name != cost.Name && item.Amount != cost.Amount) return false;
+            if (item.Name != cost.Name || item.Amount < cost.Amount) return false;
         }
 
         return true;
