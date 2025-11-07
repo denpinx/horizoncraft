@@ -5,6 +5,7 @@
 /.VSCodeCounter/**/*
 qodana.yaml
 export_presets.cfg
-.idea/
-.vs/
-profile/
+.idea/**/*
+.vs/**/*
+profile/**/*
+HorizonCraft.sln.DotSettings.user
