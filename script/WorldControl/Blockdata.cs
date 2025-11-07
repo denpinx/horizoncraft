@@ -19,7 +19,7 @@ namespace horizoncraft.script.WorldControl
         public int State;
 
         /// <summary>方块光照值</summary>
-        public int Light;
+        [MemoryPackIgnore] public int Light;
 
         [MemoryPackIgnore] public int OldLight=0;
 

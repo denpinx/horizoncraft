@@ -17,7 +17,7 @@ public class ClientChunkService : ChunkServiceBase
     {
     }
 
-    public override async Task<Chunk> LoadChunk(Vector2I pos)
+    protected override async Task<Chunk> LoadChunk(Vector2I pos)
     {
         if (RegetList.TryGetValue(pos, out int i))
         {

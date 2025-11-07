@@ -51,11 +51,13 @@ public partial class DebugView : Node2D
         var biomebase = BiomeManage.GetBiomeAsName(chunk.BiomeType);
         if (biomebase == null)
         {
+            GD.Print("biomebase == null");
             return;
         }
         DrawRect(new Rect2(0, 0, new(16 * Chunk.Size, 16 * Chunk.Size)), biomebase.DebugColor);
         List<string> list = new()
         {
+            $"time:{DateTime.Now}",
             $"区块生成耗时：{chunk.SpawnCostTime_μs} μs",
             $"坐标：{chunk.coord.X}，{chunk.coord.Y} ",
             $"生物群系类型：{chunk.BiomeType} ",

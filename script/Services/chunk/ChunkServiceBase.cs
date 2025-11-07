@@ -176,7 +176,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
         _stopwatchTick.Stop();
         tickConsumed = _stopwatchTick.ElapsedMilliseconds;
         tickConsumed_μs = _stopwatchTick.Elapsed.TotalMicroseconds;
-        
+
         UpdateLights();
     }
 
@@ -185,7 +185,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     /// </summary>
     /// <param name="pos"></param>
     /// <returns></returns>
-    public virtual async Task<Chunk> LoadChunk(Vector2I pos)
+    protected virtual async Task<Chunk> LoadChunk(Vector2I pos)
     {
         try
         {
@@ -672,7 +672,9 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
         }
 
         foreach (var chunk in resultchunk)
+        {
             chunk.CheckLightUpdate();
+        }
     }
 
     /// <summary>

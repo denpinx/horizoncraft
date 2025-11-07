@@ -57,7 +57,9 @@ namespace horizoncraft.script
         /// <summary>
         /// 区块TileMap集合
         /// </summary>
-        public List<TileMapLayerChunk> tileMapLayerChunks = new();
+        /// 
+        //public List<TileMapLayerChunk> tileMapLayerChunks = new();
+        public Dictionary<Vector2I, TileMapLayerChunk> tileMapLayerChunks = new();
 
         /// <summary>
         /// 用于显示的区块集合
@@ -161,15 +163,7 @@ namespace horizoncraft.script
         /// <returns>是否存在TileMap节点</returns>
         public bool HasTileMap(Vector2I coord)
         {
-            for (int i = 0; i < tileMapLayerChunks.Count; i++)
-            {
-                if (tileMapLayerChunks[i].chunk.coord == coord)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return tileMapLayerChunks.ContainsKey(coord);
         }
 
         /// <summary>
@@ -178,7 +172,11 @@ namespace horizoncraft.script
         /// <param name="chunk"></param>
         private void TryAddTileMap(Chunk chunk)
         {
-            if (tileMapLayerChunks.Find(a => a.chunk.coord == chunk.coord) != null) return;
+            if (tileMapLayerChunks.ContainsKey(chunk.coord))
+            {
+                tileMapLayerChunks[chunk.coord].SetChunk(chunk);
+                return;
+            }
 
             TileMapLayerChunk tmly = chunkPackedScene.Instantiate<TileMapLayerChunk>();
             tmly.chunk = chunk;
@@ -186,7 +184,7 @@ namespace horizoncraft.script
             tmly.GlobalPosition = chunk.coord * Chunk.Size * 16;
             tmly.Visible = true;
             tmly.PlayerNode = PlayerNode;
-            tileMapLayerChunks.Add(tmly);
+            tileMapLayerChunks.Add(chunk.coord, tmly);
             AddChild(tmly);
         }
 
@@ -196,12 +194,12 @@ namespace horizoncraft.script
         public void UpdateTileMap()
         {
             if (PlayerNode.playerData == null) return;
-            foreach (var tmly in tileMapLayerChunks.ToArray())
+            foreach (var tmly in tileMapLayerChunks.Values.ToArray())
             {
                 if (!VisibleChunks.ContainsKey(tmly.chunk.coord))
                 {
                     RemoveChild(tmly);
-                    tileMapLayerChunks.Remove(tmly);
+                    tileMapLayerChunks.Remove(tmly.chunk.coord);
                     tmly.QueueFree();
                 }
             }

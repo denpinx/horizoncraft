@@ -25,7 +25,10 @@ public partial class TileMapLayerChunk : Node2D
         tileMapLayer_back.TileSet = result;
     }
 
-
+    public void SetChunk(Chunk chunk)
+    {
+        this.chunk = chunk;
+    }
     public override void _Process(double delta)
     {
         if (chunk == null && GetParent() == null)
@@ -40,7 +43,7 @@ public partial class TileMapLayerChunk : Node2D
             debugView.QueueRedraw();
         }
 
-        if (chunk.update_tilemap)
+        if (chunk is { update_tilemap: true })
         {
             for (int x = 0; x < Chunk.Size; x++)
             {

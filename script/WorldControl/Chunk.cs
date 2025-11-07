@@ -30,8 +30,8 @@ namespace horizoncraft.script.WorldControl
         /// 因为异常原因导致的区块加载失败的标记
         /// </summary>
         // public bool Error = false;
-
         public static int SizeZ = 2;
+
         public static int Size = 50;
         public bool spawn = false;
         public long version;
@@ -254,8 +254,8 @@ namespace horizoncraft.script.WorldControl
             _Stopwatch_tick_used.Stop();
             TickUsedTime_μs = _Stopwatch_tick_used.Elapsed.TotalMicroseconds;
         }
+
         
-        //这个函数成功更新的光照
         public void SetLight(int light)
         {
             for (int x = 0; x < Chunk.Size; x++)
@@ -263,13 +263,13 @@ namespace horizoncraft.script.WorldControl
             {
                 data[x, y, 1].OldLight = data[x, y, 1].Light;
                 data[x, y, 1].Light = light;
-                if (data[x, y, 1].OldLight != light)
-                {
-                    update_tilemap = true;
-                }
+                // if (!update_tilemap && data[x, y, 1].OldLight != light)
+                // {
+                //     LightUpdateTime++;
+                //     update_tilemap = true;
+                // }
             }
         }
-        //但是这里又判断没有更新?
         public bool CheckLightUpdate()
         {
             for (int x = 0; x < Chunk.Size; x++)
@@ -295,20 +295,6 @@ namespace horizoncraft.script.WorldControl
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// 检查
-        /// </summary>
-        /// <returns></returns>
-        public bool CheckError()
-        {
-            // Error = true;
-            // if (BiomeManage.GetBiomeAsName(BiomeType) == null) return false;
-            // if (BiomeType == null) return false;
-            //
-            // Error = false;
-            return true;
         }
     }
 }
