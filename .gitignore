@@ -3,3 +3,8 @@
 /android/
 /save/**/*
 /.VSCodeCounter/**/*
+qodana.yaml
+export_presets.cfg
+.idea/
+.vs/
+profile/
