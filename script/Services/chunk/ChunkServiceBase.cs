@@ -114,6 +114,8 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     protected double tickConsumed_μs;
     protected double GroupingTime_μs;
 
+    protected int processloadtask_count = 0;
+
     #endregion
 
 
@@ -128,7 +130,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                   $"区块分组耗时:{GroupingTime_μs} μs/t";
         _tokenSource = new CancellationTokenSource();
         _processLoadTask = Task.Run(ProcessChunkLoadThread, _tokenSource.Token);
-    }  
+    }
 
     #region 虚方法和抽象方法
 
@@ -174,16 +176,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
         _stopwatchTick.Stop();
         tickConsumed = _stopwatchTick.ElapsedMilliseconds;
         tickConsumed_μs = _stopwatchTick.Elapsed.TotalMicroseconds;
-
-        // foreach (var pos in Chunks.Keys.ToArray())
-        // {
-        //     var chunk = Chunks[pos];
-        //     if (chunk.Error)
-        //     {
-        //         Chunks.TryRemove(pos, out _);
-        //     }
-        // }
-
+        
         UpdateLights();
     }
 
@@ -264,12 +257,6 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     {
         while (!_tokenSource.Token.IsCancellationRequested)
         {
-            GD.Print($"#{World.Service.TickTimes} 已加载区块:",Chunks.Count);
-            foreach (var chunk in Chunks)
-            {
-                GD.Print($"#{World.Service.TickTimes} 区块:{chunk.Key.X},{chunk.Key.Y}");
-            }
-            
             try
             {
                 //常规区块加载任务，自动加载玩家半径内的区块
@@ -282,19 +269,20 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                         //如果和加载队列重叠，先跳过当前的加载。
                         if (LoadChunkQueue.Contains(chunkpos))
                             continue;
-
                         tasks.Add(LoadChunk(chunkpos));
                     }
 
-
-                //加载区块队列
-                while (LoadChunkQueue.TryDequeue(out var pos))
+                int count = 0;
+                //修复死循环问题，
+                var queue = LoadChunkQueue.ToArray();
+                LoadChunkQueue.Clear();
+                for (int i = 0; i < queue.Length; i++)
                 {
+                    var pos = queue[i];
                     if (Chunks.ContainsKey(pos))
                         continue;
                     tasks.Add(LoadChunk(pos));
                 }
-
 
                 //同步处理
                 if (tasks.Count > 0)
@@ -303,7 +291,6 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                     foreach (var chunk in chunks)
                         if (Chunks.TryAdd(chunk.coord, chunk))
                         {
-                            GD.Print($"#{World.Service.TickTimes} 区块加载:{chunk.coord},{chunk.coord}");
                             OnChunkLoaded?.Invoke(chunk);
                         }
                 }
@@ -332,7 +319,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                 continue;
             }
 
-
+            processloadtask_count++;
             await Task.Delay(50, _tokenSource.Token);
         }
     }
