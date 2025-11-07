@@ -47,7 +47,6 @@
     <Content Include="config\block_tscn\furnace_1.tscn" />
     <Content Include="config\block_tscn\furnace_1.tscn31451182426.tmp" />
     <Content Include="config\builds\mine_mini_room.json" />
-    <Content Include="config\entity\entitys.json" />
     <Content Include="config\item\block\blocks.json" />
     <Content Include="config\item\Ingots.json" />
     <Content Include="config\item\Materials.json" />

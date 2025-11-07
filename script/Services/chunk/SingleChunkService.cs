@@ -8,9 +8,4 @@ public class SingleChunkService : ChunkServiceBase
     public SingleChunkService(World world) : base(world)
     {
     }
-
-    public override void Ticking()
-    {
-        base.Ticking();
-    }
 }

@@ -17,11 +17,11 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
     public bool Moved { get; set; }
 
     //节点
-    TextureRect _itemTexture_;
-    Label _itemLabel_;
-    Area2D _area2D_;
-    Area2D _area2DFar_;
-    AnimationPlayer _animationPlayer_;
+    [Export] TextureRect _itemTexture_;
+    [Export] Label _itemLabel_;
+    [Export] Area2D _area2D_;
+    [Export] Area2D _area2DFar_;
+    [Export] AnimationPlayer _animationPlayer_;
 
     //自身属性
     double _cooldown_ = 0.5f;
@@ -32,12 +32,6 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
     {
         base._Ready();
         World = (World)GetParent();
-
-        _itemTexture_ = GetNode<TextureRect>("TextureRect");
-        _animationPlayer_ = GetNode<AnimationPlayer>("AnimationPlayer");
-        _itemLabel_ = GetNode<Label>("Label");
-        _area2D_ = GetNode<Area2D>("Area2D");
-        _area2DFar_ = GetNode<Area2D>("Area2D_Far");
         _area2DFar_.BodyEntered += FarPlayerEnter;
         _area2DFar_.BodyExited += FarPlayerExit;
         _animationPlayer_.Play("ide");
@@ -76,7 +70,6 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
         if (_farPlayerNode != null)
         {
             Vector2 direction = (_farPlayerNode.Position_v2 - GlobalPosition).Normalized();
-
             Vector2 attractVelocity = direction * 40f;
             Vector2 newVelocity = LinearVelocity;
             newVelocity.X += attractVelocity.X;
@@ -90,8 +83,8 @@ public partial class ItemEntity : RigidBody2D, IEntityNode
         {
             _itemTexture_.Visible = true;
             _itemTexture_.Texture = selfcmp.ItemStack.GetItemMeta().GetTexture();
-            //_itemLabel_.Text = $"*{selfcmp.ItemStack.Amount}";
-            _itemLabel_.Text = $"[所属{Entity.Owned}] [更新状态{Entity.Update}]";
+            _itemLabel_.Text = $"*{selfcmp.ItemStack.Amount}";
+            //_itemLabel_.Text = $"[所属{Entity.Owned}] [更新状态{Entity.Update}]";
         }
         else
         {

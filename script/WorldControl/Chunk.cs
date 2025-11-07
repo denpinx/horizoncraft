@@ -26,6 +26,11 @@ namespace horizoncraft.script.WorldControl
     [MemoryPackable]
     public partial class Chunk
     {
+        /// <summary>
+        /// 因为异常原因导致的区块加载失败的标记
+        /// </summary>
+        // public bool Error = false;
+
         public static int SizeZ = 2;
         public static int Size = 50;
         public bool spawn = false;
@@ -34,7 +39,7 @@ namespace horizoncraft.script.WorldControl
         public int Y;
         public int[,] HighMap = new int[Size, SizeZ];
         public string BiomeType = "";
-        public string BiomeName = "";
+        //public string BiomeName = "";
 
         public int RemoveCount = 0;
 
@@ -153,12 +158,10 @@ namespace horizoncraft.script.WorldControl
             version = WorldService.TickTimes;
 
             UpdateList.Clear();
-            if (UpdateList_buffer.Count > 0)
-            {
-                for (int i = 0; i < UpdateList_buffer.Count; i++)
-                    UpdateList.Add(UpdateList_buffer[i]);
-                UpdateList_buffer.Clear();
-            }
+            for (int i = 0; i < UpdateList_buffer.Count; i++)
+                UpdateList.Add(UpdateList_buffer[i]);
+            UpdateList_buffer.Clear();
+
 
             BlockTickEvent blockTickEvnet = new()
             {
@@ -251,7 +254,8 @@ namespace horizoncraft.script.WorldControl
             _Stopwatch_tick_used.Stop();
             TickUsedTime_μs = _Stopwatch_tick_used.Elapsed.TotalMicroseconds;
         }
-
+        
+        //这个函数成功更新的光照
         public void SetLight(int light)
         {
             for (int x = 0; x < Chunk.Size; x++)
@@ -259,9 +263,13 @@ namespace horizoncraft.script.WorldControl
             {
                 data[x, y, 1].OldLight = data[x, y, 1].Light;
                 data[x, y, 1].Light = light;
+                if (data[x, y, 1].OldLight != light)
+                {
+                    update_tilemap = true;
+                }
             }
         }
-
+        //但是这里又判断没有更新?
         public bool CheckLightUpdate()
         {
             for (int x = 0; x < Chunk.Size; x++)
@@ -287,6 +295,20 @@ namespace horizoncraft.script.WorldControl
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// 检查
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckError()
+        {
+            // Error = true;
+            // if (BiomeManage.GetBiomeAsName(BiomeType) == null) return false;
+            // if (BiomeType == null) return false;
+            //
+            // Error = false;
+            return true;
         }
     }
 }

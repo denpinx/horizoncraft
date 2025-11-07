@@ -6,7 +6,7 @@ public partial class CreateWorldConfig : Control
 {
     [Export]private LineEdit lineEditWorldName, lineEditWorldSeed;
     [Export]private TextureButton buttonCreateWorld, buttonCancel;
-
+    public Action OnChangeScene;
     public override void _Ready()
     {
         buttonCancel.Pressed += () => { QueueFree(); };
@@ -21,7 +21,7 @@ public partial class CreateWorldConfig : Control
             else World.Seed = lineEditWorldSeed.Text.Hash();
 
             GetTree().ChangeSceneToFile("res://tscn/world.tscn");
-            QueueFree();
+            OnChangeScene?.Invoke();
         };
     }
 }

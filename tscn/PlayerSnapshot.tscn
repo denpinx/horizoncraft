@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://b2y1j1yqbixq"]
+[gd_scene load_steps=14 format=3 uid="uid://b2y1j1yqbixq"]
 
 [ext_resource type="Script" uid="uid://bq6vp14ho3yo2" path="res://tscn/PlayerSnapshot.cs" id="1_f2pik"]
 [ext_resource type="Texture2D" uid="uid://dc7ccxk2dn3pn" path="res://texture/player.png" id="2_mhjhb"]
@@ -134,8 +134,13 @@ _data = {
 &"moving": SubResource("Animation_mhjhb")
 }
 
-[node name="PlayerSnapshot" type="Node2D" node_paths=PackedStringArray("_label", "sprite2D", "animation")]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mhjhb"]
+radius = 5.0
+height = 34.0
+
+[node name="PlayerSnapshot" type="CharacterBody2D" node_paths=PackedStringArray("_label", "sprite2D", "animation")]
 z_index = 10
+collision_layer = 2
 script = ExtResource("1_f2pik")
 _label = NodePath("Label")
 sprite2D = NodePath("Body")
@@ -207,3 +212,7 @@ offset = Vector2(-1, 3)
 libraries = {
 &"": SubResource("AnimationLibrary_8olnf")
 }
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -9)
+shape = SubResource("CapsuleShape2D_mhjhb")

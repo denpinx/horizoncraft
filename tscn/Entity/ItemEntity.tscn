@@ -49,7 +49,7 @@ _data = {
 [sub_resource type="CircleShape2D" id="CircleShape2D_mbpqo"]
 radius = 64.0
 
-[node name="ItemEntity" type="RigidBody2D"]
+[node name="ItemEntity" type="RigidBody2D" node_paths=PackedStringArray("_itemTexture_", "_itemLabel_", "_area2D_", "_area2DFar_", "_animationPlayer_")]
 top_level = true
 z_index = 9
 collision_layer = 2
@@ -58,6 +58,11 @@ can_sleep = false
 lock_rotation = true
 continuous_cd = 1
 script = ExtResource("1_8uma2")
+_itemTexture_ = NodePath("TextureRect")
+_itemLabel_ = NodePath("Label")
+_area2D_ = NodePath("Area2D")
+_area2DFar_ = NodePath("Area2D_Far")
+_animationPlayer_ = NodePath("AnimationPlayer")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -0.5)
@@ -80,6 +85,7 @@ texture = ExtResource("2_hdubk")
 expand_mode = 1
 
 [node name="Area2D" type="Area2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_hdubk")
@@ -98,6 +104,7 @@ libraries = {
 speed_scale = 0.5
 
 [node name="Area2D_Far" type="Area2D" parent="."]
+collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D_Far"]
 shape = SubResource("CircleShape2D_mbpqo")

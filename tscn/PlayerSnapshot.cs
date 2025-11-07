@@ -2,7 +2,7 @@ using Godot;
 using System;
 using horizoncraft.script;
 
-public partial class PlayerSnapshot : Node2D
+public partial class PlayerSnapshot : CharacterBody2D
 {
     [Export]private Label _label;
     [Export]private Sprite2D sprite2D;

@@ -128,7 +128,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                   $"区块分组耗时:{GroupingTime_μs} μs/t";
         _tokenSource = new CancellationTokenSource();
         _processLoadTask = Task.Run(ProcessChunkLoadThread, _tokenSource.Token);
-    }
+    }  
 
     #region 虚方法和抽象方法
 
@@ -174,6 +174,16 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
         _stopwatchTick.Stop();
         tickConsumed = _stopwatchTick.ElapsedMilliseconds;
         tickConsumed_μs = _stopwatchTick.Elapsed.TotalMicroseconds;
+
+        // foreach (var pos in Chunks.Keys.ToArray())
+        // {
+        //     var chunk = Chunks[pos];
+        //     if (chunk.Error)
+        //     {
+        //         Chunks.TryRemove(pos, out _);
+        //     }
+        // }
+
         UpdateLights();
     }
 
@@ -196,7 +206,6 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                 else
                 {
                     var chunk = new Chunk(pos.X, pos.Y);
-                    Chunks[pos] = chunk;
                     WorldGenerator.Generator(chunk);
                     return chunk;
                 }
@@ -238,7 +247,10 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     public virtual void SaveAll()
     {
         foreach (var chunkset in Chunks)
+        {
+            GD.Print($"保存区块:{chunkset.Key.X},{chunkset.Key.Y}");
             SaveChunk(chunkset.Value);
+        }
     }
 
     #endregion
@@ -252,6 +264,12 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     {
         while (!_tokenSource.Token.IsCancellationRequested)
         {
+            GD.Print($"#{World.Service.TickTimes} 已加载区块:",Chunks.Count);
+            foreach (var chunk in Chunks)
+            {
+                GD.Print($"#{World.Service.TickTimes} 区块:{chunk.Key.X},{chunk.Key.Y}");
+            }
+            
             try
             {
                 //常规区块加载任务，自动加载玩家半径内的区块
@@ -284,7 +302,10 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                     Chunk[] chunks = await Task.WhenAll(tasks);
                     foreach (var chunk in chunks)
                         if (Chunks.TryAdd(chunk.coord, chunk))
+                        {
+                            GD.Print($"#{World.Service.TickTimes} 区块加载:{chunk.coord},{chunk.coord}");
                             OnChunkLoaded?.Invoke(chunk);
+                        }
                 }
 
 
@@ -587,10 +608,12 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
             return;
         }
 
-
         var highmap = chunk.HighMap;
         if (highmap == null)
-            chunk.HighMap = WorldGenerator.GetHighMap(chunk.X);
+        {
+            GD.PrintErr("highmap is null!");
+            //chunk.HighMap = WorldGenerator.GetHighMap(chunk.X);
+        }
 
         for (int x = 0; x < Chunk.Size; x++)
         {

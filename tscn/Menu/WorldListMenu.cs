@@ -18,6 +18,7 @@ public partial class WorldListMenu : Control, ITranslatable
     [Export] private VBoxContainer Root;
     private List<WorldInfoLabel> worldInfoLabels = new List<WorldInfoLabel>();
     private List<WorldProfile> worldList = new List<WorldProfile>();
+    public Action OnChangeScene;
 
     public override void _Ready()
     {
@@ -25,14 +26,20 @@ public partial class WorldListMenu : Control, ITranslatable
         UpdateWorldList();
 
         buttonBackMainMenu.Pressed += () => { QueueFree(); };
-        buttonCreateWorld.Pressed += () => { AddChild(WorldCreateScene.Instantiate()); };
+        buttonCreateWorld.Pressed += () =>
+        {
+            var node = WorldCreateScene.Instantiate<CreateWorldConfig>();
+            if (OnChangeScene != null) node.OnChangeScene += OnChangeScene;
+            AddChild(node);
+        };
         buttonLoadWorld.Pressed += () =>
         {
             World.worldMode = World.WorldMode.Single;
             World.WorldName = SelectedWorld.WorldName;
             World.Seed = SelectedWorld.WorldSeed;
+
             GetTree().ChangeSceneToFile("res://tscn/world.tscn");
-            QueueFree();
+            OnChangeScene?.Invoke();
         };
         buttonMultiplayer.Pressed += () =>
         {
@@ -40,7 +47,7 @@ public partial class WorldListMenu : Control, ITranslatable
             World.WorldName = SelectedWorld.WorldName;
             World.Seed = SelectedWorld.WorldSeed;
             GetTree().ChangeSceneToFile("res://tscn/world.tscn");
-            QueueFree();
+            OnChangeScene?.Invoke();
         };
         buttonRemove.Pressed += () =>
         {

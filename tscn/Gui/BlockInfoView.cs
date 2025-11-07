@@ -12,14 +12,13 @@ namespace HorizonCraft.tscn.Gui;
 public partial class BlockInfoView : Control
 {
     private List<ProgressItem> _progressItems = new();
-    private PackedScene _progressItemPack=GD.Load<PackedScene>("res://tscn/Gui/ProgressItem.tscn");
-    [Export]private TextureRect _textureRect;
-    [Export]private VBoxContainer _listNode;
+    private PackedScene _progressItemPack = GD.Load<PackedScene>("res://tscn/Gui/ProgressItem.tscn");
+    [Export] private TextureRect _textureRect;
+    [Export] private VBoxContainer _listNode;
     [Export] private Label _label;
 
     public override void _Ready()
     {
-        
     }
 
     /// <summary>
@@ -35,7 +34,8 @@ public partial class BlockInfoView : Control
         }
 
         Visible = true;
-        _label.Text = block.BlockMeta.Name.Trprefix("meta") + " 组件数:" + block.Components.Count + ",状态:" + block.State;
+        _label.Text = block.BlockMeta.Name.Trprefix("meta") + " 组件数:" + block.Components.Count + ",状态:" + block.State +
+                      ",光照值:" + block.Light;
         _textureRect.Texture = block.BlockMeta.ItemMeta.GetTexture();
         int used = 0;
         foreach (var cmp in block.Components)

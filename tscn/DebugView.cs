@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Godot;
@@ -15,10 +16,13 @@ public partial class DebugView : Node2D
 
         if (chunk == null)
         {
-            DrawRect(new Rect2(0, 0, new(16 * Chunk.Size, 16 * Chunk.Size)), Color.Color8(192, 192, 129));
+            DrawRect(new Rect2(0, 0, new(16 * Chunk.Size, 16 * Chunk.Size)), Color.Color8(192,0, 0));
             return;
         }
-
+        DrawString(font, new(0, 11 * Chunk.Size), $"time:{DateTime.Now}");
+        DrawString(font, new(0, 12 * Chunk.Size), $"update_tilemap:{chunk.update_tilemap}");
+        DrawString(font, new(0, 13 * Chunk.Size), $"update_server:{chunk.update_server}");
+        
         Color color;
         if (chunk.coord.X % 2 == 0)
         {
@@ -45,6 +49,10 @@ public partial class DebugView : Node2D
             }, color, 4
         );
         var biomebase = BiomeManage.GetBiomeAsName(chunk.BiomeType);
+        if (biomebase == null)
+        {
+            return;
+        }
         DrawRect(new Rect2(0, 0, new(16 * Chunk.Size, 16 * Chunk.Size)), biomebase.DebugColor);
         List<string> list = new()
         {

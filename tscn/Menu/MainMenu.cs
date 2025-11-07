@@ -5,6 +5,7 @@ using horizoncraft.script;
 using horizoncraft.script.Config;
 using horizoncraft.script.Expand;
 using horizoncraft.script.I18N;
+using horizoncraft.script.Net;
 using horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.tscn.Menu;
@@ -39,7 +40,13 @@ public partial class MainMenu : horizoncraft.script.World, ITranslatable
             if (TopCanvasLayer.GetChildCount() == 0)
             {
                 GuiCanvasLayer.Visible = false;
-                TopCanvasLayer.AddChild(WorldProfilesScene.Instantiate());
+                var node = WorldProfilesScene.Instantiate<WorldListMenu>();
+                node.OnChangeScene += () =>
+                {
+                    this.Service = null;
+                    QueueFree();
+                };
+                TopCanvasLayer.AddChild(node);
             }
         };
         buttonExit.Pressed += () => { GetTree().Quit(); };

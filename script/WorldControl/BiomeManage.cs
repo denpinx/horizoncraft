@@ -279,6 +279,7 @@ namespace horizoncraft.script.WorldControl
             if (sky != null) return sky;
             var deep = DeepBiomes.Find(B => B.name == name);
             if (deep != null) return deep;
+            GD.PrintErr($"没有找到生物群系{name}");
             return null;
         }
 
