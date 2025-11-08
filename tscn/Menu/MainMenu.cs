@@ -62,22 +62,19 @@ public partial class MainMenu : World, ITranslatable
                 };
                 TopCanvasLayer.AddChild(node);
             }
-
-            // worldMode = WorldMode.MultiplayerClient;
-            // GetTree().ChangeSceneToPacked(WorldScene);
         };
         TextEdit.Text = PlayerNode.Profile.Name;
         TextEdit.TextChanged += () =>
         {
             var old = PlayerNode.Profile.Name;
             PlayerNode.Profile.Name = TextEdit.Text;
-            Service.PlayerService.ChangeName(old,PlayerNode.Profile.Name);
+            Service.PlayerService.ChangeName(old, PlayerNode.Profile.Name);
             SaveProfile();
         };
 
         PlayerNode.Visible = false;
         PlayerNode.BaseInputable = false;
-        
+
         LanguageManage.SetTargetLang("cn", GetTree());
     }
 

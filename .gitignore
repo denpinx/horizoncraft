@@ -1,10 +1,10 @@
 # Godot 4+ specific ignores
 .godot/
+.export/
 /android/
 /save/**/*
 /.VSCodeCounter/**/*
 qodana.yaml
-export_presets.cfg
 .idea/**/*
 .vs/**/*
 profile/**/*
