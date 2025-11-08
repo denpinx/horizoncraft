@@ -560,7 +560,8 @@ namespace Horizoncraft.script
                 for (int j = 0; j < meta.Itemset.TextureNames.Count; j++)
                 {
                     var dir = $"res://texture/item/{meta.Itemset.TextureNames[j]}.png";
-                    if (FileAccess.FileExists(dir))
+
+                    if (ResourceLoader.Exists(dir))
                     {
                         var image = ResourceLoader.Load<Texture2D>(dir);
                         meta.Itemset.Textures.Add(j, image);
@@ -570,7 +571,7 @@ namespace Horizoncraft.script
                         if (meta.HasBlock)
                         {
                             var block_dir = $"res://texture/block/{meta.Itemset.TextureNames[j]}.png";
-                            if (FileAccess.FileExists(block_dir))
+                            if (ResourceLoader.Exists(block_dir))
                             {
                                 var block_image = ResourceLoader.Load<Texture2D>(block_dir);
                                 var wide = block_image.GetWidth();
@@ -633,7 +634,7 @@ namespace Horizoncraft.script
                     {
                         var image = GD.Load<Texture2D>(
                             $"res://texture/block/{blockTileSet.texture_name}.png");
-                        
+
                         int tilesX = image.GetWidth() / 16;
                         int tilesY = image.GetHeight() / 16;
                         var atlasSource = new TileSetAtlasSource();

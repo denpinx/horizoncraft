@@ -1,10 +1,13 @@
 using System;
+using System.Text.Json;
 using Godot;
 using Godot.Collections;
 using Horizoncraft.script;
 using Horizoncraft.script.Config;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.I18N;
+using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.tscn.Menu;
@@ -40,11 +43,7 @@ public partial class MainMenu : World, ITranslatable
             {
                 GuiCanvasLayer.Visible = false;
                 var node = WorldProfilesScene.Instantiate<WorldListMenu>();
-                node.OnChangeScene += () =>
-                {
-                    this.Service = null;
-                    QueueFree();
-                };
+                node.OnChangeScene += QueueFree;
                 TopCanvasLayer.AddChild(node);
             }
         };
@@ -55,11 +54,7 @@ public partial class MainMenu : World, ITranslatable
             {
                 GuiCanvasLayer.Visible = false;
                 var node = MultiplayerConnectScene.Instantiate<MultiplayerConnect>();
-                node.OnChangeScene += () =>
-                {
-                    this.Service = null;
-                    QueueFree();
-                };
+                node.OnChangeScene += QueueFree;
                 TopCanvasLayer.AddChild(node);
             }
         };
@@ -74,8 +69,40 @@ public partial class MainMenu : World, ITranslatable
 
         PlayerNode.Visible = false;
         PlayerNode.BaseInputable = false;
-
         LanguageManage.SetTargetLang("cn", GetTree());
+        SetRunConfig();
+    }
+
+    public override void _Process(double delta)
+    {
+        if (RunConfig.Mode == RunMode.Server)
+        {
+            var profile = DirUtility.GetWorldProfile(HorizonCraft.RunConfig.WorldName);
+            if (profile != null)
+            {
+                World.worldMode = World.WorldMode.MultiplayerHost;
+                World.WorldName = profile.WorldName;
+                World.Seed = profile.WorldSeed;
+                HostWorldService.Port = HorizonCraft.RunConfig.Port;
+                GetTree().ChangeSceneToFile("res://tscn/world.tscn");
+
+                GD.Print("创建服务端");
+            }
+            else
+            {
+                World.worldMode = World.WorldMode.MultiplayerHost;
+                World.WorldName = HorizonCraft.RunConfig.WorldName;
+                World.Seed = HorizonCraft.RunConfig.WorldSeed;
+                HostWorldService.Port = HorizonCraft.RunConfig.Port;
+
+                GetTree().ChangeSceneToFile("res://tscn/world.tscn");
+                GD.Print("创建新的存档");
+            }
+
+            QueueFree();
+        }
+
+        base._Process(delta);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -104,6 +131,8 @@ public partial class MainMenu : World, ITranslatable
     public override void _ExitTree()
     {
         SaveProfile();
+        this.Service = null;
+        GD.Print("Exit Tree");
     }
 
     private static void LoadProfile()
@@ -139,6 +168,62 @@ public partial class MainMenu : World, ITranslatable
         FileAccess fs = FileAccess.Open("profile/local.json", FileAccess.ModeFlags.Write);
         fs.StoreString(Json.Stringify(PlayerNode.Profile.ToDictionary()));
         fs.Close();
+    }
+
+
+    private void SetRunConfig()
+    {
+        if (OS.HasFeature("dedicated_server"))
+        {
+            RunConfig.Mode = RunMode.Server;
+            if (FileAccess.FileExists("run.json"))
+            {
+                FileAccess fileAccess = FileAccess.Open("run.json", FileAccess.ModeFlags.Read);
+                string jsonText = fileAccess.GetAsText();
+                fileAccess.Close();
+                var dict = JsonCleaner.FromJson(jsonText);
+
+                PlayerNode.Profile.Name = Guid.NewGuid().ToString();
+                if (dict.TryGetValue("world-name", out var name))
+                {
+                    RunConfig.WorldName = (string)name;
+                }
+
+                if (dict.TryGetValue("world-seed", out var seed))
+                {
+                    RunConfig.WorldSeed = long.Parse((string)seed);
+                }
+
+                if (dict.TryGetValue("ip", out var ip))
+                {
+                    RunConfig.Ip = (string)ip;
+                }
+
+                if (dict.TryGetValue("port", out var port))
+                {
+                    RunConfig.Port = (int)port;
+                }
+            }
+            else
+            {
+                Console.Write("世界名:");
+                var worldName = Console.ReadLine();
+                Console.Write("种子:");
+                var worldSeed = Console.ReadLine();
+                Console.Write("端口:");
+                var port = Console.ReadLine();
+                RunConfig.WorldName = worldName;
+                RunConfig.Port = int.Parse(port);
+                if (long.TryParse(worldSeed, out var result))
+                {
+                    RunConfig.WorldSeed = result;
+                }
+
+                var file = FileAccess.Open("run.json", FileAccess.ModeFlags.Write);
+                file.StoreString(Json.Stringify(RunConfig.ToDictionary()));
+                file.Close();
+            }
+        }
     }
 
     public void TranslateChange()

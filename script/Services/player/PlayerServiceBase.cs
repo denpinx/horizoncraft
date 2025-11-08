@@ -73,7 +73,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
     {
         PrecessNodeSync();
         ProcessPlayerState();
-        if (World.PlayerNode.playerData != null)
+        if (World?.PlayerNode?.playerData != null)
             SyncPlayerNodePositionToData(World.PlayerNode, World.PlayerNode.playerData);
     }
 

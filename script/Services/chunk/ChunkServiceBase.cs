@@ -335,12 +335,16 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     public HashSet<Vector2I> GetAllLoadRangeChunks()
     {
         HashSet<Vector2I> loadqueue = new HashSet<Vector2I>();
-        foreach (var player in World.Service.PlayerService.Players.Values)
+        if (World?.Service?.PlayerService?.Players?.Values != null)
+            foreach (var player in World.Service.PlayerService.Players.Values)
+            {
+                if (player.State == PlayerState.Live || player.State == PlayerState.Dead)
+                    GetLoadRangeChunks(player.ChunkCoord, loadqueue);
+            }
+        else
         {
-            if (player.State == PlayerState.Live || player.State == PlayerState.Dead)
-                GetLoadRangeChunks(player.ChunkCoord, loadqueue);
+            // this._tokenSource.Cancel();
         }
-
         return loadqueue;
     }
 
@@ -637,6 +641,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     /// </summary>
     public void UpdateLights()
     {
+        if (World.PlayerNode == null) return;
         var player = World.PlayerNode.playerData;
         if (player == null) return;
         var poss = new HashSet<Vector2I>();
