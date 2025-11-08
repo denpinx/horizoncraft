@@ -285,14 +285,14 @@ public static class RecipeManage
 
     static RecipeManage()
     {
-        if (!DirAccess.DirExistsAbsolute("config/recipes"))
+        if (!DirAccess.DirExistsAbsolute("res://config/recipes"))
         {
             GD.PrintErr("[RecipeManage] 初始化失败! 配方目录不存在!");
             return;
         }
 
         var list = new List<string>();
-        GetAllFiles("config/recipes", list);
+        GetAllFiles("res://config/recipes", list);
         foreach (var file in list)
         {
             if (!file.EndsWith(".json")) continue;

@@ -34,7 +34,8 @@ public static class LanguageManage
         TextManages.Clear();
 
         List<string> files = new();
-        DirUtility.GetAllFiles("config/lang", files);
+        
+        DirUtility.GetAllFiles("res://config/lang", files);
         foreach (var file in files)
         {
             LoadTargetLanguage(file, Lang);

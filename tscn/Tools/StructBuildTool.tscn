@@ -1,11 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://cw0lhh2hnj66l"]
+[gd_scene load_steps=5 format=3 uid="uid://cw0lhh2hnj66l"]
 
 [ext_resource type="Script" uid="uid://bocbkt0mmo3o4" path="res://tscn/Tools/StructBuildTool.cs" id="1_kpgmv"]
-[ext_resource type="Texture2D" uid="uid://6g7uuvd2ds2a" path="res://texture/block/sand.png" id="1_uqt7y"]
 [ext_resource type="Script" uid="uid://c00argdtokc7d" path="res://tscn/EditTileMapView.cs" id="4_ce6aj"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ce6aj"]
-texture = ExtResource("1_uqt7y")
 0:0/0 = 0
 1:0/0 = 0
 0:1/0 = 0

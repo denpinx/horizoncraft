@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bwmi4lqb4qf6c"
-path="res://.godot/imported/big_Logistics_Pipeline.png-71c5a1e22356c9f533d59f022a985f2e.ctex"
+path="res://.godot/imported/big_logistics_pipeline.png-02dbe8356b378d97d4686d387533f1e1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://texture/item/big_Logistics_Pipeline.png"
-dest_files=["res://.godot/imported/big_Logistics_Pipeline.png-71c5a1e22356c9f533d59f022a985f2e.ctex"]
+source_file="res://texture/item/big_logistics_pipeline.png"
+dest_files=["res://.godot/imported/big_logistics_pipeline.png-02dbe8356b378d97d4686d387533f1e1.ctex"]
 
 [params]
 

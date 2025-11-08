@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bneraot6rj2yi"
-path="res://.godot/imported/Birch_log.png-11b5f51733c6a3d3ee4f9ff124cf8a4b.ctex"
+path="res://.godot/imported/birch_log.png-1fbedfc727d84748bc13b5a74d94dce7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://texture/item/Birch_log.png"
-dest_files=["res://.godot/imported/Birch_log.png-11b5f51733c6a3d3ee4f9ff124cf8a4b.ctex"]
+source_file="res://texture/item/birch_log.png"
+dest_files=["res://.godot/imported/birch_log.png-1fbedfc727d84748bc13b5a74d94dce7.ctex"]
 
 [params]
 

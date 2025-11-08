@@ -206,7 +206,7 @@ namespace Horizoncraft.script
         private static void LoadAllItemConfigs()
         {
             var list = new List<string>();
-            DirUtility.GetAllFiles("config/item", list);
+            DirUtility.GetAllFiles("res://config/item", list);
             foreach (var fn in list)
             {
                 if (!fn.EndsWith(".json")) continue;
@@ -288,7 +288,7 @@ namespace Horizoncraft.script
         private static void LoadAllBlockConfigs()
         {
             var list = new List<string>();
-            DirUtility.GetAllFiles("config/block", list);
+            DirUtility.GetAllFiles("res://config/block", list);
             foreach (var fn in list)
             {
                 if (!fn.EndsWith(".json")) continue;
@@ -553,13 +553,13 @@ namespace Horizoncraft.script
         public static void ProcessTextures()
         {
             var default_image = ResourceLoader.Load<Texture2D>(
-                $"texture/item/default.png");
+                $"res://texture/item/default.png");
 
             foreach (var meta in ItemMetas.Values)
             {
                 for (int j = 0; j < meta.Itemset.TextureNames.Count; j++)
                 {
-                    var dir = $"texture/item/{meta.Itemset.TextureNames[j]}.png";
+                    var dir = $"res://texture/item/{meta.Itemset.TextureNames[j]}.png";
                     if (FileAccess.FileExists(dir))
                     {
                         var image = ResourceLoader.Load<Texture2D>(dir);
@@ -569,7 +569,7 @@ namespace Horizoncraft.script
                     {
                         if (meta.HasBlock)
                         {
-                            var block_dir = $"texture/block/{meta.Itemset.TextureNames[j]}.png";
+                            var block_dir = $"res://texture/block/{meta.Itemset.TextureNames[j]}.png";
                             if (FileAccess.FileExists(block_dir))
                             {
                                 var block_image = ResourceLoader.Load<Texture2D>(block_dir);
@@ -631,8 +631,9 @@ namespace Horizoncraft.script
                     }
                     else
                     {
-                        var image = ResourceLoader.Load<Texture2D>(
-                            $"texture/block/{blockTileSet.texture_name}.png");
+                        var image = GD.Load<Texture2D>(
+                            $"res://texture/block/{blockTileSet.texture_name}.png");
+                        
                         int tilesX = image.GetWidth() / 16;
                         int tilesY = image.GetHeight() / 16;
                         var atlasSource = new TileSetAtlasSource();
