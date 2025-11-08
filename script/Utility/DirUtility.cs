@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Godot;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.WorldControl.Tool;
 
 namespace Horizoncraft.script.Utility;
 
@@ -39,5 +41,19 @@ public static class DirUtility
         }
 
         dir.ListDirEnd();
+    }
+
+    public static WorldProfile GetWorldProfile(string worldName)
+    {
+        if (FileAccess.FileExists($"save/{worldName}/data.db"))
+        {
+            using (var conn = SqliteTool.InitSqlite(worldName))
+            {
+                var file = conn.GetWorldProfileByteData("WorldProfile");
+                return file;
+            }
+        }
+
+        return null;
     }
 }

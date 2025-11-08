@@ -7,7 +7,6 @@ namespace Horizoncraft.script.Config;
 public partial class LocalProfile
 {
     public string Name;
-
     public void ParseDictionary(Dictionary dict)
     {
         this.Name = (string)dict["Name"];

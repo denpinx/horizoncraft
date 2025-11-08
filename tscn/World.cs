@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Godot;
+using HorizonCraft;
 using Horizoncraft.script.Config;
 using HorizonCraft.script.Services.world;
 using Horizoncraft.script.WorldControl;
@@ -86,6 +87,13 @@ namespace Horizoncraft.script
         {
             _ = Materials.BlockMetas;
 
+            if (RunConfig.Mode == RunMode.Server)
+            {
+                PlayerNode.QueueFree();
+                PlayerNode = null;
+            }
+
+
             timer.Timeout += ClientTick;
 
             if (worldMode == WorldMode.Single)
@@ -115,6 +123,8 @@ namespace Horizoncraft.script
 
         public override void _Process(double delta)
         {
+            if (PlayerNode == null||Service==null) return;
+
             //更新天空背景颜色
             textureRect.Modulate = Service.GetSkyColor();
             //更新覆盖的光线明暗度变化
@@ -193,7 +203,7 @@ namespace Horizoncraft.script
         /// </summary>
         public void UpdateTileMap()
         {
-            if (PlayerNode.playerData == null) return;
+            if (PlayerNode==null||PlayerNode.playerData == null) return;
             foreach (var tmly in tileMapLayerChunks.Values.ToArray())
             {
                 if (!VisibleChunks.ContainsKey(tmly.chunk.coord))

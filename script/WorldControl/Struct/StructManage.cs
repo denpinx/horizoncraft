@@ -47,7 +47,7 @@ public static class BlockStructManager
     private static void LoadStaticBuilds()
     {
         List<string> list = [];
-        DirUtility.GetAllFiles("config/builds", list);
+        DirUtility.GetAllFiles("res://config/builds", list);
         foreach (var dir in list)
         {
             if (!dir.EndsWith(".json")) continue;

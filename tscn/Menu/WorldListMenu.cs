@@ -124,7 +124,7 @@ public partial class WorldListMenu : Control, ITranslatable
 
         return worldFiles;
     }
-
+    
     public void TranslateChange()
     {
         buttonBackMainMenu.Text = "ui.Back Main Menu".Trprefix();
