@@ -1,6 +1,5 @@
 using Godot;
-using System;
-using horizoncraft.script.Components;
+using Horizoncraft.script.Components;
 
 public partial class FurnaceInv : InventoryNode
 {

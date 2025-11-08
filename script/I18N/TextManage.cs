@@ -1,8 +1,7 @@
-using System.Text.Json;
 using Godot;
 using Godot.Collections;
 
-namespace horizoncraft.script.I18N;
+namespace Horizoncraft.script.I18N;
 
 public class TextManage
 {

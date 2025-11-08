@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Godot.Collections;
 
-namespace horizoncraft.script.WorldControl.Struct;
+namespace Horizoncraft.script.WorldControl.Struct;
 
 /// <summary>
 /// 预制建筑结构

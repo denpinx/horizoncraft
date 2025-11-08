@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Net;
-using horizoncraft.script.NewProxy.player;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Net;
 using HorizonCraft.script.Services.chunk;
 using HorizonCraft.script.Services.player;
-using HorizonCraft.script.Services.world;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script.Events.player;
+namespace Horizoncraft.script.Events.player;
 
 /// <summary>
 /// 玩家触发事件的基类

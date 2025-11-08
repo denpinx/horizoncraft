@@ -2,7 +2,7 @@ using Godot;
 using MemoryPack;
 using Vector2 = System.Numerics.Vector2;
 
-namespace horizoncraft.script.Components;
+namespace Horizoncraft.script.Components;
 
 [MemoryPackable]
 public partial class SubBlockComponent : Component

@@ -1,6 +1,6 @@
 using Godot;
 using System;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 
 public partial class EditTileMapView : Godot.TileMapLayer
 {

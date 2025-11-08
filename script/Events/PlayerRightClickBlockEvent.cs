@@ -1,7 +1,7 @@
 using Godot;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script.Events;
+namespace Horizoncraft.script.Events;
 
 public class PlayerRightClickBlockEvent:WorldEvent
 {

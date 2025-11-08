@@ -1,6 +1,6 @@
 using MemoryPack;
 
-namespace horizoncraft.script;
+namespace Horizoncraft.script;
 
 [MemoryPackable]
 public partial class ConfigSet<T>

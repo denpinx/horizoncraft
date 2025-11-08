@@ -1,6 +1,6 @@
 using MemoryPack;
 
-namespace horizoncraft.script.Inventory;
+namespace Horizoncraft.script.Inventory;
 
 [MemoryPackable]
 public partial class BlockInventory : InventoryBase

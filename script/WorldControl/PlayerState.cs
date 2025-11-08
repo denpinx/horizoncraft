@@ -1,6 +1,5 @@
-using MemoryPack;
 
-namespace horizoncraft.script.WorldControl;
+namespace Horizoncraft.script.WorldControl;
 
 public enum PlayerState
 {

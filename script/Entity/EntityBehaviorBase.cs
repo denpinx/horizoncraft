@@ -1,6 +1,4 @@
-using System.Diagnostics;
-
-namespace horizoncraft.script.Entity;
+namespace Horizoncraft.script.Entity;
 
 /// <summary>
 /// 实体行为基础

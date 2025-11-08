@@ -1,6 +1,4 @@
-using System.Threading;
-
-namespace horizoncraft.script.WorldControl.Struct;
+namespace Horizoncraft.script.WorldControl.Struct;
 
 public class OreConfig
 {

@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Net;
-using horizoncraft.script.NewProxy.player;
+using Horizoncraft.script;
+using Horizoncraft.script.Entity;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.NewProxy.player;
 
 namespace HorizonCraft.script.Services.entity;
 

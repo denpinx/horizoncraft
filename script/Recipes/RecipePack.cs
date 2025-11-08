@@ -1,4 +1,4 @@
-namespace horizoncraft.script.Recipes;
+namespace Horizoncraft.script.Recipes;
 
 public class RecipePack
 {

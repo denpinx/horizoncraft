@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using Microsoft.Win32;
 
-namespace horizoncraft.script.WorldControl.Struct;
+namespace Horizoncraft.script.WorldControl.Struct;
 
 public static class OreManage
 {

@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Events;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Events.SystemEvents;
-using horizoncraft.script.Inventory;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Events;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Events.SystemEvents;
 
-namespace horizoncraft.script.Components.Systems;
+namespace HorizonCraft.script.Components.Systems.ItemSystems;
 
 public class ItemComponentSystem : IComponentSystem
 {

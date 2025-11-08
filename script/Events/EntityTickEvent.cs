@@ -1,9 +1,9 @@
 using System;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Entity;
+using Horizoncraft.script.Components.EntityComponents;
+using Horizoncraft.script.Entity;
 using HorizonCraft.script.Services.world;
 
-namespace horizoncraft.script.Events;
+namespace Horizoncraft.script.Events;
 
 public class EntityTickEvent
 {

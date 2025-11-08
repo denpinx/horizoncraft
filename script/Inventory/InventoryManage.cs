@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
 using Godot;
 
-namespace horizoncraft.script.Inventory;
+namespace Horizoncraft.script.Inventory;
 
 public static class InventoryManage
 {

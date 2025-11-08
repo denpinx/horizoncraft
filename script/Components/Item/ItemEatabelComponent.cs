@@ -1,8 +1,8 @@
-using horizoncraft.script.Components.Interfaces;
-using horizoncraft.script.I18N;
+using Horizoncraft.script.Components.Interfaces;
+using Horizoncraft.script.I18N;
 using MemoryPack;
 
-namespace horizoncraft.script.Components.Item;
+namespace Horizoncraft.script.Components.Item;
 
 [MemoryPackable]
 public partial class ItemEatableComponent : ItemUsefulComponent, ITip

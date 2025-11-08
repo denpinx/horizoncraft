@@ -1,4 +1,4 @@
-namespace horizoncraft.script.Services;
+namespace Horizoncraft.script.Services;
 
 public interface ISave
 {

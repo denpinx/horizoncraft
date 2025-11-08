@@ -1,6 +1,6 @@
 using Godot;
 
-namespace horizoncraft.script.Utility;
+namespace Horizoncraft.script.Utility;
 
 public static class NodeUtility
 {

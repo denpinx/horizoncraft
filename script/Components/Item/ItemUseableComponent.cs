@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using MemoryPack;
 
-namespace horizoncraft.script.Components.Item;
+namespace Horizoncraft.script.Components.Item;
 
 /// <summary>
 /// 表示物品可以右键触发物品功能

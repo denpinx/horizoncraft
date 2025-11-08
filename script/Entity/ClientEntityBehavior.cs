@@ -1,7 +1,6 @@
-using System.Numerics;
-using horizoncraft.script.Expand;
+using Horizoncraft.script.Expand;
 
-namespace horizoncraft.script.Entity;
+namespace Horizoncraft.script.Entity;
 
 /// <summary>
 /// 客户端实体行为

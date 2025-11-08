@@ -2,10 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using horizoncraft.script;
-using horizoncraft.script.I18N;
-using horizoncraft.script.Net;
-using horizoncraft.script.WorldControl.Tool;
+using Horizoncraft.script;
+using Horizoncraft.script.I18N;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.WorldControl.Tool;
 using FileAccess = Godot.FileAccess;
 
 public partial class WorldListMenu : Control, ITranslatable

@@ -1,9 +1,7 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Recipes;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Recipes;
 
 public partial class CraftInventory : InventoryNode
 {

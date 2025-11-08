@@ -1,7 +1,4 @@
-using Godot;
-using Godot.NativeInterop;
-
-namespace horizoncraft.script.Services;
+namespace Horizoncraft.script.Services;
 
 public class ServiceBase(World world)
 {

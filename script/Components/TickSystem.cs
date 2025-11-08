@@ -1,16 +1,10 @@
 using System.Collections.Generic;
-using Godot;
-using Godot.NativeInterop;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Components.Systems;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Events;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Events.SystemEvents;
-using horizoncraft.script.Inventory;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Components.EntityComponents;
+using Horizoncraft.script.Events;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Events.SystemEvents;
 
-namespace horizoncraft.script.Components
+namespace Horizoncraft.script.Components
 {
     public class TickSystem : IComponentSystem
     {

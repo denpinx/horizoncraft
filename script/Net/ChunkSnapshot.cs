@@ -1,11 +1,8 @@
 using System.Collections.Generic;
-using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Entity;
+using Horizoncraft.script.Entity;
 using MemoryPack;
 
-namespace horizoncraft.script.Net;
+namespace Horizoncraft.script.Net;
 
 [MemoryPackable]
 public partial class ChunkSnapshot
@@ -13,7 +10,7 @@ public partial class ChunkSnapshot
     public long Version;
     public int X;
     public int Y;
-    public List<BlockSnapshot> list = new();
+    public List<BlockSnapshot> Blocks = new();
     public List<EntityData> Entiydatas = new();
 
     /// <summary>

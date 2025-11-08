@@ -11,7 +11,7 @@ using Dict = System.Collections.Generic.Dictionary<string, object>;
 using Expression = System.Linq.Expressions.Expression;
 
 
-namespace horizoncraft.script.Components
+namespace Horizoncraft.script.Components
 {
     /// <summary>
     /// 用于使用集合配置来构建含有初始化配置的对象，获取极致的可配置性，以及高性能。

@@ -1,4 +1,4 @@
-namespace horizoncraft.script.Components;
+namespace Horizoncraft.script.Components;
 
 public interface IGetMask
 {

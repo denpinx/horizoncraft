@@ -1,6 +1,5 @@
 using Godot;
-using System;
-using horizoncraft.script.Chat;
+using Horizoncraft.script.Chat;
 
 /// <summary>
 /// 消息标签

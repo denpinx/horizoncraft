@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Events;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Recipes;
+using Horizoncraft.script.Recipes;
 
-namespace horizoncraft.script.Components.Systems;
+namespace Horizoncraft.script.Components.Systems;
+
 /// <summary>
 /// 工作台系统
 /// 接收玩家的合成指令，消耗物品栏物品合成。
@@ -13,52 +12,55 @@ public class WorkBenchSystem : TickSystem
 {
     public override void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)
     {
-        var BlockInv = (component as InventoryComponent).GetInventory();
-        if (value.ContainsKey("Action"))
+        if (component is InventoryComponent inventoryComponent)
         {
-            if (value["Action"] == "Craft-All")
+            var inventory = inventoryComponent.GetInventory();
+            if (value.ContainsKey("Action"))
             {
-                GD.Print("Craft-All");
-                var gri = RecipeManage.GetRecipe(BlockInv, 3, 0, "workbench");
-                while (gri != null)
+                if (value["Action"] == "Craft-All")
                 {
-                    if (!player.Inventory.TryAddItem(gri.Result.Copy()))
-                        return;
+                    GD.Print("Craft-All");
+                    var gri = RecipeManage.GetRecipe(inventory, 3, 0, "workbench");
+                    while (gri != null)
+                    {
+                        if (!player.Inventory.TryAddItem(gri.Result.Copy()))
+                            return;
 
-                    for (int i = 0; i < 9; i++)
-                        BlockInv.ReduceItemAmount(i);
+                        for (int i = 0; i < 9; i++)
+                            inventory.ReduceItemAmount(i);
 
-                    gri = RecipeManage.GetRecipe(BlockInv, 3);
+                        gri = RecipeManage.GetRecipe(inventory, 3);
+                    }
                 }
-            }
 
-            if (value["Action"] == "Craft")
-            {
-                GD.Print("Craft");
-                var gri = RecipeManage.GetRecipe(BlockInv, 3);
-                if (gri != null)
+                if (value["Action"] == "Craft")
                 {
-                    var handitme = player.Inventory.GetHandItemStack();
-                    if (handitme == null
-                       )
+                    GD.Print("Craft");
+                    var gri = RecipeManage.GetRecipe(inventory, 3);
+                    if (gri != null)
                     {
-                        player.Inventory.HandItemStack = gri.Result.Copy();
-                    }
-                    else if (
-                        handitme.Name == gri.Result.Name &&
-                        handitme.Amount + gri.Result.Amount <= gri.Result.GetItemMeta().MaxAmount
-                    )
-                    {
-                        handitme.Amount += gri.Result.Amount;
-                    }
-                    else
-                    {
-                        return;
-                    }
+                        var handitme = player.Inventory.GetHandItemStack();
+                        if (handitme == null
+                           )
+                        {
+                            player.Inventory.HandItemStack = gri.Result.Copy();
+                        }
+                        else if (
+                            handitme.Name == gri.Result.Name &&
+                            handitme.Amount + gri.Result.Amount <= gri.Result.GetItemMeta().MaxAmount
+                        )
+                        {
+                            handitme.Amount += gri.Result.Amount;
+                        }
+                        else
+                        {
+                            return;
+                        }
 
-                    for (int i = 0; i < 9; i++)
-                    {
-                        BlockInv.ReduceItemAmount(i);
+                        for (int i = 0; i < 9; i++)
+                        {
+                            inventory.ReduceItemAmount(i);
+                        }
                     }
                 }
             }

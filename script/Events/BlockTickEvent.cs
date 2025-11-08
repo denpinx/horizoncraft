@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Expand;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Expand;
+using Horizoncraft.script.WorldControl;
 using Vector3 = System.Numerics.Vector3;
 
-namespace horizoncraft.script.Events
+namespace Horizoncraft.script.Events
 {
     /// <summary>
     /// [严重]设置方块后不要使用原get的数据操作

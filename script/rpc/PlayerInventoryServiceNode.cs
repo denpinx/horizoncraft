@@ -1,11 +1,11 @@
 using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Inventory;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Inventory;
 using HorizonCraft.script.Services.world;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script.rpc;
+namespace Horizoncraft.script.rpc;
 
 /// <summary>
 /// 玩家容器相关RPC操作

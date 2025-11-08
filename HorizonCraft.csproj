@@ -26,9 +26,6 @@
   <ItemGroup>
     <Folder Include="config\packscene\" />
     <Folder Include="script\Interface\" />
-    <Folder Include="script\Net\SyncDatas\" />
-    <Folder Include="script\WorldParials\" />
-    <Folder Include="script\Yaml\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="config\block\buildblock\door.json" />

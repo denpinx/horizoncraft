@@ -2,8 +2,10 @@ using System.IO;
 using System.IO.Compression;
 using MemoryPack;
 
-namespace horizoncraft.script.Net;
-
+namespace Horizoncraft.script.Net;
+/// <summary>
+/// 封装的MemoryPack序列化+Gzip压缩工具。
+/// </summary>
 public static class ByteTool
 {
     public static byte[] ToBytes<T>(T t)

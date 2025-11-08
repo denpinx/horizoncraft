@@ -1,7 +1,6 @@
-using horizoncraft.script.Inventory;
+using Horizoncraft.script.Inventory;
 using MemoryPack;
-
-namespace horizoncraft.script.Components.EntityComponents;
+namespace Horizoncraft.script.Components.EntityComponents;
 
 [MemoryPackable]
 public partial class ItemEntityComponent : EntityComponent

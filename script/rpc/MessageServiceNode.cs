@@ -1,8 +1,8 @@
 using Godot;
-using horizoncraft.script.Chat;
-using horizoncraft.script.Net;
+using Horizoncraft.script.Chat;
+using Horizoncraft.script.Net;
 
-namespace horizoncraft.script.rpc;
+namespace Horizoncraft.script.rpc;
 
 public partial class MessageServiceNode : Node
 {

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Net;
-using horizoncraft.script.rpc;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.rpc;
+using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Services.chunk;
 
@@ -39,7 +39,7 @@ public class HostChunkService : ChunkServiceBase
         //差异更新
         foreach (var chunk in WorldSnapshot.chunks)
         {
-            if(chunk.list.Count==0&&chunk.Entiydatas.Count==0)continue;
+            if(chunk.Blocks.Count==0&&chunk.Entiydatas.Count==0)continue;
             
             foreach (var playerset in World.Service.PlayerService.Players)
             {
@@ -161,7 +161,7 @@ public class HostChunkService : ChunkServiceBase
 
                 foreach (var v in chunk.UpdateList)
                 {
-                    cs.list.Add(new BlockSnapshot()
+                    cs.Blocks.Add(new BlockSnapshot()
                     {
                         x = (byte)v.X,
                         y = (byte)v.Y,

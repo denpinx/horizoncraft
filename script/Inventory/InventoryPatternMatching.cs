@@ -1,7 +1,7 @@
 using System;
-using horizoncraft.script.Components;
+using Horizoncraft.script.Components;
 
-namespace horizoncraft.script.Inventory;
+namespace Horizoncraft.script.Inventory;
 
 public abstract class InventoryPatternMatching
 {

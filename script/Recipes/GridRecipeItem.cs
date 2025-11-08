@@ -1,7 +1,6 @@
-using Godot;
-using horizoncraft.script.Inventory;
+using Horizoncraft.script.Inventory;
 
-namespace horizoncraft.script.Recipes;
+namespace Horizoncraft.script.Recipes;
 
 public class GridRecipeItem
 {

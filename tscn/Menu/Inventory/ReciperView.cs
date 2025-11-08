@@ -2,10 +2,10 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using horizoncraft.script;
-using horizoncraft.script.I18N;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Recipes;
+using Horizoncraft.script;
+using Horizoncraft.script.I18N;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Recipes;
 
 public partial class ReciperView : Control, ITranslatable
 {

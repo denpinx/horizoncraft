@@ -1,4 +1,4 @@
-namespace horizoncraft.script.Inventory;
+namespace Horizoncraft.script.Inventory;
 
 public enum ItemType
 {

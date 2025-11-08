@@ -1,7 +1,6 @@
-using Godot;
 using MemoryPack;
 
-namespace horizoncraft.script.Inventory;
+namespace Horizoncraft.script.Inventory;
 
 [MemoryPackable]
 public partial class PlayerInventory() : InventoryBase(4 * 9 + 4)

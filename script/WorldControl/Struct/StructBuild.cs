@@ -1,7 +1,6 @@
 using System;
-using Godot;
 
-namespace horizoncraft.script.WorldControl.Struct;
+namespace Horizoncraft.script.WorldControl.Struct;
 
 public class StructBuild
 {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using horizoncraft.script;
-using horizoncraft.script.Net;
+using Horizoncraft.script;
+using Horizoncraft.script.Net;
 
 namespace HorizonCraft.script.Services.entity;
 

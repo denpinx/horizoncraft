@@ -1,8 +1,5 @@
 using System.Collections.Generic;
-using Godot;
-using Godot.NativeInterop;
-
-namespace horizoncraft.script.Inventory;
+namespace Horizoncraft.script.Inventory;
 
 /// <summary>
 /// 战利品表

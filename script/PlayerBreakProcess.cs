@@ -1,6 +1,6 @@
 using Godot;
 
-namespace horizoncraft.script;
+namespace Horizoncraft.script;
 
 public class PlayerActionProcess
 {

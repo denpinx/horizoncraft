@@ -1,8 +1,7 @@
 using Godot;
-using System;
-using horizoncraft.script;
-using horizoncraft.script.I18N;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.I18N;
+using Horizoncraft.script.WorldControl;
 
 public partial class DeadView : Control
 {

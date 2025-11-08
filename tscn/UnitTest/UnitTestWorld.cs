@@ -1,6 +1,4 @@
-using Godot;
-using System;
-using horizoncraft.script;
+using Horizoncraft.script;
 using HorizonCraft.script.Services.world;
 
 /// <summary>

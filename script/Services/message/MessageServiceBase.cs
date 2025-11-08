@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using Godot;
-using horizoncraft.script.Chat;
+using Horizoncraft.script.Chat;
 
-namespace horizoncraft.script.Services.message;
+namespace Horizoncraft.script.Services.message;
 
 /// <summary>
 /// 消息管理服务

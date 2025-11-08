@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Components;
+using Horizoncraft.script.Components;
 
-namespace horizoncraft.script.Inventory;
+namespace Horizoncraft.script.Inventory;
 
 public class ItemMeta
 {
@@ -12,7 +12,7 @@ public class ItemMeta
 
     //内部id
     public int Id;
-    public string NameSpace = nameof(horizoncraft);
+    public string NameSpace = nameof(Horizoncraft);
     public string Name;
     public string Description;
     public bool HasBlock = false;

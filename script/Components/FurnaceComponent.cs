@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using horizoncraft.script.Components.Interfaces;
-using horizoncraft.script.Inventory;
+using Horizoncraft.script.Components.Interfaces;
+using Horizoncraft.script.Inventory;
 using MemoryPack;
 
-namespace horizoncraft.script.Components;
+namespace Horizoncraft.script.Components;
 
 [MemoryPackable]
 public partial class FurnaceComponent : InventoryComponent, IGetProgress
@@ -23,12 +23,12 @@ public partial class FurnaceComponent : InventoryComponent, IGetProgress
                 Max = ProcessTick,
                 Value = Progress
             };
-        else
-            return new ProgressValue
-            {
-                Name = "",
-                Max = ProcessTick,
-                Value = Progress
-            };
+        
+        return new ProgressValue
+        {
+            Name = "",
+            Max = ProcessTick,
+            Value = Progress
+        };
     }
 }

@@ -1,4 +1,4 @@
-namespace horizoncraft.script.I18N;
+namespace Horizoncraft.script.I18N;
 
 public interface ITranslatable
 {

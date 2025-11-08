@@ -1,21 +1,16 @@
 using System;
-using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Components.Item;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Expand;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Net;
-using horizoncraft.script.NewProxy.player;
-using horizoncraft.script.Recipes;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Components.Item;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Expand;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Recipes;
 using HorizonCraft.script.Services.world;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 using Vector2 = System.Numerics.Vector2;
 
-namespace horizoncraft.script.Events;
+namespace Horizoncraft.script.Events;
 
 /// <summary>
 /// 玩家事件处理集

@@ -1,9 +1,8 @@
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script.UnitTest.Tests;
+namespace Horizoncraft.script.UnitTest.Tests;
 
 public class ChunkGeneratorTest : UnitTestItem<object>
 {

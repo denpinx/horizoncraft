@@ -1,7 +1,4 @@
-using System.Reflection.Metadata;
-using Godot;
-
-namespace horizoncraft.script.WorldControl.Struct.structs;
+namespace Horizoncraft.script.WorldControl.Struct.structs;
 
 public class StaticBuildStruct : BlockStruct
 {

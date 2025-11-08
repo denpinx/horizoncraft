@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using Godot;
 
-namespace horizoncraft.script.WorldControl
+namespace Horizoncraft.script.WorldControl
 {
     public class BlockStruct
     {

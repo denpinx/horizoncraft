@@ -1,16 +1,15 @@
 using System;
 using Godot;
 using Godot.Collections;
-using horizoncraft.script;
-using horizoncraft.script.Config;
-using horizoncraft.script.Expand;
-using horizoncraft.script.I18N;
-using horizoncraft.script.Net;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.Config;
+using Horizoncraft.script.Expand;
+using Horizoncraft.script.I18N;
+using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.tscn.Menu;
 
-public partial class MainMenu : horizoncraft.script.World, ITranslatable
+public partial class MainMenu : Horizoncraft.script.World, ITranslatable
 {
     [Export] private CanvasLayer TopCanvasLayer, GuiCanvasLayer;
     [Export] private Button ButtonSingle, buttonExit, ButtonConnect;

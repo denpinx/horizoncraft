@@ -2,12 +2,12 @@ using System;
 using MemoryPack;
 using System.Collections.Generic;
 using Godot.NativeInterop;
-using horizoncraft.script.Components.BlockComponents;
-using horizoncraft.script.Components.EnergyBlocks;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Components.Item;
+using Horizoncraft.script.Components.BlockComponents;
+using Horizoncraft.script.Components.EnergyBlocks;
+using Horizoncraft.script.Components.EntityComponents;
+using Horizoncraft.script.Components.Item;
 
-namespace horizoncraft.script.Components
+namespace Horizoncraft.script.Components
 {
     /// <summary>
     /// 所有凡是继承了 Component 的组件都要在这里配置Union，否则无法序列化

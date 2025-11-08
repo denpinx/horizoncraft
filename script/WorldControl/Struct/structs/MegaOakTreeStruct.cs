@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 using Godot;
 
-namespace horizoncraft.script.WorldControl.Struct.structs;
+namespace Horizoncraft.script.WorldControl.Struct.structs;
 
 public class MegaOakTreeStruct : StructBuild
 {
-    private BlockMeta _oak_log = Materials.Valueof("oak_log");
-    private BlockMeta _oak_leaves = Materials.Valueof("oak_leaves");
+    private readonly BlockMeta _oak_log = Materials.Valueof("oak_log");
+    private readonly BlockMeta _oak_leaves = Materials.Valueof("oak_leaves");
 
     public MegaOakTreeStruct()
     {

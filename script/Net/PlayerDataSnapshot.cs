@@ -1,9 +1,8 @@
 using System;
-using Godot;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 using MemoryPack;
 
-namespace horizoncraft.script.Net;
+namespace Horizoncraft.script.Net;
 
 [MemoryPackable]
 public partial class PlayerDataSnapshot

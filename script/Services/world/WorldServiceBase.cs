@@ -4,18 +4,18 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Entity;
-using horizoncraft.script.I18N;
-using horizoncraft.script.Net;
-using horizoncraft.script.rpc;
-using horizoncraft.script.Services;
+using Horizoncraft.script;
+using Horizoncraft.script.Entity;
+using Horizoncraft.script.I18N;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.rpc;
+using Horizoncraft.script.Services;
 using HorizonCraft.script.Services.chunk;
 using HorizonCraft.script.Services.entity;
-using horizoncraft.script.Services.message;
+using Horizoncraft.script.Services.message;
 using HorizonCraft.script.Services.player;
-using horizoncraft.script.WorldControl;
-using horizoncraft.script.WorldControl.Tool;
+using Horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl.Tool;
 
 namespace HorizonCraft.script.Services.world;
 

@@ -1,13 +1,13 @@
-using horizoncraft.script.Events;
+using Horizoncraft.script.Events;
 
-namespace horizoncraft.script.Components.Systems.BlockSystems.Reactive;
+namespace Horizoncraft.script.Components.Systems.BlockSystems.Reactive;
 
 /// <summary>
 /// 门的联动更新系统，用于同步相邻门的打开状态的
 /// </summary>
 public class DoorLinkUpdateSystem : TickSystem
 {
-    private BlockMeta air = Materials.BlockMetas["air"];
+    private readonly BlockMeta _air = Materials.BlockMetas["air"];
 
     public override bool OnRightClick(PlayerRightClickBlockEvent playerRightClickBlockEvent, Component component)
     {
@@ -33,7 +33,7 @@ public class DoorLinkUpdateSystem : TickSystem
             var topblock = blockTickEvent.GetTopBlock();
             if (topblock.BlockMeta != block.BlockMeta)
             {
-                blockTickEvent.SetBlock(air);
+                blockTickEvent.SetBlock(_air);
                 blockTickEvent.UpdateNeighborBlock();
             }
             else
@@ -50,7 +50,7 @@ public class DoorLinkUpdateSystem : TickSystem
             var bottomblock = blockTickEvent.GetBottomBlock();
             if (bottomblock.BlockMeta != block.BlockMeta)
             {
-                blockTickEvent.SetBlock(air);
+                blockTickEvent.SetBlock(_air);
                 blockTickEvent.UpdateNeighborBlock();
             }
             else

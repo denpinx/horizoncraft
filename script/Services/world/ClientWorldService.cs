@@ -1,10 +1,10 @@
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Entity;
-using horizoncraft.script.NewProxy.player;
+using Horizoncraft.script;
+using Horizoncraft.script.Entity;
+using Horizoncraft.script.NewProxy.player;
 using HorizonCraft.script.Services.chunk;
 using HorizonCraft.script.Services.entity;
-using horizoncraft.script.Services.message;
+using Horizoncraft.script.Services.message;
 
 namespace HorizonCraft.script.Services.world;
 

@@ -1,10 +1,9 @@
 using Godot;
-using horizoncraft.script.Components.Item;
-using horizoncraft.script.Events;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Inventory;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Components.Item;
+using Horizoncraft.script.Events.player;
 
-namespace horizoncraft.script.Components.Systems;
+namespace HorizonCraft.script.Components.Systems.ItemSystems;
 
 public class ItemDurableSystem : ItemComponentSystem
 {

@@ -1,7 +1,7 @@
 using Godot;
 using Vector2 = System.Numerics.Vector2;
 
-namespace horizoncraft.script.Expand;
+namespace Horizoncraft.script.Expand;
 
 public static class MathExpand
 {

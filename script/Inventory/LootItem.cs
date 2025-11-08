@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace horizoncraft.script.Inventory;
+namespace Horizoncraft.script.Inventory;
 
 /// <summary>
 /// 由DropChance确定掉不掉落这个物品，再由AmountChances决定掉落的物品数量

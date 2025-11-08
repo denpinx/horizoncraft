@@ -1,4 +1,4 @@
-namespace horizoncraft.script.Components.Interfaces;
+namespace Horizoncraft.script.Components.Interfaces;
 /// <summary>
 /// 获取进度值
 /// </summary>

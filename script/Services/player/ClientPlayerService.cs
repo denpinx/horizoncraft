@@ -1,12 +1,12 @@
 using System;
 using Godot;
 using Godot.NativeInterop;
-using horizoncraft.script.Net;
-using horizoncraft.script.Services.Events;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.Services.Events;
 using HorizonCraft.script.Services.player;
 using HorizonCraft.script.Services.world;
 
-namespace horizoncraft.script.NewProxy.player;
+namespace Horizoncraft.script.NewProxy.player;
 
 public class ClientPlayerService : PlayerServiceBase
 {

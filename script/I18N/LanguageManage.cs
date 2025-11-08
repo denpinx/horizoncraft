@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Utility;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Utility;
 
-namespace horizoncraft.script.I18N;
+namespace Horizoncraft.script.I18N;
 
 /// <summary>
 /// 本地化管理器，通常情况下，只会加载使用时的语言

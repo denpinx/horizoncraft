@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.WorldControl.worldbiomes;
+using Horizoncraft.script.WorldControl.worldbiomes;
 
-namespace horizoncraft.script.WorldControl
+namespace Horizoncraft.script.WorldControl
 {
     public struct BiomeItem
     {

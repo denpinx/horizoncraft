@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Godot;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script.Events
+namespace Horizoncraft.script.Events
 {
     public class BreakBlockEvent : WorldEvent
     {

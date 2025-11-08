@@ -1,4 +1,4 @@
-namespace horizoncraft.script.Components.Systems;
+namespace Horizoncraft.script.Components.Systems;
 
 public class EntitySystem : TickSystem
 {

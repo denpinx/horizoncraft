@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Components.Interfaces;
-using horizoncraft.script.I18N;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.Components.Interfaces;
+using Horizoncraft.script.I18N;
+using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.tscn.Gui;
 

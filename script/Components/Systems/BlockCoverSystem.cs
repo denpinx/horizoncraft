@@ -1,6 +1,6 @@
-using horizoncraft.script.Events;
+using Horizoncraft.script.Events;
 
-namespace horizoncraft.script.Components.Systems;
+namespace Horizoncraft.script.Components.Systems;
 /// <summary>
 /// 方块覆盖系统
 /// 当当前方块被顶部被覆盖时自动转换方块。

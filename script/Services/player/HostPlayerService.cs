@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Components;
-using horizoncraft.script.Expand;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Net;
-using horizoncraft.script.rpc;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Expand;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.rpc;
+using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Services.player;
 

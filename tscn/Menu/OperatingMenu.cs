@@ -1,6 +1,4 @@
 using Godot;
-using System;
-using horizoncraft.script;
 
 public partial class OperatingMenu : Control
 {

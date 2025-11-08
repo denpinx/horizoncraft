@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Godot;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 
 public partial class DebugView : Node2D
 {

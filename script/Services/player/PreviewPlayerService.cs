@@ -1,8 +1,8 @@
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Expand;
-using horizoncraft.script.NewProxy.player;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.Expand;
+using Horizoncraft.script.NewProxy.player;
+using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Services.player;
 

@@ -1,15 +1,15 @@
 using System;
-using horizoncraft.script.Components.BlockComponents;
-using horizoncraft.script.Events;
+using Horizoncraft.script.Components.BlockComponents;
+using Horizoncraft.script.Events;
 
-namespace horizoncraft.script.Components.Systems;
+namespace Horizoncraft.script.Components.Systems;
 /// <summary>
 /// 作物生长系统
 /// 每Tick尝试随机生长一次，累计N次后增加一次生长状态。
 /// </summary>
 public class CropGrowthSystem:TickSystem
 {
-    private static BlockMeta farmland = Materials.Valueof("farmland");
+    private readonly BlockMeta _farmland = Materials.Valueof("farmland");
     public override void BlockTick(BlockTickEvent e, Component cmp)
     {
         if (cmp is CropGrowComponent cgc)
@@ -22,7 +22,7 @@ public class CropGrowthSystem:TickSystem
             if (cgc.Water)
             {
                 var bottom = e.GetBottomBlock();
-                if (!e.CheckMeta(bottom, farmland)||bottom.State==0)
+                if (!e.CheckMeta(bottom, _farmland)||bottom.State==0)
                     return;
             }
 

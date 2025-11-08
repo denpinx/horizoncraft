@@ -1,10 +1,9 @@
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Components;
-using horizoncraft.script.Components.Item;
-using horizoncraft.script.Components.Systems;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Components.Item;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Components.Systems.ItemSystems;
 
@@ -17,33 +16,33 @@ public class PlaceFluidSystem : ItemComponentSystem
             if (Materials.BlockMetas.TryGetValue(itemFluidComponent.FluidName, out var material))
             {
                 var pos = playerUseItemEvent.Position;
-                BlockData result_block = null;
-                Vector3I result_positon = Vector3I.Zero;
+                BlockData resultBlock = null;
+                Vector3I resultPositon = Vector3I.Zero;
                 {
-                    var new_pos = new Vector3I(pos.X, pos.Y, 0);
-                    var block = playerUseItemEvent.ChunkService.GetBlock(new_pos);
+                    var newPos = new Vector3I(pos.X, pos.Y, 0);
+                    var block = playerUseItemEvent.ChunkService.GetBlock(newPos);
                     if (block != null && block.BlockMeta.Replaceable &&
                         block.BlockMeta.Name != itemFluidComponent.FluidName)
                     {
-                        result_block = block;
-                        result_positon = new_pos;
+                        resultBlock = block;
+                        resultPositon = newPos;
                     }
                 }
-                if (result_block == null)
+                if (resultBlock == null)
                 {
-                    var new_pos = new Vector3I(pos.X, pos.Y, 1);
-                    var block = playerUseItemEvent.ChunkService.GetBlock(new_pos);
+                    var newPos = new Vector3I(pos.X, pos.Y, 1);
+                    var block = playerUseItemEvent.ChunkService.GetBlock(newPos);
                     if (block != null && block.BlockMeta.Replaceable &&
                         block.BlockMeta.Name != itemFluidComponent.FluidName)
                     {
-                        result_block = block;
-                        result_positon = new_pos;
+                        resultBlock = block;
+                        resultPositon = newPos;
                     }
                 }
                 
-                if (result_block != null)
+                if (resultBlock != null)
                 {
-                    playerUseItemEvent.ChunkService.SetBlock(result_positon, material);
+                    playerUseItemEvent.ChunkService.SetBlock(resultPositon, material);
                     playerUseItemEvent.UseItemStack.Amount -= 1;
                 }
             }

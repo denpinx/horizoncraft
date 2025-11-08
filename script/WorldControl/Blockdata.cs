@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Components;
+using Horizoncraft.script.Components;
 using MemoryPack;
 
-namespace horizoncraft.script.WorldControl
+namespace Horizoncraft.script.WorldControl
 {
     [MemoryPackable]
     public partial class BlockData

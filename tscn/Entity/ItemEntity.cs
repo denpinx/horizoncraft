@@ -1,11 +1,7 @@
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Components;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Inventory;
-using HorizonCraft.script.Services.world;
-
+using Horizoncraft.script;
+using Horizoncraft.script.Components.EntityComponents;
+using Horizoncraft.script.Entity;
 namespace HorizonCraft.tscn.Entity;
 
 public partial class ItemEntity : RigidBody2D, IEntityNode

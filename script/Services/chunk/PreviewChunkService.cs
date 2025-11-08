@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Services.chunk;
 

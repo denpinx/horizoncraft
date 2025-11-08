@@ -1,6 +1,6 @@
 using MemoryPack;
 
-namespace horizoncraft.script.Components
+namespace Horizoncraft.script.Components
 {
     [MemoryPackable]
     public partial class TickComponent : Component

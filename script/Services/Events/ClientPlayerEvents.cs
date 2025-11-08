@@ -1,11 +1,11 @@
-using horizoncraft.script.Events;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Net;
-using horizoncraft.script.rpc;
+using Horizoncraft.script.Events;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.rpc;
 using HorizonCraft.script.Services.world;
 
-namespace horizoncraft.script.Services.Events;
+namespace Horizoncraft.script.Services.Events;
 
 //本地事件触发
 public class ClientPlayerEvents : PlayerEvents

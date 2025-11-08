@@ -1,6 +1,6 @@
 using MemoryPack;
 
-namespace horizoncraft.script.Components.Item;
+namespace Horizoncraft.script.Components.Item;
 
 [MemoryPackable]
 public partial class ItemFluidComponent:ItemUsefulComponent

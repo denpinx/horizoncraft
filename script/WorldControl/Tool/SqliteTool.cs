@@ -1,13 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
 using Godot;
-using horizoncraft.script.Net;
+using Horizoncraft.script.Net;
 using Microsoft.Data.Sqlite;
 
-namespace horizoncraft.script.WorldControl.Tool;
+namespace Horizoncraft.script.WorldControl.Tool;
 
 public static class SqliteTool
 {

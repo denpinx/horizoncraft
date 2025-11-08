@@ -1,8 +1,7 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using horizoncraft.script;
-using horizoncraft.script.Inventory;
+using Horizoncraft.script;
+using Horizoncraft.script.Inventory;
 
 public partial class HotBar : CanvasLayer
 {

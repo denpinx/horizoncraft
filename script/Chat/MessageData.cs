@@ -1,7 +1,7 @@
 using System;
 using MemoryPack;
 
-namespace horizoncraft.script.Chat;
+namespace Horizoncraft.script.Chat;
 
 /// <summary>
 /// 消息数据

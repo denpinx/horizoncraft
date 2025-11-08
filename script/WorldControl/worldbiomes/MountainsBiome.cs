@@ -1,7 +1,8 @@
 using System;
 using Godot;
+using HorizonCraft.script.WorldControl.Context;
 
-namespace horizoncraft.script.WorldControl.worldbiomes;
+namespace Horizoncraft.script.WorldControl.worldbiomes;
 
 public class MountainsBiome : LandBiome
 {

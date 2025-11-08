@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Entity;
 using MemoryPack;
 
-namespace horizoncraft.script.Net;
+namespace Horizoncraft.script.Net;
 
 [MemoryPackable]
 public partial class EntityPack

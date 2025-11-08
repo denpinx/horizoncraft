@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Events;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.WorldControl;
-using horizoncraft.script.WorldControl.Struct;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Events;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl.Struct;
 using Dictionary = System.Collections.Generic.Dictionary<string, string>;
 
-namespace horizoncraft.script
+namespace Horizoncraft.script
 {
     /// <summary>
     /// 方块配置

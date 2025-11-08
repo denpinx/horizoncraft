@@ -1,10 +1,8 @@
-using System;
 using Godot;
-using horizoncraft.script.Events;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Recipes;
+using Horizoncraft.script.Events;
+using Horizoncraft.script.Recipes;
 
-namespace horizoncraft.script.Components.Systems;
+namespace Horizoncraft.script.Components.Systems;
 /// <summary>
 /// 熔炉系统
 /// 处理熔炉配方

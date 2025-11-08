@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Components;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Events.SystemEvents;
-using horizoncraft.script.Expand;
-using horizoncraft.script.Net;
-using horizoncraft.script.Services;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Entity;
+using Horizoncraft.script.Events.SystemEvents;
+using Horizoncraft.script.Expand;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.Services;
+using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Services.entity;
 

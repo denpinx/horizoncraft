@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Godot;
 
-namespace horizoncraft.script.UnitTest;
+namespace Horizoncraft.script.UnitTest;
 
 /// <summary>
 /// 单元测试项

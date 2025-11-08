@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script.WorldControl.Context;
-using horizoncraft.script.WorldControl.Struct;
+using Horizoncraft.script.WorldControl.Context;
+using HorizonCraft.script.WorldControl.Context;
+using Horizoncraft.script.WorldControl.Struct;
 
-namespace horizoncraft.script.WorldControl
+namespace Horizoncraft.script.WorldControl
 {
     public class LandBiome : BaseBiome
     {

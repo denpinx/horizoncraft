@@ -1,7 +1,6 @@
 using Godot;
-using System;
-using horizoncraft.script.Components.Item;
-using horizoncraft.script.Inventory;
+using Horizoncraft.script.Components.Item;
+using Horizoncraft.script.Inventory;
 
 public partial class Slot : Control
 {

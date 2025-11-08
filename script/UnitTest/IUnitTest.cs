@@ -1,6 +1,6 @@
 using Godot;
 
-namespace horizoncraft.script.UnitTest;
+namespace Horizoncraft.script.UnitTest;
 
 public interface IUnitTest
 {

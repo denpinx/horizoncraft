@@ -1,7 +1,7 @@
-using horizoncraft.script.Components;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Net;
-using horizoncraft.script.Recipes;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.Recipes;
 
 namespace HorizonCraft.tscn.Menu.Inventory;
 

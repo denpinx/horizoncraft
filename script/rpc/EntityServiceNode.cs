@@ -1,8 +1,8 @@
 using Godot;
 using System;
-using horizoncraft.script;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Net;
+using Horizoncraft.script;
+using Horizoncraft.script.Entity;
+using Horizoncraft.script.Net;
 using HorizonCraft.script.Services.world;
 
 /// <summary>

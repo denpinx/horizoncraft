@@ -1,14 +1,14 @@
 using System;
 using Godot;
-using horizoncraft.script.Components.Item;
-using horizoncraft.script.Config;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Expand;
-using horizoncraft.script.rpc;
+using Horizoncraft.script.Components.Item;
+using Horizoncraft.script.Config;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Expand;
+using Horizoncraft.script.rpc;
 using HorizonCraft.script.Services.world;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script;
+namespace Horizoncraft.script;
 
 public partial class PlayerNode : CharacterBody2D
 {

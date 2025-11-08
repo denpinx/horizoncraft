@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Events;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.Events;
+using Horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script.Components.Systems;
+namespace Horizoncraft.script.Components.Systems;
 /// <summary>
 /// 物流输入系统
 /// 在1tick内dfs周围的物流管道传输物品，没有缓存。
@@ -17,23 +17,23 @@ public class LogisticsInputSystem : TickSystem
     /// <param name="component"></param>
     public override void BlockTick(BlockTickEvent e, Component component)
     {
-        HashSet<Vector3I> finded = new HashSet<Vector3I>();
-        var formblock = GetInventoryBlock(e, e.GlobalePos, true);
-        if (formblock == null) return;
+        HashSet<Vector3I> passBlocks = new HashSet<Vector3I>();
+        var block = GetInventoryBlock(e, e.GlobalePos, true);
+        if (block == null) return;
 
-        var input_inv = formblock.GetComponent<InventoryComponent>();
-        if (input_inv == null) return;
+        var inputInv = block.GetComponent<InventoryComponent>();
+        if (inputInv == null) return;
 
-        var result = FindInputBlock(e, finded, e.GlobalePos);
+        var result = FindInputBlock(e, passBlocks, e.GlobalePos);
         if (result == null) return;
 
-        var (index, item) = input_inv.TryTakeItem(formblock.BlockMeta, 1, false);
+        var (index, item) = inputInv.TryTakeItem(block.BlockMeta, 1, false);
         if (item == null) return;
 
-        var targetmeta = result.BlockMeta;
-        var target_inv = result.GetComponent<InventoryComponent>();
-        if (target_inv.TryPushItem(targetmeta, item))
-            input_inv.GetInventory().ReduceItemAmount(index, 1);
+        var targetBlockMeta = result.BlockMeta;
+        var targetInv = result.GetComponent<InventoryComponent>();
+        if (targetInv.TryPushItem(targetBlockMeta, item))
+            inputInv.GetInventory().ReduceItemAmount(index);
     }
     /// <summary>
     /// 被动触发Tick
@@ -42,58 +42,58 @@ public class LogisticsInputSystem : TickSystem
     /// <param name="component"></param>
     public override void ReactiveTick(BlockTickEvent e, ReactiveComponent component)
     {
-        HashSet<Vector3I> finded = new HashSet<Vector3I>();
-        var formblock = GetInventoryBlock(e, e.GlobalePos, true);
-        if (formblock == null) return;
+        HashSet<Vector3I> passBlocks = new HashSet<Vector3I>();
+        var block = GetInventoryBlock(e, e.GlobalePos, true);
+        if (block == null) return;
 
-        var input_inv = formblock.GetComponent<InventoryComponent>();
-        if (input_inv == null) return;
+        var inputInv = block.GetComponent<InventoryComponent>();
+        if (inputInv == null) return;
 
-        var result = FindInputBlock(e, finded, e.GlobalePos);
+        var result = FindInputBlock(e, passBlocks, e.GlobalePos);
         if (result == null) return;
 
-        var (index, item) = input_inv.TryTakeItem(formblock.BlockMeta, 1, false);
+        var (index, item) = inputInv.TryTakeItem(block.BlockMeta, 1, false);
         if (item == null) return;
 
-        var targetmeta = result.BlockMeta;
-        var target_inv = result.GetComponent<InventoryComponent>();
-        if (target_inv.TryPushItem(targetmeta, item))
-            input_inv.GetInventory().ReduceItemAmount(index, 1);
+        var targetBlockMeta = result.BlockMeta;
+        var targetInv = result.GetComponent<InventoryComponent>();
+        if (targetInv.TryPushItem(targetBlockMeta, item))
+            inputInv.GetInventory().ReduceItemAmount(index);
     }
 
-    public BlockData FindInputBlock(BlockTickEvent e, HashSet<Vector3I> finded, Vector3I pos)
+    private BlockData FindInputBlock(BlockTickEvent e, HashSet<Vector3I> passBlocks, Vector3I pos)
     {
-        if (finded.Contains(pos) || finded.Count > 128) return null;
+        if (passBlocks.Contains(pos) || passBlocks.Count > 128) return null;
 
         var block = e.Service.ChunkService.GetBlock(pos);
         if (block == null || !block.CheckTag("link", "net")) return null;
         if (block.IsMeta("output_block"))
         {
-            var invblock = GetInventoryBlock(e, pos);
-            if (invblock != null) return invblock;
+            var inventoryBlock = GetInventoryBlock(e, pos);
+            if (inventoryBlock != null) return inventoryBlock;
         }
 
-        finded.Add(pos);
+        passBlocks.Add(pos);
         {
-            var result = FindInputBlock(e, finded, pos + Vector3I.Up);
+            var result = FindInputBlock(e, passBlocks, pos + Vector3I.Up);
             if (result != null) return result;
         }
         {
-            var result = FindInputBlock(e, finded, pos + Vector3I.Down);
+            var result = FindInputBlock(e, passBlocks, pos + Vector3I.Down);
             if (result != null) return result;
         }
         {
-            var result = FindInputBlock(e, finded, pos + Vector3I.Left);
+            var result = FindInputBlock(e, passBlocks, pos + Vector3I.Left);
             if (result != null) return result;
         }
         {
-            var result = FindInputBlock(e, finded, pos + Vector3I.Right);
+            var result = FindInputBlock(e, passBlocks, pos + Vector3I.Right);
             if (result != null) return result;
         }
         return null;
     }
 
-    public BlockData GetInventoryBlock(BlockTickEvent e, Vector3I pos, bool hasitem = false)
+    private BlockData GetInventoryBlock(BlockTickEvent e, Vector3I pos, bool hasItem = false)
     {
         {
             var block = e.Service.ChunkService.GetBlock(pos + Vector3I.Up);
@@ -102,7 +102,7 @@ public class LogisticsInputSystem : TickSystem
                 var cmp = block.GetComponent<InventoryComponent>();
                 if (cmp != null)
                 {
-                    if (hasitem)
+                    if (hasItem)
                     {
                         if (!cmp.GetInventory().IsEmpty()) return block;
                     }
@@ -117,7 +117,7 @@ public class LogisticsInputSystem : TickSystem
                 var cmp = block.GetComponent<InventoryComponent>();
                 if (cmp != null)
                 {
-                    if (hasitem)
+                    if (hasItem)
                     {
                         if (!cmp.GetInventory().IsEmpty()) return block;
                     }
@@ -132,7 +132,7 @@ public class LogisticsInputSystem : TickSystem
                 var cmp = block.GetComponent<InventoryComponent>();
                 if (cmp != null)
                 {
-                    if (hasitem)
+                    if (hasItem)
                     {
                         if (!cmp.GetInventory().IsEmpty()) return block;
                     }
@@ -147,7 +147,7 @@ public class LogisticsInputSystem : TickSystem
                 var cmp = block.GetComponent<InventoryComponent>();
                 if (cmp != null)
                 {
-                    if (hasitem)
+                    if (hasItem)
                     {
                         if (!cmp.GetInventory().IsEmpty()) return block;
                     }

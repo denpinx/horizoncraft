@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using horizoncraft.script.Events;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Events.SystemEvents;
+using Horizoncraft.script.Events;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Events.SystemEvents;
 
-namespace horizoncraft.script.Components
+namespace Horizoncraft.script.Components
 {
     //组件事件处理
     public interface IComponentSystem

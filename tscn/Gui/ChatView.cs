@@ -1,8 +1,7 @@
 using Godot;
 using System;
-using System.Collections.Generic;
-using horizoncraft.script;
-using horizoncraft.script.Chat;
+using Horizoncraft.script;
+using Horizoncraft.script.Chat;
 
 /// <summary>
 /// 聊天视图

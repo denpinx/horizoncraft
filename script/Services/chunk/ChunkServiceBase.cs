@@ -6,12 +6,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Components;
-using horizoncraft.script.Expand;
-using horizoncraft.script.Services;
-using horizoncraft.script.WorldControl;
-using horizoncraft.script.WorldControl.Tool;
+using Horizoncraft.script;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Expand;
+using Horizoncraft.script.Services;
+using Horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl.Tool;
 
 namespace HorizonCraft.script.Services.chunk;
 

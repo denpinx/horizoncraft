@@ -1,5 +1,5 @@
 using Godot;
-using horizoncraft.script;
+using Horizoncraft.script;
 
 namespace HorizonCraft.script.Services.chunk;
 

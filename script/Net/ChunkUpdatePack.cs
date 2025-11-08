@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using System.Numerics;
 using MemoryPack;
 
-namespace horizoncraft.script.Net;
+namespace Horizoncraft.script.Net;
 
 /// <summary>
 /// 增量同步

@@ -1,14 +1,14 @@
 using System;
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Net;
-using horizoncraft.script.NewProxy.player;
+using Horizoncraft.script;
+using Horizoncraft.script.Entity;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.NewProxy.player;
 using HorizonCraft.script.Services.chunk;
 using HorizonCraft.script.Services.entity;
-using horizoncraft.script.Services.message;
+using Horizoncraft.script.Services.message;
 using HorizonCraft.script.Services.player;
-using horizoncraft.script.WorldControl.Tool;
+using Horizoncraft.script.WorldControl.Tool;
 
 namespace HorizonCraft.script.Services.world;
 

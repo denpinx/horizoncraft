@@ -1,5 +1,5 @@
 using Godot;
-using horizoncraft.script;
+using Horizoncraft.script;
 
 /// <summary>
 /// 显示玩家手中的物品

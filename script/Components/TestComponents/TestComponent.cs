@@ -1,8 +1,8 @@
+using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
-namespace horizoncraft.script.Components.TestComponents;
-
+namespace Horizoncraft.script.Components.TestComponents;
+[Obsolete]
 public record TestComponent
 {
     public string Name="";

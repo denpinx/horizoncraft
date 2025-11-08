@@ -1,10 +1,9 @@
 using Godot;
 using System.Collections.Generic;
-using horizoncraft.script;
-using horizoncraft.script.Components;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.WorldControl;
 
 /// <summary>
 /// 通用菜单节点,根据节点自定义

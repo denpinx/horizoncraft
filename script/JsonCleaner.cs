@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace horizoncraft.script
+namespace Horizoncraft.script
 {
     public class JsonCleaner
     {

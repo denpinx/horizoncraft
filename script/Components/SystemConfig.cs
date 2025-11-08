@@ -1,6 +1,6 @@
 using System;
 
-namespace horizoncraft.script.Components
+namespace Horizoncraft.script.Components
 {
     public class SystemConfig
     {

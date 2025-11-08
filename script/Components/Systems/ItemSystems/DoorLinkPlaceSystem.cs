@@ -1,7 +1,10 @@
 using Godot;
-using horizoncraft.script.Events.player;
+using Horizoncraft.script;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Components.Systems;
+using Horizoncraft.script.Events.player;
 
-namespace horizoncraft.script.Components.Systems.BlockSystems;
+namespace HorizonCraft.script.Components.Systems.ItemSystems;
 
 public class DoorLinkPlaceSystem : ItemComponentSystem
 {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using MemoryPack;
 
-namespace horizoncraft.script.Net;
+namespace Horizoncraft.script.Net;
 
 [MemoryPackable]
 public partial class EntityUuidPack

@@ -1,14 +1,12 @@
-using System;
 using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Events;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Net;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Net;
 using HorizonCraft.script.Services.world;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script.rpc;
+namespace Horizoncraft.script.rpc;
 
 /// <summary>
 /// 区块类相关RPC操作
@@ -66,9 +64,9 @@ public partial class ChunkServiceNode : Node
         {
             if (World.Service.ChunkService.Chunks.TryGetValue(new Vector2I(update.X, update.Y), out Chunk chunk))
             {
-                foreach (var block in update.list)
+                foreach (var block in update.Blocks)
                     chunk.SetBlock(block.x, block.y, block.z, Materials.BlockMetas[block.id], block.state);
-                GD.Print($"#{chunk.coord} 区块增量更新:{update.list.Count}个方块");
+                GD.Print($"#{chunk.coord} 区块增量更新:{update.Blocks.Count}个方块");
                 foreach (var entity in update.Entiydatas)
                     WorldService.EntityService.AddEntityData(entity);
             }

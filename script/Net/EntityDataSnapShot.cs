@@ -1,12 +1,12 @@
 using System;
 using Godot;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Expand;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.Entity;
+using Horizoncraft.script.Expand;
+using Horizoncraft.script.WorldControl;
 using MemoryPack;
 using Vector2 = System.Numerics.Vector2;
 
-namespace horizoncraft.script.Net;
+namespace Horizoncraft.script.Net;
 
 [MemoryPackable]
 public partial class EntityDataSnapShot

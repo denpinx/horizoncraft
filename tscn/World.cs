@@ -5,14 +5,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Godot;
-using horizoncraft.script.Config;
+using Horizoncraft.script.Config;
 using HorizonCraft.script.Services.world;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 using Microsoft.Data.Sqlite;
 using Array = Godot.Collections.Array;
 using Timer = Godot.Timer;
 
-namespace horizoncraft.script
+namespace Horizoncraft.script
 {
     //第一次重构:策略模式，但是功能聚合
     //第二次重构:功能组合，代理模式

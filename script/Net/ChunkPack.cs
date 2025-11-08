@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 using MemoryPack;
 
-namespace horizoncraft.script.Net;
+namespace Horizoncraft.script.Net;
 
 /// <summary>
 /// 全量同步

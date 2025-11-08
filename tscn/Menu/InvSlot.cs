@@ -1,10 +1,10 @@
 using Godot;
 using System;
 using System.Text;
-using horizoncraft.script.Components.Interfaces;
-using horizoncraft.script.Components.Item;
-using horizoncraft.script.I18N;
-using horizoncraft.script.Inventory;
+using Horizoncraft.script.Components.Interfaces;
+using Horizoncraft.script.Components.Item;
+using Horizoncraft.script.I18N;
+using Horizoncraft.script.Inventory;
 
 public partial class InvSlot : Control
 {

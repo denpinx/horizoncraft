@@ -6,11 +6,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script.WorldControl.Context;
-using horizoncraft.script.WorldControl.Struct;
-using static horizoncraft.script.WorldControl.BiomeManage;
+using Horizoncraft.script.WorldControl.Context;
+using HorizonCraft.script.WorldControl.Context;
+using Horizoncraft.script.WorldControl.Struct;
+using static Horizoncraft.script.WorldControl.BiomeManage;
 
-namespace horizoncraft.script.WorldControl
+namespace Horizoncraft.script.WorldControl
 {
     public class WorldGenerator
     {

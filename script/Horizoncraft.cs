@@ -1,4 +1,4 @@
-namespace horizoncraft.script
+namespace Horizoncraft.script
 {
     public partial class Horizoncraft
     {

@@ -1,8 +1,8 @@
 using Godot;
 using System.Collections.Generic;
-using horizoncraft.script;
-using horizoncraft.script.UnitTest;
-using horizoncraft.script.UnitTest.Tests;
+using Horizoncraft.script;
+using Horizoncraft.script.UnitTest;
+using Horizoncraft.script.UnitTest.Tests;
 
 public partial class UnitTest : Node2D
 {

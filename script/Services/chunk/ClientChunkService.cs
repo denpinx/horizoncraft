@@ -2,10 +2,10 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script;
-using horizoncraft.script.Net;
-using horizoncraft.script.rpc;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.rpc;
+using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.script.Services.chunk;
 

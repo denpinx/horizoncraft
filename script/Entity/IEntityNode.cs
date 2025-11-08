@@ -1,6 +1,6 @@
 using Godot;
 
-namespace horizoncraft.script.Entity;
+namespace Horizoncraft.script.Entity;
 
 /// <summary>
 /// 通过实现这个接口，就可以统一存储和管理各种被注册的Godot节点

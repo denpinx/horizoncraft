@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Components.Item;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Components.Item;
 
-namespace horizoncraft.script.UnitTest.Tests;
+namespace Horizoncraft.script.UnitTest.Tests;
 
 public class Simple_LambdaBuildTest_1 : UnitTestItem<Func<ItemDurableComponent>>
 {

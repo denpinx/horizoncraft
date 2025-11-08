@@ -1,6 +1,5 @@
 using Godot;
-using System;
-using horizoncraft.script;
+using Horizoncraft.script;
 
 public partial class PlayerSnapshot : CharacterBody2D
 {

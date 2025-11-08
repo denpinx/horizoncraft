@@ -1,9 +1,7 @@
-using Godot;
-using Godot.NativeInterop;
-using horizoncraft.script.Components.EnergyBlocks;
-using horizoncraft.script.Events;
+using Horizoncraft.script.Components.EnergyBlocks;
+using Horizoncraft.script.Events;
 
-namespace horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
+namespace Horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
 /// <summary>
 /// 太阳能系统
 /// 仅在白天工作，自动向周围传输能能量。

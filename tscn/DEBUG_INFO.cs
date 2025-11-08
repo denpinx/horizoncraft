@@ -1,10 +1,9 @@
 using Godot;
 using System;
 using System.Text;
-using horizoncraft.script;
-using horizoncraft.script.Components;
-using horizoncraft.script.Expand;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script;
+using Horizoncraft.script.Expand;
+using Horizoncraft.script.WorldControl;
 
 public partial class DEBUG_INFO : CanvasLayer
 {

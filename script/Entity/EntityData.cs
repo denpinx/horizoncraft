@@ -2,14 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Vector2 = System.Numerics.Vector2;
-using System.Threading.Tasks;
 using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Expand;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Expand;
 using MemoryPack;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script.Entity
+namespace Horizoncraft.script.Entity
 {
     [MemoryPackable]
     public partial class EntityData

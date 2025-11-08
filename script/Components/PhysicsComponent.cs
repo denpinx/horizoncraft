@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MemoryPack;
-
-namespace horizoncraft.script.Components
+namespace Horizoncraft.script.Components
 {
     [MemoryPackable]
     public partial class PhysicsComponent : ExpandComponent

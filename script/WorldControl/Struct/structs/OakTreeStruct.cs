@@ -1,13 +1,12 @@
 using System;
-using System.ComponentModel;
 using System.Linq;
 
-namespace horizoncraft.script.WorldControl.Struct.structs;
+namespace Horizoncraft.script.WorldControl.Struct.structs;
 
 public class OakTreeStruct : StructBuild
 {
-    private BlockMeta _oak_log = Materials.Valueof("oak_log");
-    private BlockMeta _oak_leaves = Materials.Valueof("oak_leaves");
+    private readonly BlockMeta _oak_log = Materials.Valueof("oak_log");
+    private readonly BlockMeta _oak_leaves = Materials.Valueof("oak_leaves");
 
     public OakTreeStruct()
     {

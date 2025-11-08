@@ -1,9 +1,7 @@
 using Godot;
-using System;
 using Godot.Collections;
-using horizoncraft.script;
-using horizoncraft.script.WorldControl;
-using horizoncraft.script.WorldControl.Struct;
+using Horizoncraft.script;
+using Horizoncraft.script.WorldControl.Struct;
 /// <summary>
 /// 建筑蓝图绘制工具。
 /// </summary>

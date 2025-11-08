@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Components;
+using Horizoncraft.script.Components;
 
-namespace horizoncraft.script.UnitTest.Tests;
+namespace Horizoncraft.script.UnitTest.Tests;
 
 public class Simple_LambdaBuildTest_0 : UnitTestItem<Func<ItemComponent>>
 {

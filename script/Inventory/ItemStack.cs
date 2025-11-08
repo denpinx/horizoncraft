@@ -1,15 +1,12 @@
-using System;
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Components.Interfaces;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Net;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Components.EntityComponents;
+using Horizoncraft.script.Entity;
 using MemoryPack;
 using Vector2 = System.Numerics.Vector2;
 
-namespace horizoncraft.script.Inventory;
+namespace Horizoncraft.script.Inventory;
 
 [MemoryPackable]
 public partial class ItemStack

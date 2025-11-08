@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Components;
-using horizoncraft.script.Components.TestComponents;
+using Horizoncraft.script.Components;
+using Horizoncraft.script.Components.TestComponents;
 
-namespace horizoncraft.script.UnitTest.Tests;
+namespace Horizoncraft.script.UnitTest.Tests;
 
 public class Complex_LambdaBuildTest_0 : UnitTestItem<Func<TestComponent>>
 {

@@ -1,12 +1,8 @@
-using System.Collections.Generic;
 using Godot;
-using Godot.NativeInterop;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Entity;
-using horizoncraft.script.Events;
-using horizoncraft.script.Expand;
-
-namespace horizoncraft.script.Components.Systems;
+using Horizoncraft.script.Components.EntityComponents;
+using Horizoncraft.script.Events;
+using Horizoncraft.script.Expand;
+namespace Horizoncraft.script.Components.Systems;
 /// <summary>
 /// 物品实体系统
 /// 自动合并相同物品的实体。

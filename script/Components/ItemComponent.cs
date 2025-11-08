@@ -1,7 +1,7 @@
-using horizoncraft.script.Components.Interfaces;
+using Horizoncraft.script.Components.Interfaces;
 using MemoryPack;
 
-namespace horizoncraft.script.Components;
+namespace Horizoncraft.script.Components;
 
 [MemoryPackable]
 public partial class ItemComponent : Component

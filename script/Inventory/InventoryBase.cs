@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Net;
 using MemoryPack;
 
-namespace horizoncraft.script.Inventory;
+namespace Horizoncraft.script.Inventory;
 
 [MemoryPackable]
 [MemoryPackUnion(0, typeof(PlayerInventory))]

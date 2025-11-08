@@ -3,8 +3,10 @@ using Godot;
 using Godot.Collections;
 using Godot.NativeInterop;
 
-namespace horizoncraft.script.Expand;
-
+namespace Horizoncraft.script.Expand;
+/// <summary>
+/// 集合扩展，c#字典和godot字典的转换。
+/// </summary>
 public static class DictionaryExpand
 {
     public static System.Collections.Generic.Dictionary<string, object> ToCsharp(

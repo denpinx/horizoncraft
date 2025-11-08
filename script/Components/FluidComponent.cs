@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MemoryPack;
 
-namespace horizoncraft.script.Components
+namespace Horizoncraft.script.Components
 {
     [MemoryPackable]
     public partial class FluidComponent : ExpandComponent

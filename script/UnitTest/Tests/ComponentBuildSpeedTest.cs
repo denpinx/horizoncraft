@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Godot;
 
-namespace horizoncraft.script.UnitTest.Tests;
+namespace Horizoncraft.script.UnitTest.Tests;
 
 public class ComponentBuildSpeedTest : UnitTestItem<object>
 {

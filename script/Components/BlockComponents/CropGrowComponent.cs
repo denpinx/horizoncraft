@@ -1,7 +1,7 @@
 using System;
 using MemoryPack;
 
-namespace horizoncraft.script.Components.BlockComponents;
+namespace Horizoncraft.script.Components.BlockComponents;
 
 [MemoryPackable]
 public partial class CropGrowComponent : TickComponent

@@ -1,7 +1,7 @@
-using horizoncraft.script.Components.Interfaces;
+using Horizoncraft.script.Components.Interfaces;
 using MemoryPack;
 
-namespace horizoncraft.script.Components.EnergyBlocks;
+namespace Horizoncraft.script.Components.EnergyBlocks;
 
 [MemoryPackable]
 public partial class EnergyUnitComponent : TickComponent, IGetProgress

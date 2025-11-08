@@ -1,8 +1,7 @@
 using Godot;
-using System;
-using horizoncraft.script;
-using horizoncraft.script.I18N;
-using horizoncraft.script.Recipes;
+using Horizoncraft.script;
+using Horizoncraft.script.I18N;
+using Horizoncraft.script.Recipes;
 using HorizonCraft.script.Services.chunk;
 
 /// <summary>

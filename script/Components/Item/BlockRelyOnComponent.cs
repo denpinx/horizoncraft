@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using MemoryPack;
-
-namespace horizoncraft.script.Components.Item;
+namespace Horizoncraft.script.Components.Item;
 
 /// <summary>
 /// 玩家放置放置时会经过物品上的这个组件进行放置判断，决定要不要放置

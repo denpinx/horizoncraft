@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using horizoncraft.script.Inventory;
+using Horizoncraft.script.Inventory;
 
-namespace horizoncraft.script.Recipes;
+namespace Horizoncraft.script.Recipes;
 
 /// <summary>
 /// 支持把不同目录的json文件，的相同配方类型给自动合并，一个json既支持只写一个，多个json也可以对同一个类型添加

@@ -1,8 +1,7 @@
 using Godot.Collections;
-using horizoncraft.script.Net;
 using MemoryPack;
 
-namespace horizoncraft.script.Config;
+namespace Horizoncraft.script.Config;
 
 [MemoryPackable]
 public partial class LocalProfile

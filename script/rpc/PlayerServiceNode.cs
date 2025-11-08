@@ -1,10 +1,8 @@
 using Godot;
-using System;
-using horizoncraft.script;
-using horizoncraft.script.Components;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Net;
+using Horizoncraft.script;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Net;
 using HorizonCraft.script.Services.chunk;
 using HorizonCraft.script.Services.player;
 using HorizonCraft.script.Services.world;

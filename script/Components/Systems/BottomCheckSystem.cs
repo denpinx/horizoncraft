@@ -1,6 +1,6 @@
-using horizoncraft.script.Events;
+using Horizoncraft.script.Events;
 
-namespace horizoncraft.script.Components.Systems;
+namespace Horizoncraft.script.Components.Systems;
 /// <summary>
 /// 检查底部是否为指定方块，否则被替换为"空气"
 /// </summary>

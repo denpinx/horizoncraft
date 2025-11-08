@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Godot;
-using horizoncraft.script.WorldControl.Context;
-using horizoncraft.script.WorldControl.Struct;
-using static horizoncraft.script.WorldControl.BiomeManage;
+using Horizoncraft.script.WorldControl.Context;
+using HorizonCraft.script.WorldControl.Context;
+using Horizoncraft.script.WorldControl.Struct;
+using static Horizoncraft.script.WorldControl.BiomeManage;
 using Vector2 = Godot.Vector2;
 
-namespace horizoncraft.script.WorldControl
+namespace Horizoncraft.script.WorldControl
 {
     public class Biome : BaseBiome
     {

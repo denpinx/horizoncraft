@@ -2,24 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using horizoncraft.script.Components.BlockComponents;
-using horizoncraft.script.Components.EnergyBlocks;
-using horizoncraft.script.Components.EntityComponents;
-using horizoncraft.script.Components.Item;
-using horizoncraft.script.Components.Systems;
-using horizoncraft.script.Components.Systems.BlockSystems;
-using horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
-using horizoncraft.script.Components.Systems.BlockSystems.Reactive;
-using horizoncraft.script.Components.Systems.ItemSystems;
+using Horizoncraft.script.Components.BlockComponents;
+using Horizoncraft.script.Components.EnergyBlocks;
+using Horizoncraft.script.Components.EntityComponents;
+using Horizoncraft.script.Components.Item;
+using Horizoncraft.script.Components.Systems;
+using Horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
+using Horizoncraft.script.Components.Systems.BlockSystems.Reactive;
 using HorizonCraft.script.Components.Systems.ItemSystems;
-using horizoncraft.script.Events;
-using horizoncraft.script.Events.player;
-using horizoncraft.script.Events.SystemEvents;
-using horizoncraft.script.Inventory;
-using horizoncraft.script.Net;
-using horizoncraft.script.WorldControl;
+using Horizoncraft.script.Events;
+using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Events.SystemEvents;
+using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Net;
+using Horizoncraft.script.WorldControl;
 
-namespace horizoncraft.script.Components;
+namespace Horizoncraft.script.Components;
 
 /// <summary>
 /// 组件的系统管理器
@@ -57,10 +55,9 @@ public static class ComponentManager
     /// <returns>是否有组件的系统取消事件</returns>
     public static bool ExecuteItemComponents<T>(PlayerEvent playerEvent, ItemStack itemStack)
     {
-        string start_id = itemStack.Name;
-        for (int i = 0; i < itemStack.Components.Count; i++)
+        string startId = itemStack.Name;
+        foreach (var component in itemStack.Components)
         {
-            Component component = itemStack.Components[i];
             if (component == null)
             {
                 GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
@@ -79,7 +76,7 @@ public static class ComponentManager
                 if (!s) return false;
             }
 
-            if (itemStack.Name != start_id)
+            if (itemStack.Name != startId)
                 return false;
         }
 
@@ -95,9 +92,8 @@ public static class ComponentManager
     public static bool ExecuteItemComponents(PlayerEvent playerEvent, ItemStack itemStack)
     {
         string primName = itemStack.Name;
-        for (int i = 0; i < itemStack.Components.Count; i++)
+        foreach (var component in itemStack.Components)
         {
-            Component component = itemStack.Components[i];
             if (component == null)
             {
                 GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
@@ -128,10 +124,9 @@ public static class ComponentManager
     /// <returns>是否有组件的系统取消事件或执行失败</returns>
     public static bool ExecuteBlockComponents(WorldEvent worldEvent, BlockData blockData)
     {
-        string start_id = blockData.Id;
-        for (int i = 0; i < blockData.Components.Count; i++)
+        string startId = blockData.Id;
+        foreach (var component in blockData.Components)
         {
-            Component component = blockData.Components[i];
             if (component == null)
             {
                 GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
@@ -145,15 +140,15 @@ public static class ComponentManager
                 continue;
             }
 
-            if (ComponentSets.ContainsKey(component.EnumId))
+            if (ComponentSets.TryGetValue(component.EnumId, out var set))
             {
-                var s = ComponentSets[component.EnumId].System.ExecuteBlockComponent(worldEvent, component);
+                var s = set.System.ExecuteBlockComponent(worldEvent, component);
                 //取消事件
                 if (!s) return false;
             }
 
-            //方块类型和状态可能已经被组件给修改了，blockdata.componets的状态已经成为未知状态了,之后就不用继续运行
-            if (blockData.Id != start_id)
+            //方块类型和状态可能已经被组件给修改了,blockdata.componets的状态已经成为未知状态了,之后就不用继续运行
+            if (blockData.Id != startId)
                 return false;
         }
 
@@ -169,9 +164,8 @@ public static class ComponentManager
     public static void SetBlockComponentData(PlayerData player, BlockData blockData,
         SetComponentData setComponentData)
     {
-        for (int i = 0; i < blockData.Components.Count; i++)
+        foreach (var component in blockData.Components)
         {
-            Component component = blockData.Components[i];
             if (component == null)
             {
                 GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(SetBlockComponentData)} 方块组件被意外删除。");

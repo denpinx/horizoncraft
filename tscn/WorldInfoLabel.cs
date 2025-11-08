@@ -1,7 +1,6 @@
 using Godot;
-using System;
-using horizoncraft.script.I18N;
-using horizoncraft.script.Net;
+using Horizoncraft.script.I18N;
+using Horizoncraft.script.Net;
 
 public partial class WorldInfoLabel : HBoxContainer
 {
