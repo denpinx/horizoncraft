@@ -36,8 +36,15 @@ public class ClientWorldService : WorldServiceBase
 
 
         var enet = new ENetMultiplayerPeer();
-        enet.CreateClient(ip, Port);
-        world.Multiplayer.MultiplayerPeer = enet;
+        var result = enet.CreateClient(ip, Port);
+        if (result == Error.Ok)
+        {
+            world.Multiplayer.MultiplayerPeer = enet;
+        }
+        else
+        {
+            GD.PrintErr($"客户端连接失败 {result}");
+        }
     }
 
     public override void InitializeServices()

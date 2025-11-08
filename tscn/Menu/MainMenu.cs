@@ -9,13 +9,15 @@ using Horizoncraft.script.WorldControl;
 
 namespace HorizonCraft.tscn.Menu;
 
-public partial class MainMenu : Horizoncraft.script.World, ITranslatable
+public partial class MainMenu : World, ITranslatable
 {
     [Export] private CanvasLayer TopCanvasLayer, GuiCanvasLayer;
     [Export] private Button ButtonSingle, buttonExit, ButtonConnect;
     [Export] private TextEdit TextEdit;
 
     private PackedScene WorldProfilesScene = GD.Load<PackedScene>("res://tscn/Menu/WorldListMenu.tscn");
+    private PackedScene MultiplayerConnectScene = GD.Load<PackedScene>("res://tscn/Menu/MultiplayerConnect.tscn");
+
     private PackedScene WorldScene = GD.Load<PackedScene>("res://tscn/world.tscn");
 
     public override void _Ready()
@@ -32,8 +34,6 @@ public partial class MainMenu : Horizoncraft.script.World, ITranslatable
 
 
         base._Ready();
-        PlayerNode.hotBar.Visible = false;
-
         ButtonSingle.Pressed += () =>
         {
             if (TopCanvasLayer.GetChildCount() == 0)
@@ -51,24 +51,38 @@ public partial class MainMenu : Horizoncraft.script.World, ITranslatable
         buttonExit.Pressed += () => { GetTree().Quit(); };
         ButtonConnect.Pressed += () =>
         {
-            worldMode = WorldMode.MultiplayerClient;
-            GetTree().ChangeSceneToPacked(WorldScene);
+            if (TopCanvasLayer.GetChildCount() == 0)
+            {
+                GuiCanvasLayer.Visible = false;
+                var node = MultiplayerConnectScene.Instantiate<MultiplayerConnect>();
+                node.OnChangeScene += () =>
+                {
+                    this.Service = null;
+                    QueueFree();
+                };
+                TopCanvasLayer.AddChild(node);
+            }
+
+            // worldMode = WorldMode.MultiplayerClient;
+            // GetTree().ChangeSceneToPacked(WorldScene);
         };
         TextEdit.Text = PlayerNode.Profile.Name;
         TextEdit.TextChanged += () =>
         {
+            var old = PlayerNode.Profile.Name;
             PlayerNode.Profile.Name = TextEdit.Text;
+            Service.PlayerService.ChangeName(old,PlayerNode.Profile.Name);
             SaveProfile();
         };
 
-
+        PlayerNode.Visible = false;
+        PlayerNode.BaseInputable = false;
+        
         LanguageManage.SetTargetLang("cn", GetTree());
     }
 
     public override void _PhysicsProcess(double delta)
     {
-        PlayerNode.Visible = false;
-        PlayerNode.BaseInputable = false;
         base._PhysicsProcess(delta);
         PlayerNode.Position += Vector2.Left * 1;
 
@@ -87,8 +101,6 @@ public partial class MainMenu : Horizoncraft.script.World, ITranslatable
             var coord = (PlayerNode.Position.ToVector2I().MathFloor(16)).Remainder(Chunk.Size);
             var targetpos = new Vector2(PlayerNode.Position.X, chunk.HighMap[coord.X, 0] * 16f);
             PlayerNode.Position = targetpos;
-            //var tween = GetTree().CreateTween();
-            //tween.TweenProperty(PlayerNode, "position", targetpos, 0.1f);
         }
     }
 

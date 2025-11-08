@@ -18,7 +18,7 @@ namespace Horizoncraft.script.Components
     /// </summary>
     public static class LambdaCreater
     {
-        const string TypeNamespace = "horizoncraft.script.Components";
+        const string TypeNamespace = "Horizoncraft.script.Components";
 
         /// <summary>
         /// 获取对象的表达式
@@ -194,6 +194,10 @@ namespace Horizoncraft.script.Components
                 }
             }
 
+            if (results.Count == 0)
+            {
+                GD.PrintErr($"未找到：{typeName}");
+            }
             return results?.First();
         }
 

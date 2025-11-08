@@ -1,0 +1,158 @@
+[gd_scene load_steps=11 format=3 uid="uid://c4gdydacuyy65"]
+
+[ext_resource type="Script" uid="uid://baen15m578dh1" path="res://tscn/Menu/MultiplayerConnect.cs" id="1_uctsd"]
+[ext_resource type="Texture2D" uid="uid://ds2cd0avimbko" path="res://texture/Gui/panel5.png" id="2_lytof"]
+[ext_resource type="Texture2D" uid="uid://cqua03fhv28h7" path="res://texture/Gui/panel4.png" id="3_r036g"]
+[ext_resource type="Texture2D" uid="uid://baf6hjwqh4psh" path="res://texture/Gui/button.png" id="4_dhab6"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_d4r6m"]
+texture = ExtResource("2_lytof")
+texture_margin_left = 32.0
+texture_margin_top = 32.0
+texture_margin_right = 32.0
+texture_margin_bottom = 32.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_7inrf"]
+texture = ExtResource("3_r036g")
+texture_margin_left = 16.0
+texture_margin_top = 16.0
+texture_margin_right = 16.0
+texture_margin_bottom = 16.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rkedk"]
+atlas = ExtResource("4_dhab6")
+region = Rect2(0, 0, 128, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dju16"]
+atlas = ExtResource("4_dhab6")
+region = Rect2(0, 64, 128, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kac2s"]
+atlas = ExtResource("4_dhab6")
+region = Rect2(0, 32, 128, 32)
+
+[sub_resource type="LabelSettings" id="LabelSettings_b4cvi"]
+
+[node name="MultiplayerConnect" type="Control" node_paths=PackedStringArray("_lineEditIp", "_lineEditPort", "_buttonCancel", "_buttonConnect")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_uctsd")
+_lineEditIp = NodePath("HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/LineEdit_Ip")
+_lineEditPort = NodePath("HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/LineEdit_Port")
+_buttonCancel = NodePath("HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/Button_Cancel")
+_buttonConnect = NodePath("HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/Button_Connect")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+
+[node name="PanelContainer" type="PanelContainer" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_d4r6m")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 6
+text = "连接地址"
+horizontal_alignment = 1
+
+[node name="AspectRatioContainer2" type="AspectRatioContainer" parent="HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LineEdit_Ip" type="LineEdit" parent="HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(196, 48)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxTexture_7inrf")
+placeholder_text = "地址"
+alignment = 1
+virtual_keyboard_type = 2
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LineEdit_Port" type="LineEdit" parent="HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(196, 48)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxTexture_7inrf")
+text = "4455"
+placeholder_text = "端口"
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Button_Cancel" type="TextureButton" parent="HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(48, 32)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.1
+texture_normal = SubResource("AtlasTexture_rkedk")
+texture_pressed = SubResource("AtlasTexture_dju16")
+texture_hover = SubResource("AtlasTexture_kac2s")
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/Button_Cancel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "取消"
+label_settings = SubResource("LabelSettings_b4cvi")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Button_Connect" type="TextureButton" parent="HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(48, 32)
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.1
+texture_normal = SubResource("AtlasTexture_rkedk")
+texture_pressed = SubResource("AtlasTexture_dju16")
+texture_hover = SubResource("AtlasTexture_kac2s")
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/Button_Connect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "连接"
+label_settings = SubResource("LabelSettings_b4cvi")
+horizontal_alignment = 1
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="AspectRatioContainer" type="AspectRatioContainer" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

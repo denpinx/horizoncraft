@@ -270,6 +270,17 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
 
     #region 内部实现
 
+    public void ChangeName(string name, string newName)
+    {
+        if (Players.ContainsKey(newName))
+            return;
+        if (Players.TryRemove(name, out var data))
+        {
+            data.Name = newName;
+            Players.TryAdd(data.Name, data);
+        }
+    }
+
     /// <summary>
     /// 获取半径内的第一个玩家
     /// </summary>

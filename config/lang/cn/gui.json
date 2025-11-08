@@ -14,7 +14,7 @@
     "create_date": "创建日期:{0}",
     "load_date": "上次加载日期:{0}",
     "world_seed": "地图种子:{0}",
-    "tip_item_name": "物品名 {0}",
+    "tip_item_name": "{0}",
     "tip_item_tool_level": "工具等级 {0}",
     "tip_item_tool_type": "工具类型 {0}",
     "tip_item_tool_durable": "工具耐久 {0}/{1}",

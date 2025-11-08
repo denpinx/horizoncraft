@@ -26,6 +26,7 @@ public partial class HotBar : CanvasLayer
     {
         if (PlayerNode != null && PlayerNode.playerData != null)
         {
+            if (Visible != PlayerNode.Visible) Visible = PlayerNode.Visible;
             if (PlayerNode.OpeningInventoryNode != null)
             {
                 if (control.Visible) control.Visible = false;

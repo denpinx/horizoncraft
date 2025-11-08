@@ -31,6 +31,7 @@ public partial class DEBUG_INFO : CanvasLayer
         }
         else if (!_playerNode.MoreInfo || !_playerNode.BaseInputable)
         {
+            if (Visible != _playerNode.Visible) Visible = _playerNode.Visible;
             Label_DEBUG_Left.Visible = false;
             Label_DEBUG_Right.Visible = false;
             return;
@@ -41,6 +42,7 @@ public partial class DEBUG_INFO : CanvasLayer
             Label_DEBUG_Right.Visible = true;
         }
 
+        if (Visible != _playerNode.Visible) Visible = _playerNode.Visible;
         World world = _playerNode.world;
 
         Vector2I mouseBlockPos = _playerNode.GetGlobalMousePosition().ToVector2I().MathFloor(16);

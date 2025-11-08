@@ -13,6 +13,9 @@ public partial class WorldListMenu : Control, ITranslatable
     public WorldProfile SelectedWorld;
     private PackedScene WorldCreateScene = GD.Load<PackedScene>("res://tscn/Menu/create_world_config.tscn");
 
+    private PackedScene _packedSceneCreateMultiplayerConnection =
+        GD.Load<PackedScene>("res://tscn/Menu/CreateMultiplayerConnection.tscn");
+
     [Export] private Button buttonBackMainMenu, buttonLoadWorld, buttonMultiplayer, buttonCreateWorld, buttonRemove;
     [Export] private VBoxContainer ListRoot;
     [Export] private VBoxContainer Root;
@@ -43,11 +46,16 @@ public partial class WorldListMenu : Control, ITranslatable
         };
         buttonMultiplayer.Pressed += () =>
         {
-            World.worldMode = World.WorldMode.MultiplayerHost;
-            World.WorldName = SelectedWorld.WorldName;
-            World.Seed = SelectedWorld.WorldSeed;
-            GetTree().ChangeSceneToFile("res://tscn/world.tscn");
-            OnChangeScene?.Invoke();
+            var node = _packedSceneCreateMultiplayerConnection
+                .Instantiate<HorizonCraft.tscn.Menu.CreateMultiplayerConnection>();
+            if (OnChangeScene != null) node.OnChangeScene += OnChangeScene;
+            node.Ready += () => node.SetWorld(SelectedWorld.WorldName, SelectedWorld.WorldSeed);
+            AddChild(node);
+            // World.worldMode = World.WorldMode.MultiplayerHost;
+            // World.WorldName = SelectedWorld.WorldName;
+            // World.Seed = SelectedWorld.WorldSeed;
+            // GetTree().ChangeSceneToFile("res://tscn/world.tscn");
+            // OnChangeScene?.Invoke();
         };
         buttonRemove.Pressed += () =>
         {

@@ -24,7 +24,6 @@
     <Compile Remove="script\WorldControl\Service\EntityService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="config\packscene\" />
     <Folder Include="script\Interface\" />
   </ItemGroup>
   <ItemGroup>

@@ -313,18 +313,13 @@ wait_time = 0.05
 autostart = true
 
 [node name="Label_PlayerName" type="Label" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -12.0
-offset_top = -50.0
-offset_right = 37.0
-offset_bottom = -28.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = -16.0
+offset_top = -46.0
+offset_right = 48.0
+offset_bottom = -24.0
 scale = Vector2(0.5, 0.5)
-size_flags_horizontal = 3
-size_flags_vertical = 6
+size_flags_horizontal = 4
+size_flags_vertical = 1
 theme_override_styles/normal = SubResource("StyleBoxFlat_2i02x")
 text = "player"
 label_settings = SubResource("LabelSettings_hdrus")
