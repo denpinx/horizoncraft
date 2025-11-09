@@ -2,43 +2,13 @@
   "blocks": [
     {
       "name": "oak_plank",
-      "x": 1,
-      "y": -3,
+      "x": -4,
+      "y": 0,
       "z": 0
     },
     {
       "name": "oak_plank",
-      "x": 2,
-      "y": -3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": -3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": -2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -1,
-      "y": -2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -2,
-      "y": -2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 1,
+      "x": -3,
       "y": 0,
       "z": 0
     },
@@ -62,67 +32,7 @@
     },
     {
       "name": "oak_plank",
-      "x": -2,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": -3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": -2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 2,
-      "y": -2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 2,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
       "x": 1,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 1,
-      "y": -2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -1,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
       "y": 0,
       "z": 0
     },
@@ -134,464 +44,80 @@
     },
     {
       "name": "oak_plank",
-      "x": -1,
-      "y": -3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -2,
-      "y": -3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
+      "x": 3,
       "y": 0,
       "z": 0
     },
     {
       "name": "oak_plank",
-      "x": -3,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -2,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -1,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 1,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 2,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
+      "x": 4,
       "y": 0,
       "z": 0
     },
     {
       "name": "oak_plank",
-      "x": -4,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -2,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -1,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 1,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 2,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 2,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 1,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -1,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -2,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -2,
-      "y": -4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -1,
-      "y": -4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": -4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 1,
-      "y": -4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 2,
-      "y": -4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": -4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -1,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": 1,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -5,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -4,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -3,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -2,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -5,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
+      "x": 5,
       "y": 0,
       "z": 0
     },
     {
       "name": "oak_plank",
-      "x": -5,
-      "y": -1,
+      "x": 6,
+      "y": 0,
       "z": 0
     },
     {
       "name": "oak_plank",
-      "x": -5,
-      "y": 3,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": 3,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": 3,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": 4,
+      "x": 7,
+      "y": 0,
       "z": 0
     },
     {
       "name": "oak_plank",
-      "x": -5,
-      "y": -5,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -2,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -1,
+      "x": 1,
       "y": -5,
       "z": 1
     },
     {
       "name": "oak_plank",
-      "x": 1,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -5,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -1,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -2,
-      "y": -5,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
       "x": 3,
-      "y": -1,
+      "y": -5,
       "z": 1
     },
     {
       "name": "oak_plank",
-      "x": 2,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 1,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -2,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": 0,
+      "x": 4,
+      "y": -5,
       "z": 1
     },
     {
       "name": "oak_plank",
       "x": -5,
-      "y": -1,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -6,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -7,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -8,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -8,
+      "y": 0,
       "z": 1
     },
     {
@@ -602,177 +128,63 @@
     },
     {
       "name": "oak_plank",
-      "x": -6,
-      "y": 1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -6,
-      "y": 2,
+      "x": -7,
+      "y": 0,
       "z": 1
     },
     {
       "name": "oak_plank",
       "x": -5,
-      "y": -2,
+      "y": 0,
       "z": 1
     },
     {
       "name": "oak_plank",
-      "x": -5,
-      "y": -3,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -4,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -5,
-      "z": 1
-    },
-    {
-      "name": "ladder",
       "x": -4,
-      "y": 2,
+      "y": 0,
       "z": 1
     },
     {
       "name": "oak_plank",
       "x": -3,
-      "y": -5,
+      "y": 0,
       "z": 1
     },
     {
       "name": "oak_plank",
       "x": -2,
-      "y": -5,
+      "y": 0,
       "z": 1
     },
     {
       "name": "oak_plank",
       "x": -1,
-      "y": -5,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": -5,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 1,
-      "y": -5,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 2,
-      "y": -5,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": -5,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": -4,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": -3,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": -2,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 0,
-      "y": -5,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 1,
-      "y": -5,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 2,
-      "y": -5,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": -5,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -6,
-      "y": 3,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 2,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 3,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 4,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 4,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 4,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 4,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 4,
       "y": 0,
-      "z": 0
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 0,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 1,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 2,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 3,
+      "y": 0,
+      "z": 1
     },
     {
       "name": "oak_plank",
@@ -783,157 +195,931 @@
     {
       "name": "oak_plank",
       "x": 5,
-      "y": 2,
-      "z": 0
+      "y": 0,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 6,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 7,
+      "y": 0,
+      "z": 1
     },
     {
       "name": "oak_plank",
       "x": 5,
-      "y": 1,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 6,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 7,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": -7,
+      "y": -3,
       "z": 0
     },
     {
       "name": "oak_plank",
-      "x": 5,
-      "y": 3,
+      "x": -3,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -4,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -5,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -6,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -7,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -8,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 3,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 7,
+      "y": -4,
       "z": 0
     },
     {
       "name": "oak_plank",
       "x": 4,
-      "y": 4,
-      "z": 1
+      "y": -4,
+      "z": 0
     },
     {
       "name": "oak_plank",
-      "x": 3,
-      "y": 4,
-      "z": 1
+      "x": 5,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 6,
+      "y": -4,
+      "z": 0
     },
     {
       "name": "oak_plank",
       "x": 2,
-      "y": 4,
-      "z": 1
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -2,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -1,
+      "y": -4,
+      "z": 0
     },
     {
       "name": "oak_plank",
       "x": 1,
-      "y": 4,
-      "z": 1
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -8,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -7,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -6,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -5,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -4,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -2,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -1,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 1,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 2,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 3,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 4,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 5,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 6,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 7,
+      "y": -5,
+      "z": 0
     },
     {
       "name": "oak_plank",
       "x": 0,
-      "y": 4,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -3,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 0,
+      "y": -5,
       "z": 1
     },
     {
       "name": "oak_plank",
       "x": -1,
-      "y": 4,
+      "y": -5,
       "z": 1
     },
     {
       "name": "oak_plank",
       "x": -2,
-      "y": 4,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": -3,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": -4,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": -5,
+      "y": -5,
       "z": 1
     },
     {
       "name": "oak_plank",
       "x": -6,
-      "y": -1,
+      "y": -5,
       "z": 1
     },
     {
       "name": "oak_plank",
-      "x": -6,
+      "x": -7,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": -8,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 2,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": -7,
       "y": -1,
       "z": 0
     },
     {
       "name": "oak_plank",
-      "x": -6,
-      "y": 0,
+      "x": -8,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -8,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -8,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -7,
+      "y": -4,
       "z": 0
     },
     {
       "name": "oak_plank",
       "x": -6,
-      "y": 2,
+      "y": -2,
       "z": 0
     },
     {
       "name": "oak_plank",
-      "x": -6,
-      "y": 3,
+      "x": -5,
+      "y": -2,
       "z": 0
     },
     {
       "name": "oak_plank",
-      "x": -6,
-      "y": 1,
+      "x": -4,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -3,
+      "y": -2,
       "z": 0
     },
     {
       "name": "oak_plank",
       "x": -2,
-      "y": 3,
-      "z": 1
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -1,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 0,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 1,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 2,
+      "y": -1,
+      "z": 0
     },
     {
       "name": "oak_plank",
       "x": 3,
-      "y": 0,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 4,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 5,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 6,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 7,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 7,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 7,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 6,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 5,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 4,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 2,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 0,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -1,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -2,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -4,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -5,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -6,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -6,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -5,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -4,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -2,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -1,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 2,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 3,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 4,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 0,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -3,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -3,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 1,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 3,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 0,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 1,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 5,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 6,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_pillar",
+      "x": 2,
+      "y": -1,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": 2,
+      "y": -2,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": 2,
+      "y": -3,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 2,
+      "y": -4,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": -3,
+      "y": -4,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": -3,
+      "y": -3,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": -3,
+      "y": -2,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": -3,
+      "y": -1,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": 7,
+      "y": -2,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": 7,
+      "y": -3,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": 7,
+      "y": -1,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 7,
+      "y": -4,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": -8,
+      "y": -4,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": -8,
+      "y": -3,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": -8,
+      "y": -2,
+      "z": 1
+    },
+    {
+      "name": "oak_pillar",
+      "x": -8,
+      "y": -1,
       "z": 1
     },
     {
       "name": "furnace",
-      "x": -5,
-      "y": 2,
+      "x": 0,
+      "y": -1,
       "z": 1
     },
     {
-      "name": "workbench",
-      "x": -5,
-      "y": 1,
+      "name": "furnace",
+      "x": -1,
+      "y": -1,
+      "z": 1
+    },
+    {
+      "name": "furnace",
+      "x": 0,
+      "y": -2,
+      "z": 1
+    },
+    {
+      "name": "furnace",
+      "x": -2,
+      "y": -1,
+      "z": 1
+    },
+    {
+      "name": "furnace",
+      "x": -1,
+      "y": -2,
+      "z": 1
+    },
+    {
+      "name": "furnace",
+      "x": 1,
+      "y": -1,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": -9,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": -9,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 8,
+      "y": 0,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 8,
+      "y": -5,
+      "z": 1
+    },
+    {
+      "name": "oak_plank",
+      "x": 8,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 8,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 8,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 8,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 8,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": 8,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -9,
+      "y": 0,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -9,
+      "y": -1,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -9,
+      "y": -2,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -9,
+      "y": -3,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -9,
+      "y": -4,
+      "z": 0
+    },
+    {
+      "name": "oak_plank",
+      "x": -9,
+      "y": -5,
+      "z": 0
+    },
+    {
+      "name": "wooden_storage_box",
+      "x": 5,
+      "y": -1,
       "z": 1
     },
     {
       "name": "wooden_storage_box",
+      "x": -6,
+      "y": -1,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -7,
+      "y": -4,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -7,
+      "y": -3,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -7,
+      "y": -2,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -7,
+      "y": -1,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -6,
+      "y": -2,
+      "z": 1
+    },
+    {
+      "name": "torch",
+      "x": -6,
+      "y": -3,
+      "z": 1
+    },
+    {
+      "name": "air",
       "x": -5,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "light",
-      "x": 0,
-      "y": 1,
-      "z": 1
-    },
-    {
-      "name": "light",
-      "x": 0,
-      "y": -3,
+      "y": -4,
       "z": 1
     },
     {
       "name": "air",
-      "x": -3,
+      "x": -5,
       "y": -2,
       "z": 1
     },
     {
       "name": "air",
-      "x": -3,
+      "x": -6,
+      "y": -4,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -5,
+      "y": -1,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -4,
+      "y": -1,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -4,
+      "y": -2,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -4,
       "y": -3,
       "z": 1
     },
     {
       "name": "air",
-      "x": -3,
+      "x": -4,
       "y": -4,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -5,
+      "y": -3,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -2,
+      "y": -4,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -1,
+      "y": -4,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": 0,
+      "y": -4,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": -1,
+      "y": -3,
       "z": 1
     },
     {
@@ -946,36 +1132,6 @@
       "name": "air",
       "x": -2,
       "y": -2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -1,
-      "y": -4,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -1,
-      "y": -3,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -1,
-      "y": -2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -2,
-      "y": -4,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 0,
-      "y": -4,
       "z": 1
     },
     {
@@ -986,794 +1142,110 @@
     },
     {
       "name": "air",
-      "x": 2,
-      "y": -4,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 2,
-      "y": -3,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 2,
-      "y": -2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 1,
-      "y": -2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 0,
-      "y": -2,
-      "z": 1
-    },
-    {
-      "name": "air",
       "x": 1,
       "y": -3,
       "z": 1
     },
     {
       "name": "air",
-      "x": -3,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -3,
-      "y": 1,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -3,
-      "y": 2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -2,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -2,
-      "y": 1,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -1,
-      "y": 1,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -2,
-      "y": 2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -1,
-      "y": 2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 0,
-      "y": 2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 0,
-      "y": 3,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -1,
-      "y": 3,
-      "z": 1
-    },
-    {
-      "name": "air",
       "x": 1,
-      "y": 3,
+      "y": -2,
       "z": 1
     },
     {
       "name": "air",
-      "x": 2,
-      "y": 3,
+      "x": 0,
+      "y": -3,
       "z": 1
     },
     {
       "name": "air",
       "x": 3,
-      "y": 3,
+      "y": -2,
       "z": 1
     },
     {
       "name": "air",
       "x": 3,
-      "y": 2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 2,
-      "y": 2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 1,
-      "y": 2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 1,
-      "y": 1,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 2,
-      "y": 1,
+      "y": -1,
       "z": 1
     },
     {
       "name": "air",
       "x": 3,
-      "y": 1,
+      "y": -3,
       "z": 1
     },
     {
       "name": "air",
-      "x": 2,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 1,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 0,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": -1,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -6,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -7,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -8,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -10,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -11,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -12,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -9,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -10,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -11,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -7,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -8,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -9,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -7,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -6,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -11,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -10,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -9,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -8,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -7,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -6,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -6,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -7,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -9,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -10,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -11,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -12,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -4,
-      "y": -12,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -8,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -8,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -9,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -3,
-      "y": -12,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -6,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -12,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -11,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -10,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -9,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -7,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -11,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -10,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -6,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": -5,
-      "y": -8,
-      "z": 1
-    },
-    {
-      "name": "ladder",
-      "x": -4,
-      "y": -12,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 5,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 6,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 8,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 7,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 6,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 7,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 8,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": 0,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 8,
-      "y": 0,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 7,
-      "y": 0,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 6,
-      "y": 0,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 5,
-      "y": 0,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 6,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 7,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 8,
-      "y": 1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 6,
-      "y": 2,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 8,
-      "y": 3,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 7,
-      "y": 4,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 8,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 7,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 6,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 5,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": -1,
-      "z": 0
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": 3,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 8,
-      "y": 4,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 7,
-      "y": 4,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 6,
-      "y": 4,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 5,
-      "y": 4,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": 4,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": 2,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": 1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 9,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 8,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 7,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 6,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "oak_plank",
-      "x": 5,
-      "y": -1,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 5,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 5,
-      "y": 1,
+      "x": 3,
+      "y": -4,
       "z": 1
     },
     {
       "name": "air",
       "x": 4,
-      "y": 1,
+      "y": -2,
       "z": 1
     },
     {
       "name": "air",
       "x": 4,
-      "y": 2,
+      "y": -1,
       "z": 1
     },
     {
       "name": "air",
       "x": 4,
-      "y": 3,
+      "y": -4,
       "z": 1
     },
     {
       "name": "air",
       "x": 5,
-      "y": 3,
+      "y": -4,
       "z": 1
     },
     {
       "name": "air",
       "x": 6,
-      "y": 3,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 7,
-      "y": 3,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 7,
-      "y": 2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 8,
-      "y": 2,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 8,
-      "y": 1,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 8,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 7,
-      "y": 0,
+      "y": -4,
       "z": 1
     },
     {
       "name": "air",
       "x": 6,
-      "y": 0,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 6,
-      "y": 1,
-      "z": 1
-    },
-    {
-      "name": "air",
-      "x": 6,
-      "y": 2,
+      "y": -2,
       "z": 1
     },
     {
       "name": "air",
       "x": 5,
-      "y": 2,
+      "y": -2,
       "z": 1
     },
     {
       "name": "air",
-      "x": 7,
-      "y": 1,
+      "x": 4,
+      "y": -3,
+      "z": 1
+    },
+    {
+      "name": "torch",
+      "x": 5,
+      "y": -3,
       "z": 1
     },
     {
       "name": "air",
-      "x": 8,
-      "y": 3,
+      "x": 6,
+      "y": -3,
+      "z": 1
+    },
+    {
+      "name": "air",
+      "x": 6,
+      "y": -1,
       "z": 1
     }
   ],

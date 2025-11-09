@@ -34,8 +34,7 @@ public abstract class MessageServiceBase : ServiceBase
     public MessageServiceBase(World world) : base(world)
     {
         this.Player = World.PlayerNode;
-        if (Player != null)
-            world.timer.Timeout += Tick;
+        world.timer.Timeout += Tick;
     }
 
     /// <summary>
@@ -44,7 +43,7 @@ public abstract class MessageServiceBase : ServiceBase
     protected virtual void Tick()
     {
         UpdateMessages();
-
+        if (Player == null) return;
         if (Player.ChatView.LineEdit.Visible)
         {
             Player.Inputable = false;

@@ -56,12 +56,6 @@
     "cube": false,
     "replace": true
   },
-  "light": {
-    "rigidity": 0.1,
-    "collide": false,
-    "cube": false,
-    "light": true
-  },
   "farmland": {
     "rigidity": 1,
     "state": {
@@ -75,5 +69,20 @@
     "tags": {
       "type": "shovel"
     }
+  },
+  "oak_pillar": {
+    "rigidity": 1,
+    "collide": false,
+    "cube": false,
+    "tags": {
+      "type": "axe"
+    }
+  },
+  "torch": {
+    "rigidity": 0.1,
+    "collide": false,
+    "cube": false,
+    "light": true,
+    "tiletype": "atlas"
   }
 }
