@@ -1,16 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://cw0lhh2hnj66l"]
+[gd_scene load_steps=3 format=3 uid="uid://cw0lhh2hnj66l"]
 
 [ext_resource type="Script" uid="uid://bocbkt0mmo3o4" path="res://tscn/Tools/StructBuildTool.cs" id="1_kpgmv"]
 [ext_resource type="Script" uid="uid://c00argdtokc7d" path="res://tscn/EditTileMapView.cs" id="4_ce6aj"]
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ce6aj"]
-0:0/0 = 0
-1:0/0 = 0
-0:1/0 = 0
-1:1/0 = 0
-
-[sub_resource type="TileSet" id="TileSet_34fmu"]
-sources/0 = SubResource("TileSetAtlasSource_ce6aj")
 
 [node name="StructBuildTool" type="CanvasLayer" node_paths=PackedStringArray("EditTileMapView", "TextEdit", "LineEdit_BuildName", "Button_Remove_All", "Button_Import")]
 script = ExtResource("1_kpgmv")
@@ -81,7 +72,6 @@ focus_mode = 2
 
 [node name="EditTileMapView" type="TileMapLayer" parent="HBoxContainer/VBoxContainer/PanelContainer" node_paths=PackedStringArray("BackGround")]
 position = Vector2(590, 352)
-tile_set = SubResource("TileSet_34fmu")
 script = ExtResource("4_ce6aj")
 BackGround = NodePath("BackGroundLayer")
 
