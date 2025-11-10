@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using Godot;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Net;
-using HorizonCraft.script.Services.chunk;
-using HorizonCraft.script.Services.player;
+using Horizoncraft.script.Services.chunk;
+using Horizoncraft.script.Services.player;
 using Horizoncraft.script.WorldControl;
 
 namespace Horizoncraft.script.Events.player;

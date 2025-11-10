@@ -4,7 +4,7 @@ using Horizoncraft.script.Expand;
 using Horizoncraft.script.NewProxy.player;
 using Horizoncraft.script.WorldControl;
 
-namespace HorizonCraft.script.Services.player;
+namespace Horizoncraft.script.Services.player;
 
 public class PreviewPlayerService : PlayerServiceBase
 {

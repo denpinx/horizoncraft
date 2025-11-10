@@ -9,7 +9,7 @@ using Horizoncraft.script.Components.Item;
 using Horizoncraft.script.Components.Systems;
 using Horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
 using Horizoncraft.script.Components.Systems.BlockSystems.Reactive;
-using HorizonCraft.script.Components.Systems.ItemSystems;
+using Horizoncraft.script.Components.Systems.ItemSystems;
 using Horizoncraft.script.Events;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Events.SystemEvents;
@@ -117,6 +117,42 @@ public static class ComponentManager
     }
 
     /// <summary>
+    /// 处理随机方块组件事件
+    /// </summary>
+    /// <param name="tickEvent">方块事件</param>
+    /// <param name="blockData">方块</param>
+    /// <returns>是否有组件的系统取消事件或执行失败</returns>
+    public static bool ExecuteRandBlockComponents(BlockTickEvent tickEvent, BlockData blockData)
+    {
+        string startId = blockData.Id;
+        foreach (var component in blockData.Components)
+        {
+            if (component == null)
+            {
+                GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
+                GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
+                GD.PrintErr($"\t block-state:\t{blockData.State}");
+                GD.PrintErr(
+                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Name))}");
+                GD.PrintErr(
+                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Name))}");
+                continue;
+            }
+
+            if (ComponentSets.TryGetValue(component.EnumId, out var set))
+            {
+                var s = set.System.ExecuteRandBlockEvent(tickEvent, component);
+                if (!s) return false;
+            }
+
+            if (blockData.Id != startId)
+                return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// 处理方块组件事件
     /// </summary>
     /// <param name="worldEvent">方块事件</param>
@@ -197,7 +233,7 @@ public static class ComponentManager
     /// <param name="enumId">枚举Id</param>
     /// <param name="componentType">功能服务的组件类型</param>
     /// <param name="system">系统</param>
-    private static void Register(SystemEnum enumId, Type componentType, IComponentSystem system)
+    private static void Register(SystemEnum enumId, Type componentType, ComponentSystem system)
     {
         ComponentSets.Add(enumId, new SystemConfig()
         {
@@ -222,7 +258,7 @@ public static class ComponentManager
         );
         //底部检查组件
         Register(SystemEnum.BottomCheck,
-            typeof(TickComponent),
+            typeof(BottomCheckComponent),
             new BottomCheckSystem()
         );
         //流体组件，水流扩散

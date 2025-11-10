@@ -2,7 +2,7 @@ using Godot;
 using Horizoncraft.script;
 using Horizoncraft.script.Components.EntityComponents;
 using Horizoncraft.script.Entity;
-namespace HorizonCraft.tscn.Entity;
+namespace Horizoncraft.tscn.Entity;
 
 public partial class ItemEntity : RigidBody2D, IEntityNode
 {

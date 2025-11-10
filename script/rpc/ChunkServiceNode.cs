@@ -3,8 +3,9 @@ using Horizoncraft.script.Components;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Net;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 using Horizoncraft.script.WorldControl;
+using InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
 
 namespace Horizoncraft.script.rpc;
 

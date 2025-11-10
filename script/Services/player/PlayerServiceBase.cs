@@ -13,7 +13,7 @@ using Horizoncraft.script.Services;
 using Horizoncraft.script.WorldControl;
 using Horizoncraft.script.WorldControl.Tool;
 
-namespace HorizonCraft.script.Services.player;
+namespace Horizoncraft.script.Services.player;
 
 /// <summary>
 /// 基础玩家服务

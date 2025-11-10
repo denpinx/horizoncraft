@@ -1,12 +1,14 @@
 using System.Collections.Generic;
+using Horizoncraft.script.Components.BlockComponents;
 using Horizoncraft.script.Components.EntityComponents;
+using Horizoncraft.script.Components.Systems;
 using Horizoncraft.script.Events;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Events.SystemEvents;
 
 namespace Horizoncraft.script.Components
 {
-    public class TickSystem : IComponentSystem
+    public class TickSystem : ComponentSystem
     {
         /// <summary>
         /// 处理放方块组件
@@ -14,7 +16,7 @@ namespace Horizoncraft.script.Components
         /// <param name="worldEvent"></param>
         /// <param name="component"></param>
         /// <returns></returns>
-        public bool ExecuteBlockComponent(WorldEvent worldEvent, Component component)
+        public override bool ExecuteBlockComponent(WorldEvent worldEvent, Component component)
         {
             if (worldEvent is BlockTickEvent)
             {
@@ -43,13 +45,8 @@ namespace Horizoncraft.script.Components
 
             return true;
         }
-        //接口原因，这里没用,
-        public bool ExecuteItemComponent(PlayerEvent playerEvent, Component component)
-        {
-            return true;
-        }
 
-        public bool ExecuteEntityComponent(EntitySystemEvent ese)
+        public override bool ExecuteEntityComponent(EntitySystemEvent ese)
         {
             foreach (var cmp in ese.EntityData.Components)
             {
@@ -67,16 +64,6 @@ namespace Horizoncraft.script.Components
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// 设置组件值事件
-        /// </summary>
-        /// <param name="player">玩家</param>
-        /// <param name="component">组件</param>
-        /// <param name="value">值</param>
-        public virtual void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)
-        {
         }
 
         /// <summary>
@@ -115,7 +102,7 @@ namespace Horizoncraft.script.Components
         }
 
         /// <summary>
-        /// 
+        /// 被玩家右键事件
         /// </summary>
         /// <param name="playerRightClickBlockEvent"></param>
         /// <param name="component"></param>

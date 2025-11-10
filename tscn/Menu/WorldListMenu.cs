@@ -47,7 +47,7 @@ public partial class WorldListMenu : Control, ITranslatable
         buttonMultiplayer.Pressed += () =>
         {
             var node = _packedSceneCreateMultiplayerConnection
-                .Instantiate<HorizonCraft.tscn.Menu.CreateMultiplayerConnection>();
+                .Instantiate<Horizoncraft.tscn.Menu.CreateMultiplayerConnection>();
             if (OnChangeScene != null) node.OnChangeScene += OnChangeScene;
             node.Ready += () => node.SetWorld(SelectedWorld.WorldName, SelectedWorld.WorldSeed);
             AddChild(node);

@@ -1,9 +1,9 @@
-using System.Collections.Generic;
+using Horizoncraft.script;
+using Horizoncraft.script.Components;
 using Horizoncraft.script.Inventory;
-using Horizoncraft.script.Recipes;
 using MemoryPack;
 
-namespace Horizoncraft.script.Components;
+namespace Horizoncraft.script.Components.BlockComponents;
 
 [MemoryPackable]
 public partial class InventoryComponent : TickComponent

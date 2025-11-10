@@ -13,7 +13,7 @@ using Horizoncraft.script.Net;
 using Horizoncraft.script.Services;
 using Horizoncraft.script.WorldControl;
 
-namespace HorizonCraft.script.Services.entity;
+namespace Horizoncraft.script.Services.entity;
 
 /// <summary>
 /// 基础实体服务

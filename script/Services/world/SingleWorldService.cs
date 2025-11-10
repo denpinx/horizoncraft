@@ -2,12 +2,12 @@ using Godot;
 using Horizoncraft.script;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.NewProxy.player;
-using HorizonCraft.script.Services.chunk;
-using HorizonCraft.script.Services.entity;
+using Horizoncraft.script.Services.chunk;
+using Horizoncraft.script.Services.entity;
 using Horizoncraft.script.Services.message;
-using HorizonCraft.script.Services.player;
+using Horizoncraft.script.Services.player;
 
-namespace HorizonCraft.script.Services.world;
+namespace Horizoncraft.script.Services.world;
 
 public class SingleWorldService : WorldServiceBase
 {

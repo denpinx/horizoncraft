@@ -1,3 +1,4 @@
+using Horizoncraft.script.Components.BlockComponents;
 using Horizoncraft.script.Events;
 
 namespace Horizoncraft.script.Components.Systems;
@@ -10,34 +11,37 @@ public class PhysicsSystem : TickSystem
 {
     private readonly BlockMeta _air = Materials.BlockMetas["air"];
 
+    //主动触发
     public override void BlockTick(BlockTickEvent e, Component cmp)
     {
-        PhysicsComponent pc = cmp as PhysicsComponent;
-        if (Materials.BlockMetas.TryGetValue(pc.BlockName, out var pcmeta))
+        if (cmp is PhysicsComponent pc)
         {
-            if (e.CheckCanReplaceAndNotMeta(e.GetBottomBlock(), pcmeta))
+            if (Materials.BlockMetas.TryGetValue(pc.BlockName, out var pcmeta))
             {
-                e.DropBlockLoot(e.GetBottomBlock());
-                e.SetBottomBlock(pcmeta, 0);
-                e.SetBlock(_air);
-                return;
-            }
-
-            if (e.CheckMeta(e.GetTopBlock(), pcmeta))
-            {
-                if (e.CheckCanReplaceAndNotMeta(e.GetLeftBlock(), pcmeta))
+                if (e.CheckCanReplaceAndNotMeta(e.GetBottomBlock(), pcmeta))
                 {
-                    e.DropBlockLoot(e.GetLeftBlock());
-                    e.SetLeftBlock(pcmeta, 0);
+                    e.DropBlockLoot(e.GetBottomBlock());
+                    e.SetBottomBlock(pcmeta);
                     e.SetBlock(_air);
                     return;
                 }
-                if (e.CheckCanReplaceAndNotMeta(e.GetRightBlock(), pcmeta))
+
+                if (e.CheckMeta(e.GetTopBlock(), pcmeta))
                 {
-                    e.DropBlockLoot(e.GetRightBlock());
-                    e.SetRightBlock(pcmeta, 0);
-                    e.SetBlock(_air);
-                    return;
+                    if (e.CheckCanReplaceAndNotMeta(e.GetLeftBlock(), pcmeta))
+                    {
+                        e.DropBlockLoot(e.GetLeftBlock());
+                        e.SetLeftBlock(pcmeta);
+                        e.SetBlock(_air);
+                        return;
+                    }
+
+                    if (e.CheckCanReplaceAndNotMeta(e.GetRightBlock(), pcmeta))
+                    {
+                        e.DropBlockLoot(e.GetRightBlock());
+                        e.SetRightBlock(pcmeta);
+                        e.SetBlock(_air);
+                    }
                 }
             }
         }

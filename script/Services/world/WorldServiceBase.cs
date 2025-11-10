@@ -10,14 +10,14 @@ using Horizoncraft.script.I18N;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.rpc;
 using Horizoncraft.script.Services;
-using HorizonCraft.script.Services.chunk;
-using HorizonCraft.script.Services.entity;
+using Horizoncraft.script.Services.chunk;
+using Horizoncraft.script.Services.entity;
 using Horizoncraft.script.Services.message;
-using HorizonCraft.script.Services.player;
+using Horizoncraft.script.Services.player;
 using Horizoncraft.script.WorldControl;
 using Horizoncraft.script.WorldControl.Tool;
 
-namespace HorizonCraft.script.Services.world;
+namespace Horizoncraft.script.Services.world;
 
 /// <summary>
 /// 世界服务基础，生命周期管理

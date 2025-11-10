@@ -6,14 +6,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Godot;
-using Horizoncraft.script;
 using Horizoncraft.script.Components;
+using Horizoncraft.script.Components.BlockComponents;
 using Horizoncraft.script.Expand;
-using Horizoncraft.script.Services;
 using Horizoncraft.script.WorldControl;
 using Horizoncraft.script.WorldControl.Tool;
 
-namespace HorizonCraft.script.Services.chunk;
+
+namespace Horizoncraft.script.Services.chunk;
 
 /// <summary>
 /// 区块服务基类
@@ -345,6 +345,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
         {
             // this._tokenSource.Cancel();
         }
+
         return loadqueue;
     }
 
@@ -452,7 +453,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     /// 将被动更新方块添加到待更新列表中
     /// </summary>
     /// <param name="globalPosition"></param>
-    public void UpdateBlock(Vector3I globalPosition)
+    public void UpdateBlock(Vector3I globalPosition, int deep = 0)
     {
         var block = World.Service.ChunkService.GetBlock(globalPosition);
         if (block == null) return;
@@ -461,26 +462,33 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
         var localPos = globalPosition.Remainder(Chunk.Size);
 
         var local = new System.Numerics.Vector3(localPos.X, localPos.Y, globalPosition.Z);
-        if (!block.HasComponent<ReactiveComponent>()) return;
+        //if (!block.HasComponent<ReactiveComponent>()) return;
 
         if (World.Service.ChunkService.Chunks.TryGetValue(chunkPos, out var chunk))
             chunk.PassiveTickList.Add(local);
+        if (deep > 0)
+        {
+            PassiveUpdateNeighborBlock(globalPosition, true, deep - 1);
+        }
     }
 
     /// <summary>
     /// 别动更新邻居方块（不包括自身）
     /// </summary>
     /// <param name="globalPosition">全局坐标</param>
-    public void PassiveUpdateNeighborBlock(Vector3I globalPosition)
+    /// <param name="inside">是否包含自身更新</param>>
+    public void PassiveUpdateNeighborBlock(Vector3I globalPosition, bool inside = false, int deep = 0)
     {
+        if (inside)
+            UpdateBlock(globalPosition);
         if (globalPosition.Z == 0)
             UpdateBlock(new Vector3I(globalPosition.X, globalPosition.Y, 1));
         else UpdateBlock(new Vector3I(globalPosition.X, globalPosition.Y, 0));
 
-        UpdateBlock(globalPosition + Vector3I.Up);
-        UpdateBlock(globalPosition + Vector3I.Down);
-        UpdateBlock(globalPosition + Vector3I.Left);
-        UpdateBlock(globalPosition + Vector3I.Right);
+        UpdateBlock(globalPosition + Vector3I.Up, deep - 1);
+        UpdateBlock(globalPosition + Vector3I.Down, deep - 1);
+        UpdateBlock(globalPosition + Vector3I.Left, deep - 1);
+        UpdateBlock(globalPosition + Vector3I.Right, deep - 1);
     }
 
     /// <summary>

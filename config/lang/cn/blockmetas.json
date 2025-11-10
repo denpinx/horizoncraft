@@ -42,6 +42,8 @@
     "interface_block": "接口方块",
     "oak_door": "橡木门",
     "oak_pillar": "橡木柱子",
-    "torch": "火把"
+    "torch": "火把",
+    "bamboo": "竹子",
+    "reed": "芦苇"
   }
 }

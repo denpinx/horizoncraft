@@ -1,5 +1,6 @@
 using System;
 using Horizoncraft.script.Components;
+using InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
 
 namespace Horizoncraft.script.Inventory;
 

@@ -1,4 +1,5 @@
 using System;
+using Horizoncraft.script.Components.Systems;
 
 namespace Horizoncraft.script.Components
 {
@@ -12,6 +13,6 @@ namespace Horizoncraft.script.Components
         /// <summary>
         /// 组件对应的系统
         /// </summary>
-        public IComponentSystem System;
+        public ComponentSystem System;
     }
 }

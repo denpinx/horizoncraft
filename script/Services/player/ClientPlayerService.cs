@@ -3,8 +3,8 @@ using Godot;
 using Godot.NativeInterop;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.Services.Events;
-using HorizonCraft.script.Services.player;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.player;
+using Horizoncraft.script.Services.world;
 
 namespace Horizoncraft.script.NewProxy.player;
 

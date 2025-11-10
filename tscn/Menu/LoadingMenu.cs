@@ -1,6 +1,6 @@
 using Godot;
 using Horizoncraft.script;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 
 public partial class LoadingMenu : CanvasLayer
 {

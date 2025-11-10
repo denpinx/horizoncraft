@@ -1,5 +1,5 @@
 using Horizoncraft.script;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 
 /// <summary>
 /// 用于单元测试的世界

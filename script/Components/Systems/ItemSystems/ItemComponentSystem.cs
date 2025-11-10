@@ -5,16 +5,11 @@ using Horizoncraft.script.Events;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Events.SystemEvents;
 
-namespace HorizonCraft.script.Components.Systems.ItemSystems;
+namespace Horizoncraft.script.Components.Systems.ItemSystems;
 
-public class ItemComponentSystem : IComponentSystem
+public class ItemComponentSystem : ComponentSystem
 {
-    public bool ExecuteBlockComponent(WorldEvent worldEvent, Component component)
-    {
-        return true;
-    }
-
-    public bool ExecuteItemComponent(PlayerEvent playerEvent, Component component)
+    public override bool ExecuteItemComponent(PlayerEvent playerEvent, Component component)
     {
         if (component is ItemComponent ic)
         {
@@ -36,16 +31,6 @@ public class ItemComponentSystem : IComponentSystem
 
         return true;
     }
-
-    public bool ExecuteEntityComponent(EntitySystemEvent ese)
-    {
-        return false;
-    }
-
-    public virtual void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)
-    {
-    }
-
     public virtual bool OnBreakBlock(PlayerBreakblockEvent bbe, ItemComponent itemComponent)
     {
         var block = bbe.GetBlockData();

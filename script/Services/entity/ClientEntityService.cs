@@ -5,7 +5,7 @@ using Horizoncraft.script.Entity;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.NewProxy.player;
 
-namespace HorizonCraft.script.Services.entity;
+namespace Horizoncraft.script.Services.entity;
 
 public class ClientEntityService : EntityServiceBase
 {

@@ -5,7 +5,7 @@ using Horizoncraft.script.Components.Item;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.WorldControl;
 
-namespace HorizonCraft.script.Components.Systems.ItemSystems;
+namespace Horizoncraft.script.Components.Systems.ItemSystems;
 
 public class PlaceFluidSystem : ItemComponentSystem
 {

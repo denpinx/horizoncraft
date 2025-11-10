@@ -6,8 +6,9 @@ using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Recipes;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 using Horizoncraft.script.WorldControl;
+using InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
 using Vector2 = System.Numerics.Vector2;
 
 namespace Horizoncraft.script.Events;
@@ -228,7 +229,7 @@ public class PlayerEvents
                 return false;
 
         e.ChunkService.SetBlock(pos, bm);
-        e.ChunkService.PassiveUpdateNeighborBlock(pos);
+        e.ChunkService.PassiveUpdateNeighborBlock(pos,true);
 
         if (e.Player.Mode == 0)
         {

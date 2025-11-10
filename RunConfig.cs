@@ -1,6 +1,6 @@
 using Godot.Collections;
 
-namespace HorizonCraft;
+namespace Horizoncraft;
 
 public static class RunConfig
 {

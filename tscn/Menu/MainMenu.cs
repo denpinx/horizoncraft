@@ -6,11 +6,11 @@ using Horizoncraft.script;
 using Horizoncraft.script.Config;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.I18N;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 using Horizoncraft.script.Utility;
 using Horizoncraft.script.WorldControl;
 
-namespace HorizonCraft.tscn.Menu;
+namespace Horizoncraft.tscn.Menu;
 
 public partial class MainMenu : World, ITranslatable
 {
@@ -77,13 +77,13 @@ public partial class MainMenu : World, ITranslatable
     {
         if (RunConfig.Mode == RunMode.Server)
         {
-            var profile = DirUtility.GetWorldProfile(HorizonCraft.RunConfig.WorldName);
+            var profile = DirUtility.GetWorldProfile(RunConfig.WorldName);
             if (profile != null)
             {
                 World.worldMode = World.WorldMode.MultiplayerHost;
                 World.WorldName = profile.WorldName;
                 World.Seed = profile.WorldSeed;
-                HostWorldService.Port = HorizonCraft.RunConfig.Port;
+                HostWorldService.Port = RunConfig.Port;
                 GetTree().ChangeSceneToFile("res://tscn/world.tscn");
 
                 GD.Print("创建服务端");
@@ -91,9 +91,9 @@ public partial class MainMenu : World, ITranslatable
             else
             {
                 World.worldMode = World.WorldMode.MultiplayerHost;
-                World.WorldName = HorizonCraft.RunConfig.WorldName;
-                World.Seed = HorizonCraft.RunConfig.WorldSeed;
-                HostWorldService.Port = HorizonCraft.RunConfig.Port;
+                World.WorldName = RunConfig.WorldName;
+                World.Seed = RunConfig.WorldSeed;
+                HostWorldService.Port = RunConfig.Port;
 
                 GetTree().ChangeSceneToFile("res://tscn/world.tscn");
                 GD.Print("创建新的存档");

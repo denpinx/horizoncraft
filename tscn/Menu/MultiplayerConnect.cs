@@ -2,9 +2,9 @@ using System;
 using System.Net;
 using Godot;
 using Horizoncraft.script;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 
-namespace HorizonCraft.tscn.Menu;
+namespace Horizoncraft.tscn.Menu;
 
 public partial class MultiplayerConnect : Control
 {

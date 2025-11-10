@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using Horizoncraft.script.WorldControl.Context;
-using HorizonCraft.script.WorldControl.Context;
 using Horizoncraft.script.WorldControl.Struct;
 
 namespace Horizoncraft.script.WorldControl.worldbiomes

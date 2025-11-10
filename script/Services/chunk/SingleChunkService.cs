@@ -1,7 +1,7 @@
 using Godot;
 using Horizoncraft.script;
 
-namespace HorizonCraft.script.Services.chunk;
+namespace Horizoncraft.script.Services.chunk;
 
 public class SingleChunkService : ChunkServiceBase
 {

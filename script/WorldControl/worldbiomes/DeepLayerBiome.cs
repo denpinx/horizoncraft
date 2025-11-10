@@ -1,6 +1,5 @@
 using Godot;
 using Horizoncraft.script.WorldControl.Context;
-using HorizonCraft.script.WorldControl.Context;
 using Horizoncraft.script.WorldControl.Struct;
 using Horizoncraft.script.WorldControl.Struct.structs;
 using static Horizoncraft.script.WorldControl.BiomeManage;

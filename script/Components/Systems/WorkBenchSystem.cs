@@ -12,7 +12,7 @@ public class WorkBenchSystem : TickSystem
 {
     public override void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)
     {
-        if (component is InventoryComponent inventoryComponent)
+        if (component is BlockComponents.InventoryComponent inventoryComponent)
         {
             var inventory = inventoryComponent.GetInventory();
             if (value.ContainsKey("Action"))

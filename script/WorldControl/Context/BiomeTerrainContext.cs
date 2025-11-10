@@ -2,7 +2,7 @@ using System;
 using Horizoncraft.script;
 using Horizoncraft.script.WorldControl;
 
-namespace HorizonCraft.script.WorldControl.Context;
+namespace Horizoncraft.script.WorldControl.Context;
 
 public class BiomeTerrainContext
 {

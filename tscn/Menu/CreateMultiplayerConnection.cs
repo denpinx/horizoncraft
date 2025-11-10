@@ -1,8 +1,9 @@
 using System;
 using Godot;
 using Horizoncraft.script;
-using HorizonCraft.script.Services.world;
-namespace HorizonCraft.tscn.Menu;
+using Horizoncraft.script.Services.world;
+
+namespace Horizoncraft.tscn.Menu;
 
 public partial class CreateMultiplayerConnection : Control
 {

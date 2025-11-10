@@ -3,9 +3,9 @@ using Horizoncraft.script;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Net;
-using HorizonCraft.script.Services.chunk;
-using HorizonCraft.script.Services.player;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.chunk;
+using Horizoncraft.script.Services.player;
+using Horizoncraft.script.Services.world;
 
 /// <summary>
 /// 将World中的Rpc函数全部单独拿出来作为节点调用

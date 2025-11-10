@@ -3,7 +3,7 @@ using Godot;
 using Horizoncraft.script;
 using Horizoncraft.script.WorldControl;
 
-namespace HorizonCraft.script.Services.chunk;
+namespace Horizoncraft.script.Services.chunk;
 
 public class PreviewChunkService : ChunkServiceBase
 {

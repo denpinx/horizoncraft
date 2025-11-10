@@ -8,7 +8,9 @@ using Horizoncraft.script.Components;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.Events;
 using Horizoncraft.script.Expand;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
+using ReactiveComponent = Horizoncraft.script.Components.BlockComponents.ReactiveComponent;
+using TickComponent = Horizoncraft.script.Components.BlockComponents.TickComponent;
 using Vector2 = System.Numerics.Vector2;
 using Vector3 = System.Numerics.Vector3;
 
@@ -24,6 +26,7 @@ namespace Horizoncraft.script.WorldControl
         public static int SizeZ = 2;
 
         public static int Size = 50;
+        public static int RandTickPerCount = Size / 2;
         public bool spawn = false;
         public long version;
         public int X;
@@ -142,6 +145,50 @@ namespace Horizoncraft.script.WorldControl
             return data[x, y, z];
         }
 
+        public void RandTick(WorldServiceBase WorldService, World world)
+        {
+            HashSet<Vector3I> randpos = new HashSet<Vector3I>(RandTickPerCount);
+            for (int i = 0; i < RandTickPerCount;)
+            {
+                var pos = new Vector3I(Random.Shared.Next(0, Size), Random.Shared.Next(0, Size),
+                    Random.Shared.Next(0, SizeZ));
+                if (randpos.Add(pos))
+                {
+                    i++;
+                }
+            }
+
+            BlockTickEvent randEvent = new()
+            {
+                World = world,
+                Service = WorldService,
+                Chunk = this,
+            };
+            foreach (var pos in randpos)
+            {
+                randEvent.LocalPos = pos;
+                randEvent.GlobalePos = new Vector3I(
+                    coord.X * Size + pos.X
+                    , coord.Y * Size + pos.Y
+                    , pos.Z);
+                var block = GetBlock(pos.X, pos.Y, pos.Z);
+                randEvent.BlockData = block;
+                if (block?.Components == null) continue;
+
+                var stateStart = block.State;
+                
+                ComponentManager.ExecuteRandBlockComponents(randEvent, block);
+                
+                if (stateStart != block.State)
+                {
+                    update_tilemap = true;
+                    UpdateList_buffer.Add(randEvent.LocalPos);
+                }
+                
+                randEvent.Reset();
+            }
+        }
+
         //50*50*2 2500个tick对象的情况下，平均每个区块最大耗时 1ms
         public void Tick(WorldServiceBase WorldService, World world)
         {
@@ -242,11 +289,13 @@ namespace Horizoncraft.script.WorldControl
                 }
             }
 
+            RandTick(WorldService, world);
+
             _Stopwatch_tick_used.Stop();
             TickUsedTime_μs = _Stopwatch_tick_used.Elapsed.TotalMicroseconds;
         }
 
-        
+
         public void SetLight(int light)
         {
             for (int x = 0; x < Chunk.Size; x++)
@@ -261,6 +310,7 @@ namespace Horizoncraft.script.WorldControl
                 // }
             }
         }
+
         public bool CheckLightUpdate()
         {
             for (int x = 0; x < Chunk.Size; x++)

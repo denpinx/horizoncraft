@@ -2,10 +2,9 @@
   "dirt": {
     "rigidity": 0.4,
     "components": {
-      "ExpandComponent": {
+      "ExpandReactiveComponent": {
         "Name": "BlockSpread",
-        "BlockName": "grass",
-        "Max": 20
+        "BlockName": "grass"
       }
     },
     "tags": {
@@ -30,9 +29,14 @@
     "collide": false,
     "cube": false,
     "components": {
-      "TickComponent": {
+      "BottomCheckComponent": {
         "Name": "BottomCheck",
-        "Max": 20
+        "Max": 20,
+        "DropItem": true
+      },
+      "BlockRelyOnComponent": {
+        "Name": "BottomMatch",
+        "RelyOnBlockName": "grass"
       }
     }
   },
@@ -63,6 +67,23 @@
     },
     "tags": {
       "type": "shovel"
+    }
+  },
+  "rose": {
+    "rigidity": 0.1,
+    "collide": false,
+    "cube": false,
+    "replace": true,
+    "components": {
+      "BottomCheckComponent": {
+        "Name": "BottomCheck",
+        "Max": 20,
+        "DropItem": true
+      },
+      "BlockRelyOnComponent": {
+        "Name": "BottomMatch",
+        "RelyOnBlockName": "grass"
+      }
     }
   }
 }

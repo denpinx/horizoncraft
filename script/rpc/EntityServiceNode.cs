@@ -3,7 +3,7 @@ using System;
 using Horizoncraft.script;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.Net;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 
 /// <summary>
 /// 实体类相关RPC操作

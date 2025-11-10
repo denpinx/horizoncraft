@@ -4,7 +4,7 @@ using Horizoncraft.script.Components;
 using Horizoncraft.script.Components.Systems;
 using Horizoncraft.script.Events.player;
 
-namespace HorizonCraft.script.Components.Systems.ItemSystems;
+namespace Horizoncraft.script.Components.Systems.ItemSystems;
 
 public class DoorLinkPlaceSystem : ItemComponentSystem
 {

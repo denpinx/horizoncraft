@@ -18,6 +18,7 @@ namespace Horizoncraft.script.Components
     /// </summary>
     public static class LambdaCreater
     {
+        //Horizoncraft.script.Components.
         const string TypeNamespace = "Horizoncraft.script.Components";
 
         /// <summary>
@@ -146,11 +147,7 @@ namespace Horizoncraft.script.Components
 #if DEBUG
             GD.Print(
                 $"[{nameof(LambdaCreater)}]\n" +
-                $"\tCreateLambda :\t {lambda} \n " +
-                $"\tFromJson: \n{System.Text.Json.JsonSerializer.Serialize(cfg, options: new System.Text.Json.JsonSerializerOptions()
-                {
-                    WriteIndented = true
-                })}\n");
+                $"\tCreateLambda :\t {lambda} \n ");
 #endif
 
             var result = lambda.Compile();
@@ -197,8 +194,10 @@ namespace Horizoncraft.script.Components
             if (results.Count == 0)
             {
                 GD.PrintErr($"未找到：{typeName}");
+                return null;
             }
-            return results?.First();
+
+            return results.First();
         }
 
         /// <summary>

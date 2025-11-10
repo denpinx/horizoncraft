@@ -4,6 +4,7 @@ using Horizoncraft.script;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.WorldControl;
+using InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
 
 /// <summary>
 /// 通用菜单节点,根据节点自定义

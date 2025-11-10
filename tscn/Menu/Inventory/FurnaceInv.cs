@@ -1,5 +1,6 @@
 using Godot;
 using Horizoncraft.script.Components;
+using FurnaceComponent = Horizoncraft.script.Components.BlockComponents.FurnaceComponent;
 
 public partial class FurnaceInv : InventoryNode
 {

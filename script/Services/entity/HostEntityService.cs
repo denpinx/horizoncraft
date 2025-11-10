@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Horizoncraft.script;
 using Horizoncraft.script.Net;
 
-namespace HorizonCraft.script.Services.entity;
+namespace Horizoncraft.script.Services.entity;
 
 public class HostEntityService : EntityServiceBase
 {

@@ -8,8 +8,10 @@ using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.rpc;
 using Horizoncraft.script.WorldControl;
+using BlockComponents_InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
+using InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
 
-namespace HorizonCraft.script.Services.player;
+namespace Horizoncraft.script.Services.player;
 
 public class HostPlayerService : PlayerServiceBase
 {
@@ -87,7 +89,7 @@ public class HostPlayerService : PlayerServiceBase
                     var pos = new Vector3I((int)player.OpenInventory.X, (int)player.OpenInventory.Y,
                         (int)player.OpenInventory.Z);
                     var blockdata = World.Service.ChunkService.GetBlock(pos);
-                    var inv = blockdata?.GetComponent<InventoryComponent>();
+                    var inv = blockdata?.GetComponent<BlockComponents_InventoryComponent>();
                     if (blockdata != null && inv != null)
                     {
                         if (inv.GetInventory().update)
@@ -115,7 +117,7 @@ public class HostPlayerService : PlayerServiceBase
                     (int)player.OpenInventory.Z
                 );
                 var blockdata = World.Service.ChunkService.GetBlock(pos);
-                var inv = blockdata?.GetComponent<InventoryComponent>();
+                var inv = blockdata?.GetComponent<BlockComponents_InventoryComponent>();
                 if (blockdata != null && inv != null && inv.GetInventory().update)
                 {
                     inv.GetInventory().update = false;

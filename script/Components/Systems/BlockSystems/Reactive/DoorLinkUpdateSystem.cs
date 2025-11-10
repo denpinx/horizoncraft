@@ -25,7 +25,7 @@ public class DoorLinkUpdateSystem : TickSystem
         return true;
     }
 
-    public override void ReactiveTick(BlockTickEvent blockTickEvent, ReactiveComponent component)
+    public override void ReactiveTick(BlockTickEvent blockTickEvent, BlockComponents.ReactiveComponent component)
     {
         var block = blockTickEvent.BlockData;
         if (block.State == 0 || block.State == 1)

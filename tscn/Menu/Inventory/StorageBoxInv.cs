@@ -2,6 +2,7 @@ using Godot;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Net;
+using InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
 
 
 public partial class StorageBoxInv : InventoryNode

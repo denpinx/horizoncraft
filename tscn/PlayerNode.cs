@@ -1,12 +1,14 @@
 using System;
+using System.Collections.Generic;
 using Godot;
 using Horizoncraft.script.Components.Item;
 using Horizoncraft.script.Config;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.rpc;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 using Horizoncraft.script.WorldControl;
+using Horizoncraft.tscn.Gui;
 
 namespace Horizoncraft.script;
 
@@ -18,7 +20,7 @@ public partial class PlayerNode : CharacterBody2D
     /// <summary>
     /// 获取调试信息委托集合
     /// </summary>
-    public static System.Collections.Generic.Dictionary<string, Func<string>> GetInformation = new();
+    public static Dictionary<string, Func<string>> GetInformation = new();
 
     /// <summary>
     /// 本地玩家文档
@@ -39,8 +41,8 @@ public partial class PlayerNode : CharacterBody2D
     public PlayerData playerData;
     public bool BaseInputable = true;
     public bool Inputable = true;
-    public bool MoreInfo = false;
-    public bool Stop = false;
+    public bool MoreInfo;
+    public bool Stop;
     [Export] public World world;
     [Export] public ChatView ChatView;
 
@@ -52,7 +54,7 @@ public partial class PlayerNode : CharacterBody2D
     //
     [Export] AnimationPlayer animationPlayer_other;
     [Export] AnimationPlayer animationPlayer_move;
-    [Export] private HorizonCraft.tscn.Gui.BlockInfoView BlockInfoView;
+    [Export] private BlockInfoView BlockInfoView;
     [Export] CollisionShape2D collisionShape2D;
     [Export] public CanvasLayer OvrCanvasLayer;
     [Export] public CanvasLayer GuiCanvasLayer;
@@ -68,10 +70,10 @@ public partial class PlayerNode : CharacterBody2D
     //
 
 
-    private bool LastFramIsLeft = false;
-    private bool LastFramIsRight = false;
+    private bool LastFramIsLeft;
+    private bool LastFramIsRight;
 
-    private int LastFramLayer = 0;
+    private int LastFramLayer;
     //private Vector2I LastFramPosition;
 
     public override void _Process(double delta)
@@ -223,7 +225,7 @@ public partial class PlayerNode : CharacterBody2D
         {
             if (ActionProcess.ProcessTime >= ActionProcess.FinalTime)
             {
-                var bbe = new PlayerBreakblockEvent()
+                var bbe = new PlayerBreakblockEvent
                 {
                     world = world,
                     Player = playerData,
@@ -234,7 +236,8 @@ public partial class PlayerNode : CharacterBody2D
                 ActionProcess.FinalTime = 2;
                 return;
             }
-            else if (ActionProcess.ProcessTime > 0)
+
+            if (ActionProcess.ProcessTime > 0)
             {
                 ActionProcess.ProcessTime += (float)delta;
                 if (ActionProcess.Position != finalpos)
@@ -296,7 +299,7 @@ public partial class PlayerNode : CharacterBody2D
             targetpos = new Vector3I(coord.X, coord.Y, 0);
         }
 
-        var e = new PlayerPlaceBlockEvent()
+        var e = new PlayerPlaceBlockEvent
         {
             world = world,
             Player = playerData,
@@ -311,7 +314,7 @@ public partial class PlayerNode : CharacterBody2D
         if (world.Service.PlayerService.Events.PlaceBlock(e))
             LastFramLayer = e.PlaceLayerResult;
         else if (!LastFramIsRight)
-            world.Service.PlayerService.Events.InterfaceBlock(new InterfaceBlockEvent()
+            world.Service.PlayerService.Events.InterfaceBlock(new InterfaceBlockEvent
             {
                 world = world,
                 Player = playerData,
@@ -337,7 +340,7 @@ public partial class PlayerNode : CharacterBody2D
                         ActionProcess.ProcessTime += (float)delta;
                         if (ActionProcess.ProcessTime >= ActionProcess.FinalTime)
                         {
-                            var puie = new PlayerUseItemEvent()
+                            var puie = new PlayerUseItemEvent
                             {
                                 world = world,
                                 Player = playerData,
@@ -659,9 +662,7 @@ public partial class PlayerNode : CharacterBody2D
         {
             return true;
         }
-        else
-        {
-            return false;
-        }
+
+        return false;
     }
 }

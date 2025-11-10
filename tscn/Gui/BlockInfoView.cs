@@ -4,7 +4,7 @@ using Horizoncraft.script.Components.Interfaces;
 using Horizoncraft.script.I18N;
 using Horizoncraft.script.WorldControl;
 
-namespace HorizonCraft.tscn.Gui;
+namespace Horizoncraft.tscn.Gui;
 
 /// <summary>
 /// 方块信息视图

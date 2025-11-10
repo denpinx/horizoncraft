@@ -2,7 +2,7 @@ using Godot;
 using Horizoncraft.script;
 using Horizoncraft.script.I18N;
 using Horizoncraft.script.Recipes;
-using HorizonCraft.script.Services.chunk;
+using Horizoncraft.script.Services.chunk;
 
 /// <summary>
 /// 物品管理器

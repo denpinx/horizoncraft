@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Godot;
+using Horizoncraft.script.Components.BlockComponents;
 using Horizoncraft.script.Events;
 using Horizoncraft.script.WorldControl;
 

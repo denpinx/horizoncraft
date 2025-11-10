@@ -1,6 +1,6 @@
 using System;
 using Godot;
-using HorizonCraft.script.WorldControl.Context;
+using Horizoncraft.script.WorldControl.Context;
 
 namespace Horizoncraft.script.WorldControl.worldbiomes;
 

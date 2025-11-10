@@ -7,7 +7,7 @@ using Horizoncraft.script.Net;
 using Horizoncraft.script.rpc;
 using Horizoncraft.script.WorldControl;
 
-namespace HorizonCraft.script.Services.chunk;
+namespace Horizoncraft.script.Services.chunk;
 
 public class HostChunkService : ChunkServiceBase
 {

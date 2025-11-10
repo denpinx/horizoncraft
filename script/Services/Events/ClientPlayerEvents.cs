@@ -3,7 +3,7 @@ using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.rpc;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 
 namespace Horizoncraft.script.Services.Events;
 

@@ -4,7 +4,7 @@ using MemoryPack;
 namespace Horizoncraft.script.Components.EnergyBlocks;
 
 [MemoryPackable]
-public partial class EnergyUnitComponent : TickComponent, IGetProgress
+public partial class EnergyUnitComponent : BlockComponents.TickComponent, IGetProgress
 {
     public int EnergyUnitMax;
     public int EnergyUnitValue;

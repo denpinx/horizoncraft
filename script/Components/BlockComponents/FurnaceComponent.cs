@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using Horizoncraft.script.Components;
 using Horizoncraft.script.Components.Interfaces;
 using Horizoncraft.script.Inventory;
 using MemoryPack;
 
-namespace Horizoncraft.script.Components;
+namespace Horizoncraft.script.Components.BlockComponents;
 
 [MemoryPackable]
 public partial class FurnaceComponent : InventoryComponent, IGetProgress

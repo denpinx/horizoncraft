@@ -1,6 +1,6 @@
 using Horizoncraft.script.Components.EntityComponents;
 using Horizoncraft.script.Entity;
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 
 namespace Horizoncraft.script.Events.SystemEvents;
 

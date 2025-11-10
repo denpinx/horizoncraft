@@ -1,4 +1,4 @@
-using HorizonCraft.script.Services.world;
+using Horizoncraft.script.Services.world;
 
 namespace Horizoncraft.script.Events
 {

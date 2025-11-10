@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Horizoncraft.script.Components;
 using MemoryPack;
+using InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
 
 namespace Horizoncraft.script.WorldControl
 {

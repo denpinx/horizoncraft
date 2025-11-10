@@ -50,12 +50,6 @@
       "type": "pickaxe"
     }
   },
-  "rose": {
-    "rigidity": 0.1,
-    "collide": false,
-    "cube": false,
-    "replace": true
-  },
   "farmland": {
     "rigidity": 1,
     "state": {

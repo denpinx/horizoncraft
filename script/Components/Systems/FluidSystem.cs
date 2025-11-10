@@ -35,14 +35,14 @@ public class FluidSystem : TickSystem
 
     public override void BlockTick(BlockTickEvent e, Component cmp)
     {
-        FluidComponent fc = cmp as FluidComponent;
+        BlockComponents.FluidComponent fc = cmp as BlockComponents.FluidComponent;
         BlockMeta blockMeta = Materials.Valueof(fc.BlockName);
         //四周蔓延衰减
         if (e.CheckCanReplaceAndNotMeta(e.GetBottomBlock(), blockMeta))
         {
             e.DropBlockLoot(e.GetBottomBlock());
             e.SetBottomBlock(blockMeta, 0);
-            e.GetBottomBlock().GetComponent<FluidComponent>("FluidComponent").mobility = true;
+            e.GetBottomBlock().GetComponent<BlockComponents.FluidComponent>("FluidComponent").mobility = true;
             return;
         }
 
@@ -56,7 +56,7 @@ public class FluidSystem : TickSystem
             {
                 e.DropBlockLoot(e.GetLeftBlock());
                 e.SetLeftBlock(blockMeta, e.BlockData.State + 1);
-                e.GetLeftBlock().GetComponent<FluidComponent>("FluidComponent").mobility = true;
+                e.GetLeftBlock().GetComponent<BlockComponents.FluidComponent>("FluidComponent").mobility = true;
                 return;
             }
 
@@ -64,7 +64,7 @@ public class FluidSystem : TickSystem
             {
                 e.DropBlockLoot(e.GetRightBlock());
                 e.SetRightBlock(blockMeta, e.BlockData.State + 1);
-                e.GetRightBlock().GetComponent<FluidComponent>("FluidComponent").mobility = true;
+                e.GetRightBlock().GetComponent<BlockComponents.FluidComponent>("FluidComponent").mobility = true;
                 return;
             }
         }

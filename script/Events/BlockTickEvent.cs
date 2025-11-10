@@ -1,5 +1,5 @@
 using Godot;
-using Horizoncraft.script.Components;
+using Horizoncraft.script.Components.BlockComponents;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.WorldControl;
 using Vector3 = System.Numerics.Vector3;
@@ -125,31 +125,9 @@ namespace Horizoncraft.script.Events
         /// <summary>
         /// 更新周围的所有被动更新方块,注:是延迟到下tick更新
         /// </summary>
-        public void UpdateNeighborBlock()
+        public void UpdateNeighborBlock(bool inside = false,int deep=0)
         {
-            UpdateBlock(GlobalePos + Vector3I.Up);
-            UpdateBlock(GlobalePos + Vector3I.Down);
-            UpdateBlock(GlobalePos + Vector3I.Left);
-            UpdateBlock(GlobalePos + Vector3I.Right);
-        }
-
-        /// <summary>
-        /// 更新方块
-        /// </summary>
-        /// <param name="position">全局坐标</param>
-        public void UpdateBlock(Vector3I position)
-        {
-            var block = World.Service.ChunkService.GetBlock(position);
-            if (block == null) return;
-
-            var chunkPos = position.MathFloor(Chunk.Size);
-            var localPos = position.Remainder(Chunk.Size);
-
-            var local = new Vector3(localPos.X, localPos.Y, position.Z);
-            if (!block.HasComponent<ReactiveComponent>()) return;
-
-            if (World.Service.ChunkService.Chunks.TryGetValue(chunkPos, out var chunk))
-                chunk.PassiveTickList.Add(local);
+            World.Service.ChunkService.PassiveUpdateNeighborBlock(GlobalePos,inside,deep);
         }
 
         public void DropBlockLoot(BlockData blockData)

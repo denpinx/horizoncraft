@@ -2,8 +2,10 @@ using Horizoncraft.script.Components;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.Recipes;
+using BlockComponents_InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
+using InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
 
-namespace HorizonCraft.tscn.Menu.Inventory;
+namespace Horizoncraft.tscn.Menu.Inventory;
 
 public partial class CraftingTableInventory : InventoryNode
 {
@@ -46,7 +48,7 @@ public partial class CraftingTableInventory : InventoryNode
         //检查合成结果
         if (PlayerNode?.world == null) return;
 
-        var inv = TargetBlock?.GetComponent<InventoryComponent>()?.GetInventory();
+        var inv = TargetBlock?.GetComponent<BlockComponents_InventoryComponent>()?.GetInventory();
         if (inv == null) return;
 
         var gri = RecipeManage.GetRecipe(inv, 3);
