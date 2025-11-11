@@ -188,6 +188,7 @@ public static class ComponentManager
             if (blockData.Id != startId)
                 return false;
         }
+
         return true;
     }
 
@@ -346,7 +347,12 @@ public static class ComponentManager
         Register(SystemEnum.BambooSystem,
             typeof(ReactiveComponent),
             new BambooSystem()
-        );        
+        );
+        //竹笋生长系统
+        Register(SystemEnum.BambooShootSystem,
+            typeof(ReactiveComponent),
+            new BambooShootSystem()
+        );
         //芦苇生长系统
         Register(SystemEnum.ReedSystem,
             typeof(ReactiveComponent),

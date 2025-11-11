@@ -26,4 +26,5 @@ public enum SystemEnum
     PlaceFluidSystem,
     BambooSystem,
     ReedSystem,
+    BambooShootSystem
 }
