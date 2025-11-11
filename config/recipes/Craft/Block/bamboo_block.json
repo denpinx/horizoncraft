@@ -4,27 +4,26 @@
   "recipes": [
     {
       "template": [
-        "#",
-        "#"
-      ],
-      "mask-tag": {
-        "#": "plank"
-      },
-      "result": [
-        "stick",
-        4
-      ]
-    },
-    {
-      "template": [
-        "#",
-        "#"
+        "##",
+        "##"
       ],
       "mask-tag": {
         "#": "bamboo"
       },
       "result": [
-        "stick",
+        "bamboo_block",
+        1
+      ]
+    },
+    {
+      "template": [
+        "#"
+      ],
+      "mask-tag": {
+        "#": "bamboo_block"
+      },
+      "result": [
+        "bamboo",
         4
       ]
     }

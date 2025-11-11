@@ -28,8 +28,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="config\block\buildblock\door.json" />
-    <Content Include="config\block\buildblock\HasComponentBlocks.json" />
-    <Content Include="config\block\buildblock\NoComponentBlocks.json" />
+    <Content Include="config\block\buildblock\function_blocks.json" />
+    <Content Include="config\block\buildblock\decorative_blocks.json" />
     <Content Include="config\block\EraofEnergy\cables.json" />
     <Content Include="config\block\EraofEnergy\energystore.json" />
     <Content Include="config\block\EraofEnergy\generator.json" />
@@ -43,6 +43,7 @@
     <Content Include="config\block_tscn\furnace_1.tscn" />
     <Content Include="config\block_tscn\furnace_1.tscn31451182426.tmp" />
     <Content Include="config\builds\mine_mini_room.json" />
+    <Content Include="config\item\bamboo_block.json" />
     <Content Include="config\item\block\blocks.json" />
     <Content Include="config\item\Ingots.json" />
     <Content Include="config\item\Materials.json" />
@@ -57,6 +58,7 @@
     <Content Include="config\lang\cn\debug.json" />
     <Content Include="config\lang\cn\gui.json" />
     <Content Include="config\lang\cn\itemmetas.json" />
+    <Content Include="config\recipes\Craft\Block\bamboo_block.json" />
     <Content Include="config\recipes\Craft\Block\door.json" />
     <Content Include="config\recipes\Craft\Block\furnace.json" />
     <Content Include="config\recipes\Craft\Block\iron_storage_box.json" />
