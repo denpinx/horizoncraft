@@ -31,7 +31,6 @@
     "components": {
       "BottomCheckComponent": {
         "Name": "BottomCheck",
-        "Max": 20,
         "DropItem": true
       },
       "BlockRelyOnComponent": {
@@ -83,6 +82,31 @@
       "BlockRelyOnComponent": {
         "Name": "BottomMatch",
         "RelyOnBlockName": "grass"
+      }
+    }
+  },
+  "bamboo": {
+    "rigidity": 1,
+    "tiletype": "atlas",
+    "collide": false,
+    "cube": false,
+    "tags": {
+      "type": "axe"
+    },
+    "components": {
+      "ReactiveComponent": {
+        "Name": "BambooSystem"
+      }
+    }
+  },
+  "reed": {
+    "rigidity": 0.1,
+    "collide": false,
+    "cube": false,
+    "tiletype": "atlas",
+    "components": {
+      "ReactiveComponent": {
+        "Name": "ReedSystem"
       }
     }
   }

@@ -7,6 +7,7 @@ using Horizoncraft.script.Components.EnergyBlocks;
 using Horizoncraft.script.Components.EntityComponents;
 using Horizoncraft.script.Components.Item;
 using Horizoncraft.script.Components.Systems;
+using Horizoncraft.script.Components.Systems.BlockSystems;
 using Horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
 using Horizoncraft.script.Components.Systems.BlockSystems.Reactive;
 using Horizoncraft.script.Components.Systems.ItemSystems;
@@ -187,7 +188,6 @@ public static class ComponentManager
             if (blockData.Id != startId)
                 return false;
         }
-
         return true;
     }
 
@@ -341,6 +341,16 @@ public static class ComponentManager
         Register(SystemEnum.PlaceFluidSystem,
             typeof(ItemFluidComponent),
             new PlaceFluidSystem()
+        );
+        //竹子生长系统
+        Register(SystemEnum.BambooSystem,
+            typeof(ReactiveComponent),
+            new BambooSystem()
+        );        
+        //芦苇生长系统
+        Register(SystemEnum.ReedSystem,
+            typeof(ReactiveComponent),
+            new ReedSystem()
         );
     }
 }

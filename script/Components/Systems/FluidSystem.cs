@@ -1,6 +1,7 @@
 using Horizoncraft.script.Events;
 
 namespace Horizoncraft.script.Components.Systems;
+
 /// <summary>
 /// 流体系统
 /// 当被手持铁桶右键时会被替换成空气，并基给予玩家一个水桶。
@@ -46,28 +47,32 @@ public class FluidSystem : TickSystem
             return;
         }
 
-        if (e.CheckMeta(e.GetBottomBlock(), blockMeta))
+        if (e.GetBottomBlock() != null)
         {
-            e.GetBottomBlock().State = 0;
-        }
-        else
-        {
-            if (e.CheckCanReplaceAndNotMeta(e.GetLeftBlock(), blockMeta) && e.BlockData.State < FluidLenght - 1)
+            if (e.CheckMeta(e.GetBottomBlock(), blockMeta))
             {
-                e.DropBlockLoot(e.GetLeftBlock());
-                e.SetLeftBlock(blockMeta, e.BlockData.State + 1);
-                e.GetLeftBlock().GetComponent<BlockComponents.FluidComponent>("FluidComponent").mobility = true;
-                return;
+                e.GetBottomBlock().State = 0;
             }
+            else
+            {
+                if (e.CheckCanReplaceAndNotMeta(e.GetLeftBlock(), blockMeta) && e.BlockData.State < FluidLenght - 1)
+                {
+                    e.DropBlockLoot(e.GetLeftBlock());
+                    e.SetLeftBlock(blockMeta, e.BlockData.State + 1);
+                    e.GetLeftBlock().GetComponent<BlockComponents.FluidComponent>("FluidComponent").mobility = true;
+                    return;
+                }
 
-            if (e.CheckCanReplaceAndNotMeta(e.GetRightBlock(), blockMeta) && e.BlockData.State < FluidLenght - 1)
-            {
-                e.DropBlockLoot(e.GetRightBlock());
-                e.SetRightBlock(blockMeta, e.BlockData.State + 1);
-                e.GetRightBlock().GetComponent<BlockComponents.FluidComponent>("FluidComponent").mobility = true;
-                return;
+                if (e.CheckCanReplaceAndNotMeta(e.GetRightBlock(), blockMeta) && e.BlockData.State < FluidLenght - 1)
+                {
+                    e.DropBlockLoot(e.GetRightBlock());
+                    e.SetRightBlock(blockMeta, e.BlockData.State + 1);
+                    e.GetRightBlock().GetComponent<BlockComponents.FluidComponent>("FluidComponent").mobility = true;
+                    return;
+                }
             }
         }
+
 
         //顶部没有方块
         if (e.GetTopBlock() != null && !e.CheckMeta(e.GetTopBlock(), blockMeta))

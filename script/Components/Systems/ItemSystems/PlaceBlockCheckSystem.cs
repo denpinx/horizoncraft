@@ -13,22 +13,44 @@ public class PlaceBlockBottomMatchSystem : ItemComponentSystem
         {
             var bottomblock = pbe.world.Service.ChunkService.GetBlock(pbe.Position + new Vector3I(0, 1, 0));
             if (bottomblock == null) return false;
-            if (broc.MatchTag)
+            if (broc.Negate)
             {
-                if (bottomblock.CheckTag("thesaurus", broc.RelyOnBlockName))
+                if (broc.MatchTag)
+                {
+                    if (bottomblock.CheckTag("thesaurus", broc.RelyOnBlockName))
+                    {
+                        if (broc.State != -1)
+                            return bottomblock.State != broc.State;
+                        return false;
+                    }
+                }
+                else if (bottomblock.BlockMeta.Name == broc.RelyOnBlockName)
+                {
+                    if (broc.State != -1)
+                        return bottomblock.State != broc.State;
+                    return false;
+                }
+
+                return true;
+            }
+            else
+            {
+                if (broc.MatchTag)
+                {
+                    if (bottomblock.CheckTag("thesaurus", broc.RelyOnBlockName))
+                    {
+                        if (broc.State != -1)
+                            return bottomblock.State == broc.State;
+                        return true;
+                    }
+                }
+                else if (bottomblock.BlockMeta.Name == broc.RelyOnBlockName)
                 {
                     if (broc.State != -1)
                         return bottomblock.State == broc.State;
 
                     return true;
                 }
-            }
-            else if (bottomblock.BlockMeta.Name == broc.RelyOnBlockName)
-            {
-                if (broc.State != -1)
-                    return bottomblock.State == broc.State;
-
-                return true;
             }
         }
 

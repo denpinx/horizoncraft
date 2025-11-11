@@ -78,18 +78,5 @@
     "cube": false,
     "light": true,
     "tiletype": "atlas"
-  },
-  "bamboo": {
-    "rigidity": 1,
-    "collide": false,
-    "cube": false,
-    "tags": {
-      "type": "axe"
-    }
-  },
-  "reed": {
-    "rigidity": 0.1,
-    "collide": false,
-    "cube": false
   }
 }

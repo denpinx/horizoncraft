@@ -135,7 +135,28 @@ namespace Horizoncraft.script.Events
             blockData?.DropBlockLoot(World, new Vector2I(GlobalePos.X, GlobalePos.Y));
             blockData?.DropBlockInventoryItems(World, new Vector2I(GlobalePos.X, GlobalePos.Y));
         }
-
+        /// <summary>
+        /// 检查
+        /// </summary>
+        /// <param name="positions"></param>
+        /// <param name="meta"></param>
+        /// <param name="blockData"></param>
+        /// <returns></returns>
+        public bool CheckOneOfWithOffset(Vector3I[] positions, BlockMeta meta,out BlockData blockData)
+        {
+            foreach (var pos in positions)
+            {
+                var block = World.Service.ChunkService.GetBlock(GlobalePos+pos);
+                if (block != null && block.BlockMeta == meta)
+                {
+                    blockData = block;
+                    return true;
+                }
+            }
+            blockData = null;
+            return false;
+        }
+        
         public void Reset()
         {
             _bottomBlock = null;

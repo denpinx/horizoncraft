@@ -9,6 +9,7 @@ namespace Horizoncraft.script.Components.Item;
 public partial class BlockRelyOnComponent : ItemComponent
 {
     public string RelyOnBlockName;
+    public bool Negate=false;
     public bool MatchTag = false;
     public int State = -1;
 }

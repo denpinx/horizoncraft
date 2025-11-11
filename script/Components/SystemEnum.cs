@@ -24,4 +24,6 @@ public enum SystemEnum
     DoorLinkPlace,
     DoorLinkUpdate,
     PlaceFluidSystem,
+    BambooSystem,
+    ReedSystem,
 }
