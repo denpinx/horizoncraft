@@ -6,6 +6,7 @@ using Horizoncraft.script.Components;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.Inventory;
+using Horizoncraft.script.RenderSystem;
 using Horizoncraft.script.Utility;
 using Horizoncraft.script.WorldControl;
 using Horizoncraft.script.WorldControl.Struct;
@@ -338,6 +339,24 @@ namespace Horizoncraft.script
                 if (config.TryGetValue("liquid", out var value))
                 {
                     blockmeta.IsLiquid = (bool)value;
+                }
+
+                if (config.TryGetValue("tile-visible", out var tile_visible_object))
+                {
+                    blockmeta.TileVisible = (bool)tile_visible_object;
+                }
+                if (config.TryGetValue("render", out var renderObject))
+                {
+                    var list = (List<object>)renderObject;
+                    List<int> renderid = [];
+                    foreach (var item in list)
+                    {
+                        int id = RenderSystemManager.GetRenderId((string)item);
+                        if (id != -1)
+                            renderid.Add(id);
+                    }
+
+                    blockmeta.RenderSystem = renderid;
                 }
 
                 if (config.TryGetValue("break-level", out var vbl))

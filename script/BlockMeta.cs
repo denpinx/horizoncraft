@@ -15,10 +15,13 @@ namespace Horizoncraft.script
     /// </summary>
     public class BlockMeta
     {
+        public bool TileVisible = true;
         /// <summary>组件属性集合</summary>
-        public List<Func<Component>> Components = new();
+        public List<Func<Component>> Components = [];
 
-        public List<Component> Examples = new();
+        public List<int> RenderSystem = [];
+
+        public List<Component> Examples = [];
 
         // TODO 待实现,或将转移指组件system中执行
         /// <summary>方块放置事件</summary>
@@ -30,9 +33,9 @@ namespace Horizoncraft.script
 
         /// <summary>决定不同方块状态的不同tile</summary>
         public List<BlockTileSet> blockTileDatas = new();
-        
+
         public List<OverCollideSet> overCollideDatas = new();
-        
+
         /// <summary>其他扩展属性和标签</summary>
         public Dictionary Tags = new();
 
@@ -50,6 +53,7 @@ namespace Horizoncraft.script
 
         /// <summary>是否为完整方块</summary>
         public bool Cube = true;
+
         /// <summary>是否可以被直接替换</summary>
         public bool Replaceable = false;
 

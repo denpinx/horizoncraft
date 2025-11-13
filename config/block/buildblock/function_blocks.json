@@ -43,7 +43,10 @@
     "rigidity": 1,
     "collide": false,
     "cube": false,
-    "tiletype": "atlas",
+    "render": [
+      "water_render"
+    ],
+    "tile-visible": false,
     "components": {
       "FluidComponent": {
         "Name": "FluidComponent",

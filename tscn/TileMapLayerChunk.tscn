@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://b8sm5vjvrp1v2"]
+[gd_scene load_steps=7 format=3 uid="uid://b8sm5vjvrp1v2"]
 
 [ext_resource type="Script" uid="uid://ckrstqs6hvawg" path="res://tscn/TileMapLayerChunk.cs" id="1_2arkn"]
 [ext_resource type="Texture2D" uid="uid://cg50yloerq0wx" path="res://texture/shadow.png" id="2_61nbq"]
+[ext_resource type="Script" uid="uid://b45554edbq8yv" path="res://tscn/RenderNode.cs" id="2_wribj"]
 [ext_resource type="Script" uid="uid://ckokgwlpye0pe" path="res://tscn/DebugView.cs" id="8_agw1w"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wribj"]
@@ -20,13 +21,15 @@ texture = ExtResource("2_61nbq")
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_wribj")
 
-[node name="TileMapLayerChunk" type="Node2D" node_paths=PackedStringArray("tileMapLayer_font", "tileMapLayer_back", "tileMapLayer_shadow", "debugView")]
+[node name="TileMapLayerChunk" type="Node2D" node_paths=PackedStringArray("tileMapLayer_font", "tileMapLayer_back", "tileMapLayer_shadow", "debugView", "BackGroundDraw_Layer_0", "BackGroundDraw_Layer_1")]
 top_level = true
 script = ExtResource("1_2arkn")
 tileMapLayer_font = NodePath("TileMapLayer_font")
 tileMapLayer_back = NodePath("TileMapLayer_back")
 tileMapLayer_shadow = NodePath("TileMapLayer_shadow")
 debugView = NodePath("DebugView")
+BackGroundDraw_Layer_0 = NodePath("TileMapLayer_back/BackGroundDraw")
+BackGroundDraw_Layer_1 = NodePath("TileMapLayer_font/BackGroundDraw")
 
 [node name="TileMapLayer_back" type="TileMapLayer" parent="."]
 modulate = Color(0.41598, 0.41598, 0.41598, 1)
@@ -34,8 +37,17 @@ occlusion_enabled = false
 collision_enabled = false
 navigation_enabled = false
 
+[node name="BackGroundDraw" type="Node2D" parent="TileMapLayer_back"]
+show_behind_parent = true
+script = ExtResource("2_wribj")
+
 [node name="TileMapLayer_font" type="TileMapLayer" parent="."]
 z_index = 1
+
+[node name="BackGroundDraw" type="Node2D" parent="TileMapLayer_font"]
+show_behind_parent = true
+script = ExtResource("2_wribj")
+Z = 1
 
 [node name="TileMapLayer_shadow" type="TileMapLayer" parent="."]
 z_index = 2

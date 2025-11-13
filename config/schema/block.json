@@ -8,6 +8,18 @@
         "type": "boolean",
         "description": "是否为流体"
       },
+      "tile-visible": {
+        "type": "boolean",
+        "description": "是否显示Tile"
+      },
+      "render": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "绘制系统名"
+        },
+        "description": "绘制系统集合"
+      },
       "rigidity": {
         "type": "number",
         "description": "方块硬度"

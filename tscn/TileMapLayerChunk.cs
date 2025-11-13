@@ -5,18 +5,24 @@ using Horizoncraft.script.WorldControl;
 public partial class TileMapLayerChunk : Node2D
 {
     [Export] public bool DEBUG = true;
+    private World world;
     public Chunk chunk;
     public PlayerNode PlayerNode;
     [Export] TileMapLayer tileMapLayer_font;
     [Export] TileMapLayer tileMapLayer_back;
     [Export] TileMapLayer tileMapLayer_shadow;
     [Export] DebugView debugView;
+
+    [Export] RenderNode BackGroundDraw_Layer_0;
+    [Export] RenderNode BackGroundDraw_Layer_1;
+
     //[Export] private float perspectiveOffsetFactor = 0.1f;
 
     private long time;
 
     public override void _Ready()
     {
+        world = (World)GetParent();
         var result = Materials.CreateTileSet();
         tileMapLayer_font.TileSet = result;
         tileMapLayer_back.TileSet = result;
@@ -25,7 +31,10 @@ public partial class TileMapLayerChunk : Node2D
     public void SetChunk(Chunk chunk)
     {
         this.chunk = chunk;
+        BackGroundDraw_Layer_0.SetConfig(chunk, world);
+        BackGroundDraw_Layer_1.SetConfig(chunk, world);
     }
+
     public override void _Process(double delta)
     {
         if (chunk == null && GetParent() == null)
@@ -64,7 +73,9 @@ public partial class TileMapLayerChunk : Node2D
                             continue;
                         }
 
-
+                        if(!block.BlockMeta.TileVisible)
+                            continue;
+                        
                         int tile_id = -1;
                         var bts = block.GetBlockTileSet();
                         if (bts != null) tile_id = bts.tile_id;
@@ -112,8 +123,11 @@ public partial class TileMapLayerChunk : Node2D
                                 if (tileMapLayer_shadow.GetCellSourceId(pos) != -1)
                                     tileMapLayer_shadow.SetCell(new(x, y), -1);
                             }
-                            else if (tileMapLayer_shadow.GetCellAtlasCoords(pos) != new Vector2I(block_font.Light, 0))
-                                tileMapLayer_shadow.SetCell(new(x, y), 0, new Vector2I(block_font.Light, 0));
+                            else
+                            {
+                                if (tileMapLayer_shadow.GetCellAtlasCoords(pos) != new Vector2I(block_font.Light, 0))
+                                    tileMapLayer_shadow.SetCell(new(x, y), 0, new Vector2I(block_font.Light, 0));
+                            }
 
                             if (block.BlockMeta.Name == "air")
                             {
@@ -126,8 +140,12 @@ public partial class TileMapLayerChunk : Node2D
                     }
                 }
             }
-
+            
             chunk.update_tilemap = false;
+            
+            //调用自定义渲染
+            BackGroundDraw_Layer_0.QueueRedraw();
+            BackGroundDraw_Layer_1.QueueRedraw();
         }
     }
 }
