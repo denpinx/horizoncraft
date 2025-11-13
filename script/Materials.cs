@@ -651,8 +651,19 @@ namespace Horizoncraft.script
                     }
                     else
                     {
+                        var texture_name = "";
+                        if (meta.TileVisible) texture_name = blockTileSet.texture_name;
+                        else
+                        {
+                            meta.Texture = GD.Load<Texture2D>($"res://texture/block/{blockTileSet.texture_name}.png");
+                            texture_name = "empty_block";
+                        }
                         var image = GD.Load<Texture2D>(
-                            $"res://texture/block/{blockTileSet.texture_name}.png");
+                                $"res://texture/block/{texture_name}.png");
+
+                        if(meta.Texture==null)
+                            meta.Texture = image;
+                       
 
                         int tilesX = image.GetWidth() / 16;
                         int tilesY = image.GetHeight() / 16;

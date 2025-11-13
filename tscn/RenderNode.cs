@@ -38,6 +38,8 @@ public partial class RenderNode : Node2D
                     if (Chunk.GetBlock(x, y, 1).BlockMeta.Cube)
                         continue;
                 }
+                else if (block.Light == 0)
+                    continue;
 
                 RenderContext context = new()
                 {
@@ -45,7 +47,8 @@ public partial class RenderNode : Node2D
                     Chunk = Chunk,
                     Node = this,
                     Block = block,
-                    Position = new Vector2I(x, y)
+                    Position = new Vector3I(x, y,Z),
+                    GlobalPosition = new Vector3I(Chunk.X * Chunk.Size + x, Chunk.Y * Chunk.Size + y,Z)
                 };
                 foreach (var index in block.BlockMeta.RenderSystem)
                 {

@@ -51,6 +51,10 @@ public partial class TileMapLayerChunk : Node2D
 
         if (chunk is { update_tilemap: true })
         {
+            //调用自定义渲染
+            BackGroundDraw_Layer_0.QueueRedraw();
+            BackGroundDraw_Layer_1.QueueRedraw();
+
             for (int x = 0; x < Chunk.Size; x++)
             {
                 for (int y = 0; y < Chunk.Size; y++)
@@ -73,8 +77,6 @@ public partial class TileMapLayerChunk : Node2D
                             continue;
                         }
 
-                        if(!block.BlockMeta.TileVisible)
-                            continue;
                         
                         int tile_id = -1;
                         var bts = block.GetBlockTileSet();
@@ -142,10 +144,6 @@ public partial class TileMapLayerChunk : Node2D
             }
             
             chunk.update_tilemap = false;
-            
-            //调用自定义渲染
-            BackGroundDraw_Layer_0.QueueRedraw();
-            BackGroundDraw_Layer_1.QueueRedraw();
         }
     }
 }
