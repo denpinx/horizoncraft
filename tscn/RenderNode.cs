@@ -23,7 +23,10 @@ public partial class RenderNode : Node2D
         this.Chunk = chunk;
         this.World = world;
     }
-
+    
+    /// <summary>
+    /// 仅在区块数据发生变化时重新绘制
+    /// </summary>
     public override void _Draw()
     {
         if (Chunk == null) return;

@@ -1,13 +1,8 @@
-using System;
 using Godot;
-using Horizoncraft.script.WorldControl;
-
 namespace Horizoncraft.script.RenderSystem.render;
 
 public class WaterRender() : RenderSystem("water_render")
 {
-    private Texture2D texture = GD.Load<Texture2D>("res://texture/block/water.png");
-
     public override void OnDraw(RenderContext context)
     {
         var pos = context.pos_v2;

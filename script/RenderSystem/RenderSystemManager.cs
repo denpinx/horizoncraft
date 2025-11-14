@@ -18,7 +18,7 @@ public static class RenderSystemManager
     }
 
     /// <summary>
-    /// 仅在方块加载元数据时调用
+    /// 仅在方块元数据在程序加载时调用
     /// </summary>
     /// <param name="renderName">渲染系统名</param>
     /// <returns></returns>
