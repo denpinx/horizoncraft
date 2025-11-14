@@ -60,9 +60,6 @@ public class BambooSystem : TickSystem
                 e.SetBlock(_air);
                 e.UpdateNeighborBlock();
             }
-        }
-        else if (e.GetBottomBlock() != null)
-        {
             if (e.GetBottomBlock().BlockMeta != e.BlockData.BlockMeta)
             {
                 if (e.BlockData.State == 0)

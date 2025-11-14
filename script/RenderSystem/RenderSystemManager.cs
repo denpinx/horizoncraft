@@ -39,5 +39,6 @@ public static class RenderSystemManager
     {
         RegisterRenderSystem(new TestRender());
         RegisterRenderSystem(new WaterRender());
+        RegisterRenderSystem(new ReedRender());
     }
 }

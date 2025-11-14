@@ -106,12 +106,13 @@
     "rigidity": 0.1,
     "collide": false,
     "cube": false,
-    "tiletype": "atlas",
     "components": {
       "ReactiveComponent": {
         "Name": "ReedSystem"
       }
-    }
+    },
+    "tile-visible": false,
+    "render": ["reed_render"]
   },
   "bamboo_shoot": {
     "rigidity": 0.4,
