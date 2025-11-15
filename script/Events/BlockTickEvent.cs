@@ -130,7 +130,12 @@ namespace Horizoncraft.script.Events
             World.Service.ChunkService.PassiveUpdateNeighborBlock(GlobalePos,inside,deep);
         }
 
-        public void DropBlockLoot(BlockData blockData)
+        public void UpdateSelf()
+        {
+            World.Service.ChunkService.UpdateBlock(GlobalePos);
+        }
+
+        public void  DropBlockLoot(BlockData blockData)
         {
             blockData?.DropBlockLoot(World, new Vector2I(GlobalePos.X, GlobalePos.Y));
             blockData?.DropBlockInventoryItems(World, new Vector2I(GlobalePos.X, GlobalePos.Y));

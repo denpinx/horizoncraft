@@ -24,6 +24,9 @@ namespace Horizoncraft.script
         public List<Component> Examples = [];
         //如果有多张不同状态的贴图，这个只会获取第一张
         public Texture2D Texture;
+        
+        public Dictionary<string,Texture2D> ExpandTextures = new Dictionary<string,Texture2D>();
+        
         // TODO 待实现,或将转移指组件system中执行
         /// <summary>方块放置事件</summary>
         public Action<PlaceBlockEvent> PlaceBlockEvent;

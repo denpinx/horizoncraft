@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using MemoryPack;
 
 namespace Horizoncraft.script.Components.BlockComponents;

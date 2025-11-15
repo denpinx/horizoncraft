@@ -20,9 +20,17 @@
         },
         "description": "绘制系统集合"
       },
+      "expand-texture": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "贴图名称"
+        },
+        "description": "扩展贴图集合"
+      },
       "rigidity": {
         "type": "number",
-        "description": "方块硬度"
+        "description": "方块硬度,默认:0.5 "
       },
       "break-level": {
         "type": "number",
@@ -30,7 +38,7 @@
       },
       "collide": {
         "type": "boolean",
-        "description": "碰撞"
+        "description": "碰撞,默认:true"
       },
       "replace": {
         "type": "boolean",
@@ -38,11 +46,11 @@
       },
       "cube": {
         "type": "boolean",
-        "description": "是否为完整方块"
+        "description": "是否为完整方块,默认:true"
       },
       "light": {
         "type": "boolean",
-        "description": "是否为光源"
+        "description": "是否为光源,默认:false"
       },
       "tiletype": {
         "type": "string",

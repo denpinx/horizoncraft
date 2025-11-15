@@ -16,7 +16,6 @@ public partial class PlayerNode : CharacterBody2D
 {
     private PackedScene PackedSceneDeadView = GD.Load<PackedScene>("res://tscn/Gui/DeadView.tscn");
     private const bool TEST_MODE = true;
-
     /// <summary>
     /// 获取调试信息委托集合
     /// </summary>
@@ -352,7 +351,6 @@ public partial class PlayerNode : CharacterBody2D
                             return true;
                         }
                     }
-
                 }
                 else
                 {

@@ -71,27 +71,29 @@ scale = Vector2(5, 5)
 texture = ExtResource("4_38adb")
 centered = false
 
-[node name="Parallax2D_Back" type="Parallax2D" parent="Node"]
-scroll_scale = Vector2(0.05, 0)
-repeat_size = Vector2(1024, 0)
-repeat_times = 4
-screen_offset = Vector2(481, 0)
-
-[node name="B0" type="Sprite2D" parent="Node/Parallax2D_Back"]
-position = Vector2(354.20004, 168.00003)
-scale = Vector2(4, 4)
-texture = ExtResource("3_gmryn")
-centered = false
-
 [node name="Parallax2D_Font" type="Parallax2D" parent="Node"]
-scroll_scale = Vector2(0.1, 0)
-scroll_offset = Vector2(-491, 56)
-repeat_size = Vector2(1024, 0)
+scroll_scale = Vector2(0.01, 0)
+scroll_offset = Vector2(124, -182)
+repeat_size = Vector2(512, 0)
 repeat_times = 4
 screen_offset = Vector2(481, 0)
 
 [node name="B1" type="Sprite2D" parent="Node/Parallax2D_Font"]
-position = Vector2(869.1, 112)
-scale = Vector2(4, 4)
+position = Vector2(526.81, 337)
+scale = Vector2(2, 2)
 texture = ExtResource("5_08a46")
+centered = false
+
+[node name="Parallax2D_Back" type="Parallax2D" parent="Node"]
+visible = false
+scroll_scale = Vector2(0.1, 0)
+scroll_offset = Vector2(340, -81)
+repeat_size = Vector2(512, 0)
+repeat_times = 6
+screen_offset = Vector2(481, 0)
+
+[node name="B0" type="Sprite2D" parent="Node/Parallax2D_Back"]
+position = Vector2(-257.9, 251)
+scale = Vector2(2, 2)
+texture = ExtResource("3_gmryn")
 centered = false

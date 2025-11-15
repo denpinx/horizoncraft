@@ -83,5 +83,10 @@
     "rigidity": 1,
     "collide": true,
     "cube": true
+  },
+  "glass": {
+    "rigidity": 0.5,
+    "collide": true,
+    "cube": false
   }
 }

@@ -9,6 +9,10 @@
         "FluidName": "water"
       }
     },
-    "max": 4
+    "tags": {
+      "fluid": "water",
+      "on-used": "iron_bukkit"
+    },
+    "max": 1
   }
 }

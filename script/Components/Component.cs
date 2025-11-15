@@ -29,6 +29,8 @@ namespace Horizoncraft.script.Components;
 [MemoryPackUnion(16, typeof(ItemFluidComponent))]
 [MemoryPackUnion(17, typeof(BottomCheckComponent))]
 [MemoryPackUnion(18, typeof(ExpandReactiveComponent))]
+[MemoryPackUnion(19, typeof(ConnectComponent))]
+[MemoryPackUnion(20, typeof(TankComponent))]
 public abstract partial class Component
 {
     [MemoryPackAllowSerialize] private string _name;

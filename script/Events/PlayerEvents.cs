@@ -116,6 +116,12 @@ public class PlayerEvents
     /// <returns></returns>
     public virtual bool OpenBlockView(PlayerOpenBlockViewEvent e)
     {
+        if (e.Player.CancelTask == Cancel.OpenBlock)
+        {
+            e.Player.CancelTask = Cancel.None;
+            return false;
+        }
+
         var world = e.world;
         if (world.PlayerNode.OpeningInventoryNode != null)
         {
@@ -209,6 +215,12 @@ public class PlayerEvents
     /// <returns></returns>
     public virtual bool PlaceBlock(PlayerPlaceBlockEvent e)
     {
+        if (e.Player.CancelTask == Cancel.PlaceBlock)
+        {
+            e.Player.CancelTask = Cancel.None;
+            return false;
+        }
+
         var set = e.GetBlockData();
         var block = set.Item1;
         var pos = set.Item2;
@@ -229,13 +241,14 @@ public class PlayerEvents
                 return false;
 
         e.ChunkService.SetBlock(pos, bm);
-        e.ChunkService.PassiveUpdateNeighborBlock(pos,true);
+        e.ChunkService.PassiveUpdateNeighborBlock(pos, true);
 
         if (e.Player.Mode == 0)
         {
             e.Player.Inventory.ReduceItemAmount(e.Player.Inventory.ToolBarIndex);
         }
 
+        e.Player.CancelTask = Cancel.UseBlock;
         return true;
     }
 
@@ -247,6 +260,11 @@ public class PlayerEvents
     public virtual bool BreakBlock(PlayerBreakblockEvent e)
     {
         if (e.Player.State != PlayerState.Live) return false;
+        if (e.Player.CancelTask == Cancel.BreakBlock)
+        {
+            e.Player.CancelTask = Cancel.None;
+            return false;
+        }
 
         var targetblock = e.GetBlockData();
 
@@ -317,7 +335,13 @@ public class PlayerEvents
         e.Player.OpeningBlockInventory = true;
         e.Player.OpenInventory = new System.Numerics.Vector3(finalpos.X, finalpos.Y, finalpos.Z);
         var blockinv = InterfaceBlock.GetComponent<InventoryComponent>();
-        if (blockinv == null)
+        //if (blockinv == null)
+        //{
+        if (e.Player.CancelTask == Cancel.UseBlock)
+        {
+            e.Player.CancelTask = Cancel.None;
+        }
+        else
         {
             PlayerRightClickBlockEvent prcbe = new PlayerRightClickBlockEvent()
             {
@@ -327,7 +351,6 @@ public class PlayerEvents
                 Position = finalpos,
                 blockData = InterfaceBlock
             };
-
             var state = InterfaceBlock.State;
             var result = ComponentManager.ExecuteBlockComponents(prcbe, InterfaceBlock);
             if (InterfaceBlock.State != state)
@@ -341,8 +364,14 @@ public class PlayerEvents
                 }
             }
 
-            return result;
+            if (!result)
+            {
+                e.Player.CancelTask = Cancel.PlaceBlock;
+                return result;
+            }
         }
+
+        if (blockinv == null) return false;
 
         var pobve = new PlayerOpenBlockViewEvent()
         {

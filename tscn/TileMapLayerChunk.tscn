@@ -30,6 +30,7 @@ tileMapLayer_shadow = NodePath("TileMapLayer_shadow")
 debugView = NodePath("DebugView")
 BackGroundDraw_Layer_0 = NodePath("TileMapLayer_back/BackGroundDraw")
 BackGroundDraw_Layer_1 = NodePath("TileMapLayer_font/BackGroundDraw")
+metadata/_edit_group_ = true
 
 [node name="TileMapLayer_back" type="TileMapLayer" parent="."]
 modulate = Color(0.41598, 0.41598, 0.41598, 1)

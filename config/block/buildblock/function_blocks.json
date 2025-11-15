@@ -24,10 +24,27 @@
       "type": "shovel"
     }
   },
+  "high_bush": {
+    "rigidity": 0.2,
+    "collide": false,
+    "cube": false,
+    "replace": true,
+    "components": {
+      "BottomCheckComponent": {
+        "Name": "BottomCheck",
+        "DropItem": true
+      },
+      "BlockRelyOnComponent": {
+        "Name": "BottomMatch",
+        "RelyOnBlockName": "grass"
+      }
+    }
+  },
   "bush": {
     "rigidity": 0.1,
     "collide": false,
     "cube": false,
+    "replace": true,
     "components": {
       "BottomCheckComponent": {
         "Name": "BottomCheck",
@@ -43,6 +60,8 @@
     "rigidity": 1,
     "collide": false,
     "cube": false,
+    "replace": true,
+    
     "render": [
       "water_render"
     ],
@@ -123,5 +142,39 @@
         "Name": "BambooShootSystem"
       }
     }
+  },
+  "iron_tank":{
+    "rigidity": 1,
+    "collide": true,
+    "cube": true,
+    "components": {
+      "TankComponent": {
+        "Name": "TankSystem"
+      }
+    },
+    "render": ["tank_render"]
+  },
+  "oak_sapling": {
+    "rigidity": 0.2,
+    "collide": false,
+    "cube": false,
+    "components": {
+      "BottomCheckComponent": {
+        "Name": "BottomCheck",
+        "DropItem": true
+      },
+      "BlockRelyOnComponent": {
+        "Name": "BottomMatch",
+        "RelyOnBlockName": "grass"
+      }
+    }
+  },
+  "fluid_pipe": {
+    "collide": false,
+    "cube": false,
+    "expand-texture": [
+      "fluid_pipe/fluid_pipe_connect.png",
+      "fluid_pipe/fluid_pipe_input.png"
+    ]
   }
 }

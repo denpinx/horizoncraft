@@ -24,6 +24,8 @@ public partial class PlayerData
     [MemoryPackAllowSerialize] private int _mode;
     [MemoryPackAllowSerialize] private PlayerState _state = PlayerState.Respawning;
 
+    public Cancel CancelTask = Cancel.None;
+
     //连接id
     public int PeerId = 0;
 
@@ -182,4 +184,13 @@ public partial class PlayerData
 
         return new Vector2(ChunkX * Chunk.Size + randx, gy);
     }
+}
+
+public enum Cancel
+{
+    None,
+    PlaceBlock,
+    BreakBlock,
+    OpenBlock,
+    UseBlock,
 }

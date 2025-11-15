@@ -15,6 +15,7 @@
     "rose": "玫瑰",
     "farmland": "耕地",
     "bush": "草丛",
+    "high_bush": "高草丛",
     "water": "水",
     "sand": "沙子",
     "carrot": "胡萝卜",
@@ -25,6 +26,7 @@
     "furnace": "熔炉",
     "oak_log": "橡木原木",
     "oak_leaves": "橡木树叶",
+    "oak_sapling": "橡木树苗",
     "birch_log": "桦木原木",
     "birch_leaves": "桦木树叶",
     "coal_ore": "煤矿石",
@@ -46,6 +48,9 @@
     "bamboo": "竹子",
     "bamboo_shoot": "竹笋",
     "bamboo_block": "一堆竹子",
-    "reed": "芦苇"
+    "reed": "芦苇",
+    "glass": "玻璃",
+    "iron_tank": "铁质水缸",
+    "fluid_pipe": "流体管道"
   }
 }

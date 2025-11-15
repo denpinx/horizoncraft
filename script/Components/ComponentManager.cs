@@ -358,5 +358,11 @@ public static class ComponentManager
             typeof(ReactiveComponent),
             new ReedSystem()
         );
+        //水缸系统
+        Register(SystemEnum.TankSystem,
+            typeof(TankComponent),
+            new IronTankSystem()
+        );
+        
     }
 }

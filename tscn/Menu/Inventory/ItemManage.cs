@@ -167,7 +167,7 @@ public partial class ItemManage : HBoxContainer, ITranslatable
                         invslot.ShowItem != null)
                     {
                         var item = invslot.ShowItem.Copy();
-                        if (isshift) item.Amount = 64;
+                        if (isshift) item.Amount=item.GetItemMeta().MaxAmount;
                         _player.playerData.Inventory.TryAddItem(item);
                     }
                     else

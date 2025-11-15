@@ -359,6 +359,26 @@ namespace Horizoncraft.script
                     blockmeta.RenderSystem = renderid;
                 }
 
+                if (config.TryGetValue("expand-texture", out var texture_object))
+                {
+                    var list = (List<object>)texture_object;
+                    Dictionary<string, Texture2D> texture2Ds = [];
+                    foreach (var item in list)
+                    {
+                        string texture_dir = (string)item;
+                        var name = texture_dir
+                            .Split('/')
+                            .Last().
+                            Split(".png").
+                            First().
+                            ToLower();
+                        var image = GD.Load<Texture2D>("res://texture/block/"+texture_dir);
+                        texture2Ds.Add(name, image);
+                    }
+                    blockmeta.ExpandTextures = texture2Ds;
+                }
+                
+
                 if (config.TryGetValue("break-level", out var vbl))
                 {
                     blockmeta.BreakLevel = (int)vbl;
