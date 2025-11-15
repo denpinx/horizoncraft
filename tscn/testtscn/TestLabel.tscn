@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://bjdm115sr550d"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t0cvk"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="TestLabel" type="Label"]
+offset_right = 1.0
+offset_bottom = 23.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_t0cvk")
+text = "123456"
+horizontal_alignment = 1
