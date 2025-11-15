@@ -7,7 +7,7 @@
     "tiletype": "atlas",
     "components": {
       "CropGrowComponent": {
-        "Name": "CropGrowComponent",
+        "Drive": "CropGrowComponent",
         "Max": 20,
         "Water": false,
         "GrowState": 8,
@@ -15,12 +15,12 @@
         "GrowCount": 16
       },
       "ItemEatableComponent": {
-        "Name": "ItemEatableComponent",
+        "Drive": "ItemEatableComponent",
         "UseTime": 1,
         "Hunger": 5
       },
       "BlockRelyOnComponent": {
-        "Name": "BottomMatch",
+        "Drive": "BottomMatch",
         "RelyOnBlockName": "farmland"
       }
     },

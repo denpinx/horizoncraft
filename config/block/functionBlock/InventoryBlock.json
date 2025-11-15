@@ -3,7 +3,7 @@
     "rigidity": 0.5,
     "components": {
       "InventoryComponent": {
-        "Name": "WorkBenchComponent",
+        "Drive": "WorkBenchComponent",
         "Size": 9,
         "InventoryName": "CraftingTableInventory"
       }
@@ -34,7 +34,7 @@
     },
     "components": {
       "FurnaceComponent": {
-        "Name": "FurnaceComponent",
+        "Drive": "FurnaceComponent",
         "Max": 1,
         "Size": 3,
         "InventoryName": "FurnaceInv"

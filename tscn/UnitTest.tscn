@@ -1,6 +1,106 @@
-[gd_scene load_steps=2 format=3 uid="uid://cwg7ajqnntrfm"]
+[gd_scene load_steps=4 format=3 uid="uid://cwg7ajqnntrfm"]
 
 [ext_resource type="Script" uid="uid://d1hvo1g7s4g13" path="res://tscn/UnitTest.cs" id="1_ktvph"]
 
-[node name="UnitTest" type="Node2D"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ktvph"]
+bg_color = Color(0.05197096, 0.051970966, 0.051970914, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0eupg"]
+bg_color = Color(0.14044744, 0.14044744, 0.14044744, 1)
+
+[node name="UnitTest" type="Control" node_paths=PackedStringArray("Tabel_Test_Name", "Tabel_Test_UseTime", "Tabel_Test_LastUseTime", "Tabel_Test_Result")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_ktvph")
+Tabel_Test_Name = NodePath("VBoxContainer/Body/List/Test_Name")
+Tabel_Test_UseTime = NodePath("VBoxContainer/Body/List/Test_UseTime")
+Tabel_Test_LastUseTime = NodePath("VBoxContainer/Body/List/Test_LastTime")
+Tabel_Test_Result = NodePath("VBoxContainer/Body/List/Test_Result")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_stretch_ratio = 0.31
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/Title"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_ktvph")
+
+[node name="Label" type="Label" parent="VBoxContainer/Title/PanelContainer"]
+layout_mode = 2
+text = "测试结果"
+horizontal_alignment = 1
+
+[node name="TableName" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/TableName"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_0eupg")
+text = "测试名"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="VBoxContainer/TableName"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_0eupg")
+text = "耗时"
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="VBoxContainer/TableName"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_0eupg")
+text = "上次耗时"
+horizontal_alignment = 1
+
+[node name="Label4" type="Label" parent="VBoxContainer/TableName"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_0eupg")
+text = "测试结果"
+horizontal_alignment = 1
+
+[node name="Body" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="List" type="HBoxContainer" parent="VBoxContainer/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Test_Name" type="VBoxContainer" parent="VBoxContainer/Body/List"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Test_UseTime" type="VBoxContainer" parent="VBoxContainer/Body/List"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Test_LastTime" type="VBoxContainer" parent="VBoxContainer/Body/List"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Test_Result" type="VBoxContainer" parent="VBoxContainer/Body/List"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="End" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_stretch_ratio = 0.03

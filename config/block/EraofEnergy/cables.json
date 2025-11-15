@@ -8,7 +8,7 @@
     },
     "components": {
       "EnergyUnitComponent": {
-        "Name": "EnergyCable",
+        "Drive": "EnergyCable",
         "Max": 4,
         "EnergyUnitMax": 1024,
         "Rate": 64

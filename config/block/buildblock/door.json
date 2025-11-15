@@ -17,10 +17,10 @@
     ],
     "components": {
       "ReactiveComponent": {
-        "Name": "DoorLinkUpdate"
+        "Drive": "DoorLinkUpdate"
       },
       "ItemComponent": {
-        "Name": "DoorLinkPlace"
+        "Drive": "DoorLinkPlace"
       }
     },
     "tags": {

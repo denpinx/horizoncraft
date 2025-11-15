@@ -125,7 +125,7 @@
         "additionalProperties": {
           "type": "object",
           "properties": {
-            "Name": {
+            "Drive": {
               "type": "string",
               "description": "组件功能名"
             },

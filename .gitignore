@@ -3,6 +3,7 @@
 .export/
 /android/
 /save/**/*
+/test/**/*
 /.VSCodeCounter/**/*
 qodana.yaml
 .idea/**/*

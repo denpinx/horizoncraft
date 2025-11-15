@@ -23,7 +23,7 @@
     "rigidity": 0.5,
     "components": {
       "TickComponent": {
-        "Name": "LogisticsInputComponent"
+        "Drive": "LogisticsInputComponent"
       }
     },
     "tags": {

@@ -14,7 +14,7 @@ public enum SystemEnum
     FurnaceComponent,
     LogisticsInputComponent,
     WorkBenchComponent,
-    ItemDurableComponent,
+    ToolSystem,
     ItemEntityComponent,
     SolarGenerator,
     EnergyCable,
@@ -28,4 +28,5 @@ public enum SystemEnum
     ReedSystem,
     BambooShootSystem,
     TankSystem,
+    FluidPipeSystem
 }

@@ -44,7 +44,7 @@ public partial class ItemStack
     public T GetComponent<T>(string name) where T : Component
     {
         foreach (var cmp in Components)
-            if (cmp is T t && t.Name == name)
+            if (cmp is T t && t.Drive == name)
                 return t;
         return null;
     }
@@ -79,7 +79,7 @@ public partial class ItemStack
             {
                 new ItemEntityComponent()
                 {
-                    Name = "ItemEntityComponent",
+                    Drive = "ItemEntityComponent",
                     ItemStack = this
                 }
             }

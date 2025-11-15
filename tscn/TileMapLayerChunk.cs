@@ -30,6 +30,11 @@ public partial class TileMapLayerChunk : Node2D
 
     public void SetChunk(Chunk chunk)
     {
+        if (this.chunk == null || this.chunk != chunk)
+        {
+            chunk.update_tilemap = true;
+        }
+        
         this.chunk = chunk;
         BackGroundDraw_Layer_0.SetConfig(chunk, world);
         BackGroundDraw_Layer_1.SetConfig(chunk, world);

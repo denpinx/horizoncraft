@@ -17,7 +17,7 @@ namespace Horizoncraft.script.Components;
 [MemoryPackUnion(4, typeof(ItemComponent))]
 [MemoryPackUnion(5, typeof(InventoryComponent))]
 [MemoryPackUnion(6, typeof(FurnaceComponent))]
-[MemoryPackUnion(7, typeof(ItemDurableComponent))]
+[MemoryPackUnion(7, typeof(ToolComponent))]
 [MemoryPackUnion(8, typeof(EntityComponent))]
 [MemoryPackUnion(9, typeof(ItemEntityComponent))]
 [MemoryPackUnion(10, typeof(EnergyUnitComponent))]
@@ -33,15 +33,15 @@ namespace Horizoncraft.script.Components;
 [MemoryPackUnion(20, typeof(TankComponent))]
 public abstract partial class Component
 {
-    [MemoryPackAllowSerialize] private string _name;
+    [MemoryPackAllowSerialize] private string _drive;
 
     [MemoryPackIgnore]
-    public string Name
+    public string Drive
     {
-        get => _name;
+        get => _drive;
         init
         {
-            _name = value;
+            _drive = value;
             if (SystemEnum.TryParse<SystemEnum>(value, out var id))
             {
                 EnumId = id;

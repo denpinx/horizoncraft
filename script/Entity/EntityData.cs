@@ -38,7 +38,7 @@ namespace Horizoncraft.script.Entity
 
         public T GetComponent<T>(string name) where T : Component
         {
-            var cmp = Components.Find(c => c is T && name == c.Name);
+            var cmp = Components.Find(c => c is T && name == c.Drive);
             if (cmp != null) return (T)cmp;
             return null;
         }

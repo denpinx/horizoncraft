@@ -113,7 +113,7 @@ public partial class InvSlot : Control
                 this.Label_Amount.Text = itemStack.Amount.ToString();
             else this.Label_Amount.Text = "";
 
-            var durable = itemStack.GetComponent<ItemDurableComponent>();
+            var durable = itemStack.GetComponent<ToolComponent>();
             if (durable != null)
             {
                 if (durable.Max != durable.Value)

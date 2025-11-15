@@ -9,7 +9,7 @@ public class ItemDurableSystem : ItemComponentSystem
 {
     public override bool OnBreakBlock(PlayerBreakblockEvent bbe, ItemComponent itemComponent)
     {
-        var durable = itemComponent as ItemDurableComponent;
+        var durable = itemComponent as ToolComponent;
         GD.Print($"[方块挖掘] 当前耐久{durable.Value}/{durable.Max}");
         if (bbe.GetBlockData().BlockMeta.BreakLevel <= durable.ToolLevel)
             //正常掉落

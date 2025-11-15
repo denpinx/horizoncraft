@@ -5,7 +5,7 @@
   "iron_bukkit_water": {
     "components": {
       "ItemFluidComponent": {
-        "Name": "PlaceFluidSystem",
+        "Drive": "PlaceFluidSystem",
         "FluidName": "water"
       }
     },

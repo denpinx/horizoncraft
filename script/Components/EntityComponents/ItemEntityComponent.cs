@@ -9,6 +9,6 @@ public partial class ItemEntityComponent : EntityComponent
 
     public ItemEntityComponent()
     {
-        Name = "ItemEntityComponent";
+        Drive = "ItemEntityComponent";
     }
 }

@@ -5,9 +5,9 @@
       "fuel": "10"
     },
     "components": {
-      "ItemDurableComponent": {
-        "Name": "ItemDurableComponent",
-        "Tag": "any|pickaxe",
+      "ToolComponent": {
+        "Drive": "ToolSystem",
+        "Tag": ["pickaxe"],
         "ToolLevel": 0,
         "Efficiency": 1,
         "Max": 100,
@@ -18,9 +18,9 @@
   "stone_pickaxe": {
     "max": 1,
     "components": {
-      "ItemDurableComponent": {
-        "Name": "ItemDurableComponent",
-        "Tag": "any|pickaxe",
+      "ToolComponent": {
+        "Drive": "ToolSystem",
+        "Tag": ["pickaxe"],
         "ToolLevel": 1,
         "Efficiency": 3,
         "Max": 250,
@@ -31,9 +31,9 @@
   "iron_pickaxe": {
     "max": 1,
     "components": {
-      "ItemDurableComponent": {
-        "Name": "ItemDurableComponent",
-        "Tag": "any|pickaxe",
+      "ToolComponent": {
+        "Drive": "ToolSystem",
+        "Tag": ["pickaxe"],
         "ToolLevel": 2,
         "Efficiency": 5,
         "Max": 500,
@@ -44,9 +44,9 @@
   "diamond_pickaxe": {
     "max": 1,
     "components": {
-      "ItemDurableComponent": {
-        "Name": "ItemDurableComponent",
-        "Tag": "any|pickaxe",
+      "ToolComponent": {
+        "Drive": "ToolSystem",
+        "Tag": ["pickaxe"],
         "ToolLevel": 3,
         "Efficiency": 8,
         "Max": 1500,

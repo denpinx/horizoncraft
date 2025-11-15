@@ -16,6 +16,7 @@ public partial class PlayerNode : CharacterBody2D
 {
     private PackedScene PackedSceneDeadView = GD.Load<PackedScene>("res://tscn/Gui/DeadView.tscn");
     private const bool TEST_MODE = true;
+
     /// <summary>
     /// 获取调试信息委托集合
     /// </summary>
@@ -253,11 +254,11 @@ public partial class PlayerNode : CharacterBody2D
                 float efficiency = 1f;
                 float gap = meta.BreakLevel;
 
-                var durable = playerData.Inventory.GetToolBarItem()?.GetComponent<ItemDurableComponent>();
+                var durable = playerData.Inventory.GetToolBarItem()?.GetComponent<ToolComponent>();
                 if (durable != null)
                 {
                     string tag = InterfaceBlock.GetTag("type");
-                    if ((tag != null && durable.HasTag(tag)) || durable.HasTag("any"))
+                    if ((tag != null && durable.Tag.Contains(tag)) || durable.Tag.Contains("any"))
                         efficiency = 1f + durable.Efficiency * 0.25f;
                     else
                     {

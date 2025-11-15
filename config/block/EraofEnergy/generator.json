@@ -8,7 +8,7 @@
     },
     "components": {
       "EnergyUnitComponent": {
-        "Name": "SolarGenerator",
+        "Drive": "SolarGenerator",
         "Max": 4,
         "Rate": 64,
         "EnergyUnitMax": 1024,

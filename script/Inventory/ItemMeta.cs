@@ -61,7 +61,7 @@ public class ItemMeta
             var result_type = result.GetType();
             var itemcmp = Components.Find(cmp => cmp().GetType() == result_type);
             if (itemcmp != null) return false;
-            GD.Print($"方块组件 to 物品组件 {result.Name} {result}");
+            GD.Print($"方块组件 to 物品组件 {result.Drive} {result}");
             Components.Add(func);
             return true;
         }

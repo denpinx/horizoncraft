@@ -17,7 +17,7 @@ public partial class Slot : Control
         {
             this.TextureRect_Item.Texture = itemStack.GetItemMeta().GetTexture(itemStack.State);
             this.Label_Amount.Text = itemStack.Amount.ToString();
-            var durable = itemStack.GetComponent<ItemDurableComponent>();
+            var durable = itemStack.GetComponent<ToolComponent>();
             if (durable != null)
             {
                 ProgressBar.Value = durable.Value;

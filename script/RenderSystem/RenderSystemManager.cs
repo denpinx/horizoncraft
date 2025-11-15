@@ -41,5 +41,6 @@ public static class RenderSystemManager
         RegisterRenderSystem(new WaterRender());
         RegisterRenderSystem(new ReedRender());
         RegisterRenderSystem(new TankRender());
+        RegisterRenderSystem(new FluidPipeRender());
     }
 }

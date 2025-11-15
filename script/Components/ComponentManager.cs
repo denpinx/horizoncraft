@@ -64,7 +64,7 @@ public static class ComponentManager
                 GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
                 GD.PrintErr($"\t item-name:\t{itemStack.Name}");
                 GD.PrintErr($"\t item-state:\t{itemStack.State}");
-                GD.PrintErr($"\t item-components:\t{string.Join(",", itemStack.Components.Select(c => c.Name))}");
+                GD.PrintErr($"\t item-components:\t{string.Join(",", itemStack.Components.Select(c => c.Drive))}");
                 continue;
             }
 
@@ -100,7 +100,7 @@ public static class ComponentManager
                 GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
                 GD.PrintErr($"\t item-name:\t{itemStack.Name}");
                 GD.PrintErr($"\t item-state:\t{itemStack.State}");
-                GD.PrintErr($"\t item-components:\t{string.Join(",", itemStack.Components.Select(c => c.Name))}");
+                GD.PrintErr($"\t item-components:\t{string.Join(",", itemStack.Components.Select(c => c.Drive))}");
                 continue;
             }
 
@@ -134,9 +134,9 @@ public static class ComponentManager
                 GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
                 GD.PrintErr($"\t block-state:\t{blockData.State}");
                 GD.PrintErr(
-                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Name))}");
+                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Drive))}");
                 GD.PrintErr(
-                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Name))}");
+                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Drive))}");
                 continue;
             }
 
@@ -170,9 +170,9 @@ public static class ComponentManager
                 GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
                 GD.PrintErr($"\t block-state:\t{blockData.State}");
                 GD.PrintErr(
-                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Name))}");
+                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Drive))}");
                 GD.PrintErr(
-                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Name))}");
+                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Drive))}");
 
                 continue;
             }
@@ -209,20 +209,20 @@ public static class ComponentManager
                 GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
                 GD.PrintErr($"\t block-state:\t{blockData.State}");
                 GD.PrintErr(
-                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Name))}");
+                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Drive))}");
                 GD.PrintErr(
-                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Name))}");
+                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Drive))}");
                 continue;
             }
 
-            if (setComponentData.ComponentSets.TryGetValue(component.Name, out var dict))
+            if (setComponentData.ComponentSets.TryGetValue(component.Drive, out var dict))
             {
                 if (ComponentSets.TryGetValue(component.EnumId, out var cmp))
                     cmp.System.SetComponentValue(player, component, dict);
                 else
                 {
                     GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(SetBlockComponentData)} 没有对应的组件处理该方法。");
-                    GD.PrintErr($"\t component-name:\t{component.Name}");
+                    GD.PrintErr($"\t component-name:\t{component.Drive}");
                 }
             }
         }
@@ -293,8 +293,8 @@ public static class ComponentManager
             new WorkBenchSystem()
         );
         //物品耐久&工具组件
-        Register(SystemEnum.ItemDurableComponent,
-            typeof(ItemDurableComponent),
+        Register(SystemEnum.ToolSystem,
+            typeof(ToolComponent),
             new ItemDurableSystem()
         );
         //物品实体组件
@@ -362,6 +362,11 @@ public static class ComponentManager
         Register(SystemEnum.TankSystem,
             typeof(TankComponent),
             new IronTankSystem()
+        ); 
+        //流体管道
+        Register(SystemEnum.FluidPipeSystem,
+            typeof(ConnectComponent),
+            new FluidPipeSystem()
         );
         
     }

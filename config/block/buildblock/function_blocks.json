@@ -3,7 +3,7 @@
     "rigidity": 0.4,
     "components": {
       "ExpandReactiveComponent": {
-        "Name": "BlockSpread",
+        "Drive": "BlockSpread",
         "BlockName": "grass"
       }
     },
@@ -15,7 +15,7 @@
     "rigidity": 0.5,
     "components": {
       "ExpandComponent": {
-        "Name": "BlockCover",
+        "Drive": "BlockCover",
         "BlockName": "dirt",
         "Max": 20
       }
@@ -31,11 +31,11 @@
     "replace": true,
     "components": {
       "BottomCheckComponent": {
-        "Name": "BottomCheck",
+        "Drive": "BottomCheck",
         "DropItem": true
       },
       "BlockRelyOnComponent": {
-        "Name": "BottomMatch",
+        "Drive": "BottomMatch",
         "RelyOnBlockName": "grass"
       }
     }
@@ -47,11 +47,11 @@
     "replace": true,
     "components": {
       "BottomCheckComponent": {
-        "Name": "BottomCheck",
+        "Drive": "BottomCheck",
         "DropItem": true
       },
       "BlockRelyOnComponent": {
-        "Name": "BottomMatch",
+        "Drive": "BottomMatch",
         "RelyOnBlockName": "grass"
       }
     }
@@ -61,14 +61,13 @@
     "collide": false,
     "cube": false,
     "replace": true,
-    
     "render": [
       "water_render"
     ],
     "tile-visible": false,
     "components": {
       "FluidComponent": {
-        "Name": "FluidComponent",
+        "Drive": "FluidComponent",
         "BlockName": "water",
         "Max": 5
       }
@@ -81,7 +80,7 @@
     "rigidity": 0.5,
     "components": {
       "PhysicsComponent": {
-        "Name": "PhysicsComponent",
+        "Drive": "PhysicsComponent",
         "BlockName": "sand",
         "Max": 2
       }
@@ -97,12 +96,12 @@
     "replace": true,
     "components": {
       "BottomCheckComponent": {
-        "Name": "BottomCheck",
+        "Drive": "BottomCheck",
         "Max": 20,
         "DropItem": true
       },
       "BlockRelyOnComponent": {
-        "Name": "BottomMatch",
+        "Drive": "BottomMatch",
         "RelyOnBlockName": "grass"
       }
     }
@@ -117,7 +116,7 @@
     },
     "components": {
       "ReactiveComponent": {
-        "Name": "BambooSystem"
+        "Drive": "BambooSystem"
       }
     }
   },
@@ -127,11 +126,13 @@
     "cube": false,
     "components": {
       "ReactiveComponent": {
-        "Name": "ReedSystem"
+        "Drive": "ReedSystem"
       }
     },
     "tile-visible": false,
-    "render": ["reed_render"]
+    "render": [
+      "reed_render"
+    ]
   },
   "bamboo_shoot": {
     "rigidity": 0.4,
@@ -139,20 +140,22 @@
     "cube": false,
     "components": {
       "ReactiveComponent": {
-        "Name": "BambooShootSystem"
+        "Drive": "BambooShootSystem"
       }
     }
   },
-  "iron_tank":{
+  "iron_tank": {
     "rigidity": 1,
     "collide": true,
-    "cube": true,
+    "cube": false,
     "components": {
       "TankComponent": {
-        "Name": "TankSystem"
+        "Drive": "TankSystem"
       }
     },
-    "render": ["tank_render"]
+    "render": [
+      "tank_render"
+    ]
   },
   "oak_sapling": {
     "rigidity": 0.2,
@@ -160,11 +163,11 @@
     "cube": false,
     "components": {
       "BottomCheckComponent": {
-        "Name": "BottomCheck",
+        "Drive": "BottomCheck",
         "DropItem": true
       },
       "BlockRelyOnComponent": {
-        "Name": "BottomMatch",
+        "Drive": "BottomMatch",
         "RelyOnBlockName": "grass"
       }
     }
@@ -175,6 +178,14 @@
     "expand-texture": [
       "fluid_pipe/fluid_pipe_connect.png",
       "fluid_pipe/fluid_pipe_input.png"
-    ]
+    ],
+    "render": [
+      "fluid_pipe_render"
+    ],
+    "components": {
+      "ConnectComponent": {
+        "Drive": "FluidPipeSystem"
+      }
+    }
   }
 }

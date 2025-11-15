@@ -50,7 +50,7 @@ namespace Horizoncraft.script.WorldControl
 
         public T GetComponent<T>(string name) where T : Component
         {
-            var result = Components.Find(cmp => cmp is T && cmp.Name == name);
+            var result = Components.Find(cmp => cmp is T && cmp.Drive == name);
             if (result != null) return result as T;
             return null;
         }

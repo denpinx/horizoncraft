@@ -135,7 +135,35 @@ namespace Horizoncraft.script.Components
                 object ResultValue = value;
                 if (value.GetType() != targetType)
                 {
-                    ResultValue = Convert.ChangeType(value, targetType);
+                    if (value.GetType() == typeof(List<object>))
+                    {
+                        var list = (List<object>)value;
+                        if (targetType == typeof(List<string>))
+                        {
+                            var liststr = new List<string>();
+                            foreach (var item in list)
+                                liststr.Add((string)item);
+                            ResultValue = liststr;
+                        }else
+                        if (targetType == typeof(List<int>))
+                        {
+                            var liststr = new List<int>();
+                            foreach (var item in list)
+                                liststr.Add((int)item);
+                            ResultValue = liststr;
+                        }else
+                        if (targetType == typeof(List<float>))
+                        {
+                            var liststr = new List<float>();
+                            foreach (var item in list)
+                                liststr.Add((float)item);
+                            ResultValue = liststr;
+                        }
+                    }
+                    else
+                    {
+                        ResultValue = Convert.ChangeType(value, targetType);
+                    }
                 }
 
                 bindings.Add(Expression.Bind(member, GetObjcetExpression(ResultValue)));

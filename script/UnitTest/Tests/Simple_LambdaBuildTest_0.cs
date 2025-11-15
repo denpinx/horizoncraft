@@ -12,7 +12,7 @@ public class Simple_LambdaBuildTest_0 : UnitTestItem<Func<ItemComponent>>
         if (result == null) return false;
         var outputObject = result();
         if (outputObject == null) return false;
-        if (outputObject.Name != "Simple_LambdaBuildTest_0") return false;
+        if (outputObject.Drive != "Simple_LambdaBuildTest_0") return false;
         return true;
     }
 
@@ -20,7 +20,7 @@ public class Simple_LambdaBuildTest_0 : UnitTestItem<Func<ItemComponent>>
     {
         var func = LambdaCreater.CreateLambda<ItemComponent>("ItemComponent", new Dictionary<string, object>()
         {
-            ["name"] = "Simple_LambdaBuildTest_0",
+            ["drive"] = "Simple_LambdaBuildTest_0",
         }, true);
         _ = func();
         return func;
