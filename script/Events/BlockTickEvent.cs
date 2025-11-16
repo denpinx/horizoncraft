@@ -125,9 +125,9 @@ namespace Horizoncraft.script.Events
         /// <summary>
         /// 更新周围的所有被动更新方块,注:是延迟到下tick更新
         /// </summary>
-        public void UpdateNeighborBlock(bool inside = false,int deep=0)
+        public void UpdateNeighborBlock(bool inside = false, int deep = 0)
         {
-            World.Service.ChunkService.PassiveUpdateNeighborBlock(GlobalePos,inside,deep);
+            World.Service.ChunkService.PassiveUpdateNeighborBlock(GlobalePos, inside, deep);
         }
 
         public void UpdateSelf()
@@ -135,11 +135,12 @@ namespace Horizoncraft.script.Events
             World.Service.ChunkService.UpdateBlock(GlobalePos);
         }
 
-        public void  DropBlockLoot(BlockData blockData)
+        public void DropBlockLoot(BlockData blockData)
         {
             blockData?.DropBlockLoot(World, new Vector2I(GlobalePos.X, GlobalePos.Y));
             blockData?.DropBlockInventoryItems(World, new Vector2I(GlobalePos.X, GlobalePos.Y));
         }
+
         /// <summary>
         /// 检查
         /// </summary>
@@ -147,22 +148,23 @@ namespace Horizoncraft.script.Events
         /// <param name="meta"></param>
         /// <param name="blockData"></param>
         /// <returns></returns>
-        public bool CheckOneOfWithOffset(Vector3I[] positions, BlockMeta meta,out BlockData blockData)
+        public bool CheckOneOfWithOffset(Vector3I[] positions, BlockMeta meta, out BlockData blockData)
         {
             foreach (var pos in positions)
             {
-                var block = World.Service.ChunkService.GetBlock(GlobalePos+pos);
+                var block = World.Service.ChunkService.GetBlock(GlobalePos + pos);
                 if (block != null && block.BlockMeta == meta)
                 {
                     blockData = block;
                     return true;
                 }
             }
+
             blockData = null;
             return false;
         }
-        
-        public void Reset()
+
+        public override void Reset()
         {
             _bottomBlock = null;
             _topBlock = null;

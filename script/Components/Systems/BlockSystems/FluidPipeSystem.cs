@@ -10,6 +10,7 @@ public class FluidPipeSystem : TickSystem
     {
         if (component is ConnectComponent cc)
         {
+            var old = cc.AngleState.Clone();
             var top = e.GetTopBlock();
             if (top != null)
             {
@@ -84,6 +85,11 @@ public class FluidPipeSystem : TickSystem
                         cc.AngleState.Right = MathResult.None;
                     }
                 }
+            }
+            
+            if (!old.Same(cc.AngleState))
+            {
+                e.UpdateNeighborBlock();
             }
         }
     }

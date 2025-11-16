@@ -452,4 +452,75 @@ public class PlayerEvents
             }
         }
     }
+
+    /// <summary>
+    /// 快速转移物品
+    /// </summary>
+    /// <param name="service"></param>
+    /// <param name="player_name"></param>
+    /// <param name="index"></param>
+    public virtual void QuickClickBlockInvItem(WorldServiceBase service, string player_name, int index)
+    {
+        if (service.PlayerService.Players.TryGetValue(player_name, out var player))
+        {
+            if (!player.OpeningBlockInventory) return;
+            var block = service.ChunkService.GetBlock(player.OpenInventory.ToVector3I());
+            var cmp = block.GetComponent<InventoryComponent>();
+            if (cmp == null) return;
+            var item = cmp.GetInventory().GetItem(index);
+            if (item == null) return;
+            if (player.Inventory.HasSpace(item))
+            {
+                cmp.GetInventory().SetItem(index, null);
+                player.Inventory.TryAddItem(item);
+            }
+        }
+    }   
+    /// <summary>
+    /// 快速转移物品
+    /// </summary>
+    /// <param name="service"></param>
+    /// <param name="player_name"></param>
+    /// <param name="index"></param>
+    public virtual void QuickClickPlayerInvItem(WorldServiceBase service, string player_name, int index)
+    {
+        if (service.PlayerService.Players.TryGetValue(player_name, out var player))
+        {
+            GD.Print($"{player_name}, {index}");
+            var item = player.Inventory.GetItem(index);
+            if (item == null) return;
+
+            if (player.OpeningBlockInventory)
+            {
+                var block = service.ChunkService.GetBlock(player.OpenInventory.ToVector3I());
+                var cmp = block.GetComponent<InventoryComponent>();
+                if (cmp == null) return;
+                var block_inv = cmp.GetInventory();
+                if (block_inv.HasSpace(item))
+                {
+                    player.Inventory.SetItem(index, null);
+                    block_inv.TryAddItem(item);
+                }
+            }
+            else
+            {
+                if (index < 9)
+                {
+                    if (player.Inventory.HasSpace(item, 9))
+                    {
+                        player.Inventory.SetItem(index, null);
+                        player.Inventory.TryAddItem(item,9);
+                    }
+                }
+                else
+                {
+                    if (player.Inventory.HasSpace(item))
+                    {
+                        player.Inventory.SetItem(index, null);
+                        player.Inventory.TryAddItem(item);
+                    }
+                }
+            }
+        }
+    }
 }

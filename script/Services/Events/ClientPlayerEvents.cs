@@ -106,4 +106,16 @@ public class ClientPlayerEvents : PlayerEvents
     {
         service.PlayerServiceNode.RpcId(1, nameof(PlayerServiceNode.DropItemEvent), name, true);
     }
+
+    public override void QuickClickBlockInvItem(WorldServiceBase service, string player_name, int index)
+    {
+        service.PlayerInventoryServiceNode.RpcId(1, nameof(PlayerInventoryServiceNode.QuickClickBlockInvItem),
+            player_name, index);
+    }
+
+    public override void QuickClickPlayerInvItem(WorldServiceBase service, string player_name, int index)
+    {
+        service.PlayerInventoryServiceNode.RpcId(1, nameof(PlayerInventoryServiceNode.QuickClickPlayerInvItem),
+            player_name, index);
+    }
 }

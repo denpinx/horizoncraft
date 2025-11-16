@@ -187,5 +187,14 @@
         "Drive": "FluidPipeSystem"
       }
     }
+  },
+  "cactus": {
+    "collide": false,
+    "cube": false,
+    "components": {
+      "ReactiveComponent": {
+        "Drive": "CactusSystem"
+      }
+    }
   }
 }

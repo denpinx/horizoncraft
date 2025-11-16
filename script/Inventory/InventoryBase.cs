@@ -135,10 +135,10 @@ public abstract partial class InventoryBase
     /// </summary>
     /// <param name="additem"></param>
     /// <returns>如果物品栏如果无法添加该物品，则返回false</returns>
-    public bool TryAddItem(ItemStack additem)
+    public bool TryAddItem(ItemStack additem, int start = 0)
     {
-        if (!HasSpace(additem)) return false;
-        for (int i = 0; i < Size; i++)
+        if (!HasSpace(additem, start)) return false;
+        for (int i = start; i < Size; i++)
         {
             ItemStack item = GetItem(i);
             if (item == null)
@@ -179,10 +179,10 @@ public abstract partial class InventoryBase
     /// </summary>
     /// <param name="additem"></param>
     /// <returns></returns>
-    private bool HasSpace(ItemStack additem)
+    public bool HasSpace(ItemStack additem, int start = 0)
     {
         int space = 0;
-        for (int i = 0; i < Size; i++)
+        for (int i = start; i < Size; i++)
         {
             ItemStack item = GetItem(i);
             if (item == null)
@@ -210,7 +210,7 @@ public abstract partial class InventoryBase
             ItemStack item = GetItem(Index);
             if (item != null)
             {
-                for (var resultIndex = 0; resultIndex < ItemStacks.Count; resultIndex++)
+                for (var resultIndex = Index + 1; resultIndex < ItemStacks.Count; resultIndex++)
                 {
                     if (ItemStacks[resultIndex].Name == item.Name)
                     {
@@ -219,7 +219,7 @@ public abstract partial class InventoryBase
                         {
                             if (space < item.Amount)
                             {
-                                ItemStacks[resultIndex].Amount += space;
+                                ItemStacks[resultIndex].Amount = ItemStacks[resultIndex].GetItemMeta().MaxAmount;
                                 item.Amount -= space;
                             }
 
@@ -239,6 +239,7 @@ public abstract partial class InventoryBase
         }
 
         ItemStacks.Sort((a, b) => a.Name.CompareTo(b.Name));
+
         for (int i = 0; i < Size; i++)
         {
             if (i < ItemStacks.Count)

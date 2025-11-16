@@ -138,28 +138,34 @@ public partial class InventoryNode : CanvasLayer
 
         if (isShift)
         {
-            var targetinv = TargetBlock?.GetComponent<InventoryComponent>()?.GetInventory();
-            if (targetinv == null)
-            {
-                events.PickItem(ppi);
-                if (index < 9)
-                {
-                    ppi.Index = PlayerNode.playerData.Inventory.GetEmpyIndex(9);
-                    events.PickItem(ppi);
-                }
-                else
-                {
-                    ppi.Index = PlayerNode.playerData.Inventory.GetEmpyIndex(0);
-                    events.PickItem(ppi);
-                }
-            }
-            else
-            {
-                events.PickItem(ppi);
-                ppi.Index = targetinv.GetEmpyIndex();
-                ppi.Inventory = targetinv;
-                events.PickItem(ppi);
-            }
+            PlayerNode.world.Service.PlayerService.Events.QuickClickPlayerInvItem(
+                PlayerNode.world.Service,
+                PlayerNode.playerData.Name,
+                index
+            );
+            
+            // var targetinv = TargetBlock?.GetComponent<InventoryComponent>()?.GetInventory();
+            // if (targetinv == null)
+            // {
+            //     events.PickItem(ppi);
+            //     if (index < 9)
+            //     {
+            //         ppi.Index = PlayerNode.playerData.Inventory.GetEmpyIndex(9);
+            //         events.PickItem(ppi);
+            //     }
+            //     else
+            //     {
+            //         ppi.Index = PlayerNode.playerData.Inventory.GetEmpyIndex(0);
+            //         events.PickItem(ppi);
+            //     }
+            // }
+            // else
+            // {
+            //     events.PickItem(ppi);
+            //     ppi.Index = targetinv.GetEmpyIndex();
+            //     ppi.Inventory = targetinv;
+            //     events.PickItem(ppi);
+            // }
         }
         else
         {
@@ -198,10 +204,15 @@ public partial class InventoryNode : CanvasLayer
 
         if (isShift)
         {
-            PlayerNode.world.Service.PlayerService.Events.PickItem(ppi);
-            ppi.Inventory = PlayerNode.playerData.Inventory;
-            ppi.Index = ppi.Inventory.GetEmpyIndex();
-            PlayerNode.world.Service.PlayerService.Events.PickItem(ppi);
+            PlayerNode.world.Service.PlayerService.Events.QuickClickBlockInvItem(
+                PlayerNode.world.Service,
+                PlayerNode.playerData.Name,
+                index
+            );
+            // PlayerNode.world.Service.PlayerService.Events.PickItem(ppi);
+            // ppi.Inventory = PlayerNode.playerData.Inventory;
+            // ppi.Index = ppi.Inventory.GetEmpyIndex();
+            // PlayerNode.world.Service.PlayerService.Events.PickItem(ppi);
         }
         else
         {

@@ -1,0 +1,11 @@
+{
+  "type": "process",
+  "tag": "furnace",
+  "recipes": [
+    {
+      "process": 200,
+      "cost": [["cobblestone",1]],
+      "result": [["stone",1]]
+    }
+  ]
+}

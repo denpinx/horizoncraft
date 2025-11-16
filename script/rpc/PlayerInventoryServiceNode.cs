@@ -95,6 +95,18 @@ public partial class PlayerInventoryServiceNode : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void QuickClickBlockInvItem(string player, int index)
+    {
+        WorldService.PlayerService.Events.QuickClickBlockInvItem(World.Service, player, index);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+    public void QuickClickPlayerInvItem(string player, int index)
+    {
+        WorldService.PlayerService.Events.QuickClickPlayerInvItem(World.Service, player, index);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void SetHandSlot(string player, int slot)
     {
         if (WorldService.PlayerService.Players.TryGetValue(player, out var playerData))

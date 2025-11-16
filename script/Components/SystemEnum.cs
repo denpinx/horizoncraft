@@ -28,5 +28,6 @@ public enum SystemEnum
     ReedSystem,
     BambooShootSystem,
     TankSystem,
-    FluidPipeSystem
+    FluidPipeSystem,
+    CactusSystem,
 }

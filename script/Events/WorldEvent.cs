@@ -7,5 +7,10 @@ namespace Horizoncraft.script.Events
         public PlayerData Player;
         public World World;
         public WorldServiceBase Service;
+
+        public virtual void Reset()
+        {
+            
+        }
     }
 }

@@ -5,17 +5,15 @@
     {
       "template": [
         "#",
-        "!",
-        "!"
+        "#",
+        "#"
       ],
-      "mask-tag": {
-        "!": "stick",
-        "#": "cobblestone"
+      "mask": {
+        "#": "oak_plank"
       },
       "result": [
-        "stone_shovel",
-        1
+        "oak_pillar"
       ]
     }
-  ]
-}
+    ]
+  }

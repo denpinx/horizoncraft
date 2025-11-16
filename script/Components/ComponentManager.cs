@@ -164,6 +164,8 @@ public static class ComponentManager
         string startId = blockData.Id;
         foreach (var component in blockData.Components)
         {
+            worldEvent.Reset();
+            
             if (component == null)
             {
                 GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
@@ -176,7 +178,7 @@ public static class ComponentManager
 
                 continue;
             }
-
+            
             if (ComponentSets.TryGetValue(component.EnumId, out var set))
             {
                 var s = set.System.ExecuteBlockComponent(worldEvent, component);
@@ -362,12 +364,16 @@ public static class ComponentManager
         Register(SystemEnum.TankSystem,
             typeof(TankComponent),
             new IronTankSystem()
-        ); 
+        );
         //流体管道
         Register(SystemEnum.FluidPipeSystem,
             typeof(ConnectComponent),
             new FluidPipeSystem()
         );
-        
+        //仙人掌生长组件
+        Register(SystemEnum.CactusSystem,
+            typeof(ReactiveComponent),
+            new CactusSystem()
+        );
     }
 }

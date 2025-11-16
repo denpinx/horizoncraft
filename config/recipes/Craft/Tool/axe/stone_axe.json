@@ -4,16 +4,17 @@
   "recipes": [
     {
       "template": [
-        "#",
-        "!",
-        "!"
+        "##",
+        "!#",
+        "!-"
       ],
       "mask-tag": {
         "!": "stick",
-        "#": "cobblestone"
+        "#": "cobblestone",
+        "-": "air"
       },
       "result": [
-        "stone_shovel",
+        "stone_axe",
         1
       ]
     }

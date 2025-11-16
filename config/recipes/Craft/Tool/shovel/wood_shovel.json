@@ -10,10 +10,10 @@
       ],
       "mask-tag": {
         "!": "stick",
-        "#": "cobblestone"
+        "#": "plank"
       },
       "result": [
-        "stone_shovel",
+        "wood_shovel",
         1
       ]
     }
