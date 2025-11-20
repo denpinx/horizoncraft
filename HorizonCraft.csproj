@@ -43,6 +43,7 @@
     <Content Include="config\block_tscn\furnace_0.tscn" />
     <Content Include="config\block_tscn\furnace_1.tscn" />
     <Content Include="config\block_tscn\furnace_1.tscn31451182426.tmp" />
+    <Content Include="config\builds\desert_temple.json" />
     <Content Include="config\builds\mine_mini_room.json" />
     <Content Include="config\item\bamboo_block.json" />
     <Content Include="config\item\block\blocks.json" />

@@ -89,4 +89,10 @@ public static class MathExpand
     {
         return new Vector3I((int)v3.X, (int)v3.Y, (int)v3.Z);
     }
+    public static void ExtendPoints(Godot.Vector2 a, Godot.Vector2 b, float f, out Godot.Vector2 newA, out Godot.Vector2 newB)
+    {
+        Godot.Vector2 ab = b - a;
+        newA = a - f * ab;
+        newB = b + f * ab;
+    }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using Horizoncraft.script.WorldControl.Context;
+using Horizoncraft.script.WorldControl.Struct;
 
 namespace Horizoncraft.script.WorldControl.worldbiomes
 {
@@ -46,35 +47,16 @@ namespace Horizoncraft.script.WorldControl.worldbiomes
 
         public override void GeneratorStruct(LandBiomeStructContext lbsc)
         {
-            if (lbsc.Random.Next(14) != 1) return;
-            BlockStruct blockStrcut = new BlockStruct();
             if (lbsc.GlobalY < 0)
-                for (int h = 0; h < 7 + lbsc.Random.Next(6); h++)
+            {
+                if (lbsc.Random.Next(16) == 1)
                 {
-                    blockStrcut.AddBlock(lbsc.GlobalX, lbsc.GlobalY - h, lbsc.GloablZ, Materials.Valueof("oak_log"), 0);
-                    //随机分支
-                    if (lbsc.Random.Next(4) == 1)
-                    {
-                        blockStrcut.AddBlock(lbsc.GlobalX - 1, lbsc.GlobalY - h, lbsc.GloablZ,
-                            Materials.Valueof("oak_log"), 1);
-                        blockStrcut.AddBlock(lbsc.GlobalX - 1, lbsc.GlobalY - h - 1, lbsc.GloablZ,
-                            Materials.Valueof("oak_leaves"), 0);
-                        blockStrcut.AddBlock(lbsc.GlobalX - 2, lbsc.GlobalY - h, lbsc.GloablZ,
-                            Materials.Valueof("oak_leaves"), 0);
-                    }
-
-                    if (lbsc.Random.Next(4) == 2)
-                    {
-                        blockStrcut.AddBlock(lbsc.GlobalX + 1, lbsc.GlobalY - h, lbsc.GloablZ,
-                            Materials.Valueof("oak_log"), 1);
-                        blockStrcut.AddBlock(lbsc.GlobalX + 1, lbsc.GlobalY - h - 1, lbsc.GloablZ,
-                            Materials.Valueof("oak_leaves"), 0);
-                        blockStrcut.AddBlock(lbsc.GlobalX + 2, lbsc.GlobalY - h, lbsc.GloablZ,
-                            Materials.Valueof("oak_leaves"), 0);
-                    }
+                    BlockStruct blockStrcut =
+                        BlockStructManager.GetStruct("spruce_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ,
+                            lbsc.Random);
+                    lbsc.BlockStructs.Add(blockStrcut);
                 }
-
-            lbsc.BlockStructs.Add(blockStrcut);
+            }
         }
     }
 }

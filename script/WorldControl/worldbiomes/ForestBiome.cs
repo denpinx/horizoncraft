@@ -24,12 +24,20 @@ namespace Horizoncraft.script.WorldControl.worldbiomes
 
         public override void GeneratorStruct(LandBiomeStructContext lbsc)
         {
-            if (lbsc.Random.Next(12) != 1) return;
             if (lbsc.GlobalY < 0)
             {
-                BlockStruct blockStrcut =
-                    BlockStructManager.GetStruct("oak_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ, lbsc.Random);
-                lbsc.BlockStructs.Add(blockStrcut);
+                if (lbsc.Random.Next(16) == 1)
+                {
+                    BlockStruct blockStrcut =
+                        BlockStructManager.GetStruct("oak_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ, lbsc.Random);
+                    lbsc.BlockStructs.Add(blockStrcut);
+                }
+                else if (lbsc.Random.Next(16) == 1)
+                {
+                    BlockStruct blockStrcut =
+                        BlockStructManager.GetStruct("birch_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ, lbsc.Random);
+                    lbsc.BlockStructs.Add(blockStrcut);
+                }
             }
         }
 

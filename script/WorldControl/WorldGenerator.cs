@@ -31,16 +31,24 @@ namespace Horizoncraft.script.WorldControl
             );
         }
 
+        /// <summary>
+        /// 获取区块的高度图
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static int[,] GetHighMap(int x)
         {
             int[,] highmap = new int[Chunk.Size, Chunk.SizeZ];
             for (int z = 0; z < Chunk.SizeZ; z++)
             {
                 // 获取相邻区块的关键高度点（确保控制点覆盖当前区块）
-                float p0 = GetMixinLandBiome(x - 1).GetHigh(new Random((int)(World.Seed + x - 1)), FastNoiseLite, x - 1, z);
+                float p0 = GetMixinLandBiome(x - 1)
+                    .GetHigh(new Random((int)(World.Seed + x - 1)), FastNoiseLite, x - 1, z);
                 float p1 = GetMixinLandBiome(x).GetHigh(new Random((int)(World.Seed + x)), FastNoiseLite, x, z);
-                float p2 = GetMixinLandBiome(x + 1).GetHigh(new Random((int)(World.Seed + x + 1)), FastNoiseLite, x + 1, z);
-                float p3 = GetMixinLandBiome(x + 2).GetHigh(new Random((int)(World.Seed + x + 2)), FastNoiseLite, x + 2, z);
+                float p2 = GetMixinLandBiome(x + 1)
+                    .GetHigh(new Random((int)(World.Seed + x + 1)), FastNoiseLite, x + 1, z);
+                float p3 = GetMixinLandBiome(x + 2)
+                    .GetHigh(new Random((int)(World.Seed + x + 2)), FastNoiseLite, x + 2, z);
                 for (int i = 0; i < Chunk.Size; i++)
                 {
                     float t = (float)i / (float)(Chunk.Size - 1);
@@ -64,6 +72,7 @@ namespace Horizoncraft.script.WorldControl
             {
                 var landBiomeStructContext = new LandBiomeStructContext()
                 {
+                    HighMap = highmap,
                     FastNoiseLite = FastNoiseLite,
                     BlockStructs = structs,
                     Random = random,
@@ -249,8 +258,8 @@ namespace Horizoncraft.script.WorldControl
                         biomeTerrainContext.GlobalY = gy;
                         biomeTerrainContext.Noise = FastNoiseLite.GetNoise2D(gx, gy);
                         biomeTerrainContext.BlockData = chunk.GetBlock(x, y, z);
-                        
-                        
+
+
                         if (gy > highmap[x, z] && FastNoiseLite.GetNoise2D(gx / 0.5f, gy) > 0.3f && z == 1)
                             chunk.SetBlock(x, y, z, Materials.Valueof("air"));
                         else if (biomeType == BiomeType.Deep) chunk.SetBlock(x, y, z, Materials.Valueof("stone"));

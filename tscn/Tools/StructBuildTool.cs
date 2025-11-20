@@ -2,17 +2,21 @@ using Godot;
 using Godot.Collections;
 using Horizoncraft.script;
 using Horizoncraft.script.WorldControl.Struct;
+
 /// <summary>
 /// 建筑蓝图绘制工具。
 /// </summary>
 public partial class StructBuildTool : CanvasLayer
 {
+    PackedScene PackedScene_InvSlot = GD.Load<PackedScene>("res://tscn/Menu/InvSlot.tscn");
     public PreBuildStruct PreBuildStruct = new PreBuildStruct();
     [Export] EditTileMapView EditTileMapView;
     [Export] TextEdit TextEdit;
     [Export] LineEdit LineEdit_BuildName;
     [Export] Button Button_Remove_All;
     [Export] Button Button_Import;
+    [Export] Button Button_CreateJson;
+    [Export] GridContainer GridContainer;
     public int layer = 0;
     public string SelectedBlock = "stone";
 
@@ -28,13 +32,11 @@ public partial class StructBuildTool : CanvasLayer
         {
             AddBlock(new Vector3I(pos.X, pos.Y, layer), SelectedBlock);
             UpdateTileMap();
-            GenerateJson();
         };
         EditTileMapView.OnRemoveCell += (pos) =>
         {
             RemoveBlock(new Vector3I(pos.X, pos.Y, layer));
             UpdateTileMap();
-            GenerateJson();
         };
         EditTileMapView.PickCell += (pos) =>
         {
@@ -47,13 +49,8 @@ public partial class StructBuildTool : CanvasLayer
         {
             PreBuildStruct.blocks.Clear();
             UpdateTileMap();
-            GenerateJson();
         };
-        LineEdit_BuildName.TextChanged += (t) =>
-        {
-            PreBuildStruct.name = LineEdit_BuildName.Text;
-            GenerateJson();
-        };
+        LineEdit_BuildName.TextChanged += (t) => { PreBuildStruct.name = LineEdit_BuildName.Text; };
         Button_Import.Pressed += () =>
         {
             if (DisplayServer.ClipboardHas())
@@ -67,14 +64,14 @@ public partial class StructBuildTool : CanvasLayer
                 GenerateJson();
             }
         };
+        Button_CreateJson.Pressed += () => { GenerateJson(); };
+        // var GridContainer = GetNode<GridContainer>("HBoxContainer/VBoxContainer3/PanelContainer2/GridContainer");
 
-        var GridContainer = GetNode<GridContainer>("HBoxContainer/VBoxContainer3/PanelContainer2/GridContainer");
-        PackedScene ps = GD.Load<PackedScene>("res://tscn/Menu/InvSlot.tscn");
         int i = 0;
         foreach (var meta in Materials.BlockMetas.Values)
         {
             if (meta.ItemMeta == null) continue;
-            var invslot = ps.Instantiate<InvSlot>();
+            var invslot = PackedScene_InvSlot.Instantiate<InvSlot>();
             invslot.index = i;
             invslot.HideBackGround = true;
             invslot.LeftClick += (index, isshift) => { SelectedBlock = meta.Name; };

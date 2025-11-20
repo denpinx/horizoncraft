@@ -40,8 +40,30 @@ public static class BlockStructManager
 
     static void RegStructs()
     {
-        Register(new OakTreeStruct());
-        Register(new MegaOakTreeStruct());
+        Register(new TreeBuilder("oak_tree", "oak_log", "oak_leaves")
+        {
+            RootDeviate = 2,
+            RootHigh = new Vector2I(5, 6),
+            PeakDeviate = new Vector2I(3, 5),
+            PeakHigh = new Vector2I(2, 4),
+            LeavesExtend = 0.5f,
+        });
+        Register(new TreeBuilder("birch_tree", "birch_log", "birch_leaves")
+        {
+            RootDeviate = 2,
+            RootHigh = new Vector2I(5, 6),
+            PeakDeviate = new Vector2I(2, 5),
+            PeakHigh = new Vector2I(2, 3),
+            LeavesExtend = 0.4f,
+        });
+        Register(new TreeBuilder("spruce_tree", "oak_log", "oak_leaves")
+        {
+            RootDeviate = 2,
+            RootHigh = new Vector2I(6, 12),
+            PeakDeviate = new Vector2I(2, 3),
+            PeakHigh = new Vector2I(2, 3),
+            LeavesExtend = 0.4f,
+        });
     }
 
     private static void LoadStaticBuilds()

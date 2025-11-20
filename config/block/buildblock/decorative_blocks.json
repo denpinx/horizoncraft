@@ -80,6 +80,7 @@
     "collide": false,
     "cube": false,
     "light": true,
+    "replace": true,
     "tiletype": "atlas"
   },
   "bamboo_block": {
@@ -91,5 +92,17 @@
     "rigidity": 0.5,
     "collide": true,
     "cube": false
+  },
+  "sandbrick": {
+    "rigidity": 1,
+    "tags": {
+      "type": "pickaxe"
+    }
+  },
+  "sandstone": {
+    "rigidity": 1,
+    "tags": {
+      "type": "pickaxe"
+    }
   }
 }

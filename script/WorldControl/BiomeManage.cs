@@ -291,6 +291,8 @@ namespace Horizoncraft.script.WorldControl
             Register(new PlainBiome());
             //雪地
             Register(new SnowfieldBiome());
+            //沙漠群系
+            Register(new DesertBiome());
             //地下通用群系
             Register(new DeepLayerBiome());
             //天空通用群系

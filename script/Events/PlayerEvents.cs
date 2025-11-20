@@ -116,12 +116,6 @@ public class PlayerEvents
     /// <returns></returns>
     public virtual bool OpenBlockView(PlayerOpenBlockViewEvent e)
     {
-        if (e.Player.CancelTask == Cancel.OpenBlock)
-        {
-            e.Player.CancelTask = Cancel.None;
-            return false;
-        }
-
         var world = e.world;
         if (world.PlayerNode.OpeningInventoryNode != null)
         {
@@ -215,12 +209,6 @@ public class PlayerEvents
     /// <returns></returns>
     public virtual bool PlaceBlock(PlayerPlaceBlockEvent e)
     {
-        if (e.Player.CancelTask == Cancel.PlaceBlock)
-        {
-            e.Player.CancelTask = Cancel.None;
-            return false;
-        }
-
         var set = e.GetBlockData();
         var block = set.Item1;
         var pos = set.Item2;
@@ -248,7 +236,6 @@ public class PlayerEvents
             e.Player.Inventory.ReduceItemAmount(e.Player.Inventory.ToolBarIndex);
         }
 
-        e.Player.CancelTask = Cancel.UseBlock;
         return true;
     }
 
@@ -260,11 +247,6 @@ public class PlayerEvents
     public virtual bool BreakBlock(PlayerBreakblockEvent e)
     {
         if (e.Player.State != PlayerState.Live) return false;
-        if (e.Player.CancelTask == Cancel.BreakBlock)
-        {
-            e.Player.CancelTask = Cancel.None;
-            return false;
-        }
 
         var targetblock = e.GetBlockData();
 
@@ -337,39 +319,33 @@ public class PlayerEvents
         var blockinv = InterfaceBlock.GetComponent<InventoryComponent>();
         //if (blockinv == null)
         //{
-        if (e.Player.CancelTask == Cancel.UseBlock)
-        {
-            e.Player.CancelTask = Cancel.None;
-        }
-        else
-        {
-            PlayerRightClickBlockEvent prcbe = new PlayerRightClickBlockEvent()
-            {
-                World = e.world,
-                Service = e.world.Service,
-                Player = e.Player,
-                Position = finalpos,
-                blockData = InterfaceBlock
-            };
-            var state = InterfaceBlock.State;
-            var result = ComponentManager.ExecuteBlockComponents(prcbe, InterfaceBlock);
-            if (InterfaceBlock.State != state)
-            {
-                var pos = finalpos.MathFloor(Chunk.Size);
-                if (e.world.Service.ChunkService.Chunks.TryGetValue(pos, out var chunk))
-                {
-                    var local_pos = finalpos.Remainder(Chunk.Size);
-                    chunk.update_tilemap = true;
-                    chunk.UpdateList_buffer.Add(new Vector3I(local_pos.X, local_pos.Y, finalpos.Z));
-                }
-            }
 
-            if (!result)
+        PlayerRightClickBlockEvent prcbe = new PlayerRightClickBlockEvent()
+        {
+            World = e.world,
+            Service = e.world.Service,
+            Player = e.Player,
+            Position = finalpos,
+            blockData = InterfaceBlock
+        };
+        var state = InterfaceBlock.State;
+        var result = ComponentManager.ExecuteBlockComponents(prcbe, InterfaceBlock);
+        if (InterfaceBlock.State != state)
+        {
+            var pos = finalpos.MathFloor(Chunk.Size);
+            if (e.world.Service.ChunkService.Chunks.TryGetValue(pos, out var chunk))
             {
-                e.Player.CancelTask = Cancel.PlaceBlock;
-                return result;
+                var local_pos = finalpos.Remainder(Chunk.Size);
+                chunk.update_tilemap = true;
+                chunk.UpdateList_buffer.Add(new Vector3I(local_pos.X, local_pos.Y, finalpos.Z));
             }
         }
+
+        if (!result)
+        {
+            return result;
+        }
+
 
         if (blockinv == null) return false;
 
@@ -475,7 +451,8 @@ public class PlayerEvents
                 player.Inventory.TryAddItem(item);
             }
         }
-    }   
+    }
+
     /// <summary>
     /// 快速转移物品
     /// </summary>
@@ -509,7 +486,7 @@ public class PlayerEvents
                     if (player.Inventory.HasSpace(item, 9))
                     {
                         player.Inventory.SetItem(index, null);
-                        player.Inventory.TryAddItem(item,9);
+                        player.Inventory.TryAddItem(item, 9);
                     }
                 }
                 else
