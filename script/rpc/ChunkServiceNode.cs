@@ -23,6 +23,7 @@ public partial class ChunkServiceNode : Node
         this.Name = nameof(ChunkServiceNode);
         World = world;
     }
+
     /// <summary>
     /// 接收单个全量更新区块，目前没用。
     /// </summary>
@@ -45,14 +46,16 @@ public partial class ChunkServiceNode : Node
         for (int i = 0; i < sync.Chunks.Count; i++)
         {
             var chunk = sync.Chunks[i];
+            chunk.update_tilemap = true;
             GD.Print($"#{chunk.coord} 区块全量更新");
-            
+
             //同步区块
             WorldService.ChunkService.Chunks[chunk.coord] = chunk;
             //同步实体
             WorldService.EntityService.ReleaseChunkEntity(chunk);
         }
     }
+
     /// <summary>
     /// 接收区块的增量更新包
     /// </summary>
@@ -65,14 +68,16 @@ public partial class ChunkServiceNode : Node
         {
             if (World.Service.ChunkService.Chunks.TryGetValue(new Vector2I(update.X, update.Y), out Chunk chunk))
             {
-                foreach (var block in update.Blocks)
-                    chunk.SetBlock(block.x, block.y, block.z, Materials.BlockMetas[block.id], block.state);
-                GD.Print($"#{chunk.coord} 区块增量更新:{update.Blocks.Count}个方块");
+                foreach (var vbd in update.VectorBlocks)
+                    chunk.SetBlock(vbd.X, vbd.Y, vbd.Z, vbd.Block);
+
+                GD.Print($"#{chunk.coord} 区块增量更新:{update.VectorBlocks.Count}个方块");
                 foreach (var entity in update.Entiydatas)
                     WorldService.EntityService.AddEntityData(entity);
             }
         }
     }
+
     /// <summary>
     /// 接收世界时间
     /// </summary>
@@ -82,6 +87,7 @@ public partial class ChunkServiceNode : Node
     {
         WorldService.TickTimes = time;
     }
+
     /// <summary>
     /// 接收单个方块的更新,目前没啥用因为会自动增量更新。
     /// </summary>
@@ -103,6 +109,7 @@ public partial class ChunkServiceNode : Node
         {
         }
     }
+
     /// <summary>
     /// 接收当前打开的方块的完整状态，
     /// </summary>
@@ -138,6 +145,7 @@ public partial class ChunkServiceNode : Node
             World.PlayerNode.AddChild(World.PlayerNode.OpeningInventoryNode);
         }
     }
+
     /// <summary>
     /// 客户端调用，重新获取区块。
     /// </summary>
@@ -152,6 +160,7 @@ public partial class ChunkServiceNode : Node
             WorldService.ChunkService.Chunks[pos].update_server = true;
         }
     }
+
     /// <summary>
     /// 客户端调用，设置当前打开方块的组件
     /// </summary>
@@ -172,6 +181,7 @@ public partial class ChunkServiceNode : Node
             WorldService.PlayerService.Events.SetOpenBlockComponent(sobc);
         }
     }
+
     /// <summary>
     /// 客户端调用，设置方块
     /// </summary>

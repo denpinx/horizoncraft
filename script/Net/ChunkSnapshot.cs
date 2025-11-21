@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Horizoncraft.script.Entity;
+using Horizoncraft.script.WorldControl;
 using MemoryPack;
 
 namespace Horizoncraft.script.Net;
@@ -10,7 +11,7 @@ public partial class ChunkSnapshot
     public long Version;
     public int X;
     public int Y;
-    public List<BlockSnapshot> Blocks = new();
+    public List<VectorBlockData> VectorBlocks = new();
     public List<EntityData> Entiydatas = new();
 
     /// <summary>

@@ -362,9 +362,10 @@ public class PlayerEvents
 
     public virtual bool UseItem(PlayerUseItemEvent e)
     {
-        var cmp = e.UseItemStack.GetComponent<ItemUsefulComponent>();
-
-        return ComponentManager.ExecuteItemComponents<ItemUsefulComponent>(e, e.UseItemStack);
+        // var cmp = e.UseItemStack.GetComponent<ItemUsefulComponent>();
+        if (e.UseItemStack != null)
+            return ComponentManager.ExecuteItemComponents<ItemUsefulComponent>(e, e.UseItemStack);
+        return false;
     }
 
 

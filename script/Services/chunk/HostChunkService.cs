@@ -39,8 +39,8 @@ public class HostChunkService : ChunkServiceBase
         //差异更新
         foreach (var chunk in WorldSnapshot.chunks)
         {
-            if(chunk.Blocks.Count==0&&chunk.Entiydatas.Count==0)continue;
-            
+            if (chunk.VectorBlocks.Count == 0 && chunk.Entiydatas.Count == 0) continue;
+
             foreach (var playerset in World.Service.PlayerService.Players)
             {
                 PlayerData pd1 = playerset.Value;
@@ -161,13 +161,12 @@ public class HostChunkService : ChunkServiceBase
 
                 foreach (var v in chunk.UpdateList)
                 {
-                    cs.Blocks.Add(new BlockSnapshot()
+                    cs.VectorBlocks.Add(new VectorBlockData()
                     {
-                        x = (byte)v.X,
-                        y = (byte)v.Y,
-                        z = (byte)v.Z,
-                        id = chunk.GetBlock(v.X, v.Y, v.Z).Id,
-                        state = (byte)chunk.GetBlock(v.X, v.Y, v.Z).State
+                        X = (byte)v.X,
+                        Y = (byte)v.Y,
+                        Z = (byte)v.Z,
+                        Block = chunk.GetBlock(v.X, v.Y, v.Z),
                     });
                 }
 

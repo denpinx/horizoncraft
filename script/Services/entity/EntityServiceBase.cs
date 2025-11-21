@@ -251,17 +251,19 @@ public class EntityServiceBase : ServiceBase
     /// </summary>
     public virtual void ProcessEntityNodeUpdate()
     {
-        foreach (var uuid in EntityDatas.Keys.ToArray())
+        foreach (var kvp in EntityDatas)
         {
+            var uuid = kvp.Key;
+            var entity_data = kvp.Value;
             //更新数据
             if (EntityNodes.ContainsKey(uuid))
             {
-                EntityNodes[uuid].Entity = EntityDatas[uuid];
+                EntityNodes[uuid].Entity = entity_data;
             }
             else
             {
                 //创建视图
-                var node = SpawnEntity(EntityDatas[uuid]);
+                var node = SpawnEntity(entity_data);
                 if (node == null)
                 {
                     continue;
@@ -272,7 +274,7 @@ public class EntityServiceBase : ServiceBase
             }
 
             //卸载不可见实体视图,更新所属权
-            var entity = EntityDatas[uuid];
+            var entity = entity_data;
             if (!World.HasTileMap(entity.ChunkCoord))
             {
                 if (entity.Owned == PlayerNode.Profile.Name)

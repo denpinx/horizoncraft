@@ -91,14 +91,6 @@ public static class BlockStructManager
                         {
                             staticBuildStruct.blockStructItems.Add(data.Coord, data);
                         }
-                        // if (Materials.BlockMetas.TryGetValue((string)block_dict["name"], out var meta))
-                        // {
-                        //     BlockStructItem block_itme = new();
-                        //     block_itme.Coord.X = (int)block_dict["x"];
-                        //     block_itme.Coord.Y = (int)block_dict["y"];
-                        //     block_itme.Coord.Z = (int)block_dict["z"];
-                        //     block_itme.BlockMeta = meta;
-                        // }
                     }
 
                     GD.Print(
