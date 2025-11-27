@@ -136,10 +136,11 @@ namespace Horizoncraft.script.WorldControl
                 TickList.Add(pos);
             }
             else TickList.Remove(pos);
-
             data[x, y, z].Components.Clear();
+            var l = data[x, y, z].Light;
             data[x, y, z] = blockData;
             data[x, y, z].State = state;
+            data[x, y, z].Light = l;
             UpdateList_buffer.Add(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z));
             update_tilemap = true;
             return data[x, y, z];

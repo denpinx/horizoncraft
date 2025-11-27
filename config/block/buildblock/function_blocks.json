@@ -76,6 +76,26 @@
       "enter_action": "no-fall"
     }
   },
+  "lava": {
+    "rigidity": 1,
+    "collide": false,
+    "cube": false,
+    "replace": true,
+    "render": [
+      "water_render"
+    ],
+    "tile-visible": false,
+    "components": {
+      "FluidComponent": {
+        "Drive": "FluidComponent",
+        "BlockName": "lava",
+        "Max": 5
+      }
+    },
+    "tags": {
+      "enter_action": "no-fall"
+    }
+  },
   "sand": {
     "rigidity": 0.5,
     "components": {
