@@ -74,6 +74,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_a2otw")
 theme_override_styles/hover = SubResource("StyleBoxFlat_3xfws")
 
 [node name="PopupMenu" type="PopupMenu" parent="MenuBar"]
+oversampling_override = 1.0
 title = "PlayerName"
 theme_override_styles/panel = SubResource("StyleBoxFlat_pmp0k")
 item_count = 1

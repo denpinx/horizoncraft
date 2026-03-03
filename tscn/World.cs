@@ -86,7 +86,7 @@ namespace Horizoncraft.script
         public override void _Ready()
         {
             _ = Materials.BlockMetas;
-
+            //服务器模式卸载预设的本地玩家
             if (RunConfig.Mode == RunMode.Server)
             {
                 PlayerNode.QueueFree();
@@ -104,8 +104,7 @@ namespace Horizoncraft.script
 
             if (worldMode == WorldMode.MultiplayerClient)
                 Service = new ClientWorldService(this);
-
-
+            
             if (worldMode == WorldMode.Preview)
             {
                 Seed = Random.Shared.NextInt64();

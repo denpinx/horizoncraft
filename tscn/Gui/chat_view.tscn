@@ -23,7 +23,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ymcwq")
 LineEdit = NodePath("Box/HBoxContainer/LineEdit")
-MessageRoot = NodePath("Box/InstantMessag")
+MessageRoot = NodePath("Box/ScrollContainer/InstantMessag")
 
 [node name="Box" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -33,17 +33,23 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="InstantMessag" type="VBoxContainer" parent="Box"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Box"]
+layout_mode = 2
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 0
+
+[node name="InstantMessag" type="VBoxContainer" parent="Box/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Box"]
 layout_mode = 2
-size_flags_vertical = 10
+size_flags_vertical = 8
 
 [node name="LineEdit" type="LineEdit" parent="Box/HBoxContainer"]
-visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 10

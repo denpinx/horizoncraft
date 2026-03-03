@@ -52,7 +52,13 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 时刻处理
+    /// 每帧主逻辑更新入口。
+    /// <list type="bullet">
+    ///   <item>清理无效实体节点</item>
+    ///   <item>同步实体数据到视图节点</item>
+    ///   <item>执行所有实体的组件系统（<see cref="ComponentManager.ExecuteEntityComponents"/>)</item>
+    ///   <item>确保实体所在区块已加载（否则加入加载队列）</item>
+    /// </list>
     /// </summary>
     protected virtual void Ticking()
     {
@@ -75,16 +81,20 @@ public class EntityServiceBase : ServiceBase
             }
         }
     }
-
+    /// <summary>
+    /// 响应区块加载完成事件，将区块中暂存的实体释放到实体服务中。
+    /// </summary>
+    /// <param name="chunk">已加载的区块</param>
     protected virtual void OnChunkLoad(Chunk chunk)
     {
         ReleaseChunkEntity(chunk);
     }
 
     /// <summary>
-    /// 接收可能来自服务端或则客户端的实体快照更新包
+    /// 处理来自网络的实体快照更新包（通常由服务端广播或客户端同步）。
+    /// <para>逐个应用快照到本地实体数据，并处理所有权变更或位置校验。</para>
     /// </summary>
-    /// <param name="entityPack"></param>
+    /// <param name="entityPack">包含多个实体快照的网络包</param>
     public virtual void ReceiveEntityPack(EntityPack entityPack)
     {
         List<EntityDataSnapShot> call_back = new();
@@ -93,10 +103,10 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 获取指定区块范围内的所有实体的guid
+    /// 获取指定区块坐标内所有实体的 UUID 列表。
     /// </summary>
-    /// <param name="coord">区块坐标</param>
-    /// <returns></returns>
+    /// <param name="coord">区块坐标（以 Chunk.Size 为单位）</param>
+    /// <returns>UUID 列表，可能为空但永不为 <c>null</c></returns>
     public List<Guid> GetUuidByChunk(Vector2I coord)
     {
         var list = new List<Guid>();
@@ -113,12 +123,12 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 获取指定坐标范围内的指定名称的实体集合
+    /// 获取指定像素坐标范围内、具有特定名称的实体集合。
     /// </summary>
-    /// <param name="coord">全局像素坐标</param>
-    /// <param name="range">范围</param>
-    /// <param name="name">实体名称</param>
-    /// <returns>实体集合,不会为null，但是可能数量为0</returns>
+    /// <param name="coord">中心像素坐标（X, Y）</param>
+    /// <param name="range">正方形范围半径（单位：像素）</param>
+    /// <param name="name">目标实体名称（区分大小写）</param>
+    /// <returns>匹配的实体列表，可能为空但永不为 <c>null</c></returns>
     public List<EntityData> GetEntityInRangeByName(Vector2I coord, int range, string name)
     {
         var list = new List<EntityData>();
@@ -137,11 +147,11 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 获取指定坐标半径内的实体集合
+    /// 获取指定像素坐标半径内的所有实体。
     /// </summary>
-    /// <param name="coord">像素坐标</param>
-    /// <param name="range">半径</param>
-    /// <returns>实体集合,不会为null，但是可能数量为0</returns>
+    /// <param name="coord">中心像素坐标（X, Y）</param>
+    /// <param name="range">正方形范围半径（单位：像素）</param>
+    /// <returns>实体列表，可能为空但永不为 <c>null</c></returns>
     public List<EntityData> GetEntityInRange(Vector2I coord, int range)
     {
         var list = new List<EntityData>();
@@ -173,9 +183,10 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 提取实体到区块中
+    /// 在区块保存前，将属于该区块的所有实体从内存移出并暂存至区块对象中。
+    /// <para>用于持久化或跨会话传输。</para>
     /// </summary>
-    /// <param name="chunk">区块</param>
+    /// <param name="chunk">即将保存的区块</param>
     public void ExtractEntitiesFromChunk(Chunk chunk)
     {
         chunk.Entitys.Clear();
@@ -192,9 +203,9 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 释放区块实体到实体服务中
+    /// 将区块中暂存的实体重新注册到实体服务中（通常在区块加载后调用）。
     /// </summary>
-    /// <param name="chunk"></param>
+    /// <param name="chunk">已加载的区块，其 <see cref="Chunk.Entitys"/> 包含待恢复的实体</param>
     public void ReleaseChunkEntity(Chunk chunk)
     {
         foreach (var entity in chunk.Entitys)
@@ -203,10 +214,15 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 获取指定区块内移动或更新过的实体
+    /// 获取指定区块内需要同步的“变动实体”——包括：
+    /// <list type="bullet">
+    ///   <item>设置了 <see cref="EntityData.Update"/> 标志的实体</item>
+    ///   <item>所有权为空（<see cref="EntityData.Owned"/> == ""）的实体（表示需重新分配）</item>
+    /// </list>
+    /// <para>常用于网络同步或存档前的状态收集。</para>
     /// </summary>
-    /// <param name="coord"></param>
-    /// <returns>集合可能为空，但不会为null</returns>
+    /// <param name="coord">区块坐标</param>
+    /// <returns>需同步的实体列表，可能为空但永不为 <c>null</c></returns>
     public List<EntityData> GetChunkMovedEntity(Vector2I coord)
     {
         var list = new List<EntityData>();
@@ -230,7 +246,8 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 处理实体节点
+    /// 清理已删除实体对应的渲染节点。
+    /// <para>确保 <see cref="EntityNodes"/> 与 <see cref="EntityDatas"/> 保持一致。</para>
     /// </summary>
     public void ProcessEntityNode()
     {
@@ -247,7 +264,12 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 处理实体节点更新
+    /// 同步实体数据到渲染节点，并管理实体可见性与所有权。
+    /// <list type="bullet">
+    ///   <item>若实体所在区块未加载，则卸载其视图节点</item>
+    ///   <item>若区块已加载且本地玩家拥有该实体，则标记为可更新</item>
+    ///   <item>自动创建缺失的视图节点</item>
+    /// </list>
     /// </summary>
     public virtual void ProcessEntityNodeUpdate()
     {
@@ -304,10 +326,10 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 创建实体
+    /// 根据实体元数据（<see cref="Materials.DictionaryEntityMetas"/>）创建对应的渲染节点。
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
+    /// <param name="data">实体数据，包含名称与初始状态</param>
+    /// <returns>初始化后的实体节点，若元数据未注册则返回 <c>null</c></returns>
     protected IEntityNode SpawnEntity(EntityData data)
     {
         if (Materials.DictionaryEntityMetas.TryGetValue(data.Name, out var meta))
@@ -322,9 +344,10 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 重置给予的uuid的实体的所属权
+    /// 批量重置指定 UUID 实体的所有权为空（""），表示放弃控制权。
+    /// <para>通常由服务端调用，用于回收客户端离线实体的控制权。</para>
     /// </summary>
-    /// <param name="uuidPack"></param>
+    /// <param name="uuidPack">包含待重置 UUID 的网络包</param>
     public void ResetEntityOwned(UUIDPack uuidPack)
     {
         foreach (var uuid in uuidPack.uuids)
@@ -337,10 +360,11 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 更新实体数据
+    /// 应用实体快照更新，处理位置校验、所有权转移与冲突回调。
+    /// <para>若目标位置存在碰撞方块，则拒绝移动并加入回调列表供重试。</para>
     /// </summary>
-    /// <param name="data">实体快照</param>
-    /// <param name="CallBack">更新失败回调</param>
+    /// <param name="data">来自网络的实体快照</param>
+    /// <param name="CallBack">因碰撞等原因未能应用的快照列表（可选）</param>
     public virtual void UpdateEntityData(EntityDataSnapShot data, List<EntityDataSnapShot> CallBack = null)
     {
         //默认是主机玩家
@@ -385,9 +409,10 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 添加实体数据
+    /// 添加新实体到服务中。
+    /// <para>自动分配 UUID 和默认所有权（当前玩家）。</para>
     /// </summary>
-    /// <param name="data"></param>
+    /// <param name="data">待添加的实体数据</param>
     public virtual void AddEntityData(EntityData data)
     {
         //默认是主机玩家
@@ -402,9 +427,10 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 删除实体
+    /// 标记指定 UUID 的实体为“已删除”。
+    /// <para>实体数据仍保留在字典中一帧，以便组件系统完成清理，下一帧由 <see cref="ProcessEntityNode"/> 移除视图。</para>
     /// </summary>
-    /// <param name="uuid"></param>
+    /// <param name="uuid">要删除的实体 UUID</param>
     public void RemoveEntityData(Guid uuid)
     {
         if (EntityDatas.TryRemove(uuid, out var data))
@@ -414,9 +440,10 @@ public class EntityServiceBase : ServiceBase
     }
 
     /// <summary>
-    /// 删除实体的所属权
+    /// 清除指定实体的所有权（设为 ""），使其变为“无主”状态。
+    /// <para>常用于玩家断开连接或实体移交控制权。</para>
     /// </summary>
-    /// <param name="uuid"></param>
+    /// <param name="uuid">目标实体 UUID</param>
     public void RemoveEntityDataOwned(Guid uuid)
     {
         if (EntityDatas.TryGetValue(uuid, out var entity))

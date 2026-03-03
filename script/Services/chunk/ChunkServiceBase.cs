@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -133,9 +134,13 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     #region 虚方法和抽象方法
-
     /// <summary>
-    /// 区块时刻，默认实现光照更新和Tick处理
+    /// 每帧调用的主逻辑入口，负责：
+    /// <list type="bullet">
+    ///   <item>对已加载区块进行 Tick 更新（按连续区块分组并行处理）</item>
+    ///   <item>根据当前光照模式更新光照</item>
+    /// </list>
+    /// 此方法由世界定时器驱动，默认每帧执行一次。
     /// </summary>
     public virtual async void Ticking()
     {
@@ -181,10 +186,11 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 加载并返回区块，这个不能在这个函数内往Chunks添加加载的区块，只能返回,因为这里是个异步方法
+    /// 异步加载指定坐标的区块。
+    /// <para>优先从 SQLite 数据库读取；若不存在，则通过世界生成器创建新区块。</para>
     /// </summary>
-    /// <param name="pos"></param>
-    /// <returns></returns>
+    /// <param name="pos">区块坐标（以 Chunk.Size 为单位）</param>
+    /// <returns>加载完成的 <see cref="Chunk"/> 实例，失败时返回 <c>null</c></returns>
     protected virtual async Task<Chunk> LoadChunk(Vector2I pos)
     {
         try
@@ -213,9 +219,10 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 保存区块，决定区块该不该被保存
+    /// 将指定区块保存到 SQLite 数据库。
+    /// <para>若数据库中已存在该区块坐标，则更新；否则插入新记录。</para>
     /// </summary>
-    /// <param name="chunk"></param>
+    /// <param name="chunk">待保存的区块实例</param>
     public virtual void SaveChunk(Chunk chunk)
     {
         try
@@ -235,7 +242,8 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 保存所有
+    /// 保存所有当前内存中的已加载区块到磁盘。
+    /// <para>通常在游戏退出或手动存档时调用。</para>
     /// </summary>
     public virtual void SaveAll()
     {
@@ -327,11 +335,41 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     #endregion
 
     #region 外部工具
+    /// <summary>
+    /// 确保以 <paramref name="coord"/> 为中心、半径为 <paramref name="range"/> 的区域内所有区块都处于加载状态。
+    /// <para>未加载的区块会被加入加载队列（<see cref="LoadChunkQueue"/>），但不会立即加载。</para>
+    /// </summary>
+    /// <param name="coord">中心区块坐标</param>
+    /// <param name="range">检查半径（单位：区块数）</param>
+    /// <returns>若区域内所有区块均已加载，返回 <c>true</c>；否则返回 <c>false</c> 并触发异步加载。</returns>
+    public bool EnsureChunksLoaded(Vector2I coord, int range)
+    {
+        bool exist = true;
+        for (int x = -range; x <= range; x++)
+        {
+            for (int y = -range; y <= range; y++)
+            {
+                var pos = coord + new Vector2I(x, y);
+                if (!Chunks.ContainsKey(pos))
+                {
+                    exist = false;
+                    if (!LoadChunkQueue.Contains(pos))
+                        LoadChunkQueue.Enqueue(pos);
+                }
+            }
+        }
+
+        if (exist)
+            return true;
+        return false;
+    }
+
 
     /// <summary>
-    /// 获取所有玩家所需加载的区块集合
+    /// 获取所有活跃玩家（存活或死亡状态）视距范围内需要加载的区块坐标集合。
+    /// <para>用于确定哪些区块应保留在内存中。</para>
     /// </summary>
-    /// <returns></returns>
+    /// <returns>需加载的区块坐标集合（去重）</returns>
     public HashSet<Vector2I> GetAllLoadRangeChunks()
     {
         HashSet<Vector2I> loadqueue = new HashSet<Vector2I>();
@@ -350,10 +388,10 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 获取视距内所需加载的区块坐标
+    /// 将以 <paramref name="centerCoord"/> 为中心、半径为 <see cref="LoadHorizon"/> 的区块坐标添加到 <paramref name="coords"/> 集合中。
     /// </summary>
-    /// <param name="centerCoord">中心坐标</param>
-    /// <param name="coords"></param>
+    /// <param name="centerCoord">中心区块坐标</param>
+    /// <param name="coords">目标集合，用于累积结果（避免重复分配）</param>
     public void GetLoadRangeChunks(Vector2I centerCoord, HashSet<Vector2I> coords)
     {
         for (int X = centerCoord.X - LoadHorizon; X <= centerCoord.X + LoadHorizon; X++)
@@ -368,10 +406,11 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 判断一个方块周围是否被完全包围
+    /// 判断指定全局坐标的方块是否被上下左右四个方向的“立方体”方块完全包围。
+    /// <para>用于优化渲染或物理计算（如气体扩散、声音传播等）。</para>
     /// </summary>
-    /// <param name="pos">坐标</param>
-    /// <returns></returns>
+    /// <param name="pos">全局三维坐标（X, Y, Z）</param>
+    /// <returns>若被完全包围且自身及邻居均为有效立方体方块，返回 <c>true</c>；否则返回 <c>false</c></returns>
     public bool CheckIsCloseBlock(Vector3I pos)
     {
         var block = GetBlock(pos);
@@ -396,11 +435,11 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 尝试获取全局坐标的方块
+    /// 尝试获取指定全局坐标的方块数据。
     /// </summary>
-    /// <param name="globalPosition">全局坐标</param>
-    /// <param name="block">方块</param>
-    /// <returns>方块是否存在</returns>
+    /// <param name="globalPosition">全局三维坐标</param>
+    /// <param name="block">输出参数：若存在则返回方块数据，否则为 <c>null</c></param>
+    /// <returns>若方块存在且所在区块已加载，返回 <c>true</c>；否则返回 <c>false</c></returns>
     public bool TryGetBlock(Vector3I globalPosition, out BlockData block)
     {
         var b = GetBlock(globalPosition);
@@ -415,12 +454,14 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 获取方块
+    /// 获取指定全局坐标的方块数据。
+    /// <para>若所在区块未加载，返回 <c>null</c>。</para>
     /// </summary>
-    /// <param name="globalPosition">全局坐标</param>
-    /// <returns></returns>
+    /// <param name="globalPosition">全局三维坐标（X, Y, Z）</param>
+    /// <returns>方块数据，或 <c>null</c>（若区块未加载或坐标越界）</returns>
     public BlockData GetBlock(Vector3I globalPosition)
     {
+        // todo: 这里可以用四叉树去优化，得改区块结构
         var coord = globalPosition.MathFloor(Chunk.Size);
         if (Chunks.TryGetValue(coord, out var chunk))
         {
@@ -432,11 +473,12 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 设置方块
+    /// 在指定全局坐标设置方块数据。
+    /// <para>仅当所在区块已加载时生效。</para>
     /// </summary>
-    /// <param name="globalPosition">全局坐标</param>
-    /// <param name="blockData">方块数据</param>
-    /// <returns>返回设置后的方块本身</returns>
+    /// <param name="globalPosition">全局三维坐标</param>
+    /// <param name="blockData">要设置的方块数据</param>
+    /// <returns>设置后的方块实例，若失败（如区块未加载）则返回 <c>null</c></returns>
     public BlockData SetBlock(Vector3I globalPosition, BlockData blockData)
     {
         var coord = globalPosition.MathFloor(Chunk.Size);
@@ -450,9 +492,11 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 将被动更新方块添加到待更新列表中
+    /// 将指定坐标的方块加入其所在区块的被动更新列表（<see cref="Chunk.PassiveTickList"/>）。
+    /// <para>用于触发响应式组件（如电路、植物生长）的后续处理。</para>
     /// </summary>
-    /// <param name="globalPosition"></param>
+    /// <param name="globalPosition">全局坐标</param>
+    /// <param name="deep">递归深度，用于同时标记邻居方块（默认为 0，不递归）</param>
     public void UpdateBlock(Vector3I globalPosition, int deep = 0)
     {
         var block = World.Service.ChunkService.GetBlock(globalPosition);
@@ -473,10 +517,12 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 别动更新邻居方块（不包括自身）
+    /// 触发指定方块及其邻居的被动更新。
+    /// <para>常用于方块状态变化后通知周围环境（如放置火把点亮周围）。</para>
     /// </summary>
-    /// <param name="globalPosition">全局坐标</param>
-    /// <param name="inside">是否包含自身更新</param>>
+    /// <param name="globalPosition">中心坐标</param>
+    /// <param name="inside">是否包含自身更新</param>
+    /// <param name="deep">递归深度（控制影响范围）</param>
     public void PassiveUpdateNeighborBlock(Vector3I globalPosition, bool inside = false, int deep = 0)
     {
         if (inside)
@@ -492,12 +538,12 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 设置方块
+    /// 使用元数据和状态值在指定全局坐标创建并设置方块。
     /// </summary>
-    /// <param name="globalPosition">全局坐标</param>
+    /// <param name="globalPosition">全局三维坐标</param>
     /// <param name="meta">方块元数据</param>
-    /// <param name="state">方块状态</param>
-    /// <returns>设置后的方块</returns>
+    /// <param name="state">方块状态（默认为 0）</param>
+    /// <returns>设置后的方块实例，若失败则返回 <c>null</c></returns>
     public BlockData SetBlock(Vector3I globalPosition, BlockMeta meta, int state = 0)
     {
         var coord = globalPosition.MathFloor(Chunk.Size);
@@ -511,12 +557,13 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 获取地形集坐标
+    /// 根据相邻方块的标签匹配情况，计算当前方块在 Atlas 贴图中的 UV 坐标（用于自动拼接纹理）。
+    /// <para>使用预定义的 <see cref="_terrainCoord"/> 映射表。</para>
     /// </summary>
-    /// <param name="globalPosition">方块全局坐标</param>
-    /// <param name="tagname">匹配标签名</param>
-    /// <param name="value">匹配标签值</param>
-    /// <returns>Atlas贴图坐标</returns>
+    /// <param name="globalPosition">当前方块的全局坐标</param>
+    /// <param name="tagname">要匹配的标签名称（如 "terrain"）</param>
+    /// <param name="value">期望的标签值（如 "grass"）</param>
+    /// <returns>Atlas 贴图中的坐标（Vector2I），默认为 (1,1) 表示“全包围”</returns>
     public Vector2I GetTerrain(Vector3I globalPosition, string tagname, string value)
     {
         var block = GetBlock(globalPosition);
@@ -536,11 +583,12 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 基于光线投射的光照更新
+    /// 使用光线投射方式从指定点向外扩散光照。
+    /// <para>模拟圆形光照衰减，适用于火把、灯等点光源。</para>
     /// </summary>
-    /// <param name="coord">全局坐标</param>
-    /// <param name="value">起始光照值</param>
-    /// <param name="detail">精细度</param>
+    /// <param name="coord">光源起始全局坐标（Z=1）</param>
+    /// <param name="value">初始光照强度（最大值）</param>
+    /// <param name="detail">光线数量（角度采样精度，默认 16 条射线）</param>
     public void RayCastLights(Vector3I coord, int value, int detail = 16)
     {
         var angle_step = detail;
@@ -566,12 +614,12 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
             }
         }
     }
-
     /// <summary>
-    /// 基于DFS的光照更新
+    /// 使用深度优先搜索（DFS）递归更新光照。
+    /// <para>性能较高但可能栈溢出，适用于小范围或可控光源。</para>
     /// </summary>
-    /// <param name="coord">全局坐标</param>
-    /// <param name="value">起始光照值</param>
+    /// <param name="coord">起始坐标</param>
+    /// <param name="value">当前光照强度</param>
     public void DfsUpdateLight(Vector3I coord, int value)
     {
         if (value <= 0) return;
@@ -597,10 +645,14 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 更新单个区块的光源
+    /// 更新指定区块内的光照信息，包括：
+    /// <list type="bullet">
+    ///   <item>天空光照（基于高度图）</item>
+    ///   <item>区块内静态光源（<see cref="Chunk.LightList"/>）</item>
+    /// </list>
     /// </summary>
-    /// <param name="chunk">区块</param>
-    public void UpdataChunkLight(Chunk chunk)
+    /// <param name="chunk">要更新的区块</param>
+    public void UpdateChunkLight(Chunk chunk)
     {
         if (LightMode == LightModeEnum.None)
         {
@@ -645,7 +697,8 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 只更新主控玩家加载范围内的光照
+    /// 更新主控玩家视距范围内的所有光照。
+    /// <para>包括天空光、区块光源以及玩家手持光源（如夜视模式增强）。</para>
     /// </summary>
     public void UpdateLights()
     {
@@ -673,7 +726,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
             {
                 var chunk = sts.Value;
                 if (poss.Contains(chunk.coord))
-                    UpdataChunkLight(chunk);
+                    UpdateChunkLight(chunk);
             }
 
             int lightsize = LightSize / 2;
@@ -691,11 +744,11 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 获取包含指定组件的邻居方块。
+    /// 获取指定方块的上下左右及前后邻居中，带有指定组件 <typeparamref name="T"/> 的方块列表。
     /// </summary>
-    /// <param name="pos"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// <typeparam name="T">要查找的组件类型（需继承自 <see cref="Component"/>）</typeparam>
+    /// <param name="pos">中心方块的全局坐标</param>
+    /// <returns>符合条件的邻居方块列表</returns>
     public List<BlockData> GetBlockAsSameComponent<T>(Vector3I pos) where T : Component
     {
         List<BlockData> result = new List<BlockData>();
@@ -736,9 +789,10 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
     }
 
     /// <summary>
-    /// 连续区块分组
+    /// 将当前所有已加载区块按“四连通连续区域”分组。
+    /// <para>用于并行 Tick 时减少线程竞争（同一组内区块相邻，可串行处理）。</para>
     /// </summary>
-    /// <returns></returns>
+    /// <returns>区块坐标分组列表，每组为一个连续区域</returns>
     public List<List<Vector2I>> GetProximityChunkGroup()
     {
         List<List<Vector2I>> result = new List<List<Vector2I>>();

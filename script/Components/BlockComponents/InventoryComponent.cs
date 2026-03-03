@@ -20,11 +20,6 @@ public partial class InventoryComponent : TickComponent
         return Inventory;
     }
 
-    public virtual bool Checkfield(string name)
-    {
-        return false;
-    }
-
     public bool MathRecipe(ItemStack recipeItem, int formindex, int targetindex)
     {
         var formitem = GetInventory().GetItem(formindex);
@@ -54,7 +49,15 @@ public partial class InventoryComponent : TickComponent
 
         return (0, null);
     }
-
+    /// <summary>
+    /// 判断容器的空间是否能够完整塞下整个物品
+    /// 如果能够完整塞下，则返回true
+    /// 如果不能，则返回false
+    /// </summary>
+    /// <param name="meta">当前容器的所属方块元数据</param>
+    /// <param name="additem"></param>
+    /// <param name="input"></param>
+    /// <returns></returns>
     private bool HasSpace(BlockMeta meta, ItemStack additem, bool input)
     {
         int space = 0;
@@ -79,7 +82,13 @@ public partial class InventoryComponent : TickComponent
 
         return space >= additem.Amount;
     }
-
+    /// <summary>
+    /// 尝试添加物品到容器，如果物品没有被完全添加进去，或是添加失败，都会返回false。
+    /// 如果添加的物品被完整添加进容器则返回true
+    /// </summary>
+    /// <param name="meta">当前容器的所属方块元数据</param>
+    /// <param name="additem">添加的物品</param>
+    /// <returns></returns>
     public bool TryPushItem(BlockMeta meta, ItemStack additem)
     {
         if (!HasSpace(meta, additem, true)) return false;

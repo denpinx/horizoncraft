@@ -92,6 +92,7 @@
     <Content Include="config\schema\item.json" />
     <Content Include="config\schema\lang.json" />
     <Content Include="config\schema\recipe.json" />
+    <Content Include="doc\文档-如何注册树.md" />
     <Content Include="doc\文档-注册和使用语言文本.md" />
     <Content Include="doc\文档-注册实体.md" />
     <Content Include="doc\文档-注册容器菜单.md" />

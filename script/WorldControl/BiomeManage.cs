@@ -270,7 +270,11 @@ namespace Horizoncraft.script.WorldControl
 
             return null;
         }
-
+        /// <summary>
+        /// 使用生物群系名，获取生物群系构造器实列
+        /// </summary>
+        /// <param name="name">生物群系名</param>
+        /// <returns>生物群系的构造器</returns>
         public static BaseBiome GetBiomeAsName(string name)
         {
             var land = LandBiomes.Find(B => B.name == name);

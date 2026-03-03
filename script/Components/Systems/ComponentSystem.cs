@@ -11,13 +11,18 @@ public abstract class ComponentSystem
     /// 处理方块组件
     /// </summary>
     /// <param name="worldEvent">方块事件</param>
-    /// <param name="component">组件</param>
+    /// <param name="component">触发事件组件</param>
     /// <returns>结果</returns>
     public virtual bool ExecuteBlockComponent(WorldEvent worldEvent, Component component)
     {
         return true;
     }
-
+    /// <summary>
+    /// 处理随机tick事件
+    /// </summary>
+    /// <param name="worldEvent">世界事件</param>
+    /// <param name="component">触发事件的组件</param>
+    /// <returns></returns>
     public virtual bool ExecuteRandBlockEvent(BlockTickEvent worldEvent, Component component)
     {
         return true;
@@ -27,7 +32,7 @@ public abstract class ComponentSystem
     /// 处理物品组件
     /// </summary>
     /// <param name="playerEvent">玩家事件</param>
-    /// <param name="component">组件</param>
+    /// <param name="component">触发事的件组件</param>
     /// <returns></returns>
     public virtual bool ExecuteItemComponent(PlayerEvent playerEvent, Component component)
     {
