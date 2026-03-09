@@ -11,7 +11,9 @@ using Horizoncraft.script.WorldControl;
 using Horizoncraft.tscn.Gui;
 
 namespace Horizoncraft.script;
-
+/// <summary>
+/// TODO:石山，得改
+/// </summary>
 public partial class PlayerNode : CharacterBody2D
 {
     private PackedScene PackedSceneDeadView = GD.Load<PackedScene>("res://tscn/Gui/DeadView.tscn");
