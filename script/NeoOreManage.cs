@@ -1,23 +1,18 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Horizoncraft.script.WorldControl;
+using Horizoncraft.script.WorldControl.Struct;
 
-namespace Horizoncraft.script.WorldControl.Struct;
+namespace Horizoncraft.script;
 
-public static class OreManage
+public class NeoOreManage
 {
-    public static Dictionary<string, OreConfig> ores = new();
-
-    public static void Registry(OreConfig config)
-    {
-        GD.Print($"[{nameof(OreManage)}] 注册矿脉结构: {config.Name} \t #{ores.Count}");
-        ores.Add(config.Name, config);
-    }
-
-    private static List<OreConfig> GetOreFliterDeep(int Deep)
+    private Dictionary<string, OreConfig> Ores = new();
+    private List<OreConfig> GetOreFliterDeep(int Deep)
     {
         var list = new List<OreConfig>();
-        foreach (var item in ores.Values)
+        foreach (var item in Ores.Values)
         {
             if (item.Deep <= Deep)
                 list.Add(item);
@@ -25,15 +20,14 @@ public static class OreManage
 
         return list;
     }
-
-    /// <summary>
+        /// <summary>
     /// 生成矿物
     /// </summary>
     /// <param name="rand">随机数来源</param>
     /// <param name="x">区块坐标 x</param>
     /// <param name="y">区块坐标 y</param>
     /// <returns>区块内的集合</returns>
-    public static BlockStruct GeneratorOre(Random rand, int x, int y)
+    public virtual BlockStruct GeneratorOre(Random rand, int x, int y)
     {
         //return GeneratorOreV2(rand, x, y);
         Vector2I Gpos = new Vector2I(x * Chunk.Size, y * Chunk.Size);
@@ -59,4 +53,5 @@ public static class OreManage
 
         return blocks;
     }
+    
 }

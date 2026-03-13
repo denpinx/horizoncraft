@@ -207,13 +207,11 @@ namespace Horizoncraft.script
         private static void LoadAllItemConfigs()
         {
             var list = new List<string>();
-            DirUtility.GetAllFiles("res://config/item", list);
+            DirUtility.GetFiles("res://config/item", ".json", list);
             foreach (var fn in list)
-            {
-                if (!fn.EndsWith(".json")) continue;
                 LoadItemConfigs(fn);
-            }
         }
+
 
         /// <summary>
         /// 加载指定地址的物品配置
@@ -289,12 +287,9 @@ namespace Horizoncraft.script
         private static void LoadAllBlockConfigs()
         {
             var list = new List<string>();
-            DirUtility.GetAllFiles("res://config/block", list);
+            DirUtility.GetFiles("res://config/block", ".json",list);
             foreach (var fn in list)
-            {
-                if (!fn.EndsWith(".json")) continue;
                 LoadBlockConfigs(fn);
-            }
         }
 
         /// <summary>
@@ -345,6 +340,7 @@ namespace Horizoncraft.script
                 {
                     blockmeta.TileVisible = (bool)tile_visible_object;
                 }
+
                 if (config.TryGetValue("render", out var renderObject))
                 {
                     var list = (List<object>)renderObject;
@@ -368,16 +364,14 @@ namespace Horizoncraft.script
                         string texture_dir = (string)item;
                         var name = texture_dir
                             .Split('/')
-                            .Last().
-                            Split(".png").
-                            First().
-                            ToLower();
-                        var image = GD.Load<Texture2D>("res://texture/block/"+texture_dir);
+                            .Last().Split(".png").First().ToLower();
+                        var image = GD.Load<Texture2D>("res://texture/block/" + texture_dir);
                         texture2Ds.Add(name, image);
                     }
+
                     blockmeta.ExpandTextures = texture2Ds;
                 }
-                
+
 
                 if (config.TryGetValue("break-level", out var vbl))
                 {
@@ -678,12 +672,13 @@ namespace Horizoncraft.script
                             meta.Texture = GD.Load<Texture2D>($"res://texture/block/{blockTileSet.texture_name}.png");
                             texture_name = "empty_block";
                         }
-                        var image = GD.Load<Texture2D>(
-                                $"res://texture/block/{texture_name}.png");
 
-                        if(meta.Texture==null)
+                        var image = GD.Load<Texture2D>(
+                            $"res://texture/block/{texture_name}.png");
+
+                        if (meta.Texture == null)
                             meta.Texture = image;
-                       
+
 
                         int tilesX = image.GetWidth() / 16;
                         int tilesY = image.GetHeight() / 16;

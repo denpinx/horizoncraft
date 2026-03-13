@@ -24,6 +24,7 @@
     <Compile Remove="script\WorldControl\Service\EntityService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="config\vein\" />
     <Folder Include="script\ComponentState\Storage\" />
     <Folder Include="script\Interface\" />
   </ItemGroup>

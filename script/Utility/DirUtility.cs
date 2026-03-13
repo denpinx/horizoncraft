@@ -1,18 +1,21 @@
 using System.Collections.Generic;
+using System.IO;
 using Godot;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.WorldControl.Tool;
+using FileAccess = Godot.FileAccess;
 
 namespace Horizoncraft.script.Utility;
 
 public static class DirUtility
 {
     /// <summary>
-    /// 加载目录下的所有文件
+    /// 获目录下的全部文件（递归目录）
+    /// 支持 res:// 目录
     /// </summary>
     /// <param name="path"></param>
     /// <param name="filelist"></param>
-    public static void GetAllFiles(string path, List<string> filelist)
+    public static void GetFiles(string path,string extenstion, List<string> filelist)
     {
         DirAccess dir = DirAccess.Open(path);
         if (dir == null)
@@ -26,20 +29,23 @@ public static class DirUtility
         while (filename != "")
         {
             if (filename == "." || filename == "..")
+            {
+                filename = dir.GetNext();
                 continue;
-            string deep_path = path + "/" + filename;
+            }
+            string deep_path = Path.Combine(path, filename);
             if (dir.CurrentIsDir())
             {
-                GetAllFiles(deep_path, filelist);
+                GetFiles(deep_path, extenstion,filelist);
             }
             else
             {
-                filelist.Add(deep_path);
+                if(Path.GetExtension(deep_path)==extenstion)
+                    filelist.Add(deep_path);
             }
 
             filename = dir.GetNext();
         }
-
         dir.ListDirEnd();
     }
 

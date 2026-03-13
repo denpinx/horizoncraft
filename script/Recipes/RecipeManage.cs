@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Godot;
 using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Utility;
+using FileAccess = Godot.FileAccess;
 
 namespace Horizoncraft.script.Recipes;
 
@@ -292,12 +295,9 @@ public static class RecipeManage
         }
 
         var list = new List<string>();
-        GetAllFiles("res://config/recipes", list);
+        DirUtility.GetFiles("res://config/recipes",".json", list);
         foreach (var file in list)
-        {
-            if (!file.EndsWith(".json")) continue;
             ParseFile(file);
-        }
     }
 
 
@@ -329,38 +329,6 @@ public static class RecipeManage
         var result = recipe.Recipes.Find(r => r.ItemMatch(Items));
         return result;
     }
-
-    private static void GetAllFiles(string path, List<string> filelist)
-    {
-        DirAccess dir = DirAccess.Open(path);
-        if (dir == null)
-        {
-            GD.PrintErr($"[GetAllFiles] 无法打开{path}");
-            return;
-        }
-
-        dir.ListDirBegin();
-        var filename = dir.GetNext();
-        while (filename != "")
-        {
-            if (filename == "." || filename == "..")
-                continue;
-            string deep_path = path + "/" + filename;
-            if (dir.CurrentIsDir())
-            {
-                GetAllFiles(deep_path, filelist);
-            }
-            else
-            {
-                filelist.Add(deep_path);
-            }
-
-            filename = dir.GetNext();
-        }
-
-        dir.ListDirEnd();
-    }
-
     /// <summary>
     /// 搜寻物品参与合成的配方
     /// </summary>

@@ -35,7 +35,7 @@ public static class LanguageManage
 
         List<string> files = new();
         
-        DirUtility.GetAllFiles("res://config/lang", files);
+        DirUtility.GetFiles("res://config/lang", ".json",files);
         foreach (var file in files)
         {
             LoadTargetLanguage(file, Lang);

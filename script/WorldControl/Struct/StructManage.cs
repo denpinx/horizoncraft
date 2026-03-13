@@ -69,10 +69,9 @@ public static class BlockStructManager
     private static void LoadStaticBuilds()
     {
         List<string> list = [];
-        DirUtility.GetAllFiles("res://config/builds", list);
+        DirUtility.GetFiles("res://config/builds", ".json",list);
         foreach (var dir in list)
         {
-            if (!dir.EndsWith(".json")) continue;
             FileAccess file = FileAccess.Open(dir, FileAccess.ModeFlags.Read);
             var dict = JsonCleaner.FromJson(file.GetAsText());
             if (dict.TryGetValue("name", out var name))
