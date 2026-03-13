@@ -62,6 +62,7 @@
     <Content Include="config\lang\cn\debug.json" />
     <Content Include="config\lang\cn\gui.json" />
     <Content Include="config\lang\cn\itemmetas.json" />
+    <Content Include="config\loot_table\carrot.json" />
     <Content Include="config\recipes\Craft\Block\bamboo_block.json" />
     <Content Include="config\recipes\Craft\Block\door.json" />
     <Content Include="config\recipes\Craft\Block\furnace.json" />

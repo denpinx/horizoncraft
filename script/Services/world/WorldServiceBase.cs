@@ -67,11 +67,14 @@ public abstract class WorldServiceBase
     /// <summary>实体节点行为,定义不同策略下的实体同步行为</summary>
     public EntityBehaviorBase EntityBehavior;
 
+    public NeoMaterials NeoMaterials;
 
     private Stopwatch _stopwatch = new Stopwatch();
 
     public WorldServiceBase(World world)
     {
+        NeoMaterials = new NeoMaterials();
+        
         this.World = world;
         LoadWorldProfile();
         BiomeManage.Reset();

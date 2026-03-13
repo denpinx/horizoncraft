@@ -73,9 +73,13 @@ namespace Horizoncraft.script
 
         public OreConfig OreConfig = null;
 
+        [Obsolete]
         /// <summary>掉落物</summary>
         public LootTable LootTable;
-
+        /// <summary>
+        /// 使用的掉落物表id
+        /// </summary>
+        public string LootTableId;
         // TODO 待实现
         /// <summary>方块的大小,这里不是指像素大小，而是一个方块究竟占多少格子，如果1*1就占1个格子，如果是2*2就占4个格子</summary>
         public Vector2I GridSize;

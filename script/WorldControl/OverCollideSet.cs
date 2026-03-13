@@ -1,8 +1,10 @@
+using System.Text.Json.Serialization;
+
 namespace Horizoncraft.script.WorldControl;
 
 public class OverCollideSet
 {
-    public int x;
-    public int y;
-    public bool Collide;
+    [JsonPropertyName("x")]public int x;
+    [JsonPropertyName("y")]public int y;
+    [JsonPropertyName("collide")]public bool Collide;
 }

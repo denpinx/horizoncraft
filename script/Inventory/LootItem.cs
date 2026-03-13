@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Horizoncraft.script.Inventory;
 
@@ -20,17 +21,21 @@ public class LootItem
 //等待所有配置文件加载完成后再转换为LootItem
 public class LootItemSnapshot
 {
+    [JsonPropertyName("name")]
     public string Name;
+    [JsonPropertyName("drop-chance")]
     public float DropChance = 1;
+    [JsonPropertyName("drop-state")]
     public int DropState = -1;
+    [JsonPropertyName("amount-chance")]
     public List<AmountChance> AmountChances = new();
 }
 
 public class AmountChance
 {
-    ///[0,1f]
+    [JsonPropertyName("chance")]
     public float Chance;
 
-    ///any count
+    [JsonPropertyName("amount")]
     public int Amount;
 }

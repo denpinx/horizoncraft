@@ -1,0 +1,38 @@
+{
+  "table-name": "carrot",
+  "loot": [
+    {
+      "drop-chance": 1,
+      "name": "carrot",
+      "amount-chance": [
+        {
+          "amount": 1,
+          "chance": 1
+        }
+      ]
+    },
+    {
+      "drop-chance": 1,
+      "drop-state": 7,
+      "name": "carrot",
+      "amount-chance": [
+        {
+          "amount": 2,
+          "chance": 1
+        },
+        {
+          "amount": 2,
+          "chance": 0.5
+        },
+        {
+          "amount": 2,
+          "chance": 0.5
+        },
+        {
+          "amount": 1,
+          "chance": 0.2
+        }
+      ]
+    }
+  ]
+}
