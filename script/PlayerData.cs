@@ -2,6 +2,7 @@ using System;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Net;
+using Horizoncraft.script.Services.world;
 using Horizoncraft.script.WorldControl;
 using MemoryPack;
 using Vector2 = System.Numerics.Vector2;
@@ -17,6 +18,7 @@ public partial class PlayerData
     [MemoryPackIgnore] public EntityUuidPack EntityUuidPack = new EntityUuidPack();
     [MemoryPackIgnore] public EntityUuidPack LastFarmeEntityUuidPack = new EntityUuidPack();
     [MemoryPackIgnore] public Vector2 LastPosition = Vector2.Zero;
+    [MemoryPackIgnore] public WorldServiceBase Service;
 
     [MemoryPackAllowSerialize] private Vector2 _position;
     [MemoryPackAllowSerialize] private bool _faceLeft;
@@ -176,7 +178,7 @@ public partial class PlayerData
     public Vector2 GetFuzzySpawnPoint()
     {
         int ChunkX = Random.Shared.Next(-16, 16);
-        var map = WorldGenerator.GetHighMap(ChunkX);
+        var map =  Service.NeoWorldGenerator.GetHighMap(ChunkX);
         int randx = Random.Shared.Next(0, Chunk.Size);
         int gy = map[randx, 1];
 

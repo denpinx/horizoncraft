@@ -176,6 +176,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                 if (conn.CheckPlayerExists(name))
                 {
                     PlayerData player = conn.GetPlayerByteData(name);
+                    player.Service = World.Service;
                     player.Name = name;
                     Players[player.Name] = player;
                     return player;
@@ -188,6 +189,7 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
                     };
                     if (Players.TryAdd(name, player))
                     {
+                        player.Service = World.Service;
                         return player;
                     }
                 }

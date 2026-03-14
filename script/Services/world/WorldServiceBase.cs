@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Godot;
 using Horizoncraft.script;
+using Horizoncraft.script.Components;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.I18N;
 using Horizoncraft.script.Net;
@@ -68,12 +69,17 @@ public abstract class WorldServiceBase
     public EntityBehaviorBase EntityBehavior;
 
     public NeoMaterials NeoMaterials;
+    public NeoComponentManager  NeoComponentManager;
+    public NeoWorldGenerator  NeoWorldGenerator;
+    
 
     private Stopwatch _stopwatch = new Stopwatch();
 
     public WorldServiceBase(World world)
     {
+        NeoComponentManager = new NeoComponentManager();
         NeoMaterials = new NeoMaterials();
+        NeoWorldGenerator = new NeoWorldGenerator();
         
         this.World = world;
         LoadWorldProfile();

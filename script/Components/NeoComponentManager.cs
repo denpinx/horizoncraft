@@ -20,20 +20,16 @@ using Horizoncraft.script.WorldControl;
 
 namespace Horizoncraft.script.Components;
 
-/// <summary>
-/// 组件的系统管理器
-/// </summary>
-[Obsolete("此类型已经弃用,请使用: NeoComponentManager",true)]
-public static class ComponentManager
+public class NeoComponentManager
 {
-    private static readonly Dictionary<SystemEnum, SystemConfig> ComponentSets = new();
+        private readonly Dictionary<SystemEnum, SystemConfig> ComponentSets = new();
 
     /// <summary>
     /// 处理实体组件事件
     /// </summary>
     /// <param name="entitySystemEvent">实体事件</param>
     /// <returns>是否有组件的系统取消事件</returns>
-    public static bool ExecuteEntityComponents(EntitySystemEvent entitySystemEvent)
+    public bool ExecuteEntityComponents(EntitySystemEvent entitySystemEvent)
     {
         foreach (var com in entitySystemEvent.EntityData.Components)
         {
@@ -55,14 +51,14 @@ public static class ComponentManager
     /// <param name="itemStack">物品</param>
     /// <typeparam name="T">类型</typeparam>
     /// <returns>是否有组件的系统取消事件</returns>
-    public static bool ExecuteItemComponents<T>(PlayerEvent playerEvent, ItemStack itemStack)
+    public  bool ExecuteItemComponents<T>(PlayerEvent playerEvent, ItemStack itemStack)
     {
         string startId = itemStack.Name;
         foreach (var component in itemStack.Components)
         {
             if (component == null)
             {
-                GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
+                GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
                 GD.PrintErr($"\t item-name:\t{itemStack.Name}");
                 GD.PrintErr($"\t item-state:\t{itemStack.State}");
                 GD.PrintErr($"\t item-components:\t{string.Join(",", itemStack.Components.Select(c => c.Drive))}");
@@ -91,14 +87,14 @@ public static class ComponentManager
     /// <param name="playerEvent">玩家事件</param>
     /// <param name="itemStack">物品</param>
     /// <returns>是否有组件的系统取消事件</returns>
-    public static bool ExecuteItemComponents(PlayerEvent playerEvent, ItemStack itemStack)
+    public bool ExecuteItemComponents(PlayerEvent playerEvent, ItemStack itemStack)
     {
         string primName = itemStack.Name;
         foreach (var component in itemStack.Components)
         {
             if (component == null)
             {
-                GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
+                GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
                 GD.PrintErr($"\t item-name:\t{itemStack.Name}");
                 GD.PrintErr($"\t item-state:\t{itemStack.State}");
                 GD.PrintErr($"\t item-components:\t{string.Join(",", itemStack.Components.Select(c => c.Drive))}");
@@ -124,14 +120,14 @@ public static class ComponentManager
     /// <param name="tickEvent">方块事件</param>
     /// <param name="blockData">方块</param>
     /// <returns>是否有组件的系统取消事件或执行失败</returns>
-    public static bool ExecuteRandBlockComponents(BlockTickEvent tickEvent, BlockData blockData)
+    public bool ExecuteRandBlockComponents(BlockTickEvent tickEvent, BlockData blockData)
     {
         string startId = blockData.Id;
         foreach (var component in blockData.Components)
         {
             if (component == null)
             {
-                GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
+                GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
                 GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
                 GD.PrintErr($"\t block-state:\t{blockData.State}");
                 GD.PrintErr(
@@ -160,7 +156,7 @@ public static class ComponentManager
     /// <param name="worldEvent">方块事件</param>
     /// <param name="blockData">方块</param>
     /// <returns>是否有组件的系统取消事件或执行失败</returns>
-    public static bool ExecuteBlockComponents(WorldEvent worldEvent, BlockData blockData)
+    public bool ExecuteBlockComponents(WorldEvent worldEvent, BlockData blockData)
     {
         string startId = blockData.Id;
         foreach (var component in blockData.Components)
@@ -169,7 +165,7 @@ public static class ComponentManager
             
             if (component == null)
             {
-                GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
+                GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
                 GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
                 GD.PrintErr($"\t block-state:\t{blockData.State}");
                 GD.PrintErr(
@@ -201,14 +197,14 @@ public static class ComponentManager
     /// <param name="player">玩家</param>
     /// <param name="blockData">方块</param>
     /// <param name="setComponentData">组件配置</param>
-    public static void SetBlockComponentData(PlayerData player, BlockData blockData,
+    public void SetBlockComponentData(PlayerData player, BlockData blockData,
         SetComponentData setComponentData)
     {
         foreach (var component in blockData.Components)
         {
             if (component == null)
             {
-                GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(SetBlockComponentData)} 方块组件被意外删除。");
+                GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(SetBlockComponentData)} 方块组件被意外删除。");
                 GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
                 GD.PrintErr($"\t block-state:\t{blockData.State}");
                 GD.PrintErr(
@@ -224,7 +220,7 @@ public static class ComponentManager
                     cmp.System.SetComponentValue(player, component, dict);
                 else
                 {
-                    GD.PrintErr($"[{nameof(ComponentManager)}] {nameof(SetBlockComponentData)} 没有对应的组件处理该方法。");
+                    GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(SetBlockComponentData)} 没有对应的组件处理该方法。");
                     GD.PrintErr($"\t component-name:\t{component.Drive}");
                 }
             }
@@ -237,7 +233,7 @@ public static class ComponentManager
     /// <param name="enumId">枚举Id</param>
     /// <param name="componentType">功能服务的组件类型</param>
     /// <param name="system">系统</param>
-    private static void Register(SystemEnum enumId, Type componentType, ComponentSystem system)
+    private void Register(SystemEnum enumId, Type componentType, ComponentSystem system)
     {
         ComponentSets.Add(enumId, new SystemConfig()
         {
@@ -248,7 +244,7 @@ public static class ComponentManager
 
     //绑定组件功能和组件类型，
     //注意：有些组件会在事件触发时修改物品或方块状态，不是所有组件都能够相互兼容。
-    static ComponentManager()
+    public NeoComponentManager()
     {
         //顶部方块覆盖组件
         Register(SystemEnum.BlockCover,

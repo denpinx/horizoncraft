@@ -12,6 +12,7 @@ using static Horizoncraft.script.WorldControl.BiomeManage;
 
 namespace Horizoncraft.script.WorldControl
 {
+    [Obsolete("此类型已经弃用,请使用: NeoWorldGenerator",true)]
     public class WorldGenerator
     {
         private static readonly Stopwatch StopWatch = new Stopwatch();

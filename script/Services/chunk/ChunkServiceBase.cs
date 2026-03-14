@@ -205,7 +205,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                 else
                 {
                     var chunk = new Chunk(pos.X, pos.Y);
-                    WorldGenerator.Generator(chunk);
+                    World.Service.NeoWorldGenerator.Generator(chunk);
                     return chunk;
                 }
             }

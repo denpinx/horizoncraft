@@ -11,6 +11,7 @@ using Horizoncraft.script.Events.SystemEvents;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.Services;
+using Horizoncraft.script.Services.world;
 using Horizoncraft.script.WorldControl;
 
 namespace Horizoncraft.script.Services.entity;
@@ -21,6 +22,8 @@ namespace Horizoncraft.script.Services.entity;
 /// </summary>
 public class EntityServiceBase : ServiceBase
 {
+    public WorldServiceBase WorldService;
+    
     /// <summary>
     /// 已加载的实体模型集合
     /// </summary>
@@ -33,6 +36,7 @@ public class EntityServiceBase : ServiceBase
 
     public EntityServiceBase(World world) : base(world)
     {
+        WorldService = world.Service;
         world.timer.Timeout += Ticking;
         world.Service.ChunkService.OnChunkLoaded += OnChunkLoad;
         world.Service.ChunkService.OnChunkSaving += ExtractEntitiesFromChunk;
@@ -73,7 +77,8 @@ public class EntityServiceBase : ServiceBase
                 Service = World.Service,
                 EntityData = entity,
             };
-            ComponentManager.ExecuteEntityComponents(ese);
+            WorldService.NeoComponentManager.ExecuteEntityComponents(ese);
+            // ComponentManager.ExecuteEntityComponents(ese);
             //尝试加载该区块
             if (!World.Service.ChunkService.Chunks.ContainsKey(entity.ChunkCoord))
             {

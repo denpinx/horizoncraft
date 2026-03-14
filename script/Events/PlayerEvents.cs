@@ -25,7 +25,8 @@ public class PlayerEvents
     public virtual void SetOpenBlockComponent(PlayerSetBlockComponentEvent e)
     {
         if (e.ChunkService.TryGetBlock(e.Player.OpenInventory.ToVector3I(), out var block))
-            ComponentManager.SetBlockComponentData(e.Player, block, e.ComponentData);
+            e.world.Service.NeoComponentManager.SetBlockComponentData(e.Player, block, e.ComponentData);
+            // ComponentManager.SetBlockComponentData(e.Player, block, e.ComponentData);
     }
 
     /// <summary>
@@ -225,7 +226,7 @@ public class PlayerEvents
         e.Position = pos;
 
         if (item.Components.Count > 0)
-            if (!ComponentManager.ExecuteItemComponents(e, item))
+            if (!e.world.Service.NeoComponentManager.ExecuteItemComponents(e, item))
                 return false;
 
         e.ChunkService.SetBlock(pos, bm);
@@ -261,7 +262,7 @@ public class PlayerEvents
                 var handItem = e.Player.Inventory.GetItem(e.Player.Inventory.ToolBarIndex);
                 //执行物品组件事件,由事件决定掉落物
                 if (handItem != null && handItem.Components.Count > 0)
-                    ComponentManager.ExecuteItemComponents(e, handItem);
+                    e.world.Service.NeoComponentManager.ExecuteItemComponents(e, handItem);
                 //没有物品组件则默认掉落方块的直接物品
                 else
                     e.DropLoots = e.GetBlockData().BlockMeta.LootTable.TryTakeItem(e.GetBlockData().State);
@@ -329,7 +330,7 @@ public class PlayerEvents
             blockData = InterfaceBlock
         };
         var state = InterfaceBlock.State;
-        var result = ComponentManager.ExecuteBlockComponents(prcbe, InterfaceBlock);
+        var result = e.world.Service.NeoComponentManager.ExecuteBlockComponents(prcbe, InterfaceBlock);
         if (InterfaceBlock.State != state)
         {
             var pos = finalpos.MathFloor(Chunk.Size);
@@ -364,7 +365,7 @@ public class PlayerEvents
     {
         // var cmp = e.UseItemStack.GetComponent<ItemUsefulComponent>();
         if (e.UseItemStack != null)
-            return ComponentManager.ExecuteItemComponents<ItemUsefulComponent>(e, e.UseItemStack);
+            return e.world.Service.NeoComponentManager.ExecuteItemComponents<ItemUsefulComponent>(e, e.UseItemStack);
         return false;
     }
 

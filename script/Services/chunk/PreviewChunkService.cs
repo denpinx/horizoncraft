@@ -14,7 +14,7 @@ public class PreviewChunkService : ChunkServiceBase
     protected override async Task<Chunk> LoadChunk(Vector2I pos)
     {
         var chunk = new Chunk(pos.X, pos.Y);
-        WorldGenerator.Generator(chunk);
+        World.Service.NeoWorldGenerator.Generator(chunk);
         return chunk;
     }
 

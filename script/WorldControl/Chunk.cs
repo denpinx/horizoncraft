@@ -177,8 +177,9 @@ namespace Horizoncraft.script.WorldControl
                 if (block?.Components == null) continue;
 
                 var stateStart = block.State;
-
-                ComponentManager.ExecuteRandBlockComponents(randEvent, block);
+                
+                WorldService.NeoComponentManager.ExecuteRandBlockComponents(randEvent, block);
+                // ComponentManager.ExecuteRandBlockComponents(randEvent, block);
 
                 if (stateStart != block.State)
                 {
@@ -228,7 +229,7 @@ namespace Horizoncraft.script.WorldControl
                         blockTickEvnet.LocalPos = pos.ToVector3I();
                         var state_start = block.State;
                         blockTickEvnet.Reset();
-                        if (!ComponentManager.ExecuteBlockComponents(blockTickEvnet, block)) goto brek_out;
+                        if (!WorldService.NeoComponentManager.ExecuteBlockComponents(blockTickEvnet, block)) goto brek_out;
                         if (state_start != block.State)
                         {
                             update_tilemap = true;
@@ -268,7 +269,8 @@ namespace Horizoncraft.script.WorldControl
                     state = block.State;
                     try
                     {
-                        ComponentManager.ExecuteBlockComponents(blockTickEvnet, block);
+                        WorldService.NeoComponentManager.ExecuteBlockComponents(blockTickEvnet, block);
+                        // ComponentManager.ExecuteBlockComponents(blockTickEvnet, block);
                         blockTickEvnet.Reset();
                     }
                     catch (Exception e)

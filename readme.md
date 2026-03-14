@@ -19,6 +19,19 @@
 | 使用日志系统                   | 无                      |
 | 去单列化，发现大量单列类型，非常影响扩展能力   | 进行中                    |
 
+## 升级进度
+
+正在将单例类型，升级成实列化对象。
+
+| 类型                 | 新类型                 | 替换进度 | 备注               |
+|--------------------|---------------------|------|------------------|
+| ComponentManager   | NeoComponentManager | 替换完成 |                  |
+| Materials          | NeoMaterials        | 替换中  | 优化代码             |
+| WorldGenerator     | NeoWorldGenerator   | 已完成  |                  |
+| RecipeManage       | 计划替换                | 无    |                  |
+| BlockStructManager | 计划替换                | 无    |                  |
+| BiomeManage        | NeoBiomeManage      | 已完成  | 方便添加更多不同策略的世界生成器 |
+
 ## 工作记录
 
 | 功能           | 状态 | 描述                                                                                 |

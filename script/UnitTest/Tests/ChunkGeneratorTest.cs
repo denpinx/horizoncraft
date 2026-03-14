@@ -10,12 +10,13 @@ public class ChunkGeneratorTest : UnitTestItem<object>
 
     protected override object StartTest(Node node)
     {
+        var NeoWorldGenerator = new NeoWorldGenerator();
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
         for (int i = 0; i < count; i++)
         {
             Chunk chunk = new Chunk(i, 0);
-            WorldGenerator.Generator(chunk);
+            NeoWorldGenerator.Generator(chunk);
         }
 
         stopwatch.Stop();
