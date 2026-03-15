@@ -11,7 +11,7 @@ namespace Horizoncraft.script;
 /// <summary>
 /// 新版本Materials，非静态版本，计划代替materials
 /// </summary>
-public class NeoMaterials
+public class NeoMaterials(NeoLootTable lootTable)
 {
     /// <summary>
     /// 可见的空气
@@ -23,12 +23,6 @@ public class NeoMaterials
     private Dictionary<string, BlockMeta> BlockMetas = new();
 
     private Dictionary<string, EntityMeta> EntityMetas = new();
-
-
-    public NeoMaterials()
-    {
-        LoadBlockMaterials();
-    }
     
     public ItemMeta GetItemMeta(string name)
     {
@@ -54,6 +48,8 @@ public class NeoMaterials
 
     protected BlockMeta RegBlockMeta(BlockMeta blockMeta)
     {
+        if(!blockMeta.Tags.ContainsKey("thesaurus"))
+            blockMeta.Tags.Add("thesaurus",blockMeta.Name);
         BlockMetas.Add(blockMeta.Name, blockMeta);
         GD.Print($"[NeoMaterials] Reg Block Meta: {blockMeta.Name,-16}, \t#{blockMeta.Id,-5}");
         if (blockMeta.Name == "air")
@@ -101,7 +97,7 @@ public class NeoMaterials
             FileAccess fileAccess = FileAccess.Open(block_json_path,FileAccess.ModeFlags.Read);
             string json = fileAccess.GetAsText();
             Dictionary<string,BlockMaterialsTemplate> blockMaterialsTemplates = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string,BlockMaterialsTemplate>>(json);
-            int id = 0;
+            int id = 0; 
             foreach (var blockMaterialsTemplate in blockMaterialsTemplates)
             {
                 var block_meta = blockMaterialsTemplate.Value.BuildBlockMeta(blockMaterialsTemplate.Key);

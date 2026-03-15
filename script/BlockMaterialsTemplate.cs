@@ -15,31 +15,31 @@ namespace Horizoncraft.script;
 /// </summary>
 public record BlockMaterialsTemplate
 {
-    [JsonPropertyName("max")] public int Max = 1;
+    [JsonPropertyName("max")] public int Max { set; get; } = 1;
 
-    [JsonPropertyName("break-level")] public int BreakLevel = 0;
+    [JsonPropertyName("break-level")] public int BreakLevel { set; get; } = 0;
 
-    [JsonPropertyName("liquid")] public bool Liquid = false;
-    [JsonPropertyName("light")] public bool Light = false;
-    [JsonPropertyName("cube")] public bool Cube = false;
-    [JsonPropertyName("collide")] public bool Collide = false;
-    [JsonPropertyName("tiletype")] public string? TileType;
-    [JsonPropertyName("thesaurus")] public string? Thesaurus;
-    [JsonPropertyName("rigidity")] public float Rigidity = 1;
+    [JsonPropertyName("liquid")] public bool Liquid { set; get; } = false;
+    [JsonPropertyName("light")] public bool Light { set; get; } = false;
+    [JsonPropertyName("cube")] public bool Cube { set; get; } = false;
+    [JsonPropertyName("collide")] public bool Collide { set; get; } = false;
+    [JsonPropertyName("tiletype")] public string? TileType { set; get; }
+    [JsonPropertyName("thesaurus")] public string? Thesaurus { set; get; }
+    [JsonPropertyName("rigidity")] public float Rigidity { set; get; } = 1;
 
-    [JsonPropertyName("replace")] public bool Replace = false;
+    [JsonPropertyName("replace")] public bool Replace { set; get; } = false;
 
-    [JsonPropertyName("mask")] public BlockMetaMaskTemplate Mask;
+    [JsonPropertyName("mask")] public BlockMetaMaskTemplate Mask { set; get; }
 
-    [JsonPropertyName("tags")] public Dictionary<string, string> Tags = new();
+    [JsonPropertyName("tags")] public Dictionary<string, string> Tags { set; get; } = new();
 
-    [JsonPropertyName("render")] public List<string> Render = new();
+    [JsonPropertyName("render")] public List<string> Render { set; get; } = new();
 
-    [JsonPropertyName("expand-texture")] public List<string> ExpandTexture = new();
-    [JsonPropertyName("state")] public Dictionary<string, BlockMetaStateTemplate> State = new();
-    [JsonPropertyName("components")] public Dictionary<string, object> Components = new();
-    [JsonPropertyName("over-collide")] public List<OverCollideSet> OverCollides = new();
-    [JsonPropertyName("loot-tabel-id")] public string LootTabelId;
+    [JsonPropertyName("expand-texture")] public List<string> ExpandTexture { set; get; } = new();
+    [JsonPropertyName("state")] public Dictionary<string, BlockMetaStateTemplate> State { set; get; } = new();
+    [JsonPropertyName("components")] public Dictionary<string, object> Components { set; get; } = new();
+    [JsonPropertyName("over-collide")] public List<OverCollideSet> OverCollides { set; get; } = new();
+    [JsonPropertyName("loot-tabel-id")] public string LootTabelId { set; get; }
 
     public BlockMeta BuildBlockMeta(string blockName)
     {
@@ -69,7 +69,7 @@ public record BlockMaterialsTemplate
         foreach (var expandTexture in ExpandTexture)
         {
             var image_name = expandTexture.GetFile();
-            var image = GD.Load<Texture2D>(expandTexture);
+            var image = GD.Load<Texture2D>("res://texture/block/" + expandTexture);
             blockMeta.ExpandTextures.Add(image_name, image);
         }
 
@@ -102,22 +102,22 @@ public record BlockMaterialsTemplate
         }
 
         if (LootTabelId != null)
-            blockMeta.LootTableId = LootTabelId;
+            blockMeta.LootTableName = LootTabelId;
         else
-            blockMeta.LootTableId = $"horizoncraft::block_meta::loot_table::{blockName}";
+            blockMeta.LootTableName = $"horizoncraft::block_meta::loot_table::{blockName}";
         return blockMeta;
     }
 }
 
 public record BlockMetaStateTemplate
 {
-    [JsonPropertyName("texture")] public string Texture;
+    [JsonPropertyName("texture")] public string Texture { set; get; }
 
-    [JsonPropertyName("scene")] public bool Scene;
+    [JsonPropertyName("scene")] public bool Scene { set; get; }
 }
 
 public record BlockMetaMaskTemplate
 {
-    [JsonPropertyName("input")] public List<int> Input;
-    [JsonPropertyName("output")] public List<int> Output;
+    [JsonPropertyName("input")] public List<int> Input { set; get; }
+    [JsonPropertyName("output")] public List<int> Output { set; get; }
 }

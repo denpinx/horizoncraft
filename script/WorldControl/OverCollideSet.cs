@@ -4,7 +4,7 @@ namespace Horizoncraft.script.WorldControl;
 
 public class OverCollideSet
 {
-    [JsonPropertyName("x")]public int x;
-    [JsonPropertyName("y")]public int y;
-    [JsonPropertyName("collide")]public bool Collide;
+    [JsonPropertyName("x")] public int x { get; set; }
+    [JsonPropertyName("y")] public int y { get; set; }
+    [JsonPropertyName("collide")] public bool Collide { get; set; }
 }

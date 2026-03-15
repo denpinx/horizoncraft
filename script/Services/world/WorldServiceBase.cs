@@ -69,6 +69,7 @@ public abstract class WorldServiceBase
     public EntityBehaviorBase EntityBehavior;
 
     public NeoMaterials NeoMaterials;
+    public NeoLootTable NeoLootTable;
     public NeoComponentManager  NeoComponentManager;
     public NeoWorldGenerator  NeoWorldGenerator;
     
@@ -78,7 +79,12 @@ public abstract class WorldServiceBase
     public WorldServiceBase(World world)
     {
         NeoComponentManager = new NeoComponentManager();
-        NeoMaterials = new NeoMaterials();
+        NeoMaterials = new NeoMaterials(NeoLootTable);
+        NeoLootTable = new NeoLootTable(NeoMaterials);
+        
+        NeoMaterials.LoadBlockMaterials();
+        NeoLootTable.LoadLootTables();
+        
         NeoWorldGenerator = new NeoWorldGenerator();
         
         this.World = world;

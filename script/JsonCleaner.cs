@@ -4,6 +4,7 @@ using System.Text.Json;
 
 namespace Horizoncraft.script
 {
+    [Obsolete("待移除")]
     public class JsonCleaner
     {
         public static Dictionary<string, object> FromJson(string json)
