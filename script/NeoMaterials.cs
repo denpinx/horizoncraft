@@ -11,8 +11,9 @@ namespace Horizoncraft.script;
 /// <summary>
 /// 新版本Materials，非静态版本，计划代替materials
 /// </summary>
-public class NeoMaterials(NeoLootTable lootTable)
+public class NeoMaterials
 {
+    public NeoLootTable LootTable;
     /// <summary>
     /// 可见的空气
     /// </summary>

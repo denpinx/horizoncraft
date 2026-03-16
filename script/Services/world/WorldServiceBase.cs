@@ -67,10 +67,21 @@ public abstract class WorldServiceBase
 
     /// <summary>实体节点行为,定义不同策略下的实体同步行为</summary>
     public EntityBehaviorBase EntityBehavior;
-
+    /// <summary>
+    /// 方块，物品，实体的元数据
+    /// </summary>
     public NeoMaterials NeoMaterials;
+    /// <summary>
+    /// 战利品表的配置
+    /// </summary>
     public NeoLootTable NeoLootTable;
+    /// <summary>
+    /// 组件管理器
+    /// </summary>
     public NeoComponentManager  NeoComponentManager;
+    /// <summary>
+    /// 世界生成器
+    /// </summary>
     public NeoWorldGenerator  NeoWorldGenerator;
     
 
@@ -78,14 +89,19 @@ public abstract class WorldServiceBase
 
     public WorldServiceBase(World world)
     {
-        NeoComponentManager = new NeoComponentManager();
-        NeoMaterials = new NeoMaterials(NeoLootTable);
-        NeoLootTable = new NeoLootTable(NeoMaterials);
+        NeoWorldGenerator = new NeoWorldGenerator();
+        NeoMaterials = new NeoMaterials();
+        NeoLootTable = new NeoLootTable();
+        
+        NeoMaterials.LootTable = NeoLootTable;
+        NeoLootTable.materials = NeoMaterials;
         
         NeoMaterials.LoadBlockMaterials();
         NeoLootTable.LoadLootTables();
-        
-        NeoWorldGenerator = new NeoWorldGenerator();
+  
+
+        //组件管理器最后初始化
+        NeoComponentManager = new NeoComponentManager(this,NeoMaterials);
         
         this.World = world;
         LoadWorldProfile();
@@ -146,7 +162,7 @@ public abstract class WorldServiceBase
         await Task.WhenAll(tasks.ToArray());
         _stopwatch.Stop();
 
-        GD.Print($"[{GetTime()}]保存结束。用时:{_stopwatch.Elapsed.Milliseconds}μs");
+        GD.Print($"[{GetTime()}]保存结束。用时:{_stopwatch.Elapsed.TotalMicroseconds}μs");
     }
 
     /// <summary>

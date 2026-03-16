@@ -6,8 +6,9 @@ using Horizoncraft.script.Utility;
 
 namespace Horizoncraft.script;
 
-public class NeoLootTable(NeoMaterials materials)
+public class NeoLootTable()
 {
+    public NeoMaterials materials;
     public Dictionary<string, LootTable> LootTables = new();
 
     public void LoadLootTables()

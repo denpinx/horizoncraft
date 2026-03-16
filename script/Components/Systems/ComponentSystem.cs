@@ -8,6 +8,16 @@ namespace Horizoncraft.script.Components.Systems;
 public abstract class ComponentSystem
 {
     /// <summary>
+    /// 组件初始化
+    /// </summary>
+    /// <param name="componentSystemInitialize"></param>
+    public virtual void Initialize(ComponentSystemInitialize componentSystemInitialize)
+    {
+        
+    }
+    
+    
+    /// <summary>
     /// 处理方块组件
     /// </summary>
     /// <param name="worldEvent">方块事件</param>

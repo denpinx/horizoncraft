@@ -16,13 +16,14 @@ using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Events.SystemEvents;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Net;
+using Horizoncraft.script.Services.world;
 using Horizoncraft.script.WorldControl;
 
 namespace Horizoncraft.script.Components;
 
 public class NeoComponentManager
 {
-        private readonly Dictionary<SystemEnum, SystemConfig> ComponentSets = new();
+    private readonly Dictionary<SystemEnum, SystemConfig> ComponentSets = new();
 
     /// <summary>
     /// 处理实体组件事件
@@ -51,7 +52,7 @@ public class NeoComponentManager
     /// <param name="itemStack">物品</param>
     /// <typeparam name="T">类型</typeparam>
     /// <returns>是否有组件的系统取消事件</returns>
-    public  bool ExecuteItemComponents<T>(PlayerEvent playerEvent, ItemStack itemStack)
+    public bool ExecuteItemComponents<T>(PlayerEvent playerEvent, ItemStack itemStack)
     {
         string startId = itemStack.Name;
         foreach (var component in itemStack.Components)
@@ -162,7 +163,7 @@ public class NeoComponentManager
         foreach (var component in blockData.Components)
         {
             worldEvent.Reset();
-            
+
             if (component == null)
             {
                 GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
@@ -175,7 +176,7 @@ public class NeoComponentManager
 
                 continue;
             }
-            
+
             if (ComponentSets.TryGetValue(component.EnumId, out var set))
             {
                 var s = set.System.ExecuteBlockComponent(worldEvent, component);
@@ -244,7 +245,7 @@ public class NeoComponentManager
 
     //绑定组件功能和组件类型，
     //注意：有些组件会在事件触发时修改物品或方块状态，不是所有组件都能够相互兼容。
-    public NeoComponentManager()
+    public NeoComponentManager(WorldServiceBase worldServiceBase,NeoMaterials neoMaterials)
     {
         //顶部方块覆盖组件
         Register(SystemEnum.BlockCover,
@@ -372,5 +373,14 @@ public class NeoComponentManager
             typeof(ReactiveComponent),
             new CactusSystem()
         );
+        
+        ComponentSystemInitialize csi = new ComponentSystemInitialize()
+        {
+            NeoMaterials = neoMaterials,
+            WorldService = worldServiceBase,
+        };
+        foreach (var componentSet in  ComponentSets)
+            componentSet.Value.System.Initialize(csi);
+        
     }
 }
