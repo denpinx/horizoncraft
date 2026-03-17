@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
 using Godot;
+using Horizoncraft.script.Components;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.RenderSystem;
 using Horizoncraft.script.WorldControl;
@@ -37,9 +38,12 @@ public record BlockMaterialsTemplate
 
     [JsonPropertyName("expand-texture")] public List<string> ExpandTexture { set; get; } = new();
     [JsonPropertyName("state")] public Dictionary<string, BlockMetaStateTemplate> State { set; get; } = new();
-    [JsonPropertyName("components")] public Dictionary<string, object> Components { set; get; } = new();
+
+    [JsonPropertyName("components")]
+    public Dictionary<string, System.Text.Json.JsonElement> Components { set; get; } = new();
+
     [JsonPropertyName("over-collide")] public List<OverCollideSet> OverCollides { set; get; } = new();
-    [JsonPropertyName("loot-tabel-id")] public string LootTabelId { set; get; }
+    [JsonPropertyName("loot-tabel-name")] public string LootTabelName { set; get; } = null;
 
     public BlockMeta BuildBlockMeta(string blockName)
     {
@@ -59,6 +63,14 @@ public record BlockMaterialsTemplate
             blockMeta.OutputMask = Mask.Output.ToHashSet();
         }
 
+        foreach (string cmp_name in Components.Keys)
+        {
+            GD.Print("[BlockMaterialsTemplate] 创建组件构造Lambda:" + cmp_name);
+            blockMeta.Components.Add(
+                LambdaCreater.CreateLambda<Component>(cmp_name,
+                    (Dictionary<string, object>)JsonCleaner.ConvertRoot(Components[cmp_name]))
+            );
+        }
 
         foreach (var render_name in Render)
         {
@@ -101,10 +113,7 @@ public record BlockMaterialsTemplate
             });
         }
 
-        if (LootTabelId != null)
-            blockMeta.LootTableName = LootTabelId;
-        else
-            blockMeta.LootTableName = $"horizoncraft::block_meta::loot_table::{blockName}";
+        blockMeta.LootTableName = LootTabelName;
         return blockMeta;
     }
 }

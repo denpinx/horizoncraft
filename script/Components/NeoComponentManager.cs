@@ -376,7 +376,6 @@ public class NeoComponentManager
         
         ComponentSystemInitialize csi = new ComponentSystemInitialize()
         {
-            NeoMaterials = neoMaterials,
             WorldService = worldServiceBase,
         };
         foreach (var componentSet in  ComponentSets)

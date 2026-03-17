@@ -5,5 +5,4 @@ namespace Horizoncraft.script.Components.Systems;
 public class ComponentSystemInitialize
 {
     public required WorldServiceBase WorldService;
-    public required NeoMaterials NeoMaterials;
 }

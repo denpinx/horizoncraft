@@ -12,8 +12,7 @@ namespace Horizoncraft.script
             using var doc = JsonDocument.Parse(json);
             return ConvertRoot(doc.RootElement) as Dictionary<string, object>;
         }
-
-        private static object ConvertRoot(JsonElement element)
+        public static object ConvertRoot(JsonElement element)
         {
             return element.ValueKind switch
             {

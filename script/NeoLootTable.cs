@@ -10,6 +10,7 @@ public class NeoLootTable()
 {
     public NeoMaterials NeoMaterials;
     public Dictionary<string, LootTable> LootTables = new();
+
     /// <summary>
     /// 加载位于 "res://config/loot_table" 中的战利品表配置
     /// </summary>
@@ -44,12 +45,42 @@ public class NeoLootTable()
                         Amount = chances.Amount,
                     });
                 }
+
                 loot_table.LootItems.Add(loot_item);
             }
-            LootTables.Add(tableRecord.TableName,loot_table);
+
+            LootTables.Add(tableRecord.TableName, loot_table);
             GD.Print($"加载战利品表：{tableRecord.TableName} {loot_table_file_path}");
         }
     }
+
+    /// <summary>
+    /// 为全部BlockMeta生成对应的战利品表
+    /// </summary>
+    public void GenerateBlockMetaLootTables()
+    {
+        foreach (var meta in NeoMaterials.BlockMetas.Values)
+        {
+            if (meta.LootTableName == null)
+            {
+                var Table = new LootTable();
+                LootItem lootItem = new LootItem();
+                lootItem.Item = meta.ItemMeta.GetItemStack();
+                lootItem.DropChance = 1;
+                lootItem.AmountChances.Add(new AmountChance()
+                {
+                    Amount = 1,
+                    Chance = 1,
+                });
+                Table.LootItems.Add(lootItem);
+                var name = $"AutoGenerate::{meta.Name}";
+                LootTables.Add(name, Table);
+                GD.Print("NeoLootTable 自动生成配方:" + name);
+                meta.LootTableName = name;
+            }
+        }
+    }
+
     /// <summary>
     /// 获取战利品表
     /// </summary>

@@ -20,6 +20,8 @@ public class NeoWorldGenerator
         NeoBiomeManage = new NeoBiomeManage();
         NeoOreManage = new  NeoOreManage();
         NeoBlockStructManager = new NeoBlockStructManager();
+        
+        NeoBlockStructManager.LoadBuilds();
     }
     /// <summary>
     /// 插值计算

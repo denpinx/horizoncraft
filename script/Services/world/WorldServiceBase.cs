@@ -95,12 +95,12 @@ public abstract class WorldServiceBase
         NeoLootTable = new NeoLootTable();
         NeoRecipeManage = new NeoRecipeManage();
         
-        NeoMaterials.LootTable = NeoLootTable;
         NeoLootTable.NeoMaterials = NeoMaterials;
         NeoRecipeManage.NeoMaterials = NeoMaterials;
         
-        NeoMaterials.LoadBlockMaterials();
+        NeoMaterials.Initialize();
         NeoLootTable.LoadLootTables();
+        NeoLootTable.GenerateBlockMetaLootTables();
         
         //组件管理器最后初始化
         NeoComponentManager = new NeoComponentManager(this,NeoMaterials);
