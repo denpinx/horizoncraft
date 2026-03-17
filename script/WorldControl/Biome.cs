@@ -4,7 +4,6 @@ using System.Numerics;
 using Godot;
 using Horizoncraft.script.WorldControl.Context;
 using Horizoncraft.script.WorldControl.Struct;
-using static Horizoncraft.script.WorldControl.BiomeManage;
 using Vector2 = Godot.Vector2;
 
 namespace Horizoncraft.script.WorldControl

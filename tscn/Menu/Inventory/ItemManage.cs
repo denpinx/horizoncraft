@@ -36,6 +36,7 @@ public partial class ItemManage : HBoxContainer, ITranslatable
     {
         _player = GetParent<InventoryNode>().PlayerNode;
         _RecipeView.ItemManage = this;
+        _RecipeView.NeoRecipeManage = _player.world.Service.NeoRecipeManage;
         _buttonMode0.Pressed += () =>
         {
             var player = GetParent<InventoryNode>().PlayerNode;
@@ -174,7 +175,7 @@ public partial class ItemManage : HBoxContainer, ITranslatable
                     {
                         if (invslot.ShowItem != null)
                         {
-                            _RecipeView.SetPerviewRecipePack(RecipeManage.SearchRecipeBySource(invslot.ShowItem));
+                            _RecipeView.SetPerviewRecipePack(_player.world.Service.NeoRecipeManage.SearchRecipeBySource(invslot.ShowItem));
                         }
                     }
                 };
@@ -182,7 +183,7 @@ public partial class ItemManage : HBoxContainer, ITranslatable
                 {
                     if (invslot.ShowItem != null)
                     {
-                        _RecipeView.SetPerviewRecipePack(RecipeManage.SearchRecipeByUsefor(invslot.ShowItem));
+                        _RecipeView.SetPerviewRecipePack(_player.world.Service.NeoRecipeManage.SearchRecipeByUsefor(invslot.ShowItem));
                     }
                 };
 

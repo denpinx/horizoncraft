@@ -23,6 +23,7 @@ public partial class TileMapLayerChunk : Node2D
     public override void _Ready()
     {
         world = (World)GetParent();
+        debugView.neoBiomeManage = world.Service.NeoWorldGenerator.NeoBiomeManage;
         var result = Materials.CreateTileSet();
         tileMapLayer_font.TileSet = result;
         tileMapLayer_back.TileSet = result;

@@ -18,7 +18,7 @@ namespace Horizoncraft.script.WorldControl
         Sky,
         Deep
     }
-
+    [Obsolete("该类已被弃用，亲使用NeoBiomeManage",true)]
     public static class BiomeManage
     {
         private static float Zoom = 0.3f;

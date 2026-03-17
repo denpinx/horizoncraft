@@ -10,6 +10,11 @@ namespace Horizoncraft.script.Components.Systems;
 /// </summary>
 public class WorkBenchSystem : TickSystem
 {
+    public NeoRecipeManage NeoRecipeManage;
+    public override void Initialize(ComponentSystemInitialize componentSystemInitialize)
+    {
+        NeoRecipeManage = componentSystemInitialize.WorldService.NeoRecipeManage;
+    }
     public override void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)
     {
         if (component is BlockComponents.InventoryComponent inventoryComponent)
@@ -20,7 +25,7 @@ public class WorkBenchSystem : TickSystem
                 if (value["Action"] == "Craft-All")
                 {
                     GD.Print("Craft-All");
-                    var gri = RecipeManage.GetRecipe(inventory, 3, 0, "workbench");
+                    var gri = NeoRecipeManage.GetRecipe(inventory, 3, 0, "workbench");
                     while (gri != null)
                     {
                         if (!player.Inventory.TryAddItem(gri.Result.Copy()))
@@ -29,14 +34,14 @@ public class WorkBenchSystem : TickSystem
                         for (int i = 0; i < 9; i++)
                             inventory.ReduceItemAmount(i);
 
-                        gri = RecipeManage.GetRecipe(inventory, 3);
+                        gri = NeoRecipeManage.GetRecipe(inventory, 3);
                     }
                 }
 
                 if (value["Action"] == "Craft")
                 {
                     GD.Print("Craft");
-                    var gri = RecipeManage.GetRecipe(inventory, 3);
+                    var gri = NeoRecipeManage.GetRecipe(inventory, 3);
                     if (gri != null)
                     {
                         var handitme = player.Inventory.GetHandItemStack();

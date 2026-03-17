@@ -52,7 +52,7 @@ namespace Horizoncraft.script.WorldControl.worldbiomes
                 if (lbsc.Random.Next(16) == 1)
                 {
                     BlockStruct blockStrcut =
-                        BlockStructManager.GetStruct("spruce_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ,
+                        lbsc.NeoBlockStructManager.GetStruct("spruce_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ,
                             lbsc.Random);
                     lbsc.BlockStructs.Add(blockStrcut);
                 }

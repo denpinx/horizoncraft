@@ -9,6 +9,8 @@ using Horizoncraft.script.Recipes;
 
 public partial class ReciperView : Control, ITranslatable
 {
+    public NeoRecipeManage NeoRecipeManage;
+    
     private PackedScene _packedSceneInvSlot = GD.Load<PackedScene>("res://tscn/Menu/InvSlot.tscn");
 
 
@@ -279,7 +281,7 @@ public partial class ReciperView : Control, ITranslatable
     {
         if (invslot.ShowItem != null)
         {
-            SetPerviewRecipePack(RecipeManage.SearchRecipeBySource(invslot.ShowItem));
+            SetPerviewRecipePack(NeoRecipeManage.SearchRecipeBySource(invslot.ShowItem));
         }
     }
 
@@ -287,7 +289,7 @@ public partial class ReciperView : Control, ITranslatable
     {
         if (invslot.ShowItem != null)
         {
-            SetPerviewRecipePack(RecipeManage.SearchRecipeByUsefor(invslot.ShowItem));
+            SetPerviewRecipePack(NeoRecipeManage.SearchRecipeByUsefor(invslot.ShowItem));
         }
     }
 

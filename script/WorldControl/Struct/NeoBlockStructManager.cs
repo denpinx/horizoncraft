@@ -6,40 +6,36 @@ using Horizoncraft.script.WorldControl.Struct.structs;
 
 namespace Horizoncraft.script.WorldControl.Struct;
 
-/// <summary>
-/// 方块结构管理器
-/// </summary>
-[Obsolete("该类型已遗弃，请使用NeoBlockStructManager",true)]
-public static class BlockStructManager
+public class NeoBlockStructManager
 {
     /// <summary>
     /// 静态建筑构造器
     /// </summary>
-    public static readonly Dictionary<string, StaticBuildStruct> StaticBuildStructs = new();
+    public readonly Dictionary<string, StaticBuildStruct> StaticBuildStructs = new();
 
     /// <summary>
     /// 动态建筑构造器
     /// </summary>
-    private static readonly Dictionary<string, StructBuild> DynamicStructs = new();
+    private readonly Dictionary<string, StructBuild> DynamicStructs = new();
 
-    public static BlockStruct GetStruct(string name, int x, int y, int z, Random rand, params object[] args)
+    public BlockStruct GetStruct(string name, int x, int y, int z, Random rand, params object[] args)
     {
         if (DynamicStructs.TryGetValue(name, out StructBuild structBuild))
         {
             return structBuild.DynamicBuild(x, y, z, rand, args);
         }
 
-        GD.PrintErr($"[{nameof(BlockStructManager)}] 动态结构生成器 {name} 未定义)]");
+        GD.PrintErr($"[{nameof(NeoBlockStructManager)}] 动态结构生成器 {name} 未定义)]");
         return null;
     }
 
-    private static void Register(StructBuild structBuild)
+    private void Register(StructBuild structBuild)
     {
-        GD.Print($"[{nameof(BlockStructManager)}] 注册动态结构生成器: {structBuild.Name,-16} \t #{DynamicStructs.Count,-4}");
+        GD.Print($"[{nameof(NeoBlockStructManager)}] 注册动态结构生成器: {structBuild.Name,-16} \t #{DynamicStructs.Count,-4}");
         DynamicStructs.Add(structBuild.Name, structBuild);
     }
 
-    static void RegStructs()
+    void RegStructs()
     {
         Register(new TreeBuilder("oak_tree", "oak_log", "oak_leaves")
         {
@@ -67,18 +63,18 @@ public static class BlockStructManager
         });
     }
 
-    private static void LoadStaticBuilds()
+    private void LoadStaticBuilds()
     {
         List<string> list = [];
-        DirUtility.GetFiles("res://config/builds", ".json",list);
+        DirUtility.GetFiles("res://config/builds", ".json", list);
         foreach (var dir in list)
         {
             FileAccess file = FileAccess.Open(dir, FileAccess.ModeFlags.Read);
             var dict = JsonCleaner.FromJson(file.GetAsText());
             if (dict.TryGetValue("name", out var name))
             {
-                StaticBuildStruct staticBuildStruct = new StaticBuildStruct();
-                staticBuildStruct.Name = name as string;
+                StaticBuildStruct BuildStruct = new StaticBuildStruct();
+                BuildStruct.Name = name as string;
                 if (dict.TryGetValue("blocks", out var blocks))
                 {
                     var block_lsit = blocks as List<object>;
@@ -89,19 +85,19 @@ public static class BlockStructManager
                         var data = new BlockStructItem();
                         if (data.ParseDictionary(block_dict))
                         {
-                            staticBuildStruct.blockStructItems.Add(data.Coord, data);
+                            BuildStruct.blockStructItems.Add(data.Coord, data);
                         }
                     }
 
                     GD.Print(
-                        $"[{nameof(BlockStructManager)}] 加载建筑结构: {staticBuildStruct.Name,-16}#{StaticBuildStructs.Count,-14}\t {staticBuildStruct.blockStructItems.Count,-4}b");
-                    StaticBuildStructs.Add(staticBuildStruct.Name, staticBuildStruct);
+                        $"[{nameof(NeoBlockStructManager)}] 加载建筑结构: {BuildStruct.Name,-16}#{StaticBuildStructs.Count,-14}\t {BuildStruct.blockStructItems.Count,-4}b");
+                    StaticBuildStructs.Add(BuildStruct.Name, BuildStruct);
                 }
             }
         }
     }
 
-    static BlockStructManager()
+    public void LoadBuilds()
     {
         LoadStaticBuilds();
         RegStructs();

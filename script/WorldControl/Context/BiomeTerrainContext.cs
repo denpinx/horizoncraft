@@ -6,6 +6,7 @@ namespace Horizoncraft.script.WorldControl.Context;
 
 public class BiomeTerrainContext
 {
+    public required NeoMaterials NeoMaterials;
     public Chunk Chunk;
     public int[,] HighMap;
     public Random Random;

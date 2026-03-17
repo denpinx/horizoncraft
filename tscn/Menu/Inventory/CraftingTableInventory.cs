@@ -51,7 +51,7 @@ public partial class CraftingTableInventory : InventoryNode
         var inv = TargetBlock?.GetComponent<BlockComponents_InventoryComponent>()?.GetInventory();
         if (inv == null) return;
 
-        var gri = RecipeManage.GetRecipe(inv, 3);
+        var gri = PlayerNode.world.Service.NeoRecipeManage.GetRecipe(inv, 3);
         ResultItem.SetShowItem(gri?.Result);
     }   
 }

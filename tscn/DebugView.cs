@@ -8,7 +8,7 @@ public partial class DebugView : Node2D
     public Chunk chunk;
     Font font = new SystemFont();
     public static bool DEBUG = false;
-
+    public NeoBiomeManage neoBiomeManage;
     public override void _Draw()
     {
         if (!DEBUG) return;
@@ -47,7 +47,7 @@ public partial class DebugView : Node2D
                 new Vector2(0, 0)
             }, color, 4
         );
-        var biomebase = BiomeManage.GetBiomeAsName(chunk.BiomeType);
+        var biomebase = neoBiomeManage.GetBiomeAsName(chunk.BiomeType);
         if (biomebase == null)
         {
             GD.Print("biomebase == null");

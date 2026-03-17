@@ -53,7 +53,7 @@ public partial class CraftInventory : InventoryNode
             invslot.SetShowItem(item);
         }
 
-        var gri = RecipeManage.GetRecipe(PlayerNode.playerData.Inventory, 2, 36);
+        var gri = PlayerNode.world.Service.NeoRecipeManage.GetRecipe(PlayerNode.playerData.Inventory, 2, 36);
         ResultItem.SetShowItem(gri?.Result);
     }
 }

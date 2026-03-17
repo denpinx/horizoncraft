@@ -24,7 +24,7 @@ public class DesertBiome : LandBiome
     {
         if (landBiomeStructContext.Random.Next(400) == 1)
         {
-            if (BlockStructManager.StaticBuildStructs.TryGetValue("desert_temple",
+            if (landBiomeStructContext.NeoBlockStructManager.StaticBuildStructs.TryGetValue("desert_temple",
                     out StaticBuildStruct staticBuildStruct))
             {
                 Vector3I pos = new Vector3I(landBiomeStructContext.GlobalX, landBiomeStructContext.GlobalY, 0);

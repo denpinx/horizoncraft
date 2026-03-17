@@ -10,6 +10,12 @@ namespace Horizoncraft.script.Components.Systems;
 /// </summary>
 public class FurnaceSystem : TickSystem
 {
+    public NeoRecipeManage NeoRecipeManage;
+    public override void Initialize(ComponentSystemInitialize componentSystemInitialize)
+    {
+        NeoRecipeManage = componentSystemInitialize.WorldService.NeoRecipeManage;
+    }
+
     public override void InventoryTick(BlockTickEvent evnet, InventoryComponent component)
     {
         FurnaceComponent furnace = component as FurnaceComponent;
@@ -24,7 +30,7 @@ public class FurnaceSystem : TickSystem
                 //var recipe = RecipeManage.GetProcessRecipe("furnace",
                    // recipeItem => recipeItem.Cost[0].Id == input.Id && recipeItem.Cost[0].Amount <= input.Amount);
                 
-                var recipe = RecipeManage.GetProcessRecipe("furnace",[input]);
+                var recipe = NeoRecipeManage.GetProcessRecipe("furnace",[input]);
                 
                 if (recipe != null)
                 {

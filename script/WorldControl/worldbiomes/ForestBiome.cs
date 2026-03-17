@@ -29,13 +29,13 @@ namespace Horizoncraft.script.WorldControl.worldbiomes
                 if (lbsc.Random.Next(16) == 1)
                 {
                     BlockStruct blockStrcut =
-                        BlockStructManager.GetStruct("oak_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ, lbsc.Random);
+                        lbsc.NeoBlockStructManager.GetStruct("oak_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ, lbsc.Random);
                     lbsc.BlockStructs.Add(blockStrcut);
                 }
                 else if (lbsc.Random.Next(16) == 1)
                 {
                     BlockStruct blockStrcut =
-                        BlockStructManager.GetStruct("birch_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ, lbsc.Random);
+                        lbsc.NeoBlockStructManager.GetStruct("birch_tree", lbsc.GlobalX, lbsc.GlobalY, lbsc.GloablZ, lbsc.Random);
                     lbsc.BlockStructs.Add(blockStrcut);
                 }
             }

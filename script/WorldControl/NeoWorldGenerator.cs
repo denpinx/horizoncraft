@@ -11,11 +11,25 @@ public class NeoWorldGenerator
 {
     private readonly Stopwatch StopWatch = new Stopwatch();
     private readonly FastNoiseLite FastNoiseLite = new FastNoiseLite();
-    private NeoBiomeManage NeoBiomeManage;
+    public NeoBiomeManage NeoBiomeManage;
+    public NeoOreManage NeoOreManage;
+    public NeoMaterials NeoMaterials;
+    public NeoBlockStructManager NeoBlockStructManager;
     public NeoWorldGenerator()
     {
         NeoBiomeManage = new NeoBiomeManage();
+        NeoOreManage = new  NeoOreManage();
+        NeoBlockStructManager = new NeoBlockStructManager();
     }
+    /// <summary>
+    /// 插值计算
+    /// </summary>
+    /// <param name="p0"></param>
+    /// <param name="p1"></param>
+    /// <param name="p2"></param>
+    /// <param name="p3"></param>
+    /// <param name="t"></param>
+    /// <returns></returns>
     public float CatmullRom(float p0, float p1, float p2, float p3, float t)
     {
         const float tension = 0.5f; // 0.5 为标准 Catmull-Rom
@@ -65,15 +79,17 @@ public class NeoWorldGenerator
         int[,] highmap = GetHighMap(x);
         Random random = new Random(x * 3 + y * 7 + z * 11);
         List<BlockStruct> structs = new();
-        BiomeType biomeType = BiomeManage.CheckRange(highmap, x, y);
+        BiomeType biomeType = NeoBiomeManage.CheckRange(highmap, x, y);
 
         if (biomeType == BiomeType.LandBiome)
         {
             var landBiomeStructContext = new LandBiomeStructContext()
             {
-                HighMap = highmap,
+                NeoBlockStructManager = NeoBlockStructManager,
                 FastNoiseLite = FastNoiseLite,
+                NeoMaterials = NeoMaterials,
                 BlockStructs = structs,
+                HighMap = highmap,
                 Random = random,
                 GloablZ = z,
             };
@@ -98,13 +114,15 @@ public class NeoWorldGenerator
         {
             var biomeStructContext = new BiomeStructContext()
             {
+                NeoBlockStructManager = NeoBlockStructManager,
                 FastNoiseLite = FastNoiseLite,
+                NeoMaterials = NeoMaterials,
+                GlobalX = x * Chunk.Size,
+                GlobalY = y * Chunk.Size,
                 BlockStructs = structs,
                 Random = random,
-                GlobalX = x * Chunk.Size,
-                GlobalY = y * Chunk.Size
             };
-            Biome biome = BiomeManage.GetDeepBiome(x, y);
+            Biome biome = NeoBiomeManage.GetDeepBiome(x, y);
             biome.GeneratorStruct(biomeStructContext);
             if (structs.Count > 0)
                 return structs;
@@ -113,13 +131,15 @@ public class NeoWorldGenerator
         {
             var landBiomeStructContext = new BiomeStructContext()
             {
+                NeoBlockStructManager = NeoBlockStructManager,
                 FastNoiseLite = FastNoiseLite,
+                NeoMaterials = NeoMaterials,
+                GlobalX = x * Chunk.Size,
+                GlobalY = y * Chunk.Size,
                 BlockStructs = structs,
                 Random = random,
-                GlobalX = x * Chunk.Size,
-                GlobalY = y * Chunk.Size
             };
-            Biome biome = BiomeManage.GetSkyBiome(x, y);
+            Biome biome = NeoBiomeManage.GetSkyBiome(x, y);
             biome.GeneratorStruct(landBiomeStructContext);
             if (structs.Count > 0)
                 return structs;
@@ -135,7 +155,7 @@ public class NeoWorldGenerator
         for (int j = y - 1; j <= y + 1; j++)
         {
             Random random = new Random(i * Int16.MaxValue + j);
-            var st = OreManage.GeneratorOre(random, i, j);
+            var st = NeoOreManage.GeneratorOre(random, i, j);
             if (st != null) structs.Add(st);
         }
 
@@ -177,13 +197,13 @@ public class NeoWorldGenerator
         Stopwatch stopWatch = new();
         stopWatch.Start();
         chunk.spawn = true;
-        var landbiome = BiomeManage.GetMixinLandBiome(chunk.X);
+        var landbiome = NeoBiomeManage.GetMixinLandBiome(chunk.X);
         int[,] highmap = GetHighMap(chunk.X);
         List<BlockStruct> structs = GetAllStructs(chunk.X, chunk.Y);
         List<BlockStruct> ores = GetAllOres(chunk.X, chunk.Y);
         //地表生物群系
 
-        BiomeType biomeType = BiomeManage.CheckRange(highmap, chunk.X, chunk.Y);
+        BiomeType biomeType = NeoBiomeManage.CheckRange(highmap, chunk.X, chunk.Y);
         if (biomeType == BiomeType.LandBiome)
         {
             chunk.BiomeType = landbiome.name;
@@ -191,6 +211,7 @@ public class NeoWorldGenerator
             {
                 Chunk = chunk,
                 HighMap = highmap,
+                NeoMaterials = NeoMaterials
             };
             for (int z = 0; z < Chunk.SizeZ; z++)
             {
@@ -241,6 +262,7 @@ public class NeoWorldGenerator
             {
                 Chunk = chunk,
                 HighMap = highmap,
+                NeoMaterials = NeoMaterials,
             };
             for (int z = 0; z < Chunk.SizeZ; z++)
             {

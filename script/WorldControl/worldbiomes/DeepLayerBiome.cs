@@ -2,8 +2,6 @@ using Godot;
 using Horizoncraft.script.WorldControl.Context;
 using Horizoncraft.script.WorldControl.Struct;
 using Horizoncraft.script.WorldControl.Struct.structs;
-using static Horizoncraft.script.WorldControl.BiomeManage;
-
 namespace Horizoncraft.script.WorldControl.worldbiomes
 {
     public class DeepLayerBiome : Biome
@@ -25,7 +23,7 @@ namespace Horizoncraft.script.WorldControl.worldbiomes
         {
             if (landBiomeStructContext.Random.Next(10) == 1)
             {
-                if (BlockStructManager.StaticBuildStructs.TryGetValue("mine_mini_room", out StaticBuildStruct staticBuildStruct))
+                if (landBiomeStructContext.NeoBlockStructManager.StaticBuildStructs.TryGetValue("mine_mini_room", out StaticBuildStruct staticBuildStruct))
                 {
                     Vector3I pos = new Vector3I(
                         landBiomeStructContext.GlobalX + landBiomeStructContext.Random.Next(Chunk.Size),

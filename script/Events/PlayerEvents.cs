@@ -35,7 +35,8 @@ public class PlayerEvents
     /// <param name="playerCraftItemEvent"></param>
     public virtual void CraftGridRecipeItem(PlayerCraftItemEvent playerCraftItemEvent)
     {
-        var gri = RecipeManage.GetRecipe(playerCraftItemEvent.Player.Inventory, 2, 36);
+        NeoRecipeManage NeoRecipeManage = playerCraftItemEvent.world.Service.NeoRecipeManage;
+        var gri = NeoRecipeManage.GetRecipe(playerCraftItemEvent.Player.Inventory, 2, 36);
         if (playerCraftItemEvent.IsAllCraft)
         {
             //一键合成,直接返回背包
@@ -45,7 +46,7 @@ public class PlayerEvents
                     return;
                 for (int i = 0; i < 4; i++)
                     playerCraftItemEvent.Player.Inventory.ReduceItemAmount(36 + i);
-                gri = RecipeManage.GetRecipe(playerCraftItemEvent.Player.Inventory, 2, 36);
+                gri = NeoRecipeManage.GetRecipe(playerCraftItemEvent.Player.Inventory, 2, 36);
             }
         }
         else if (gri != null)

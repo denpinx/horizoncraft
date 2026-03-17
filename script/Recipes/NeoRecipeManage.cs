@@ -1,25 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Godot;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Utility;
-using FileAccess = Godot.FileAccess;
 
 namespace Horizoncraft.script.Recipes;
 
-/// <summary>
-/// 支持把不同目录的json文件，的相同配方类型给自动合并，一个json既支持只写一个，多个json也可以对同一个类型添加
-/// 本质上每个json文件都是对某个配方类型的追加，不会重复。
-/// </summary>
-[Obsolete("该类型已弃用，请使用NeoRecipeManage",true)]
-public static class RecipeManage
+public class NeoRecipeManage
 {
-    private static readonly List<ProcessRecipePack> ProcessRecipes = new List<ProcessRecipePack>();
-    private static readonly List<GridRecipePack> GridRecipes = new List<GridRecipePack>();
+    private readonly List<ProcessRecipePack> ProcessRecipes = new List<ProcessRecipePack>();
+    private readonly List<GridRecipePack> GridRecipes = new List<GridRecipePack>();
+    
+    public NeoMaterials NeoMaterials;
 
-
-    public static GridRecipeItem MatchGridRecipe(ItemStack[,] items, string tag)
+    public GridRecipeItem MatchGridRecipe(ItemStack[,] items, string tag)
     {
         var gr = GridRecipes.Find(gr => gr.Tag == tag);
         if (gr == null) return null;
@@ -27,7 +21,7 @@ public static class RecipeManage
         return gri;
     }
 
-    public static GridRecipeItem GetRecipe(InventoryBase inventory, int RecipeSize, int start_index = 0,
+    public GridRecipeItem GetRecipe(InventoryBase inventory, int RecipeSize, int start_index = 0,
         string tag = "workbench")
     {
         ItemStack[,] PrimeItems = new ItemStack[RecipeSize, RecipeSize];
@@ -68,14 +62,14 @@ public static class RecipeManage
             }
         }
 
-        return RecipeManage.MatchGridRecipe(ResultItems, tag);
+        return MatchGridRecipe(ResultItems, tag);
     }
 
-    public static void RegGridRecipe(GridRecipePack recipePack)
+    public void RegGridRecipe(GridRecipePack recipePack)
     {
         if (recipePack == null)
         {
-            GD.PrintErr($"[{nameof(RecipeManage)}] 注册失败,配方异常为null。");
+            GD.PrintErr($"[{nameof(NeoRecipeManage)}] 注册失败,配方异常为null。");
             return;
         }
 
@@ -83,18 +77,18 @@ public static class RecipeManage
         if (result != null)
         {
             GD.Print(
-                $"[{nameof(RecipeManage)}] 添加配方项 {recipePack.Tag,-16} #{result.Recipes.Count,-4} + {recipePack.Recipes.Count,-4}");
+                $"[{nameof(NeoRecipeManage)}] 添加配方项 {recipePack.Tag,-16} #{result.Recipes.Count,-4} + {recipePack.Recipes.Count,-4}");
             foreach (var r in recipePack.Recipes)
                 result.Recipes.Add(r);
         }
         else
         {
-            GD.Print($"[{nameof(RecipeManage)}] 创建配方组 {recipePack.Tag,-16} #{recipePack.Recipes.Count,-4}");
+            GD.Print($"[{nameof(NeoRecipeManage)}] 创建配方组 {recipePack.Tag,-16} #{recipePack.Recipes.Count,-4}");
             GridRecipes.Add(recipePack);
         }
     }
 
-    public static void RegRecipe(ProcessRecipePack processRecipePack)
+    public void RegRecipe(ProcessRecipePack processRecipePack)
     {
         if (processRecipePack == null)
         {
@@ -116,7 +110,7 @@ public static class RecipeManage
         }
     }
 
-    private static GridRecipeItem ParseGridRecipeItem(Dictionary<string, object> dict)
+    private GridRecipeItem ParseGridRecipeItem(Dictionary<string, object> dict)
     {
         GridRecipeItem item = new GridRecipeItem();
 
@@ -186,7 +180,7 @@ public static class RecipeManage
         return item;
     }
 
-    private static ProcessRecipeItem ParseRecipeItem(Dictionary<string, object> dict)
+    private ProcessRecipeItem ParseRecipeItem(Dictionary<string, object> dict)
     {
         ProcessRecipeItem item = new ProcessRecipeItem();
 
@@ -228,7 +222,7 @@ public static class RecipeManage
         return item;
     }
 
-    private static GridRecipePack ParseGridFile(Dictionary<string, object> dict)
+    private GridRecipePack ParseGridFile(Dictionary<string, object> dict)
     {
         var recipe = new GridRecipePack();
         if (dict.TryGetValue("tag", out object value))
@@ -242,7 +236,7 @@ public static class RecipeManage
         return recipe;
     }
 
-    private static ProcessRecipePack ParseProcessRecipeFile(Dictionary<string, object> dict)
+    private ProcessRecipePack ParseProcessRecipeFile(Dictionary<string, object> dict)
     {
         var recipe = new ProcessRecipePack();
         if (dict.TryGetValue("tag", out var value))
@@ -256,7 +250,7 @@ public static class RecipeManage
         return recipe;
     }
 
-    private static void ParseFile(string filename)
+    private void ParseFile(string filename)
     {
         var path = filename;
         if (!FileAccess.FileExists(path))
@@ -287,7 +281,7 @@ public static class RecipeManage
         return;
     }
 
-    static RecipeManage()
+    public void LoadRecipes()
     {
         if (!DirAccess.DirExistsAbsolute("res://config/recipes"))
         {
@@ -296,20 +290,20 @@ public static class RecipeManage
         }
 
         var list = new List<string>();
-        DirUtility.GetFiles("res://config/recipes",".json", list);
+        DirUtility.GetFiles("res://config/recipes", ".json", list);
         foreach (var file in list)
             ParseFile(file);
     }
 
 
-    public static ProcessRecipePack GetRecipe(string tag)
+    public ProcessRecipePack GetRecipe(string tag)
     {
         var recipe = ProcessRecipes.Find(r => r.Tag == tag);
         if (recipe == null) GD.PrintErr($"[RecipeManage] 配方{tag} 不存在!");
         return recipe;
     }
 
-    public static ProcessRecipeItem GetProcessRecipe(string tag, Func<ProcessRecipeItem, bool> mathAction)
+    public ProcessRecipeItem GetProcessRecipe(string tag, Func<ProcessRecipeItem, bool> mathAction)
     {
         var recipe = GetRecipe(tag);
         if (recipe == null) return null;
@@ -323,19 +317,20 @@ public static class RecipeManage
     /// <param name="tag"></param>
     /// <param name="Items"></param>
     /// <returns></returns>
-    public static ProcessRecipeItem GetProcessRecipe(string tag, ItemStack[] Items)
+    public ProcessRecipeItem GetProcessRecipe(string tag, ItemStack[] Items)
     {
         var recipe = GetRecipe(tag);
         if (recipe == null) return null;
         var result = recipe.Recipes.Find(r => r.ItemMatch(Items));
         return result;
     }
+
     /// <summary>
     /// 搜寻物品参与合成的配方
     /// </summary>
     /// <param name="itemStack"></param>
     /// <returns></returns>
-    public static Dictionary<string, RecipePack> SearchRecipeByUsefor(ItemStack itemStack)
+    public Dictionary<string, RecipePack> SearchRecipeByUsefor(ItemStack itemStack)
     {
         Dictionary<string, RecipePack> result = new();
 
@@ -372,7 +367,7 @@ public static class RecipeManage
     /// </summary>
     /// <param name="itemStack"></param>
     /// <returns></returns>
-    public static Dictionary<string, RecipePack> SearchRecipeBySource(ItemStack itemStack)
+    public Dictionary<string, RecipePack> SearchRecipeBySource(ItemStack itemStack)
     {
         Dictionary<string, RecipePack> result = new();
         foreach (var pack in GridRecipes)

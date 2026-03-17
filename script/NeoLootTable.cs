@@ -8,9 +8,11 @@ namespace Horizoncraft.script;
 
 public class NeoLootTable()
 {
-    public NeoMaterials materials;
+    public NeoMaterials NeoMaterials;
     public Dictionary<string, LootTable> LootTables = new();
-
+    /// <summary>
+    /// 加载位于 "res://config/loot_table" 中的战利品表配置
+    /// </summary>
     public void LoadLootTables()
     {
         var loot_table_files = new List<string>();
@@ -23,7 +25,7 @@ public class NeoLootTable()
             LootTable loot_table = new LootTable();
             foreach (var table_item in tableRecord.Loot)
             {
-                var item = materials.GetItemMeta(table_item.Name);
+                var item = NeoMaterials.GetItemMeta(table_item.Name);
                 if (item == null)
                 {
                     GD.PrintErr($"{nameof(NeoLootTable)} 没有物品 {table_item.Name}");
@@ -48,7 +50,11 @@ public class NeoLootTable()
             GD.Print($"加载战利品表：{tableRecord.TableName} {loot_table_file_path}");
         }
     }
-
+    /// <summary>
+    /// 获取战利品表
+    /// </summary>
+    /// <param name="loot_table_name">表名</param>
+    /// <returns></returns>
     public LootTable GetLootTable(string loot_table_name)
     {
         if (LootTables.TryGetValue(loot_table_name, out var loot_table))

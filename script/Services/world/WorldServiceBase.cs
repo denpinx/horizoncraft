@@ -9,6 +9,7 @@ using Horizoncraft.script.Components;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.I18N;
 using Horizoncraft.script.Net;
+using Horizoncraft.script.Recipes;
 using Horizoncraft.script.rpc;
 using Horizoncraft.script.Services;
 using Horizoncraft.script.Services.chunk;
@@ -83,7 +84,7 @@ public abstract class WorldServiceBase
     /// 世界生成器
     /// </summary>
     public NeoWorldGenerator  NeoWorldGenerator;
-    
+    public NeoRecipeManage  NeoRecipeManage;
 
     private Stopwatch _stopwatch = new Stopwatch();
 
@@ -92,20 +93,20 @@ public abstract class WorldServiceBase
         NeoWorldGenerator = new NeoWorldGenerator();
         NeoMaterials = new NeoMaterials();
         NeoLootTable = new NeoLootTable();
+        NeoRecipeManage = new NeoRecipeManage();
         
         NeoMaterials.LootTable = NeoLootTable;
-        NeoLootTable.materials = NeoMaterials;
+        NeoLootTable.NeoMaterials = NeoMaterials;
+        NeoRecipeManage.NeoMaterials = NeoMaterials;
         
         NeoMaterials.LoadBlockMaterials();
         NeoLootTable.LoadLootTables();
-  
-
+        
         //组件管理器最后初始化
         NeoComponentManager = new NeoComponentManager(this,NeoMaterials);
         
         this.World = world;
         LoadWorldProfile();
-        BiomeManage.Reset();
         world.timer.Timeout += WorldServiceTick;
     }
 
