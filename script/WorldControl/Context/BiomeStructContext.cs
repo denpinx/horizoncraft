@@ -7,7 +7,6 @@ namespace Horizoncraft.script.WorldControl.Context
 {
     public class BiomeStructContext
     {
-        public required NeoMaterials NeoMaterials;
         public required NeoBlockStructManager NeoBlockStructManager;
         
         public FastNoiseLite FastNoiseLite;

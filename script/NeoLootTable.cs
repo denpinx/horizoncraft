@@ -8,7 +8,6 @@ namespace Horizoncraft.script;
 
 public class NeoLootTable()
 {
-    public NeoMaterials NeoMaterials;
     public Dictionary<string, LootTable> LootTables = new();
 
     /// <summary>
@@ -26,7 +25,7 @@ public class NeoLootTable()
             LootTable loot_table = new LootTable();
             foreach (var table_item in tableRecord.Loot)
             {
-                var item = NeoMaterials.GetItemMeta(table_item.Name);
+                var item = Materials.ItemMetas[table_item.Name];
                 if (item == null)
                 {
                     GD.PrintErr($"{nameof(NeoLootTable)} 没有物品 {table_item.Name}");
@@ -59,7 +58,7 @@ public class NeoLootTable()
     /// </summary>
     public void GenerateBlockMetaLootTables()
     {
-        foreach (var meta in NeoMaterials.BlockMetas.Values)
+        foreach (var meta in Materials.BlockMetas.Values)
         {
             if (meta.LootTableName == null)
             {

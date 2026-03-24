@@ -1,13 +1,15 @@
 using System.Collections.Generic;
 using Horizoncraft.script;
+using Horizoncraft.script.Components;
 using Horizoncraft.script.Net;
 
 namespace Horizoncraft.script.Services.entity;
 
 public class HostEntityService : EntityServiceBase
 {
-    public HostEntityService(World world) : base(world)
+    public HostEntityService(World world, NeoComponentManager componentManager) : base(world, componentManager)
     {
+        
     }
 
     public override void ReceiveEntityPack(EntityPack entityPack)

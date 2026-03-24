@@ -10,9 +10,6 @@ public class NeoRecipeManage
 {
     private readonly List<ProcessRecipePack> ProcessRecipes = new List<ProcessRecipePack>();
     private readonly List<GridRecipePack> GridRecipes = new List<GridRecipePack>();
-    
-    public NeoMaterials NeoMaterials;
-
     public GridRecipeItem MatchGridRecipe(ItemStack[,] items, string tag)
     {
         var gr = GridRecipes.Find(gr => gr.Tag == tag);

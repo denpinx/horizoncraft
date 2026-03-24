@@ -9,13 +9,14 @@ using Horizoncraft.script.WorldControl;
 
 namespace Horizoncraft.script.Services.chunk;
 
-public class ClientChunkService : ChunkServiceBase
+public class ClientChunkService(
+    World world,
+    NeoWorldGenerator worldGenerator
+) :
+    ChunkServiceBase(world, worldGenerator)
 {
     private ConcurrentDictionary<Vector2I, int> RegetList = new();
 
-    public ClientChunkService(World world) : base(world)
-    {
-    }
 
     protected override async Task<Chunk> LoadChunk(Vector2I pos)
     {

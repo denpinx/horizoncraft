@@ -20,7 +20,7 @@ namespace Horizoncraft.script.Services.entity;
 /// 基础实体服务
 /// 提供完整的实体管理，实体视图同步，实体组件处理。实体生命周期管理服务。
 /// </summary>
-public class EntityServiceBase : ServiceBase
+public class EntityServiceBase
 {
     public WorldServiceBase WorldService;
     
@@ -34,8 +34,12 @@ public class EntityServiceBase : ServiceBase
     /// </summary>
     public Dictionary<Guid, IEntityNode> EntityNodes = new();
 
-    public EntityServiceBase(World world) : base(world)
+    protected NeoComponentManager componentManager;
+    protected World World;
+    public EntityServiceBase(World world,NeoComponentManager componentManager)
     {
+        this.World = world;
+        this.componentManager = componentManager;
         WorldService = world.Service;
         world.timer.Timeout += Ticking;
         world.Service.ChunkService.OnChunkLoaded += OnChunkLoad;
@@ -77,7 +81,7 @@ public class EntityServiceBase : ServiceBase
                 Service = World.Service,
                 EntityData = entity,
             };
-            WorldService.NeoComponentManager.ExecuteEntityComponents(ese);
+            componentManager.ExecuteEntityComponents(ese);
             // ComponentManager.ExecuteEntityComponents(ese);
             //尝试加载该区块
             if (!World.Service.ChunkService.Chunks.ContainsKey(entity.ChunkCoord))

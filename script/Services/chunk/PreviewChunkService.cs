@@ -5,16 +5,13 @@ using Horizoncraft.script.WorldControl;
 
 namespace Horizoncraft.script.Services.chunk;
 
-public class PreviewChunkService : ChunkServiceBase
+public class PreviewChunkService(World world,NeoWorldGenerator worldGenerator) : ChunkServiceBase(world,worldGenerator)
 {
-    public PreviewChunkService(World world) : base(world)
-    {
-    }
 
     protected override async Task<Chunk> LoadChunk(Vector2I pos)
     {
         var chunk = new Chunk(pos.X, pos.Y);
-        World.Service.NeoWorldGenerator.Generator(chunk);
+        worldGenerator.Generator(chunk);
         return chunk;
     }
 

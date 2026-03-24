@@ -245,7 +245,7 @@ public class NeoComponentManager
 
     //绑定组件功能和组件类型，
     //注意：有些组件会在事件触发时修改物品或方块状态，不是所有组件都能够相互兼容。
-    public NeoComponentManager(WorldServiceBase worldServiceBase,NeoMaterials neoMaterials)
+    public NeoComponentManager(WorldServiceBase worldServiceBase)
     {
         //顶部方块覆盖组件
         Register(SystemEnum.BlockCover,

@@ -18,6 +18,7 @@ using Horizoncraft.script.Services.message;
 using Horizoncraft.script.Services.player;
 using Horizoncraft.script.WorldControl;
 using Horizoncraft.script.WorldControl.Tool;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Horizoncraft.script.Services.world;
 
@@ -26,6 +27,9 @@ namespace Horizoncraft.script.Services.world;
 /// </summary>
 public abstract class WorldServiceBase
 {
+    protected ServiceCollection ServiceCollection = new ServiceCollection();
+    protected ServiceProvider ServiceProvider;
+    
     public WorldProfile Profile;
     public World World;
 
@@ -41,9 +45,6 @@ public abstract class WorldServiceBase
     /// </summary>
     public int TickTimes;
 
-    /// <summary>生命周期管理 </summary>
-    public List<ServiceBase> Services = new();
-
     /// <summary>区块服务</summary>
     public ChunkServiceBase ChunkService;
 
@@ -55,7 +56,7 @@ public abstract class WorldServiceBase
     public PlayerServiceNode PlayerServiceNode;
 
     /// <summary>实体服务</summary>
-    public EntityServiceBase EntityService;
+     public EntityServiceBase EntityService;
 
     public EntityServiceNode EntityServiceNode;
 
@@ -71,7 +72,7 @@ public abstract class WorldServiceBase
     /// <summary>
     /// 方块，物品，实体的元数据
     /// </summary>
-    public NeoMaterials NeoMaterials;
+    // public NeoMaterials NeoMaterials;
     /// <summary>
     /// 战利品表的配置
     /// </summary>
@@ -90,20 +91,13 @@ public abstract class WorldServiceBase
 
     public WorldServiceBase(World world)
     {
-        NeoWorldGenerator = new NeoWorldGenerator();
-        NeoMaterials = new NeoMaterials();
-        NeoLootTable = new NeoLootTable();
-        NeoRecipeManage = new NeoRecipeManage();
-        
-        NeoLootTable.NeoMaterials = NeoMaterials;
-        NeoRecipeManage.NeoMaterials = NeoMaterials;
-        
-        NeoMaterials.Initialize();
-        NeoLootTable.LoadLootTables();
-        NeoLootTable.GenerateBlockMetaLootTables();
-        
-        //组件管理器最后初始化
-        NeoComponentManager = new NeoComponentManager(this,NeoMaterials);
+        ServiceCollection.AddSingleton<World>(world);
+        ServiceCollection.AddSingleton<WorldServiceBase>(this);
+        ServiceCollection.AddTransient<ChunkServiceNode>();
+        ServiceCollection.AddTransient<PlayerServiceNode>();
+        ServiceCollection.AddTransient<PlayerInventoryServiceNode>();
+        ServiceCollection.AddTransient<EntityServiceNode>();
+        ServiceCollection.AddTransient<MessageServiceNode>();
         
         this.World = world;
         LoadWorldProfile();
@@ -117,50 +111,33 @@ public abstract class WorldServiceBase
         if (TickTimes % (20 * AutoSaveSeconds) == 1)
             Save();
     }
-
-
-    public void InitializeNode()
+    public void InitializeServices()
     {
-        World.AddChild(ChunkServiceNode = new ChunkServiceNode(World));
-        World.AddChild(PlayerServiceNode = new PlayerServiceNode(World));
-        World.AddChild(PlayerInventoryServiceNode = new PlayerInventoryServiceNode(World));
-        World.AddChild(EntityServiceNode = new EntityServiceNode(World));
-        World.AddChild(MessageServiceNode = new MessageServiceNode(World));
+        EntityBehavior = ServiceProvider.GetService<EntityBehaviorBase>();
+        ChunkService = ServiceProvider.GetService<ChunkServiceBase>();
+        PlayerService =ServiceProvider.GetService<PlayerServiceBase>();
+        EntityService = ServiceProvider.GetService<EntityServiceBase>();
+        MessageService = ServiceProvider.GetService<MessageServiceBase>();
+        
+        NeoComponentManager = ServiceProvider.GetService<NeoComponentManager>();
+        NeoLootTable = ServiceProvider.GetService<NeoLootTable>();
+        NeoRecipeManage = ServiceProvider.GetService<NeoRecipeManage>();
+        NeoWorldGenerator = ServiceProvider.GetService<NeoWorldGenerator>();
+        
+        World.AddChild(ServiceProvider.GetService<ChunkServiceNode>());
+        World.AddChild(ServiceProvider.GetService<PlayerServiceNode>());
+        World.AddChild(ServiceProvider.GetService<PlayerInventoryServiceNode>());
+        World.AddChild(ServiceProvider.GetService<EntityServiceNode>());
+        World.AddChild(ServiceProvider.GetService<MessageServiceNode>());
     }
-
-    public abstract void InitializeServices();
-
-    /// <summary>
-    /// 将生命周期交给 WorldServiceBase管理
-    /// </summary>
-    /// <param name="service">服务</param>
-    /// <typeparam name="T">类型</typeparam>
-    /// <returns>服务本身</returns>
-    public T AddService<T>(ServiceBase service) where T : ServiceBase
-    {
-        Services.Add(service);
-        return (T)service;
-    }
-
-
     /// <summary>
     /// 保存所有实现了 ISave接口的服务。
     /// </summary>
-    public async void Save()
+    public void Save()
     {
-        List<Task> tasks = new();
         _stopwatch.Restart();
-        foreach (ServiceBase service in Services)
-        {
-            if (service is ISave save)
-            {
-                Task task = new Task(() => save.SaveAll());
-                tasks.Add(task);
-                task.Start();
-            }
-        }
-
-        await Task.WhenAll(tasks.ToArray());
+        ChunkService.SaveAll();
+        PlayerService.SaveAll();
         _stopwatch.Stop();
 
         GD.Print($"[{GetTime()}]保存结束。用时:{_stopwatch.Elapsed.TotalMicroseconds}μs");

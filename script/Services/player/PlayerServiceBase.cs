@@ -23,7 +23,7 @@ namespace Horizoncraft.script.Services.player;
 ///     玩家事件处理
 ///     异步玩家资源加载
 /// </summary>
-public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
+public abstract class PlayerServiceBase : IDisposable, ISave
 {
     /// <summary>
     /// 玩家事件处理
@@ -53,9 +53,11 @@ public abstract class PlayerServiceBase : ServiceBase, IDisposable, ISave
     private PackedScene PlayerSnapshot_ps = GD.Load<PackedScene>("res://tscn/PlayerSnapshot.tscn");
     private CancellationTokenSource _tokenSource;
     private Task _processTask;
-
-    public PlayerServiceBase(World world) : base(world)
+    protected World World;
+    public PlayerServiceBase(World world)
     {
+        this.World = world;
+        
         world.timer.Timeout += Ticking;
         PlayerNode.GetInformation[nameof(PlayerServiceBase)] =
             () => $"在线玩家:{Players.Count}";

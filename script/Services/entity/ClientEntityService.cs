@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Godot;
 using Horizoncraft.script;
+using Horizoncraft.script.Components;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.NewProxy.player;
@@ -9,8 +10,9 @@ namespace Horizoncraft.script.Services.entity;
 
 public class ClientEntityService : EntityServiceBase
 {
-    public ClientEntityService(World world) : base(world)
+    public ClientEntityService(World world, NeoComponentManager componentManager) : base(world, componentManager)
     {
+        
     }
 
     protected override void Ticking()

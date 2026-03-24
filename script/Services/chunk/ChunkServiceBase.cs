@@ -20,7 +20,7 @@ namespace Horizoncraft.script.Services.chunk;
 /// 区块服务基类
 /// 默认实现了所有方法
 /// </summary>
-public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
+public partial class ChunkServiceBase : IDisposable, ISave
 {
     /// <summary>
     /// 下标映射贴图坐标集
@@ -119,11 +119,14 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
 
     #endregion
 
-
-    public ChunkServiceBase(World world) : base(world)
+    protected NeoWorldGenerator WorldGenerator;
+    protected World World;
+    public ChunkServiceBase(World world,NeoWorldGenerator worldGenerator)
     {
+        this.World = world;
+        this.WorldGenerator = worldGenerator;
+        
         world.timer.Timeout += Ticking;
-
         PlayerNode.GetInformation[nameof(ChunkServiceBase)] =
             () => $"加载区块:{Chunks.Count}\n" +
                   $"待加载区块:{LoadChunkQueue.Count}\n" +
@@ -205,7 +208,7 @@ public partial class ChunkServiceBase : ServiceBase, IDisposable, ISave
                 else
                 {
                     var chunk = new Chunk(pos.X, pos.Y);
-                    World.Service.NeoWorldGenerator.Generator(chunk);
+                    WorldGenerator.Generator(chunk);
                     return chunk;
                 }
             }

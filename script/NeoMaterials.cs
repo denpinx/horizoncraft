@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using Horizoncraft.script.Components;
@@ -11,6 +12,7 @@ namespace Horizoncraft.script;
 /// <summary>
 /// 新版本Materials，非静态版本，计划代替materials
 /// </summary>
+[Obsolete("已禁用",true)]
 public class NeoMaterials
 {
     /// <summary>

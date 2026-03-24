@@ -26,7 +26,7 @@
 | 类型                 | 新类型                   | 替换进度 | 备注               |
 |--------------------|-----------------------|------|------------------|
 | ComponentManager   | NeoComponentManager   | 替换完成 |                  |
-| Materials          | NeoMaterials          | 替换中  | 优化代码             |
+| Materials          | NeoMaterials          | 放弃代替 | 仅优化代码            |
 | WorldGenerator     | NeoWorldGenerator     | 已完成  |                  |
 | RecipeManage       | NeoRecipeManage       | 已完成  |                  |
 | BlockStructManager | NeoBlockStructManager | 已完成  |                  |

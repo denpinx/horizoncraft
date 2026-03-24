@@ -3,6 +3,9 @@ using Horizoncraft.script.Components;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Net;
+using Horizoncraft.script.Services.chunk;
+using Horizoncraft.script.Services.entity;
+using Horizoncraft.script.Services.player;
 using Horizoncraft.script.Services.world;
 using Horizoncraft.script.WorldControl;
 using InventoryComponent = Horizoncraft.script.Components.BlockComponents.InventoryComponent;
@@ -12,17 +15,16 @@ namespace Horizoncraft.script.rpc;
 /// <summary>
 /// 区块类相关RPC操作
 /// </summary>
-public partial class ChunkServiceNode : Node
+public partial class ChunkServiceNode(
+    World World,
+    WorldServiceBase WorldService,
+    ChunkServiceBase ChunkService,
+    EntityServiceBase EntityService,
+    PlayerServiceBase PlayerService
+)
+    : Node
 {
-    private World World;
-
-    private WorldServiceBase WorldService => this.World.Service;
-
-    public ChunkServiceNode(World world)
-    {
-        this.Name = nameof(ChunkServiceNode);
-        World = world;
-    }
+    // private WorldServiceBase WorldService => World.Service;
 
     /// <summary>
     /// 接收单个全量更新区块，目前没用。
@@ -32,7 +34,7 @@ public partial class ChunkServiceNode : Node
     public void ReciveChunk(byte[] data)
     {
         Chunk chunk = ByteTool.FromBytes<Chunk>(data);
-        WorldService.ChunkService.Chunks[new(chunk.X, chunk.Y)] = chunk;
+        ChunkService.Chunks[new(chunk.X, chunk.Y)] = chunk;
     }
 
     /// <summary>
@@ -50,9 +52,9 @@ public partial class ChunkServiceNode : Node
             GD.Print($"#{chunk.coord} 区块全量更新");
 
             //同步区块
-            WorldService.ChunkService.Chunks[chunk.coord] = chunk;
+            ChunkService.Chunks[chunk.coord] = chunk;
             //同步实体
-            WorldService.EntityService.ReleaseChunkEntity(chunk);
+            EntityService.ReleaseChunkEntity(chunk);
         }
     }
 
@@ -66,14 +68,14 @@ public partial class ChunkServiceNode : Node
         var pack = ByteTool.FromBytes<WorldSnapshot>(data);
         foreach (var update in pack.chunks)
         {
-            if (World.Service.ChunkService.Chunks.TryGetValue(new Vector2I(update.X, update.Y), out Chunk chunk))
+            if (ChunkService.Chunks.TryGetValue(new Vector2I(update.X, update.Y), out Chunk chunk))
             {
                 foreach (var vbd in update.VectorBlocks)
                     chunk.SetBlock(vbd.X, vbd.Y, vbd.Z, vbd.Block);
 
                 GD.Print($"#{chunk.coord} 区块增量更新:{update.VectorBlocks.Count}个方块");
                 foreach (var entity in update.Entiydatas)
-                    WorldService.EntityService.AddEntityData(entity);
+                    EntityService.AddEntityData(entity);
             }
         }
     }
@@ -99,7 +101,7 @@ public partial class ChunkServiceNode : Node
     public void ReciveBlockData(byte[] data, int x, int y, int z)
     {
         BlockData block = ByteTool.FromBytes<BlockData>(data);
-        WorldService.ChunkService.SetBlock(new Vector3I(x, y, z), block);
+        ChunkService.SetBlock(new Vector3I(x, y, z), block);
         if (World.PlayerNode.OpeningInventoryNode != null &&
             World.PlayerNode.playerData.OpenInventory == new System.Numerics.Vector3(x, y, z))
         {
@@ -155,9 +157,9 @@ public partial class ChunkServiceNode : Node
     public void ReGetChunk(int x, int y)
     {
         var pos = new Vector2I(x, y);
-        if (WorldService.ChunkService.Chunks.ContainsKey(pos))
+        if (ChunkService.Chunks.ContainsKey(pos))
         {
-            WorldService.ChunkService.Chunks[pos].update_server = true;
+            ChunkService.Chunks[pos].update_server = true;
         }
     }
 
@@ -169,7 +171,7 @@ public partial class ChunkServiceNode : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void SetOpenBlockComponent(string name, byte[] bytes)
     {
-        if (WorldService.PlayerService.Players.TryGetValue(name, out var playerData))
+        if (PlayerService.Players.TryGetValue(name, out var playerData))
         {
             var scd = ByteTool.FromBytes<SetComponentData>(bytes);
             var sobc = new PlayerSetBlockComponentEvent()
@@ -178,7 +180,7 @@ public partial class ChunkServiceNode : Node
                 Player = playerData,
                 ComponentData = scd,
             };
-            WorldService.PlayerService.Events.SetOpenBlockComponent(sobc);
+            PlayerService.Events.SetOpenBlockComponent(sobc);
         }
     }
 
@@ -193,6 +195,6 @@ public partial class ChunkServiceNode : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer)]
     public void SetBlock(int x, int y, int z, string id, int state)
     {
-        WorldService.ChunkService.SetBlock(new(x, y, z), Materials.Valueof(id), state);
+        ChunkService.SetBlock(new(x, y, z), Materials.Valueof(id), state);
     }
 }

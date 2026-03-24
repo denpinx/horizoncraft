@@ -13,7 +13,7 @@ public class HostChunkService : ChunkServiceBase
 {
     public WorldSnapshot WorldSnapshot = new WorldSnapshot();
 
-    public HostChunkService(World world) : base(world)
+    public HostChunkService(World world,NeoWorldGenerator worldGenerator) : base(world,worldGenerator)
     {
         PlayerNode.GetInformation[nameof(HostChunkService)] =
             () => $"差异更新区块:{WorldSnapshot.chunks.Count}";

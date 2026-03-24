@@ -9,7 +9,7 @@ namespace Horizoncraft.script.Services.message;
 /// 消息管理服务
 /// 不存储消息日志
 /// </summary>
-public abstract class MessageServiceBase : ServiceBase
+public abstract class MessageServiceBase
 {
     protected PackedScene MessageLabelScene = GD.Load<PackedScene>("res://tscn/Gui/MessageLabel.tscn");
 
@@ -30,11 +30,12 @@ public abstract class MessageServiceBase : ServiceBase
     protected List<MessageData> Messages = new();
     protected Dictionary<Guid, MessageLabel> MessageLabels = new();
 
-
-    public MessageServiceBase(World world) : base(world)
+    protected World World;
+    public MessageServiceBase(World world)
     {
         this.Player = World.PlayerNode;
         world.timer.Timeout += Tick;
+        this.World = world;
     }
 
     /// <summary>

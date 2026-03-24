@@ -1,10 +1,15 @@
 using Godot;
 using Horizoncraft.script;
+using Horizoncraft.script.Components;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.NewProxy.player;
+using Horizoncraft.script.Recipes;
 using Horizoncraft.script.Services.chunk;
 using Horizoncraft.script.Services.entity;
 using Horizoncraft.script.Services.message;
+using Horizoncraft.script.Services.player;
+using Horizoncraft.script.WorldControl;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Horizoncraft.script.Services.world;
 
@@ -45,19 +50,16 @@ public class ClientWorldService : WorldServiceBase
         {
             GD.PrintErr($"客户端连接失败 {result}");
         }
-    }
-
-    public override void InitializeServices()
-    {
-        EntityBehavior = new ClientEntityBehavior();
-        ;
-        ChunkService = AddService<ClientChunkService>(new ClientChunkService(World));
-        PlayerService = AddService<ClientPlayerService>(new ClientPlayerService(World));
-        EntityService = AddService<ClientEntityService>(new ClientEntityService(World));
-        MessageService = AddService<ClientMessageService>(new ClientMessageService(World));
-        InitializeNode();
-
-        GD.Print($"[初始化完成]{nameof(ClientWorldService)}");
+        ServiceCollection.AddTransient<NeoComponentManager, NeoComponentManager>();
+        ServiceCollection.AddTransient<NeoWorldGenerator, NeoWorldGenerator>();
+        ServiceCollection.AddTransient<NeoLootTable, NeoLootTable>();
+        ServiceCollection.AddTransient<NeoRecipeManage, NeoRecipeManage>();
+        ServiceCollection.AddTransient<ChunkServiceBase, ClientChunkService>();
+        ServiceCollection.AddTransient<PlayerServiceBase, ClientPlayerService>();
+        ServiceCollection.AddTransient<EntityServiceBase, ClientEntityService>();
+        ServiceCollection.AddTransient<MessageServiceBase, ClientMessageService>();
+        ServiceCollection.AddTransient<EntityBehaviorBase, ClientEntityBehavior>();
+        ServiceProvider = ServiceCollection.BuildServiceProvider();
     }
 
     private void ConnectFailed()

@@ -1,6 +1,13 @@
-namespace Horizoncraft.script
+using Horizoncraft.script.Services.chunk;
+
+namespace Horizoncraft.script;
+
+using Microsoft.Extensions.DependencyInjection;
+
+public class Horizoncraft
 {
-    public partial class Horizoncraft
+    public Horizoncraft()
     {
+        
     }
 }

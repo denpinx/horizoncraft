@@ -1,11 +1,10 @@
 using Godot;
 using Horizoncraft.script;
+using Horizoncraft.script.WorldControl;
 
 namespace Horizoncraft.script.Services.chunk;
 
-public class SingleChunkService : ChunkServiceBase
+public class SingleChunkService(World world,NeoWorldGenerator worldGenerator) : ChunkServiceBase(world,worldGenerator)
 {
-    public SingleChunkService(World world) : base(world)
-    {
-    }
+    
 }

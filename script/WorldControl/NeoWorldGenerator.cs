@@ -13,7 +13,6 @@ public class NeoWorldGenerator
     private readonly FastNoiseLite FastNoiseLite = new FastNoiseLite();
     public NeoBiomeManage NeoBiomeManage;
     public NeoOreManage NeoOreManage;
-    public NeoMaterials NeoMaterials;
     public NeoBlockStructManager NeoBlockStructManager;
     public NeoWorldGenerator()
     {
@@ -89,7 +88,6 @@ public class NeoWorldGenerator
             {
                 NeoBlockStructManager = NeoBlockStructManager,
                 FastNoiseLite = FastNoiseLite,
-                NeoMaterials = NeoMaterials,
                 BlockStructs = structs,
                 HighMap = highmap,
                 Random = random,
@@ -118,7 +116,6 @@ public class NeoWorldGenerator
             {
                 NeoBlockStructManager = NeoBlockStructManager,
                 FastNoiseLite = FastNoiseLite,
-                NeoMaterials = NeoMaterials,
                 GlobalX = x * Chunk.Size,
                 GlobalY = y * Chunk.Size,
                 BlockStructs = structs,
@@ -135,7 +132,6 @@ public class NeoWorldGenerator
             {
                 NeoBlockStructManager = NeoBlockStructManager,
                 FastNoiseLite = FastNoiseLite,
-                NeoMaterials = NeoMaterials,
                 GlobalX = x * Chunk.Size,
                 GlobalY = y * Chunk.Size,
                 BlockStructs = structs,
@@ -213,7 +209,6 @@ public class NeoWorldGenerator
             {
                 Chunk = chunk,
                 HighMap = highmap,
-                NeoMaterials = NeoMaterials
             };
             for (int z = 0; z < Chunk.SizeZ; z++)
             {
@@ -264,7 +259,6 @@ public class NeoWorldGenerator
             {
                 Chunk = chunk,
                 HighMap = highmap,
-                NeoMaterials = NeoMaterials,
             };
             for (int z = 0; z < Chunk.SizeZ; z++)
             {
