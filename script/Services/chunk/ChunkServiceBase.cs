@@ -168,7 +168,7 @@ public partial class ChunkServiceBase : IDisposable, ISave
                 foreach (var pos in groups[i])
                 {
                     if (Chunks.TryGetValue(pos, out var chunk))
-                        chunk.Tick(World.Service, World);
+                        chunk.TriggerTick(World.Service, World);
                 }
             });
         }
@@ -314,9 +314,9 @@ public partial class ChunkServiceBase : IDisposable, ISave
                     {
                         var chunk = Chunks[chunkpos];
                         //延迟卸载，防止玩家故意卡在两个区块之间
-                        if (chunk.RemoveCount++ > 20)
+                        if (chunk.UnloadCount++ > 20)
                         {
-                            chunk.RemoveCount = 0;
+                            chunk.UnloadCount = 0;
                             OnChunkSaving?.Invoke(chunk);
                             SaveChunk(chunk);
                             Chunks.Remove(chunkpos, out _);
@@ -719,7 +719,7 @@ public partial class ChunkServiceBase : IDisposable, ISave
             if (poss.Contains(chunk.coord))
             {
                 resultchunk.Add(sts.Value);
-                sts.Value.SetLight(light);
+                sts.Value.FillLight(light);
             }
         }
 

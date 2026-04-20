@@ -48,7 +48,7 @@ public partial class ChunkServiceNode(
         for (int i = 0; i < sync.Chunks.Count; i++)
         {
             var chunk = sync.Chunks[i];
-            chunk.update_tilemap = true;
+            chunk.TileMapFullUpdate = true;
             GD.Print($"#{chunk.coord} 区块全量更新");
 
             //同步区块
@@ -159,7 +159,7 @@ public partial class ChunkServiceNode(
         var pos = new Vector2I(x, y);
         if (ChunkService.Chunks.ContainsKey(pos))
         {
-            ChunkService.Chunks[pos].update_server = true;
+            ChunkService.Chunks[pos].ServerFullUpdate = true;
         }
     }
 

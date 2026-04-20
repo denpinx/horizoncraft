@@ -20,34 +20,104 @@ namespace Horizoncraft.script.WorldControl
     public partial class Chunk
     {
         /// <summary>
-        /// 因为异常原因导致的区块加载失败的标记
+        /// 区块的层数
         /// </summary>
-        // public bool Error = false;
         public static int SizeZ = 2;
 
+        /// <summary>
+        /// 区块大小
+        /// </summary>
         public static int Size = 50;
-        public static int RandTickPerCount = Size / 2;
-        public bool spawn = false;
-        public long version;
+
+        /// <summary>
+        /// 每Tick随机触发Tick事件数量
+        /// </summary>
+        public static int RandTickPerCount = Size / 4;
+
+        /// <summary>
+        /// 世界是否生成
+        /// </summary>
+        public bool Spawn = false;
+
+        /// <summary>
+        /// 区块版本
+        /// </summary>
+        public long Version;
+
+        /// <summary>
+        /// 区块X轴坐标
+        /// </summary>
         public int X;
+
+        /// <summary>
+        /// 区块Y轴坐标
+        /// </summary>
         public int Y;
+
+        /// <summary>
+        /// 世界生成时的高度图
+        /// </summary>
         public int[,] HighMap = new int[Size, SizeZ];
+
+        /// <summary>
+        /// 生物群系类型
+        /// </summary>
         public string BiomeType = "";
-        //public string BiomeName = "";
 
-        public int RemoveCount = 0;
+        /// <summary>
+        /// 区块卸载计数
+        /// 累计到达20，就触发卸载
+        /// </summary>
+        public int UnloadCount = 0;
 
+        /// <summary>
+        /// 主动触发Tick列表
+        /// </summary>
         public HashSet<Vector3> TickList = new();
+
+        /// <summary>
+        /// 被动触发Tick列表
+        /// </summary>
         public HashSet<Vector3> PassiveTickList = new();
+
+        /// <summary>
+        /// 光照更新列表
+        /// </summary>
         public List<Vector2> LightList = new();
+
+        /// <summary>
+        /// 光照更新次数计数
+        /// </summary>
         [MemoryPackIgnore] public int LightUpdateTime = 0;
+
+        /// <summary>
+        /// 方块变更列表，用于差异更新统计
+        /// </summary>
         [MemoryPackIgnore] public List<Vector3I> UpdateList = new(32);
+
+        /// <summary>
+        /// 方块变更列表缓存
+        /// </summary>
         [MemoryPackIgnore] public List<Vector3I> UpdateList_buffer = new();
 
-        [MemoryPackIgnore] public bool update_tilemap = true;
-        [MemoryPackIgnore] public bool update_server = true;
+        /// <summary>
+        /// 设置为true，会使区块tilemap全量更新方块
+        /// </summary>
+        [MemoryPackIgnore] public bool TileMapFullUpdate = true;
 
-        [MemoryPackIgnore] public double TickUsedTime_μs;
+        /// <summary>
+        /// 设置为true，会使区块被全量更新给附近的玩家。
+        /// </summary>
+        [MemoryPackIgnore] public bool ServerFullUpdate = true;
+
+        /// <summary>
+        /// 区块Tick更新耗时,单位：μs
+        /// </summary>
+        [MemoryPackIgnore] public double TickUsedTimeμs;
+
+        /// <summary>
+        /// 计时器实列
+        /// </summary>
         [MemoryPackIgnore] public Stopwatch _Stopwatch_tick_used = new Stopwatch();
 
         [MemoryPackIgnore]
@@ -61,13 +131,20 @@ namespace Horizoncraft.script.WorldControl
             }
         }
 
-        //加载完区块后释放到世界中，卸载区块时再从世界中捕获
+        /// <summary>
+        /// 加载完区块后释放到世界中，卸载区块时再从世界中捕获
+        /// </summary>
         public List<EntityData> Entitys = new();
 
+        /// <summary>
+        /// 方块数组
+        /// </summary>
         public BlockData[,,] data = new BlockData[Size, Size, SizeZ];
-        public double SpawnCostTime_μs;
 
-        public int LoadCostTime;
+        /// <summary>
+        /// 区块生成耗时,单位：μs
+        /// </summary>
+        public double SpawnCostTime_μs;
 
         [MemoryPackConstructor]
         public Chunk()
@@ -90,11 +167,29 @@ namespace Horizoncraft.script.WorldControl
             }
         }
 
+        /// <summary>
+        /// 获取方块
+        /// 使用局部坐标
+        /// </summary>
+        /// <param name="x">0到区块的最大尺寸之内</param>
+        /// <param name="y">0到区块的最大尺寸之内</param>
+        /// <param name="z">0到区块的最大层数之内</param>
+        /// <returns>方块实列</returns>
         public BlockData GetBlock(int x, int y, int z)
         {
             return data[x, y, z];
         }
 
+        /// <summary>
+        /// 设置方块元数据
+        /// 使用局部坐标
+        /// </summary>
+        /// <param name="x">0到区块的最大尺寸之内</param>
+        /// <param name="y">0到区块的最大尺寸之内</param>
+        /// <param name="z">0到区块的最大层数之内</param>
+        /// <param name="meta">元数据</param>
+        /// <param name="state">方块状态</param>
+        /// <returns>方块实列</returns>
         public BlockData SetBlock(int x, int y, int z, BlockMeta meta, int state = 0)
         {
             var pos = new Vector3(x, y, z);
@@ -124,10 +219,20 @@ namespace Horizoncraft.script.WorldControl
             data[x, y, z].SetMeta(meta);
             data[x, y, z].State = state;
             UpdateList_buffer.Add(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z));
-            update_tilemap = true;
+            TileMapFullUpdate = true;
             return data[x, y, z];
         }
 
+        /// <summary>
+        /// 设置区块内的方块为指定方块实列
+        /// 使用局部坐标
+        /// </summary>
+        /// <param name="x">0到区块的最大尺寸之内</param>
+        /// <param name="y">0到区块的最大尺寸之内</param>
+        /// <param name="z">0到区块的最大层数之内</param>
+        /// <param name="blockData">方块实列</param>
+        /// <param name="state">状态</param>
+        /// <returns></returns>
         public BlockData SetBlock(int x, int y, int z, BlockData blockData, int state = 0)
         {
             var pos = new Vector3(x, y, z);
@@ -136,17 +241,23 @@ namespace Horizoncraft.script.WorldControl
                 TickList.Add(pos);
             }
             else TickList.Remove(pos);
+
             data[x, y, z].Components.Clear();
             var l = data[x, y, z].Light;
             data[x, y, z] = blockData;
             data[x, y, z].State = state;
             data[x, y, z].Light = l;
             UpdateList_buffer.Add(new Vector3I((int)pos.X, (int)pos.Y, (int)pos.Z));
-            update_tilemap = true;
+            TileMapFullUpdate = true;
             return data[x, y, z];
         }
 
-        public void RandTick(WorldServiceBase WorldService, World world)
+        /// <summary>
+        /// 触发当前区块的随机Tick更新
+        /// </summary>
+        /// <param name="worldService">世界服务</param>
+        /// <param name="world">世界实列</param>
+        public void TriggerRandTick(WorldServiceBase worldService, World world)
         {
             HashSet<Vector3I> randpos = new HashSet<Vector3I>(RandTickPerCount);
             for (int i = 0; i < RandTickPerCount;)
@@ -162,7 +273,7 @@ namespace Horizoncraft.script.WorldControl
             BlockTickEvent randEvent = new()
             {
                 World = world,
-                Service = WorldService,
+                Service = worldService,
                 Chunk = this,
             };
             foreach (var pos in randpos)
@@ -177,13 +288,12 @@ namespace Horizoncraft.script.WorldControl
                 if (block?.Components == null) continue;
 
                 var stateStart = block.State;
-                
-                WorldService.NeoComponentManager.ExecuteRandBlockComponents(randEvent, block);
-                // ComponentManager.ExecuteRandBlockComponents(randEvent, block);
+
+                worldService.NeoComponentManager.ExecuteRandBlockComponents(randEvent, block);
 
                 if (stateStart != block.State)
                 {
-                    update_tilemap = true;
+                    TileMapFullUpdate = true;
                     UpdateList_buffer.Add(randEvent.LocalPos);
                 }
 
@@ -191,12 +301,17 @@ namespace Horizoncraft.script.WorldControl
             }
         }
 
-        //50*50*2 2500个tick对象的情况下，平均每个区块最大耗时 1ms
-        public void Tick(WorldServiceBase WorldService, World world)
+        /// <summary>
+        /// 触发当前区块的Tick更新
+        /// 50*50*2 2500个tick对象的情况下，平均每个区块最大耗时 1ms
+        /// </summary>
+        /// <param name="worldService">世界服务</param>
+        /// <param name="world">世界实列</param>
+        public void TriggerTick(WorldServiceBase worldService, World world)
         {
             _Stopwatch_tick_used.Restart();
-            version = WorldService.TickTimes;
-            
+            Version = worldService.TickTimes;
+
             UpdateList.Clear();
             for (int i = 0; i < UpdateList_buffer.Count; i++)
                 UpdateList.Add(UpdateList_buffer[i]);
@@ -206,17 +321,19 @@ namespace Horizoncraft.script.WorldControl
             BlockTickEvent blockTickEvnet = new()
             {
                 World = world,
-                Service = WorldService,
+                Service = worldService,
                 Chunk = this,
             };
             var passiveticklist = PassiveTickList.ToArray();
             PassiveTickList.Clear();
 
             //TODO 同时拥有被动更新和主动更新会导致主动更新被更新两次
+
             foreach (var pos in passiveticklist)
             {
                 var block = GetBlock((int)pos.X, (int)pos.Y, (int)pos.Z);
                 if (block?.Components == null) continue;
+                bool exe_fail = false;
                 foreach (var cmp in block.Components)
                 {
                     var globale = new Vector3I((int)(this.coord.X * Chunk.Size + pos.X)
@@ -229,24 +346,31 @@ namespace Horizoncraft.script.WorldControl
                         blockTickEvnet.LocalPos = pos.ToVector3I();
                         var state_start = block.State;
                         blockTickEvnet.Reset();
-                        if (!WorldService.NeoComponentManager.ExecuteBlockComponents(blockTickEvnet, block)) goto brek_out;
+
+                        if (!worldService.NeoComponentManager.ExecuteBlockComponents(blockTickEvnet, block))
+                        {
+                            exe_fail = true;
+                            break;
+                        }
+
                         if (state_start != block.State)
                         {
-                            update_tilemap = true;
+                            TileMapFullUpdate = true;
                             UpdateList_buffer.Add(blockTickEvnet.LocalPos);
                         }
                     }
                 }
-                brek_out:
+
+                if (exe_fail)
                 {
-                    update_tilemap = true;
+                    TileMapFullUpdate = true;
                     UpdateList_buffer.Add(blockTickEvnet.LocalPos);
                 }
             }
 
 
-            var coord = new Godot.Vector3I(0, 0, 0);
-            var local = new Godot.Vector3I(0, 0, 0);
+            var coord = new Vector3I(0, 0, 0);
+            var local = new Vector3I(0, 0, 0);
             string id;
             int state;
             foreach (var item in TickList.ToArray())
@@ -269,7 +393,7 @@ namespace Horizoncraft.script.WorldControl
                     state = block.State;
                     try
                     {
-                        WorldService.NeoComponentManager.ExecuteBlockComponents(blockTickEvnet, block);
+                        worldService.NeoComponentManager.ExecuteBlockComponents(blockTickEvnet, block);
                         // ComponentManager.ExecuteBlockComponents(blockTickEvnet, block);
                         blockTickEvnet.Reset();
                     }
@@ -281,7 +405,7 @@ namespace Horizoncraft.script.WorldControl
 
                     if (state != block.State || id != block.Id)
                     {
-                        update_tilemap = true;
+                        TileMapFullUpdate = true;
                         UpdateList.Add(local);
                     }
                 }
@@ -292,28 +416,30 @@ namespace Horizoncraft.script.WorldControl
                 }
             }
 
-            RandTick(WorldService, world);
+            TriggerRandTick(worldService, world);
 
             _Stopwatch_tick_used.Stop();
-            TickUsedTime_μs = _Stopwatch_tick_used.Elapsed.TotalMicroseconds;
+            TickUsedTimeμs = _Stopwatch_tick_used.Elapsed.TotalMicroseconds;
         }
 
-
-        public void SetLight(int light)
+        /// <summary>
+        /// 填充区块的光照值
+        /// </summary>
+        /// <param name="light">光照值</param>
+        public void FillLight(int light)
         {
             for (int x = 0; x < Chunk.Size; x++)
             for (int y = 0; y < Chunk.Size; y++)
             {
                 data[x, y, 1].OldLight = data[x, y, 1].Light;
                 data[x, y, 1].Light = light;
-                // if (!update_tilemap && data[x, y, 1].OldLight != light)
-                // {
-                //     LightUpdateTime++;
-                //     update_tilemap = true;
-                // }
             }
         }
 
+        /// <summary>
+        /// 检查光照是否有变动
+        /// </summary>
+        /// <returns>true:发生变动，false:无变更</returns>
         public bool CheckLightUpdate()
         {
             for (int x = 0; x < Chunk.Size; x++)
@@ -322,23 +448,12 @@ namespace Horizoncraft.script.WorldControl
                 if (data[x, y, 1].OldLight != data[x, y, 1].Light)
                 {
                     LightUpdateTime++;
-                    update_tilemap = true;
+                    TileMapFullUpdate = true;
                     return true;
                 }
             }
 
             return false;
-        }
-
-        public HashSet<string> GetAllEntitys()
-        {
-            HashSet<string> result = new HashSet<string>();
-            foreach (var entity in Entitys)
-            {
-                result.Add(entity.Name);
-            }
-
-            return result;
         }
     }
 }

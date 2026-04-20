@@ -19,8 +19,8 @@ public partial class DebugView : Node2D
             return;
         }
         DrawString(font, new(0, 11 * Chunk.Size), $"time:{DateTime.Now}");
-        DrawString(font, new(0, 12 * Chunk.Size), $"update_tilemap:{chunk.update_tilemap}");
-        DrawString(font, new(0, 13 * Chunk.Size), $"update_server:{chunk.update_server}");
+        DrawString(font, new(0, 12 * Chunk.Size), $"update_tilemap:{chunk.TileMapFullUpdate}");
+        DrawString(font, new(0, 13 * Chunk.Size), $"update_server:{chunk.ServerFullUpdate}");
         
         Color color;
         if (chunk.coord.X % 2 == 0)
@@ -60,10 +60,10 @@ public partial class DebugView : Node2D
             $"区块生成耗时：{chunk.SpawnCostTime_μs} μs",
             $"坐标：{chunk.coord.X}，{chunk.coord.Y} ",
             $"生物群系类型：{chunk.BiomeType} ",
-            $"更新时间戳：{chunk.version} ",
+            $"更新时间戳：{chunk.Version} ",
             $"光源对象：{chunk.LightList.Count}个 ",
             $"Tick对象：{chunk.TickList.Count} 个",
-            $"Tick：{chunk.TickUsedTime_μs} μs/t ",
+            $"Tick：{chunk.TickUsedTimeμs} μs/t ",
             $"LightUpdateTime：{chunk.LightUpdateTime} tick ",
         };
 

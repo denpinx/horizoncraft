@@ -194,7 +194,7 @@ public class NeoWorldGenerator
     {
         Stopwatch stopWatch = new();
         stopWatch.Start();
-        chunk.spawn = true;
+        chunk.Spawn = true;
         var landbiome = NeoBiomeManage.GetMixinLandBiome(chunk.X);
         int[,] highmap = GetHighMap(chunk.X);
         List<BlockStruct> structs = GetAllStructs(chunk.X, chunk.Y);
@@ -310,8 +310,8 @@ public class NeoWorldGenerator
 
         chunk.HighMap = highmap;
         chunk.UpdateList.Clear();
-        chunk.update_tilemap = true;
-        chunk.update_server = true;
+        chunk.TileMapFullUpdate = true;
+        chunk.ServerFullUpdate = true;
         stopWatch.Stop();
         chunk.SpawnCostTime_μs = stopWatch.Elapsed.TotalMicroseconds;
     }

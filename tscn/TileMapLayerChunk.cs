@@ -33,7 +33,7 @@ public partial class TileMapLayerChunk : Node2D
     {
         if (this.chunk == null || this.chunk != chunk)
         {
-            chunk.update_tilemap = true;
+            chunk.TileMapFullUpdate = true;
         }
         
         this.chunk = chunk;
@@ -55,7 +55,7 @@ public partial class TileMapLayerChunk : Node2D
             debugView.QueueRedraw();
         }
 
-        if (chunk is { update_tilemap: true })
+        if (chunk is { TileMapFullUpdate: true })
         {
             //调用自定义渲染
             BackGroundDraw_Layer_0.QueueRedraw();
@@ -149,7 +149,7 @@ public partial class TileMapLayerChunk : Node2D
                 }
             }
             
-            chunk.update_tilemap = false;
+            chunk.TileMapFullUpdate = false;
         }
     }
 }

@@ -189,7 +189,7 @@ namespace Horizoncraft.script
 
             TileMapLayerChunk tmly = chunkPackedScene.Instantiate<TileMapLayerChunk>();
             tmly.chunk = chunk;
-            chunk.update_tilemap = true;
+            chunk.TileMapFullUpdate = true;
             tmly.GlobalPosition = chunk.coord * Chunk.Size * 16;
             tmly.Visible = true;
             tmly.PlayerNode = PlayerNode;

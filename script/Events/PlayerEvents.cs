@@ -338,7 +338,7 @@ public class PlayerEvents
             if (e.world.Service.ChunkService.Chunks.TryGetValue(pos, out var chunk))
             {
                 var local_pos = finalpos.Remainder(Chunk.Size);
-                chunk.update_tilemap = true;
+                chunk.TileMapFullUpdate = true;
                 chunk.UpdateList_buffer.Add(new Vector3I(local_pos.X, local_pos.Y, finalpos.Z));
             }
         }

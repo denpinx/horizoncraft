@@ -72,7 +72,7 @@ public class HostChunkService : ChunkServiceBase
                 }
             }
 
-            if (chunk.update_server)
+            if (chunk.ServerFullUpdate)
             {
                 //下一帧同步这个区块内的玩家
                 World.Service.PlayerService.ResetPlayerMoveStateByChunk(chunk.coord);
@@ -102,7 +102,7 @@ public class HostChunkService : ChunkServiceBase
         }
 
         foreach (var chunk in Chunks.Values)
-            chunk.update_server = false;
+            chunk.ServerFullUpdate = false;
         foreach (var key in wholeChunkUpdate.Keys)
         {
             var bytes = ByteTool.ToBytes<ChunkPack>(wholeChunkUpdate[key]);
