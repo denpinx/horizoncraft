@@ -33,7 +33,7 @@ public abstract class MessageServiceBase
     protected World World;
     public MessageServiceBase(World world)
     {
-        this.Player = World.PlayerNode;
+        this.Player = world.PlayerNode;
         world.timer.Timeout += Tick;
         this.World = world;
     }

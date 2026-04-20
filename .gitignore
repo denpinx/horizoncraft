@@ -8,5 +8,5 @@
 qodana.yaml
 .idea/**/*
 .vs/**/*
-profile/**/*
+profile/*
 HorizonCraft.sln.DotSettings.user
