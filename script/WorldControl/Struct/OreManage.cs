@@ -4,7 +4,6 @@ using Godot;
 
 namespace Horizoncraft.script.WorldControl.Struct;
 
-[Obsolete("该类已被废弃，请使用NeoOreManage",true)]
 public static class OreManage
 {
     public static Dictionary<string, OreConfig> ores = new();

@@ -5,7 +5,7 @@ using Horizoncraft.script.WorldControl;
 using Horizoncraft.script.WorldControl.Struct;
 
 namespace Horizoncraft.script;
-
+[Obsolete("未完成",true)]
 public class NeoOreManage
 {
     private Dictionary<string, OreConfig> Ores = new();

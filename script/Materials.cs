@@ -16,7 +16,6 @@ namespace Horizoncraft.script
     /// <summary>
     /// 各种元数据
     /// </summary>
-    [Obsolete("此类型已经弃用,请使用: NeoMaterials")]
     public class Materials
     {
         public static TileSet tileSet;

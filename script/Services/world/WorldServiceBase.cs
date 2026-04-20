@@ -28,6 +28,9 @@ namespace Horizoncraft.script.Services.world;
 public abstract class WorldServiceBase
 {
     protected ServiceCollection ServiceCollection = new ServiceCollection();
+    /// <summary>
+    /// 继承类型必须在构造函数内实列化此字段
+    /// </summary>
     protected ServiceProvider ServiceProvider;
     
     public WorldProfile Profile;
@@ -102,6 +105,7 @@ public abstract class WorldServiceBase
         this.World = world;
         LoadWorldProfile();
         world.timer.Timeout += WorldServiceTick;
+        //这里不实列化 ServiceProvider ，交给继承这个类型的实列去实列化
     }
 
 
@@ -110,6 +114,7 @@ public abstract class WorldServiceBase
         //自动保存
         if (TickTimes % (20 * AutoSaveSeconds) == 1)
             Save();
+        //这里不更新TickTimes
     }
     public void InitializeServices()
     {

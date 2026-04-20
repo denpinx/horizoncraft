@@ -12,12 +12,12 @@ public class NeoWorldGenerator
     private readonly Stopwatch StopWatch = new Stopwatch();
     private readonly FastNoiseLite FastNoiseLite = new FastNoiseLite();
     public NeoBiomeManage NeoBiomeManage;
-    public NeoOreManage NeoOreManage;
+    // public NeoOreManage NeoOreManage;
     public NeoBlockStructManager NeoBlockStructManager;
     public NeoWorldGenerator()
     {
         NeoBiomeManage = new NeoBiomeManage();
-        NeoOreManage = new  NeoOreManage();
+        // NeoOreManage = new  NeoOreManage();
         NeoBlockStructManager = new NeoBlockStructManager();
         
         NeoBlockStructManager.LoadBuilds();
@@ -153,7 +153,7 @@ public class NeoWorldGenerator
         for (int j = y - 1; j <= y + 1; j++)
         {
             Random random = new Random(i * Int16.MaxValue + j);
-            var st = NeoOreManage.GeneratorOre(random, i, j);
+            var st = OreManage.GeneratorOre(random, i, j);
             if (st != null) structs.Add(st);
         }
 
