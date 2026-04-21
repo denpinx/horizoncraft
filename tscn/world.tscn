@@ -7,13 +7,15 @@
 [ext_resource type="Texture2D" uid="uid://bw0n1le83dnqc" path="res://texture/background/b2.png" id="4_38adb"]
 [ext_resource type="Texture2D" uid="uid://dpfwsxvr3kdye" path="res://texture/background/b1.png" id="5_08a46"]
 
-[node name="World" type="Node2D" node_paths=PackedStringArray("PlayerNode", "timer", "textureRect", "DirectionalLight2D", "colorRect")]
+[node name="World" type="Node2D" node_paths=PackedStringArray("PlayerNode", "timer", "textureRect", "DirectionalLight2D", "colorRect", "Background", "Sky")]
 script = ExtResource("1_oo2r5")
 PlayerNode = NodePath("Player")
 timer = NodePath("Timer_Tick")
 textureRect = NodePath("CanvasLayer_Back/TextureRect_Sky")
 DirectionalLight2D = NodePath("DirectionalLight2D")
 colorRect = NodePath("CanvasLayer/ColorRect_Top")
+Background = NodePath("Node/Parallax2D_Font/B1")
+Sky = NodePath("Node/Parallax2D_Sky/B2")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -33,7 +35,7 @@ position = Vector2(603, 327)
 world = NodePath("..")
 
 [node name="CanvasLayer_Back" type="CanvasLayer" parent="."]
-layer = -1
+layer = -2
 
 [node name="TextureRect_Sky" type="TextureRect" parent="CanvasLayer_Back"]
 anchors_preset = 15
@@ -97,3 +99,10 @@ position = Vector2(-257.9, 251)
 scale = Vector2(2, 2)
 texture = ExtResource("3_gmryn")
 centered = false
+
+[node name="Parallax2D_Back2" type="Parallax2D" parent="Node"]
+scroll_scale = Vector2(0.1, 0)
+scroll_offset = Vector2(340, -81)
+repeat_size = Vector2(512, 0)
+repeat_times = 6
+screen_offset = Vector2(481, 0)

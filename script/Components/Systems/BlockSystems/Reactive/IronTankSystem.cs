@@ -13,14 +13,14 @@ public class IronTankSystem : TickSystem
         var item = inventory.GetToolBarItem();
         if (item == null) return true;
 
-        if (item.Name == "iron_bukkit")
+        if (item.Name == "iron_bucket")
         {
             if (component is IStorage<Fluid> getter)
             {
                 var storage = getter.GetStorage();
                 if (storage.TryTakeFluid("", 1000, out var result))
                 {
-                    if (Materials.ItemMetas.TryGetValue($"iron_bukkit_{result.Name}", out var meta))
+                    if (Materials.ItemMetas.TryGetValue($"iron_bucket_{result.Name}", out var meta))
                     {
                         var resultItem = meta.GetItemStack();
                         if (inventory.TryAddItem(resultItem))

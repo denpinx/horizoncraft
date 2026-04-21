@@ -53,7 +53,7 @@
     <Content Include="config\item\Materials.json" />
     <Content Include="config\item\ores\ores.json" />
     <Content Include="config\item\tool\axes.json" />
-    <Content Include="config\item\tool\bukkits\iron_bukkit.json" />
+    <Content Include="config\item\tool\bucket\iron_bucket.json" />
     <Content Include="config\item\tool\shovels.json" />
     <Content Include="config\item\tool\Tools.json" />
     <Content Include="config\item\wood\logs.json" />

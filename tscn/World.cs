@@ -74,6 +74,8 @@ namespace Horizoncraft.script
         [Export] public TextureRect textureRect;
         [Export] public DirectionalLight2D DirectionalLight2D;
         [Export] public ColorRect colorRect;
+        [Export] public Sprite2D Background;
+        [Export] public Sprite2D Sky;
 
         /// <summary>
         /// Rpc请求冷却
@@ -124,8 +126,11 @@ namespace Horizoncraft.script
         {
             if (PlayerNode == null||Service==null) return;
 
+            var sky_color = Service.GetSkyColor();
             //更新天空背景颜色
-            textureRect.Modulate = Service.GetSkyColor();
+            textureRect.Modulate = sky_color;
+            Background.Modulate = sky_color;
+            Sky.Modulate = sky_color;
             //更新覆盖的光线明暗度变化
             colorRect.Color = Color.Color8(0, 0, 0, Service.GetLightChange());
             //更新请求冷却

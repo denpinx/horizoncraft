@@ -1,8 +1,8 @@
 {
-  "iron_bukkit": {
+  "iron_bucket": {
     "max": 16
   },
-  "iron_bukkit_water": {
+  "iron_bucket_water": {
     "components": {
       "ItemFluidComponent": {
         "Drive": "PlaceFluidSystem",
@@ -11,7 +11,7 @@
     },
     "tags": {
       "fluid": "water",
-      "on-used": "iron_bukkit"
+      "on-used": "iron_bucket"
     },
     "max": 1
   }

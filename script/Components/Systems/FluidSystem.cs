@@ -17,9 +17,9 @@ public class FluidSystem : TickSystem
         var inventory = playerRightClickBlockEvent.Player.Inventory;
         var item = inventory.GetToolBarItem();
         if (item == null) return true;
-        if (item.GetItemMeta().Name == "iron_bukkit")
+        if (item.GetItemMeta().Name == "iron_bucket")
         {
-            if (Materials.ItemMetas.TryGetValue($"iron_bukkit_{playerRightClickBlockEvent.blockData.BlockMeta.Name}",
+            if (Materials.ItemMetas.TryGetValue($"iron_bucket_{playerRightClickBlockEvent.blockData.BlockMeta.Name}",
                     out var meta))
             {
                 if (inventory.TryAddItem(meta.GetItemStack()))
