@@ -3,6 +3,7 @@ using Horizoncraft.script;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Components.Item;
 using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.WorldControl;
 
 namespace Horizoncraft.script.Components.Systems.ItemSystems;
@@ -48,7 +49,7 @@ public class PlaceFluidSystem : ItemComponentSystem
             }
             else
             {
-                GD.PrintErr($"{nameof(PlaceFluidSystem)}: 方块{itemFluidComponent.FluidName} 不存在");
+                GameLogger.Error("Fluid",$"{nameof(PlaceFluidSystem)}: 方块{itemFluidComponent.FluidName} 不存在");
             }
         }
 

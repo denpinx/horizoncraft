@@ -20,7 +20,7 @@ public static class DirUtility
         DirAccess dir = DirAccess.Open(path);
         if (dir == null)
         {
-            GD.PrintErr($"[GetAllFiles] 无法打开{path}");
+            GameLogger.Error("File",$"[GetAllFiles] 无法打开{path}");
             return;
         }
 

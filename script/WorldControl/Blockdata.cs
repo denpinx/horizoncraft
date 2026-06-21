@@ -26,6 +26,9 @@ namespace Horizoncraft.script.WorldControl
 
         [MemoryPackIgnore] private BlockMeta _blockMeta;
 
+        /// <summary>组件快速查找字典</summary>
+        [MemoryPackIgnore] private Dictionary<SystemEnum, Component> _componentMap;
+
         [MemoryPackIgnore]
         public BlockMeta BlockMeta
         {
@@ -39,13 +42,21 @@ namespace Horizoncraft.script.WorldControl
 
         public T GetComponent<T>() where T : Component
         {
-            var result = Components.Find(cmp => cmp is T);
-            return result as T;
+            if (_componentMap != null)
+            {
+                foreach (var kv in _componentMap)
+                {
+                    if (kv.Value is T result) return result;
+                }
+                return null;
+            }
+            var found = Components.Find(cmp => cmp is T);
+            return found as T;
         }
 
         public bool HasComponent<T>() where T : Component
         {
-            return Components.Find(cmp => cmp is T) != null;
+            return GetComponent<T>() != null;
         }
 
         public T GetComponent<T>(string name) where T : Component
@@ -53,6 +64,18 @@ namespace Horizoncraft.script.WorldControl
             var result = Components.Find(cmp => cmp is T && cmp.Drive == name);
             if (result != null) return result as T;
             return null;
+        }
+
+        public bool TryGetComponent<T>(string name, out T result) where T : Component
+        {
+            var cmp = GetComponent<T>(name);
+            if (cmp != null)
+            {
+                result = cmp;
+                return true;
+            }
+            result = null;
+            return false;
         }
 
         public BlockData(BlockMeta meta)
@@ -72,8 +95,14 @@ namespace Horizoncraft.script.WorldControl
             BlockMeta = meta;
             Id = meta.Name;
             Components.Clear();
+            _componentMap = new Dictionary<SystemEnum, Component>(meta.Components.Count);
             foreach (Func<Component> cmp in meta.Components)
-                Components.Add(cmp());
+            {
+                var component = cmp();
+                Components.Add(component);
+                if (component != null)
+                    _componentMap[component.EnumId] = component;
+            }
         }
 
         public bool IsMeta(string name)

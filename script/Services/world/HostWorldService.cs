@@ -8,7 +8,7 @@ using Horizoncraft.script.NewProxy.player;
 using Horizoncraft.script.Recipes;
 using Horizoncraft.script.Services.chunk;
 using Horizoncraft.script.Services.entity;
-using Horizoncraft.script.Services.message;
+using Horizoncraft.script.Services.Message;
 using Horizoncraft.script.Services.player;
 using Horizoncraft.script.WorldControl;
 using Horizoncraft.script.WorldControl.Tool;

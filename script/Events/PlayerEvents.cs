@@ -3,6 +3,7 @@ using Godot;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Components.Item;
 using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Recipes;
@@ -144,7 +145,7 @@ public class PlayerEvents
         if (e.Inventory == null) return false;
         if (e.Player == null) return false;
         var handitem = e.Player.Inventory.GetHandItemStack();
-        e.Inventory.update = true;
+        e.Inventory.Update = true;
         var targetitem = e.GetIndexItem();
         if (targetitem != null && handitem != null && targetitem.Name == handitem.Name)
         {
@@ -180,7 +181,7 @@ public class PlayerEvents
                 {
                     e.SetIndexItem(handitem.Copy(1));
                     handitem.Amount -= 1;
-                    e.Player.Inventory.update = true;
+                    e.Player.Inventory.Update = true;
                 }
 
                 if (handitem == null && targetitem != null)
@@ -190,12 +191,12 @@ public class PlayerEvents
 
                     targetitem.Amount = left;
                     e.Player.Inventory.HandItemStack = targetitem.Copy(right);
-                    e.Player.Inventory.update = true;
+                    e.Player.Inventory.Update = true;
                 }
             }
             else
             {
-                e.Player.Inventory.update = true;
+                e.Player.Inventory.Update = true;
                 e.Player.Inventory.HandItemStack = targetitem;
                 e.Inventory.SetItem(e.Index, handitem);
             }
@@ -284,7 +285,7 @@ public class PlayerEvents
 
         e.ChunkService.SetBlock(e.Position, Materials.Valueof("air"));
         e.ChunkService.PassiveUpdateNeighborBlock(e.Position);
-        e.Player.Inventory.update = true;
+        e.Player.Inventory.Update = true;
         return true;
     }
 
@@ -403,7 +404,7 @@ public class PlayerEvents
                 item.Amount -= 1;
                 data.Update = true;
                 service.EntityService.AddEntityData(data);
-                player.Inventory.update = true;
+                player.Inventory.Update = true;
             }
         }
     }
@@ -427,7 +428,7 @@ public class PlayerEvents
                 data.Update = true;
                 player.Inventory.SetItem(player.Inventory.ToolBarIndex, null);
                 service.EntityService.AddEntityData(data);
-                player.Inventory.update = true;
+                player.Inventory.Update = true;
             }
         }
     }
@@ -466,13 +467,14 @@ public class PlayerEvents
     {
         if (service.PlayerService.Players.TryGetValue(player_name, out var player))
         {
-            GD.Print($"{player_name}, {index}");
+            GameLogger.Info("Player",$"{player_name}, {index}");
             var item = player.Inventory.GetItem(index);
             if (item == null) return;
 
             if (player.OpeningBlockInventory)
             {
                 var block = service.ChunkService.GetBlock(player.OpenInventory.ToVector3I());
+                if (block == null) return;
                 var cmp = block.GetComponent<InventoryComponent>();
                 if (cmp == null) return;
                 var block_inv = cmp.GetInventory();

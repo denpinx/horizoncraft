@@ -97,7 +97,7 @@ public static class LanguageManage
                 result = string.Format(result, args);
             }
         }
-        else GD.PrintErr($"[LanguageManage] {key} 文本不存在");
+        else GameLogger.Error("Language",$"[LanguageManage] {key} 文本不存在");
 
         return result;
     }
@@ -131,8 +131,8 @@ public static class LanguageManage
             return result;
         }
 
-        if (prefix == "") GD.PrintErr($"[LanguageManage] {key} 文本不存在");
-        else GD.PrintErr($"[LanguageManage] {prefix}.{key} 文本不存在");
+        if (prefix == "") GameLogger.Error("Language",$"[LanguageManage] {key} 文本不存在");
+        else GameLogger.Error("Language",$"[LanguageManage] {prefix}.{key} 文本不存在");
 
 
         return result;
@@ -159,7 +159,7 @@ public static class LanguageManage
         }
         else
         {
-            GD.PrintErr($"[LanguageManage] {lang} 语言选项不存在");
+            GameLogger.Error("Language",$"[LanguageManage] {lang} 语言选项不存在");
         }
     }
 

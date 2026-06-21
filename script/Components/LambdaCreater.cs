@@ -1,8 +1,9 @@
-#define DEBUG
+// #define DEBUG
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Horizoncraft.script.Utility;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -93,7 +94,7 @@ namespace Horizoncraft.script.Components
             Type type = FindTypesInNamespaceGlobally(typename, TypeNamespace);
             if (type == null)
             {
-                GD.PrintErr($"{typename} 不存在于命名空间{TypeNamespace}中");
+                GameLogger.Error("LambdaCreater",$"{typename} 不存在于命名空间{TypeNamespace}中");
                 return null;
             }
 
@@ -221,7 +222,7 @@ namespace Horizoncraft.script.Components
 
             if (results.Count == 0)
             {
-                GD.PrintErr($"未找到：{typeName}");
+                GameLogger.Error("LambdaCreater",$"未找到：{typeName}");
                 return null;
             }
 

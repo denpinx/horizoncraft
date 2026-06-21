@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using MemoryPack;
+using Horizoncraft.script.Utility;
 
 namespace Horizoncraft.script.Inventory;
 
@@ -10,11 +11,20 @@ namespace Horizoncraft.script.Inventory;
 [MemoryPackUnion(1, typeof(BlockInventory))]
 public abstract partial class InventoryBase
 {
+    /// <summary>
+    /// 物品数量添加事件
+    /// </summary>
     [MemoryPackIgnore] public Action<int, int> OnAddItemAmount;
+    /// <summary>
+    /// 物品被消耗事件
+    /// </summary>
     [MemoryPackIgnore] public Action<int, int> OnReduceItemAmount;
+    /// <summary>
+    /// 物品添加事件
+    /// </summary>
     [MemoryPackIgnore] public Action<int, ItemStack> OnItemAdd;
 
-    [MemoryPackIgnore] public bool update = true;
+    [MemoryPackIgnore] public bool Update = true;
     public int Size = 0;
     public ItemStack[] Items;
 
@@ -62,7 +72,7 @@ public abstract partial class InventoryBase
             Items[index] = null;
         else
             Items[index] = item;
-        update = true;
+        Update = true;
     }
 
     /// <summary>
@@ -77,7 +87,7 @@ public abstract partial class InventoryBase
 
         Items[id].Amount -= amount;
         if (Items[id].Amount <= 0) Items[id] = null;
-        update = true;
+        Update = true;
         OnReduceItemAmount?.Invoke(id, amount);
     }
 
@@ -91,7 +101,7 @@ public abstract partial class InventoryBase
     {
         if (Items[id] == null)
         {
-            GD.PrintErr("Inventory: SubItemAmount: Item not found!");
+            GameLogger.Error("Inventory","Inventory: SubItemAmount: Item not found!");
             return amount;
         }
 
@@ -144,7 +154,7 @@ public abstract partial class InventoryBase
             if (item == null)
             {
                 SetItem(i, additem);
-                update = true;
+                Update = true;
                 OnItemAdd?.Invoke(i, additem);
                 return true;
             }
@@ -157,7 +167,7 @@ public abstract partial class InventoryBase
                 {
                     item.Amount += additem.Amount;
                     additem.Amount = 0;
-                    update = true;
+                    Update = true;
                     OnItemAdd?.Invoke(i, additem);
                     return true;
                 }
@@ -252,7 +262,7 @@ public abstract partial class InventoryBase
             }
         }
 
-        update = true;
+        Update = true;
     }
 
     /// <summary>

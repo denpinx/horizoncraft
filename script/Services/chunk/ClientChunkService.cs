@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Godot;
 using Horizoncraft.script;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.rpc;
 using Horizoncraft.script.WorldControl;
@@ -57,7 +58,7 @@ public class ClientChunkService(
                 World.Service.ChunkServiceNode.RpcId(1,
                     nameof(ChunkServiceNode.ReGetChunk), pos.X, pos.Y
                 );
-                //GD.Print($"重新加载区块{pos}");
+                //GameLogger.Info("Client",$"重新加载区块{pos}");
             }
         }
     }
@@ -80,7 +81,7 @@ public class ClientChunkService(
 
         if (entityPack.Entitys.Count > 0)
         {
-            GD.Print($"[客户端]同步{entityPack.Entitys.Count}个实体回服务端");
+            GameLogger.Info("Client",$"[客户端]同步{entityPack.Entitys.Count}个实体回服务端");
             World.Service.EntityServiceNode.RpcId(1,
                 nameof(EntityServiceNode.ServerReceiveEntityPack),
                 ByteTool.ToBytes(entityPack));

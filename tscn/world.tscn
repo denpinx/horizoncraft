@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bem5bibh4ch2d"]
+[gd_scene format=3 uid="uid://bem5bibh4ch2d"]
 
 [ext_resource type="Script" uid="uid://cdh5tdovs6mq5" path="res://tscn/World.cs" id="1_oo2r5"]
 [ext_resource type="PackedScene" uid="uid://dlka0sc4kl0vb" path="res://tscn/Player.tscn" id="2_hb80g"]
@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bw0n1le83dnqc" path="res://texture/background/b2.png" id="4_38adb"]
 [ext_resource type="Texture2D" uid="uid://dpfwsxvr3kdye" path="res://texture/background/b1.png" id="5_08a46"]
 
-[node name="World" type="Node2D" node_paths=PackedStringArray("PlayerNode", "timer", "textureRect", "DirectionalLight2D", "colorRect", "Background", "Sky")]
+[node name="World" type="Node2D" unique_id=1384150335 node_paths=PackedStringArray("PlayerNode", "timer", "textureRect", "DirectionalLight2D", "colorRect", "Background", "Sky")]
 script = ExtResource("1_oo2r5")
 PlayerNode = NodePath("Player")
 timer = NodePath("Timer_Tick")
@@ -17,9 +17,9 @@ colorRect = NodePath("CanvasLayer/ColorRect_Top")
 Background = NodePath("Node/Parallax2D_Font/B1")
 Sky = NodePath("Node/Parallax2D_Sky/B2")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=87851658]
 
-[node name="ColorRect_Top" type="ColorRect" parent="CanvasLayer"]
+[node name="ColorRect_Top" type="ColorRect" parent="CanvasLayer" unique_id=1774251161]
 visible = false
 top_level = true
 anchors_preset = 15
@@ -30,14 +30,14 @@ grow_vertical = 2
 mouse_filter = 1
 color = Color(0, 0, 0, 0)
 
-[node name="Player" parent="." node_paths=PackedStringArray("world") instance=ExtResource("2_hb80g")]
+[node name="Player" parent="." unique_id=1240889663 node_paths=PackedStringArray("world") instance=ExtResource("2_hb80g")]
 position = Vector2(603, 327)
 world = NodePath("..")
 
-[node name="CanvasLayer_Back" type="CanvasLayer" parent="."]
+[node name="CanvasLayer_Back" type="CanvasLayer" parent="." unique_id=150947942]
 layer = -2
 
-[node name="TextureRect_Sky" type="TextureRect" parent="CanvasLayer_Back"]
+[node name="TextureRect_Sky" type="TextureRect" parent="CanvasLayer_Back" unique_id=1387696505]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -45,21 +45,21 @@ grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("3_ip2ov")
 
-[node name="Timer_Tick" type="Timer" parent="."]
+[node name="Timer_Tick" type="Timer" parent="." unique_id=827122711]
 wait_time = 0.05
 autostart = true
 
-[node name="DirectionalLight2D" type="DirectionalLight2D" parent="."]
+[node name="DirectionalLight2D" type="DirectionalLight2D" parent="." unique_id=713063469]
 visible = false
 rotation = 6.28319
 blend_mode = 2
 shadow_enabled = true
 shadow_color = Color(0, 0, 0, 0.470588)
 
-[node name="Node" type="Node2D" parent="."]
+[node name="Node" type="Node2D" parent="." unique_id=412761355]
 position = Vector2(3, 135)
 
-[node name="Parallax2D_Sky" type="Parallax2D" parent="Node"]
+[node name="Parallax2D_Sky" type="Parallax2D" parent="Node" unique_id=1274435747]
 scroll_scale = Vector2(0.1, 0)
 scroll_offset = Vector2(-491, 56)
 repeat_size = Vector2(960, 0)
@@ -67,26 +67,26 @@ autoscroll = Vector2(10, 0)
 repeat_times = 3
 screen_offset = Vector2(481, 0)
 
-[node name="B2" type="Sprite2D" parent="Node/Parallax2D_Sky"]
+[node name="B2" type="Sprite2D" parent="Node/Parallax2D_Sky" unique_id=306585029]
 position = Vector2(354.20004, 168.00003)
 scale = Vector2(5, 5)
 texture = ExtResource("4_38adb")
 centered = false
 
-[node name="Parallax2D_Font" type="Parallax2D" parent="Node"]
+[node name="Parallax2D_Font" type="Parallax2D" parent="Node" unique_id=457558984]
 scroll_scale = Vector2(0.01, 0)
 scroll_offset = Vector2(124, -182)
 repeat_size = Vector2(512, 0)
 repeat_times = 4
 screen_offset = Vector2(481, 0)
 
-[node name="B1" type="Sprite2D" parent="Node/Parallax2D_Font"]
+[node name="B1" type="Sprite2D" parent="Node/Parallax2D_Font" unique_id=979550553]
 position = Vector2(526.81, 337)
 scale = Vector2(2, 2)
 texture = ExtResource("5_08a46")
 centered = false
 
-[node name="Parallax2D_Back" type="Parallax2D" parent="Node"]
+[node name="Parallax2D_Back" type="Parallax2D" parent="Node" unique_id=686210704]
 visible = false
 scroll_scale = Vector2(0.1, 0)
 scroll_offset = Vector2(340, -81)
@@ -94,13 +94,13 @@ repeat_size = Vector2(512, 0)
 repeat_times = 6
 screen_offset = Vector2(481, 0)
 
-[node name="B0" type="Sprite2D" parent="Node/Parallax2D_Back"]
+[node name="B0" type="Sprite2D" parent="Node/Parallax2D_Back" unique_id=658930637]
 position = Vector2(-257.9, 251)
 scale = Vector2(2, 2)
 texture = ExtResource("3_gmryn")
 centered = false
 
-[node name="Parallax2D_Back2" type="Parallax2D" parent="Node"]
+[node name="Parallax2D_Back2" type="Parallax2D" parent="Node" unique_id=886447410]
 scroll_scale = Vector2(0.1, 0)
 scroll_offset = Vector2(340, -81)
 repeat_size = Vector2(512, 0)

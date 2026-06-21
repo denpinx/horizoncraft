@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
+using Horizoncraft.script.Utility;
 using Godot;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Inventory;
@@ -65,7 +66,7 @@ public record BlockMaterialsTemplate
 
         foreach (string cmp_name in Components.Keys)
         {
-            GD.Print("[BlockMaterialsTemplate] 创建组件构造Lambda:" + cmp_name);
+            GameLogger.Debug("Materials","[BlockMaterialsTemplate] 创建组件构造Lambda:" + cmp_name);
             blockMeta.Components.Add(
                 LambdaCreater.CreateLambda<Component>(cmp_name,
                     (Dictionary<string, object>)JsonCleaner.ConvertRoot(Components[cmp_name]))

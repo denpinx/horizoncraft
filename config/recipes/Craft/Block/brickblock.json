@@ -1,0 +1,11 @@
+{
+  "type": "craft",
+  "tag": "workbench",
+  "recipes": [
+    {
+      "template": ["##", "##"],
+      "mask": {"#": "cobblestone"},
+      "result": ["brickblock", 4]
+    }
+  ]
+}

@@ -13,6 +13,9 @@ public class HostChunkService : ChunkServiceBase
 {
     public WorldSnapshot WorldSnapshot = new WorldSnapshot();
 
+    private readonly Dictionary<int, ChunkPack> _wholeChunkUpdate = new();
+    private readonly Dictionary<int, WorldSnapshot> _diffUpdate = new();
+
     public HostChunkService(World world,NeoWorldGenerator worldGenerator) : base(world,worldGenerator)
     {
         PlayerNode.GetInformation[nameof(HostChunkService)] =
@@ -31,10 +34,8 @@ public class HostChunkService : ChunkServiceBase
     /// </summary>
     public void SyncChunks()
     {
-        //全量更新
-        Dictionary<int, ChunkPack> wholeChunkUpdate = new();
-        //差异更新
-        Dictionary<int, WorldSnapshot> diffUpdate = new();
+        _wholeChunkUpdate.Clear();
+        _diffUpdate.Clear();
 
         //差异更新
         foreach (var chunk in WorldSnapshot.chunks)
@@ -50,10 +51,13 @@ public class HostChunkService : ChunkServiceBase
                     Math.Abs(chunk.Y - pd1.ChunkCoord.Y) <= LoadHorizon
                 )
                 {
-                    if (!diffUpdate.ContainsKey(pd1.PeerId))
-                        diffUpdate[pd1.PeerId] = new WorldSnapshot();
+                    if (!_diffUpdate.TryGetValue(pd1.PeerId, out var snap))
+                    {
+                        snap = new WorldSnapshot();
+                        _diffUpdate[pd1.PeerId] = snap;
+                    }
                     chunk.ResetEmptyOwned(pd1.Name); //更新实体的从属
-                    diffUpdate[pd1.PeerId].chunks.Add(chunk);
+                    snap.chunks.Add(chunk);
                 }
             }
         }
@@ -87,14 +91,13 @@ public class HostChunkService : ChunkServiceBase
                     {
                         if (pd1.Name != PlayerNode.Profile.Name)
                         {
-                            if (!wholeChunkUpdate.ContainsKey(pd1.PeerId))
+                            if (!_wholeChunkUpdate.TryGetValue(pd1.PeerId, out var pack))
                             {
-                                var result = World.Service.EntityService.GetEntityByChunk(chunk.coord);
-                                chunk.Entitys = result;
-                                wholeChunkUpdate[pd1.PeerId] = new ChunkPack();
+                                pack = new ChunkPack();
+                                _wholeChunkUpdate[pd1.PeerId] = pack;
                             }
 
-                            wholeChunkUpdate[pd1.PeerId].Chunks.Add(chunk);
+                            pack.Chunks.Add(chunk);
                         }
                     }
                 }
@@ -103,22 +106,22 @@ public class HostChunkService : ChunkServiceBase
 
         foreach (var chunk in Chunks.Values)
             chunk.ServerFullUpdate = false;
-        foreach (var key in wholeChunkUpdate.Keys)
+        foreach (var kv in _wholeChunkUpdate)
         {
-            var bytes = ByteTool.ToBytes<ChunkPack>(wholeChunkUpdate[key]);
-            World.Service.ChunkServiceNode.RpcId(key,
+            var bytes = ByteTool.ToBytes<ChunkPack>(kv.Value);
+            World.Service.ChunkServiceNode.RpcId(kv.Key,
                 nameof(ChunkServiceNode.ReciveChunkPack),
                 bytes);
         }
 
-        foreach (var key in diffUpdate.Keys)
+        foreach (var kv in _diffUpdate)
         {
-            if (key != 0)
+            if (kv.Key != 0)
             {
-                if (World.Multiplayer.GetPeers().Contains(key))
+                if (World.Multiplayer.GetPeers().Contains(kv.Key))
                 {
-                    var bytes = ByteTool.ToBytes<WorldSnapshot>(diffUpdate[key]);
-                    World.Service.ChunkServiceNode.RpcId(key,
+                    var bytes = ByteTool.ToBytes<WorldSnapshot>(kv.Value);
+                    World.Service.ChunkServiceNode.RpcId(kv.Key,
                         nameof(ChunkServiceNode.ReciveChunkUpdatePack),
                         bytes);
                 }
@@ -149,10 +152,9 @@ public class HostChunkService : ChunkServiceBase
     {
         foreach (var chunk in Chunks.Values)
         {
-            ChunkSnapshot cs = null;
             if (chunk.UpdateList.Count > 0)
             {
-                cs = new()
+                var cs = new ChunkSnapshot()
                 {
                     Version = World.Service.TickTimes,
                     X = chunk.coord.X,
@@ -172,23 +174,20 @@ public class HostChunkService : ChunkServiceBase
 
                 WorldSnapshot.chunks.Add(cs);
             }
-
-            if (cs == null)
+            else
             {
-                cs = new()
-                {
-                    Version = World.Service.TickTimes,
-                    X = chunk.coord.X,
-                    Y = chunk.coord.Y,
-                };
                 var result = World.Service.EntityService.GetChunkMovedEntity(chunk.coord);
                 if (result.Count > 0)
                 {
-                    GD.Print($"【服务端】获取了 {result.Count} 个实体更新");
-                    cs.Entiydatas = result;
+                    var cs = new ChunkSnapshot()
+                    {
+                        Version = World.Service.TickTimes,
+                        X = chunk.coord.X,
+                        Y = chunk.coord.Y,
+                        Entiydatas = result,
+                    };
+                    WorldSnapshot.chunks.Add(cs);
                 }
-
-                WorldSnapshot.chunks.Add(cs);
             }
         }
     }

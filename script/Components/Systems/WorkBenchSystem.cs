@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Godot;
 using Horizoncraft.script.Recipes;
+using Horizoncraft.script.Utility;
 
 namespace Horizoncraft.script.Components.Systems;
 
@@ -10,10 +11,18 @@ namespace Horizoncraft.script.Components.Systems;
 /// </summary>
 public class WorkBenchSystem : TickSystem
 {
-    public NeoRecipeManage NeoRecipeManage;
+    public NeoRecipeManage NeoRecipeManage
+    {
+        get
+        {
+            return this.csi.WorldService.NeoRecipeManage;
+        }
+    }
+
+    private ComponentSystemInitialize csi;
     public override void Initialize(ComponentSystemInitialize componentSystemInitialize)
     {
-        NeoRecipeManage = componentSystemInitialize.WorldService.NeoRecipeManage;
+        csi = componentSystemInitialize;
     }
     public override void SetComponentValue(PlayerData player, Component component, Dictionary<string, string> value)
     {
@@ -24,7 +33,7 @@ public class WorkBenchSystem : TickSystem
             {
                 if (value["Action"] == "Craft-All")
                 {
-                    GD.Print("Craft-All");
+                    GameLogger.Debug("WorkBench","Craft-All");
                     var gri = NeoRecipeManage.GetRecipe(inventory, 3, 0, "workbench");
                     while (gri != null)
                     {
@@ -40,7 +49,7 @@ public class WorkBenchSystem : TickSystem
 
                 if (value["Action"] == "Craft")
                 {
-                    GD.Print("Craft");
+                    GameLogger.Debug("WorkBench","Craft");
                     var gri = NeoRecipeManage.GetRecipe(inventory, 3);
                     if (gri != null)
                     {

@@ -120,6 +120,7 @@ namespace Horizoncraft.script
         public override void _ExitTree()
         {
             Service.Save();
+            Utility.GameLogger.Flush();
         }
 
         public override void _Process(double delta)

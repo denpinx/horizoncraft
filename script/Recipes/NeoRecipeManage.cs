@@ -73,21 +73,20 @@ public class NeoRecipeManage
     {
         if (recipePack == null)
         {
-            GD.PrintErr($"[{nameof(NeoRecipeManage)}] 注册失败,配方异常为null。");
+            GameLogger.Error("RecipeManage",$"[{nameof(NeoRecipeManage)}] 注册失败,配方异常为null。");
             return;
         }
 
         var result = GridRecipes.Find(r => r.Tag == recipePack.Tag);
         if (result != null)
         {
-            GD.Print(
-                $"[{nameof(NeoRecipeManage)}] 添加配方项 {recipePack.Tag,-16} #{result.Recipes.Count,-4} + {recipePack.Recipes.Count,-4}");
+            GameLogger.Info("RecipeManage", $"添加配方项 {recipePack.Tag,-16} #{result.Recipes.Count,-4} + {recipePack.Recipes.Count,-4}");
             foreach (var r in recipePack.Recipes)
                 result.Recipes.Add(r);
         }
         else
         {
-            GD.Print($"[{nameof(NeoRecipeManage)}] 创建配方组 {recipePack.Tag,-16} #{recipePack.Recipes.Count,-4}");
+            GameLogger.Info("RecipeManage", $"创建配方组 {recipePack.Tag,-16} #{recipePack.Recipes.Count,-4}");
             GridRecipes.Add(recipePack);
         }
     }
@@ -96,20 +95,20 @@ public class NeoRecipeManage
     {
         if (processRecipePack == null)
         {
-            GD.PrintErr($"[RecipeManage] 注册失败! recipe 为 null");
+            GameLogger.Error("RecipeManage",$"[RecipeManage] 注册失败! recipe 为 null");
             return;
         }
 
         var result = ProcessRecipes.Find(r => r.Tag == processRecipePack.Tag);
         if (result != null)
         {
-            GD.Print($"[RecipeManage] 添加 {processRecipePack.Tag} 配方,{processRecipePack.Recipes.Count} 个");
+            GameLogger.Info("RecipeManage", $"添加 {processRecipePack.Tag} 配方,{processRecipePack.Recipes.Count} 个");
             foreach (var r in processRecipePack.Recipes)
                 result.Recipes.Add(r);
         }
         else
         {
-            GD.Print($"[RecipeManage] 创建 {processRecipePack.Tag} 配方,{processRecipePack.Recipes.Count} 个");
+            GameLogger.Info("RecipeManage", $"创建 {processRecipePack.Tag} 配方,{processRecipePack.Recipes.Count} 个");
             ProcessRecipes.Add(processRecipePack);
         }
     }
@@ -259,7 +258,7 @@ public class NeoRecipeManage
         var path = filename;
         if (!FileAccess.FileExists(path))
         {
-            GD.PrintErr($"[RecipeManage]] {path} 不存在！");
+            GameLogger.Error("RecipeManage",$"[RecipeManage]] {path} 不存在！");
             return;
         }
 
@@ -289,7 +288,7 @@ public class NeoRecipeManage
     {
         if (!DirAccess.DirExistsAbsolute("res://config/recipes"))
         {
-            GD.PrintErr("[RecipeManage] 初始化失败! 配方目录不存在!");
+            GameLogger.Error("RecipeManage","[RecipeManage] 初始化失败! 配方目录不存在!");
             return;
         }
 
@@ -303,7 +302,7 @@ public class NeoRecipeManage
     public ProcessRecipePack GetRecipe(string tag)
     {
         var recipe = ProcessRecipes.Find(r => r.Tag == tag);
-        if (recipe == null) GD.PrintErr($"[RecipeManage] 配方{tag} 不存在!");
+        if (recipe == null) GameLogger.Error("RecipeManage",$"[RecipeManage] 配方{tag} 不存在!");
         return recipe;
     }
 
@@ -362,7 +361,7 @@ public class NeoRecipeManage
             }
         }
 
-        GD.Print($"搜索物品作用配方 {itemStack.Name} 结果 {result.Count} 个");
+        GameLogger.Debug("RecipeManage", $"搜索物品作用配方 {itemStack.Name} 结果 {result.Count} 个");
         return result;
     }
 
@@ -438,7 +437,7 @@ public class NeoRecipeManage
                 result.Add(gridPack.Tag, gridPack);
         }
 
-        GD.Print($"搜索物品来源配方 {itemStack.Name} 结果 {result.Count} 个");
+        GameLogger.Debug("RecipeManage", $"搜索物品来源配方 {itemStack.Name} 结果 {result.Count} 个");
         return result;
     }
 }

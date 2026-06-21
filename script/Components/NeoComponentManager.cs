@@ -8,6 +8,7 @@ using Horizoncraft.script.Components.EntityComponents;
 using Horizoncraft.script.Components.Item;
 using Horizoncraft.script.Components.Systems;
 using Horizoncraft.script.Components.Systems.BlockSystems;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.Components.Systems.BlockSystems.EnergyBlocks;
 using Horizoncraft.script.Components.Systems.BlockSystems.Reactive;
 using Horizoncraft.script.Components.Systems.ItemSystems;
@@ -59,10 +60,8 @@ public class NeoComponentManager
         {
             if (component == null)
             {
-                GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
-                GD.PrintErr($"\t item-name:\t{itemStack.Name}");
-                GD.PrintErr($"\t item-state:\t{itemStack.State}");
-                GD.PrintErr($"\t item-components:\t{string.Join(",", itemStack.Components.Select(c => c.Drive))}");
+                GameLogger.Error("Component",
+                    $"[{nameof(NeoComponentManager)}] 物品组件被意外删除。item={itemStack.Name} state={itemStack.State} components={string.Join(",", itemStack.Components.Select(c => c.Drive))}");
                 continue;
             }
 
@@ -95,10 +94,8 @@ public class NeoComponentManager
         {
             if (component == null)
             {
-                GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(ExecuteItemComponents)} 物品组件被意外删除。");
-                GD.PrintErr($"\t item-name:\t{itemStack.Name}");
-                GD.PrintErr($"\t item-state:\t{itemStack.State}");
-                GD.PrintErr($"\t item-components:\t{string.Join(",", itemStack.Components.Select(c => c.Drive))}");
+                GameLogger.Error("Component",
+                    $"物品组件被意外删除。item={itemStack.Name} state={itemStack.State} components={string.Join(",", itemStack.Components.Select(c => c.Drive))}");
                 continue;
             }
 
@@ -128,13 +125,8 @@ public class NeoComponentManager
         {
             if (component == null)
             {
-                GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
-                GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
-                GD.PrintErr($"\t block-state:\t{blockData.State}");
-                GD.PrintErr(
-                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Drive))}");
-                GD.PrintErr(
-                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Drive))}");
+                GameLogger.Error("Component",
+                    $"方块组件被意外删除。block={blockData.BlockMeta.Name} state={blockData.State} runtime={string.Join(",", blockData.Components.Select(c => c.Drive))} original={string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Drive))}");
                 continue;
             }
 
@@ -166,13 +158,8 @@ public class NeoComponentManager
 
             if (component == null)
             {
-                GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(ExecuteBlockComponents)} 方块组件被意外删除。");
-                GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
-                GD.PrintErr($"\t block-state:\t{blockData.State}");
-                GD.PrintErr(
-                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Drive))}");
-                GD.PrintErr(
-                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Drive))}");
+                GameLogger.Error("Component",
+                    $"方块组件被意外删除。block={blockData.BlockMeta.Name} state={blockData.State} runtime={string.Join(",", blockData.Components.Select(c => c.Drive))} original={string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Drive))}");
 
                 continue;
             }
@@ -205,13 +192,14 @@ public class NeoComponentManager
         {
             if (component == null)
             {
-                GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(SetBlockComponentData)} 方块组件被意外删除。");
-                GD.PrintErr($"\t block-name:\t{blockData.BlockMeta.Name}");
-                GD.PrintErr($"\t block-state:\t{blockData.State}");
-                GD.PrintErr(
-                    $"\t block-runtime-components:\t{string.Join(",", blockData.Components.Select(c => c.Drive))}");
-                GD.PrintErr(
-                    $"\t block-original-components:\t{string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Drive))}");
+                GameLogger.Error("Component",
+                    $"方块组件被意外删除。block={blockData.BlockMeta.Name} state={blockData.State} runtime={string.Join(",", blockData.Components.Select(c => c.Drive))} original={string.Join(",", blockData.BlockMeta.Examples.Select(c => c.Drive))}");
+                continue;
+            }
+
+            if (component.Drive == null)
+            {
+                GameLogger.Error("Component", $"该组件没有 Drive。component={component.EnumId} block={blockData.BlockMeta.Name}");
                 continue;
             }
 
@@ -221,8 +209,7 @@ public class NeoComponentManager
                     cmp.System.SetComponentValue(player, component, dict);
                 else
                 {
-                    GD.PrintErr($"[{nameof(NeoComponentManager)}] {nameof(SetBlockComponentData)} 没有对应的组件处理该方法。");
-                    GD.PrintErr($"\t component-name:\t{component.Drive}");
+                    GameLogger.Error("Component", $"没有对应的组件处理该方法。component={component.Drive}");
                 }
             }
         }
@@ -373,13 +360,17 @@ public class NeoComponentManager
             typeof(ReactiveComponent),
             new CactusSystem()
         );
-        
+        //爆炸组件
+        Register(SystemEnum.ExplosionSystem,
+            typeof(ExplosiveComponent),
+            new ExplosiveSystem()
+        );
+
         ComponentSystemInitialize csi = new ComponentSystemInitialize()
         {
             WorldService = worldServiceBase,
         };
-        foreach (var componentSet in  ComponentSets)
+        foreach (var componentSet in ComponentSets)
             componentSet.Value.System.Initialize(csi);
-        
     }
 }

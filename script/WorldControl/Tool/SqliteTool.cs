@@ -83,7 +83,7 @@ public static class SqliteTool
     public static void InsertChunkByteValue(this SqliteConnection sqliteConnection, int x, int y, Chunk chunk)
     {
         var bytes = ByteTool.ToBytes<Chunk>(chunk);
-        string query = "INSERT INTO World (x, y, byte) VALUES (@KeyX, @KeyY, @Byte)";
+        string query = "INSERT OR REPLACE INTO World (x, y, byte) VALUES (@KeyX, @KeyY, @Byte)";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
         {
             command.Parameters.AddWithValue("@Byte", bytes);
@@ -144,7 +144,7 @@ public static class SqliteTool
     {
         var bytes = ByteTool.ToBytes(playerData);
 
-        string query = "INSERT INTO Player (name,byte) VALUES (@Name, @Byte)";
+        string query = "INSERT OR REPLACE INTO Player (name,byte) VALUES (@Name, @Byte)";
         using (SqliteCommand command = new SqliteCommand(query, sqliteConnection))
         {
             command.Parameters.AddWithValue("@Name", name);

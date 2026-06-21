@@ -12,12 +12,10 @@ public class NeoWorldGenerator
     private readonly Stopwatch StopWatch = new Stopwatch();
     private readonly FastNoiseLite FastNoiseLite = new FastNoiseLite();
     public NeoBiomeManage NeoBiomeManage;
-    // public NeoOreManage NeoOreManage;
     public NeoBlockStructManager NeoBlockStructManager;
     public NeoWorldGenerator()
     {
         NeoBiomeManage = new NeoBiomeManage();
-        // NeoOreManage = new  NeoOreManage();
         NeoBlockStructManager = new NeoBlockStructManager();
         
         NeoBlockStructManager.LoadBuilds();

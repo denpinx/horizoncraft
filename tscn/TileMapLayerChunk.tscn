@@ -1,32 +1,19 @@
-[gd_scene load_steps=7 format=3 uid="uid://b8sm5vjvrp1v2"]
+[gd_scene load_steps=4 format=3 uid="uid://b8sm5vjvrp1v2"]
 
 [ext_resource type="Script" uid="uid://ckrstqs6hvawg" path="res://tscn/TileMapLayerChunk.cs" id="1_2arkn"]
-[ext_resource type="Texture2D" uid="uid://cg50yloerq0wx" path="res://texture/shadow.png" id="2_61nbq"]
 [ext_resource type="Script" uid="uid://b45554edbq8yv" path="res://tscn/RenderNode.cs" id="2_wribj"]
+[ext_resource type="Shader" path="res://tscn/ShadowShader.gdshader" id="3_wribj"]
 [ext_resource type="Script" uid="uid://ckokgwlpye0pe" path="res://tscn/DebugView.cs" id="8_agw1w"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wribj"]
-texture = ExtResource("2_61nbq")
-0:0/0 = 0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
-1:0/0 = 0
-2:0/0 = 0
-3:0/0 = 0
-4:0/0 = 0
-5:0/0 = 0
-6:0/0 = 0
-7:0/0 = 0
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0"]
+shader = ExtResource("3_wribj")
 
-[sub_resource type="TileSet" id="TileSet_bfswo"]
-physics_layer_0/collision_layer = 1
-sources/0 = SubResource("TileSetAtlasSource_wribj")
-
-[node name="TileMapLayerChunk" type="Node2D" node_paths=PackedStringArray("tileMapLayer_font", "tileMapLayer_back", "tileMapLayer_shadow", "debugView", "BackGroundDraw_Layer_0", "BackGroundDraw_Layer_1")]
+[node name="TileMapLayerChunk" type="Node2D" node_paths=PackedStringArray("tileMapLayer_font", "tileMapLayer_back", "shadowRect", "debugView", "BackGroundDraw_Layer_0", "BackGroundDraw_Layer_1")]
 top_level = true
 script = ExtResource("1_2arkn")
 tileMapLayer_font = NodePath("TileMapLayer_font")
 tileMapLayer_back = NodePath("TileMapLayer_back")
-tileMapLayer_shadow = NodePath("TileMapLayer_shadow")
+shadowRect = NodePath("ShadowRect")
 debugView = NodePath("DebugView")
 BackGroundDraw_Layer_0 = NodePath("TileMapLayer_back/BackGroundDraw")
 BackGroundDraw_Layer_1 = NodePath("TileMapLayer_font/BackGroundDraw")
@@ -50,10 +37,12 @@ show_behind_parent = true
 script = ExtResource("2_wribj")
 Z = 1
 
-[node name="TileMapLayer_shadow" type="TileMapLayer" parent="."]
+[node name="ShadowRect" type="ColorRect" parent="."]
 z_index = 2
-tile_set = SubResource("TileSet_bfswo")
-navigation_enabled = false
+material = SubResource("ShaderMaterial_0")
+anchors_preset = 0
+size = Vector2(800, 800)
+mouse_filter = 2
 
 [node name="DebugView" type="Node2D" parent="."]
 self_modulate = Color(1, 1, 1, 0.462745)

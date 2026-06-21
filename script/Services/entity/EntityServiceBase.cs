@@ -36,6 +36,7 @@ public class EntityServiceBase
 
     protected NeoComponentManager componentManager;
     protected World World;
+    private readonly EntitySystemEvent _entitySystemEvent = new();
     public EntityServiceBase(World world,NeoComponentManager componentManager)
     {
         this.World = world;
@@ -76,12 +77,9 @@ public class EntityServiceBase
         foreach (var entity in EntityDatas.Values)
         {
             if (entity.Removed) continue;
-            EntitySystemEvent ese = new()
-            {
-                Service = World.Service,
-                EntityData = entity,
-            };
-            componentManager.ExecuteEntityComponents(ese);
+            _entitySystemEvent.Service = World.Service;
+            _entitySystemEvent.EntityData = entity;
+            componentManager.ExecuteEntityComponents(_entitySystemEvent);
             // ComponentManager.ExecuteEntityComponents(ese);
             //尝试加载该区块
             if (!World.Service.ChunkService.Chunks.ContainsKey(entity.ChunkCoord))
@@ -121,8 +119,7 @@ public class EntityServiceBase
         var list = new List<Guid>();
         foreach (var uuid in EntityDatas.Keys)
         {
-            var entity = EntityDatas[uuid];
-            if (entity.ChunkCoord == coord)
+            if (EntityDatas.TryGetValue(uuid, out var entity) && entity.ChunkCoord == coord)
             {
                 list.Add(entity.Uuid);
             }
@@ -265,9 +262,11 @@ public class EntityServiceBase
         {
             if (!EntityDatas.ContainsKey(uuid))
             {
-                var entity = EntityNodes[uuid];
-                EntityNodes.Remove(uuid);
-                entity.GetNode().QueueFree();
+                if (EntityNodes.TryGetValue(uuid, out var entity))
+                {
+                    EntityNodes.Remove(uuid);
+                    entity.GetNode().QueueFree();
+                }
             }
         }
     }
@@ -287,21 +286,21 @@ public class EntityServiceBase
             var uuid = kvp.Key;
             var entity_data = kvp.Value;
             //更新数据
-            if (EntityNodes.ContainsKey(uuid))
+            if (EntityNodes.TryGetValue(uuid, out var node))
             {
-                EntityNodes[uuid].Entity = entity_data;
+                node.Entity = entity_data;
             }
             else
             {
                 //创建视图
-                var node = SpawnEntity(entity_data);
-                if (node == null)
+                var newNode = SpawnEntity(entity_data);
+                if (newNode == null)
                 {
                     continue;
                 }
 
-                EntityNodes.Add(uuid, node);
-                World.AddChild(node.GetNode());
+                EntityNodes.Add(uuid, newNode);
+                World.AddChild(newNode.GetNode());
             }
 
             //卸载不可见实体视图,更新所属权
@@ -314,11 +313,10 @@ public class EntityServiceBase
                     entity.Update = true;
                 }
 
-                if (EntityNodes.ContainsKey(uuid))
+                if (EntityNodes.TryGetValue(uuid, out var removeNode))
                 {
-                    var node = EntityNodes[uuid];
                     EntityNodes.Remove(uuid);
-                    node.GetNode().QueueFree();
+                    removeNode.GetNode().QueueFree();
                 }
             }
             else

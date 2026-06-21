@@ -2,10 +2,20 @@ using Godot;
 using Horizoncraft.script.Components.BlockComponents;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.WorldControl;
+using SQLitePCL;
 using Vector3 = System.Numerics.Vector3;
 
 namespace Horizoncraft.script.Events
 {
+    public enum BlockDirecion
+    {
+        Up,
+        Down,
+        Left,
+        Right,
+        Font,
+        Back
+    }
     /// <summary>
     /// [严重]设置方块后不要使用原get的数据操作
     /// </summary>
@@ -23,6 +33,33 @@ namespace Horizoncraft.script.Events
         private BlockData _frontBlock;
         private BlockData _backBlock;
 
+        public BlockData GetBlock(BlockDirecion direcion)
+        {
+            switch (direcion)
+            {
+                case BlockDirecion.Up: return GetTopBlock();
+                case BlockDirecion.Down: return GetBottomBlock();
+                case BlockDirecion.Left: return GetLeftBlock();
+                case BlockDirecion.Right: return GetRightBlock();
+                case BlockDirecion.Font: return GetFrontBlock();
+                case BlockDirecion.Back: return GetBackBlock();
+            }
+            return null;
+        }
+
+        public bool TryGetBlock(BlockDirecion direcion,out BlockData block)
+        {
+            var result =  GetBlock(direcion);
+            if (result != null)
+            {
+                block = result;
+                return true;
+            }
+            block = null;
+            return false;
+        }
+        
+        
         /// <summary>
         /// 将方块标记为已更新
         /// </summary>

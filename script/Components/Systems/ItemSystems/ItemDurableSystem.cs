@@ -2,6 +2,7 @@ using Godot;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Components.Item;
 using Horizoncraft.script.Events.player;
+using Horizoncraft.script.Utility;
 
 namespace Horizoncraft.script.Components.Systems.ItemSystems;
 
@@ -10,7 +11,7 @@ public class ItemDurableSystem : ItemComponentSystem
     public override bool OnBreakBlock(PlayerBreakblockEvent bbe, ItemComponent itemComponent)
     {
         var durable = itemComponent as ToolComponent;
-        GD.Print($"[方块挖掘] 当前耐久{durable.Value}/{durable.Max}");
+        GameLogger.Debug("Tool",$"[方块挖掘] 当前耐久{durable.Value}/{durable.Max}");
         if (bbe.GetBlockData().BlockMeta.BreakLevel <= durable.ToolLevel)
             //正常掉落
             bbe.DropLoots = bbe.GetBlockData().BlockMeta.LootTable.TryTakeItem(bbe.GetBlockData().State);

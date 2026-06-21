@@ -2,7 +2,7 @@ using Horizoncraft.script.Chat;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.rpc;
 
-namespace Horizoncraft.script.Services.message;
+namespace Horizoncraft.script.Services.Message;
 
 public class ClientMessageService : MessageServiceBase
 {

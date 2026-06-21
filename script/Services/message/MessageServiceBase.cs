@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using Horizoncraft.script.Chat;
+using Horizoncraft.script.Utility;
 
-namespace Horizoncraft.script.Services.message;
+namespace Horizoncraft.script.Services.Message;
 
 /// <summary>
 /// 消息管理服务
@@ -78,7 +79,7 @@ public abstract class MessageServiceBase
         if (message.Message == "") return false;
         if (HasMessage(message.Id))
         {
-            GD.PrintErr("Message already exists");
+            GameLogger.Error("Message","Message already exists");
             return false;
         }
 

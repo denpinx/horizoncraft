@@ -25,7 +25,7 @@ public class FluidSystem : TickSystem
                 if (inventory.TryAddItem(meta.GetItemStack()))
                 {
                     item.Amount -= 1;
-                    playerRightClickBlockEvent.Player.Inventory.update = true;
+                    playerRightClickBlockEvent.Player.Inventory.Update = true;
                     playerRightClickBlockEvent.Service.ChunkService.SetBlock(playerRightClickBlockEvent.Position, air);
                 }
             }
@@ -43,7 +43,9 @@ public class FluidSystem : TickSystem
         {
             e.DropBlockLoot(e.GetBottomBlock());
             e.SetBottomBlock(blockMeta, 0);
-            e.GetBottomBlock().GetComponent<BlockComponents.FluidComponent>("FluidComponent").mobility = true;
+            
+            if(e.GetBottomBlock().TryGetComponent<BlockComponents.FluidComponent>("FluidComponent", out var fluidComponent))
+                fluidComponent.mobility = true;            
             return;
         }
 
@@ -59,7 +61,11 @@ public class FluidSystem : TickSystem
                 {
                     e.DropBlockLoot(e.GetLeftBlock());
                     e.SetLeftBlock(blockMeta, e.BlockData.State + 1);
-                    e.GetLeftBlock().GetComponent<BlockComponents.FluidComponent>("FluidComponent").mobility = true;
+
+                    if(e.GetLeftBlock().TryGetComponent<BlockComponents.FluidComponent>("FluidComponent", out var fluidComponent))
+                        fluidComponent.mobility = true;    
+                    
+                    
                     return;
                 }
 
@@ -67,7 +73,9 @@ public class FluidSystem : TickSystem
                 {
                     e.DropBlockLoot(e.GetRightBlock());
                     e.SetRightBlock(blockMeta, e.BlockData.State + 1);
-                    e.GetRightBlock().GetComponent<BlockComponents.FluidComponent>("FluidComponent").mobility = true;
+                    if(e.GetRightBlock().TryGetComponent<BlockComponents.FluidComponent>("FluidComponent", out var fluidComponent))
+                        fluidComponent.mobility = true;    
+
                     return;
                 }
             }

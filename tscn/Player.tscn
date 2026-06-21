@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://dlka0sc4kl0vb"]
+[gd_scene format=3 uid="uid://dlka0sc4kl0vb"]
 
 [ext_resource type="Script" uid="uid://b7yw7r1bwa41i" path="res://tscn/PlayerNode.cs" id="1_knoa1"]
 [ext_resource type="Texture2D" uid="uid://l3goqsi52cpt" path="res://icon.svg" id="1_qob58"]
@@ -270,7 +270,7 @@ _data = {
 &"break": SubResource("Animation_7twa1")
 }
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("ChatView", "animationPlayer_other", "animationPlayer_move", "BlockInfoView", "collisionShape2D", "OvrCanvasLayer", "GuiCanvasLayer", "Timer_Tick", "Label_DEBUG_Right", "Label_DEBUG_Left", "Label_PlayerName", "sprite2D_body", "Cursor", "Use_Process", "hotBar", "camera2d")]
+[node name="Player" type="CharacterBody2D" unique_id=659639959 node_paths=PackedStringArray("ChatView", "animationPlayer_other", "animationPlayer_move", "BlockInfoView", "collisionShape2D", "OvrCanvasLayer", "GuiCanvasLayer", "Timer_Tick", "Label_DEBUG_Right", "Label_DEBUG_Left", "Label_PlayerName", "sprite2D_body", "Cursor", "Use_Process", "hotBar", "camera2d")]
 top_level = true
 z_index = 10
 collision_layer = 2
@@ -293,26 +293,28 @@ hotBar = NodePath("GudCanvasLayer/HotBar")
 camera2d = NodePath("Camera2D")
 metadata/_edit_vertical_guides_ = [575.0]
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=876108534]
 zoom = Vector2(2, 2)
+position_smoothing_enabled = true
+position_smoothing_speed = 2.0
 metadata/_edit_lock_ = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1641433398]
 position = Vector2(-1, -8)
 shape = SubResource("RectangleShape2D_rnaqb")
 
-[node name="Icon" type="Sprite2D" parent="."]
+[node name="Icon" type="Sprite2D" parent="." unique_id=181661182]
 visible = false
 position = Vector2(-16, 1)
 scale = Vector2(0.125, 0.125)
 texture = ExtResource("1_qob58")
 metadata/_edit_lock_ = true
 
-[node name="Timer_Tick" type="Timer" parent="."]
+[node name="Timer_Tick" type="Timer" parent="." unique_id=754336329]
 wait_time = 0.05
 autostart = true
 
-[node name="Label_PlayerName" type="Label" parent="."]
+[node name="Label_PlayerName" type="Label" parent="." unique_id=1207964315]
 offset_left = -16.0
 offset_top = -46.0
 offset_right = 48.0
@@ -326,18 +328,18 @@ label_settings = SubResource("LabelSettings_hdrus")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GudCanvasLayer" type="CanvasLayer" parent="."]
+[node name="GudCanvasLayer" type="CanvasLayer" parent="." unique_id=949864674]
 layer = 2
 
-[node name="HotBar" parent="GudCanvasLayer" instance=ExtResource("4_kghmo")]
+[node name="HotBar" parent="GudCanvasLayer" unique_id=264235573 instance=ExtResource("4_kghmo")]
 
-[node name="PlayerDataView" parent="GudCanvasLayer" instance=ExtResource("7_34em8")]
+[node name="PlayerDataView" parent="GudCanvasLayer" unique_id=1014677186 instance=ExtResource("7_34em8")]
 
-[node name="ChatView" parent="GudCanvasLayer" node_paths=PackedStringArray("Player") instance=ExtResource("6_34em8")]
+[node name="ChatView" parent="GudCanvasLayer" unique_id=719320229 node_paths=PackedStringArray("Player") instance=ExtResource("6_34em8")]
 size_flags_horizontal = 4
 Player = NodePath("../..")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("Label_DEBUG_Right", "Label_DEBUG_Left", "_playerNode", "_timer")]
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=619507623 node_paths=PackedStringArray("Label_DEBUG_Right", "Label_DEBUG_Left", "_playerNode", "_timer")]
 layer = 2
 script = ExtResource("4_knoa1")
 Label_DEBUG_Right = NodePath("Control/Label_DEBUG_Right")
@@ -345,7 +347,7 @@ Label_DEBUG_Left = NodePath("Control/Label_DEBUG_Left")
 _playerNode = NodePath("..")
 _timer = NodePath("../Timer_Tick")
 
-[node name="Control" type="Control" parent="CanvasLayer"]
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=107624647]
 z_index = 2
 layout_mode = 3
 anchors_preset = 15
@@ -357,7 +359,7 @@ size_flags_horizontal = 0
 size_flags_vertical = 0
 mouse_filter = 1
 
-[node name="Label_DEBUG_Left" type="Label" parent="CanvasLayer/Control"]
+[node name="Label_DEBUG_Left" type="Label" parent="CanvasLayer/Control" unique_id=592740]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -371,7 +373,7 @@ theme_override_constants/outline_size = 6
 text = "调试信息左"
 label_settings = SubResource("LabelSettings_gqu4d")
 
-[node name="Label_DEBUG_Right" type="Label" parent="CanvasLayer/Control"]
+[node name="Label_DEBUG_Right" type="Label" parent="CanvasLayer/Control" unique_id=1322367769]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -388,9 +390,9 @@ text = "调试信息右"
 label_settings = SubResource("LabelSettings_emu1f")
 horizontal_alignment = 2
 
-[node name="BlockInfoView" parent="CanvasLayer" instance=ExtResource("7_2i02x")]
+[node name="BlockInfoView" parent="CanvasLayer" unique_id=720183330 instance=ExtResource("7_2i02x")]
 
-[node name="Tip" type="Label" parent="CanvasLayer"]
+[node name="Tip" type="Label" parent="CanvasLayer" unique_id=985670453]
 visible = false
 anchors_preset = 2
 anchor_top = 1.0
@@ -401,18 +403,18 @@ grow_vertical = 0
 theme_override_styles/normal = SubResource("StyleBoxFlat_qpm1p")
 text = "提示: 按住[shift],可以仅在背景墙放置方块，和仅破坏前景方块"
 
-[node name="RayCast2D" type="RayCast2D" parent="."]
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=892108024]
 target_position = Vector2(128, 0)
 metadata/_edit_lock_ = true
 
-[node name="Break_Process" type="Sprite2D" parent="."]
+[node name="Break_Process" type="Sprite2D" parent="." unique_id=318577876]
 position = Vector2(-20, -191)
 texture = ExtResource("5_gqu4d")
 centered = false
 hframes = 10
 metadata/_edit_lock_ = true
 
-[node name="Use_Process" type="Sprite2D" parent="."]
+[node name="Use_Process" type="Sprite2D" parent="." unique_id=1560933641]
 position = Vector2(-20, -191)
 texture = ExtResource("10_56q24")
 centered = false
@@ -420,33 +422,33 @@ hframes = 15
 frame = 14
 metadata/_edit_lock_ = true
 
-[node name="Body" type="Sprite2D" parent="."]
+[node name="Body" type="Sprite2D" parent="." unique_id=812520130]
 position = Vector2(0, -11)
 texture = SubResource("AtlasTexture_hdrus")
 script = ExtResource("7_7twa1")
 
-[node name="Head" type="Sprite2D" parent="Body"]
+[node name="Head" type="Sprite2D" parent="Body" unique_id=1041081432]
 position = Vector2(0, -7)
 texture = SubResource("AtlasTexture_knoa1")
 offset = Vector2(0, -6)
 
-[node name="Left_leg" type="Sprite2D" parent="Body"]
+[node name="Left_leg" type="Sprite2D" parent="Body" unique_id=2116162450]
 position = Vector2(0, 6)
 texture = SubResource("AtlasTexture_emu1f")
 offset = Vector2(0, 6)
 
-[node name="Right_leg" type="Sprite2D" parent="Body"]
+[node name="Right_leg" type="Sprite2D" parent="Body" unique_id=1783837707]
 show_behind_parent = true
 position = Vector2(0, 6)
 texture = SubResource("AtlasTexture_emu1f")
 offset = Vector2(0, 6)
 
-[node name="Left_arm" type="Sprite2D" parent="Body"]
+[node name="Left_arm" type="Sprite2D" parent="Body" unique_id=2041204710]
 position = Vector2(1, -4)
 texture = SubResource("AtlasTexture_q1haa")
 offset = Vector2(-1, 3)
 
-[node name="TextureRect" type="TextureRect" parent="Body/Left_arm"]
+[node name="TextureRect" type="TextureRect" parent="Body/Left_arm" unique_id=1149876394]
 show_behind_parent = true
 offset_left = -1.62684
 offset_top = -0.989645
@@ -458,25 +460,21 @@ texture = ExtResource("9_knoa1")
 expand_mode = 1
 metadata/_edit_use_anchors_ = true
 
-[node name="Right_arm" type="Sprite2D" parent="Body"]
+[node name="Right_arm" type="Sprite2D" parent="Body" unique_id=868145880]
 show_behind_parent = true
 position = Vector2(1, -4)
 texture = SubResource("AtlasTexture_q1haa")
 offset = Vector2(-1, 3)
 
-[node name="AnimationPlayer_Move" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_7twa1")
-}
+[node name="AnimationPlayer_Move" type="AnimationPlayer" parent="." unique_id=1789767362]
+libraries/ = SubResource("AnimationLibrary_7twa1")
 
-[node name="AnimationPlayer_Other" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_q1haa")
-}
+[node name="AnimationPlayer_Other" type="AnimationPlayer" parent="." unique_id=488897827]
+libraries/ = SubResource("AnimationLibrary_q1haa")
 
-[node name="OvrCanvasLayer" type="CanvasLayer" parent="."]
+[node name="OvrCanvasLayer" type="CanvasLayer" parent="." unique_id=1719244574]
 layer = 11
 
-[node name="LoadingMenu" parent="OvrCanvasLayer" node_paths=PackedStringArray("playerNode") instance=ExtResource("11_qpm1p")]
+[node name="LoadingMenu" parent="OvrCanvasLayer" unique_id=1639658048 node_paths=PackedStringArray("playerNode") instance=ExtResource("11_qpm1p")]
 visible = false
 playerNode = NodePath("../..")

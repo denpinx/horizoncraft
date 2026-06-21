@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.WorldControl.worldbiomes;
 
 namespace Horizoncraft.script.WorldControl;
@@ -136,7 +137,7 @@ public class NeoBiomeManage
             LandBiomes[i].weight_range.X = half;
             LandBiomes[i].weight_range.Y = half + LandBiomes[i].weight;
             half += LandBiomes[i].weight;
-            GD.Print(
+            GameLogger.Info("BiomeManage",
                 $"群系名称：{LandBiomes[i].name} 权重:{LandBiomes[i].weight}，{LandBiomes[i].weight_range.X},{LandBiomes[i].weight_range.Y}");
         }
 
@@ -146,7 +147,7 @@ public class NeoBiomeManage
             DeepBiomes[i].weight_range.X = half;
             DeepBiomes[i].weight_range.Y = half + DeepBiomes[i].weight;
             half += DeepBiomes[i].weight;
-            GD.Print(
+            GameLogger.Info("BiomeManage",
                 $"群系名称：{DeepBiomes[i].name} 权重:{DeepBiomes[i].weight}，{DeepBiomes[i].weight_range.X},{DeepBiomes[i].weight_range.Y}");
         }
 
@@ -156,7 +157,7 @@ public class NeoBiomeManage
             SkyBiomes[i].weight_range.X = half;
             SkyBiomes[i].weight_range.Y = half + SkyBiomes[i].weight;
             half += SkyBiomes[i].weight;
-            GD.Print(
+            GameLogger.Info("BiomeManage",
                 $"群系名称：{SkyBiomes[i].name} 权重:{SkyBiomes[i].weight}，{SkyBiomes[i].weight_range.X},{SkyBiomes[i].weight_range.Y}");
         }
     }
@@ -270,7 +271,7 @@ public class NeoBiomeManage
         if (sky != null) return sky;
         var deep = DeepBiomes.Find(B => B.name == name);
         if (deep != null) return deep;
-        GD.PrintErr($"没有找到生物群系{name}");
+        GameLogger.Error("BiomeManage",$"没有找到生物群系{name}");
         return null;
     }
 

@@ -1,0 +1,16 @@
+{
+  "type": "craft",
+  "tag": "workbench",
+  "recipes": [
+    {
+      "template": ["-", "#"],
+      "mask": {"#": "wooden_storage_box", "-": "logistics_pipeline"},
+      "result": ["output_block", 1]
+    },
+    {
+      "template": ["-", "#"],
+      "mask": {"#": "iron_storage_box", "-": "logistics_pipeline"},
+      "result": ["output_block", 1]
+    }
+  ]
+}

@@ -73,9 +73,9 @@ public class HostPlayerService : PlayerServiceBase
         {
             if (player.Name != PlayerNode.Profile.Name)
             {
-                if (player.Inventory.update)
+                if (player.Inventory.Update)
                 {
-                    player.Inventory.update = false;
+                    player.Inventory.Update = false;
                     if (World.Multiplayer.GetPeers().Contains(player.PeerId))
                         World.Service.PlayerServiceNode.RpcId(
                             player.PeerId,
@@ -92,7 +92,7 @@ public class HostPlayerService : PlayerServiceBase
                     var inv = blockdata?.GetComponent<BlockComponents_InventoryComponent>();
                     if (blockdata != null && inv != null)
                     {
-                        if (inv.GetInventory().update)
+                        if (inv.GetInventory().Update)
                             World.Service.ChunkServiceNode.RpcId(player.PeerId,
                                 nameof(ChunkServiceNode.ReciveLookingBlockData),
                                 ByteTool.ToBytes<BlockData>(blockdata),
@@ -118,9 +118,9 @@ public class HostPlayerService : PlayerServiceBase
                 );
                 var blockdata = World.Service.ChunkService.GetBlock(pos);
                 var inv = blockdata?.GetComponent<BlockComponents_InventoryComponent>();
-                if (blockdata != null && inv != null && inv.GetInventory().update)
+                if (blockdata != null && inv != null && inv.GetInventory().Update)
                 {
-                    inv.GetInventory().update = false;
+                    inv.GetInventory().Update = false;
                 }
             }
         }

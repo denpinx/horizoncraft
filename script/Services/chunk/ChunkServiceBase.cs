@@ -10,6 +10,7 @@ using Godot;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Components.BlockComponents;
 using Horizoncraft.script.Expand;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.WorldControl;
 using Horizoncraft.script.WorldControl.Tool;
 
@@ -94,6 +95,11 @@ public partial class ChunkServiceBase : IDisposable, ISave
     public ConcurrentDictionary<Vector2I, Chunk> Chunks = new();
 
     /// <summary>
+    /// 弱加载区块集合（仅数据，不渲染），用于跨区块边缘计算
+    /// </summary>
+    public ConcurrentDictionary<Vector2I, Chunk> WeakChunks = new();
+
+    /// <summary>
     /// 待加载区块的请求集合
     /// </summary>
     public ConcurrentQueue<Vector2I> LoadChunkQueue = new();
@@ -102,6 +108,17 @@ public partial class ChunkServiceBase : IDisposable, ISave
     /// 区块加载视距半径
     /// </summary>
     public int LoadHorizon = 1;
+
+    /// <summary>
+    /// 区块分组缓存脏标记，区块加载/卸载时设为true
+    /// </summary>
+    private bool _chunkGroupDirty = true;
+    private List<List<Vector2I>> _cachedGroups = new();
+
+    private HashSet<Vector2I> _lightPoss = new();
+    private List<Chunk> _resultChunk = new();
+    private HashSet<Vector2I> _rangeChunksCache = new();
+    private HashSet<Vector2I> _weakRangeChunksCache = new();
 
     protected CancellationTokenSource _tokenSource;
     protected Task _processLoadTask;
@@ -252,7 +269,6 @@ public partial class ChunkServiceBase : IDisposable, ISave
     {
         foreach (var chunkset in Chunks)
         {
-            GD.Print($"保存区块:{chunkset.Key.X},{chunkset.Key.Y}");
             SaveChunk(chunkset.Value);
         }
     }
@@ -270,56 +286,96 @@ public partial class ChunkServiceBase : IDisposable, ISave
         {
             try
             {
-                //常规区块加载任务，自动加载玩家半径内的区块
-                //异步加载
                 var rangeChunks = GetAllLoadRangeChunks();
+                var weakRangeChunks = GetWeakLoadRangeChunks();
                 var tasks = new List<Task<Chunk>>();
+
+                // 强加载区块
                 foreach (var chunkpos in rangeChunks)
-                    if (!Chunks.ContainsKey(chunkpos))
+                    if (!Chunks.ContainsKey(chunkpos) && !WeakChunks.ContainsKey(chunkpos))
                     {
-                        //如果和加载队列重叠，先跳过当前的加载。
                         if (LoadChunkQueue.Contains(chunkpos))
                             continue;
                         tasks.Add(LoadChunk(chunkpos));
                     }
 
-                int count = 0;
-                //修复死循环问题，
+                // 弱加载区块（强半径+1，不渲染）
+                foreach (var chunkpos in weakRangeChunks)
+                    if (!Chunks.ContainsKey(chunkpos) && !WeakChunks.ContainsKey(chunkpos))
+                        tasks.Add(LoadChunk(chunkpos));
+
                 var queue = LoadChunkQueue.ToArray();
                 LoadChunkQueue.Clear();
                 for (int i = 0; i < queue.Length; i++)
                 {
                     var pos = queue[i];
-                    if (Chunks.ContainsKey(pos))
+                    if (Chunks.ContainsKey(pos) || WeakChunks.ContainsKey(pos))
                         continue;
                     tasks.Add(LoadChunk(pos));
                 }
 
-                //同步处理
                 if (tasks.Count > 0)
                 {
                     Chunk[] chunks = await Task.WhenAll(tasks);
                     foreach (var chunk in chunks)
-                        if (Chunks.TryAdd(chunk.coord, chunk))
+                    {
+                        if (chunk == null) continue;
+                        if (rangeChunks.Contains(chunk.coord))
                         {
-                            OnChunkLoaded?.Invoke(chunk);
+                            if (Chunks.TryAdd(chunk.coord, chunk))
+                            {
+                                OnChunkLoaded?.Invoke(chunk);
+                                MarkChunkGroupDirty();
+                            }
                         }
+                        else
+                        {
+                            WeakChunks.TryAdd(chunk.coord, chunk);
+                        }
+                    }
                 }
 
-
-                //区块卸载,数据去重
-                foreach (var chunkpos in Chunks.Keys.ToArray())
+                // 弱→强提升：玩家移近后，弱区块变为强区块
+                foreach (var kv in WeakChunks)
                 {
-                    if (!rangeChunks.Contains(chunkpos))
+                    if (rangeChunks.Contains(kv.Key))
+                    {
+                        if (Chunks.TryAdd(kv.Key, kv.Value))
+                        {
+                            WeakChunks.TryRemove(kv.Key, out _);
+                            OnChunkLoaded?.Invoke(kv.Value);
+                            MarkChunkGroupDirty();
+                        }
+                    }
+                }
+
+                // 区块卸载
+                foreach (var chunkpos in Chunks.Keys)
+                {
+                    if (!rangeChunks.Contains(chunkpos) && !weakRangeChunks.Contains(chunkpos))
                     {
                         var chunk = Chunks[chunkpos];
-                        //延迟卸载，防止玩家故意卡在两个区块之间
                         if (chunk.UnloadCount++ > 20)
                         {
                             chunk.UnloadCount = 0;
                             OnChunkSaving?.Invoke(chunk);
                             SaveChunk(chunk);
                             Chunks.Remove(chunkpos, out _);
+                            MarkChunkGroupDirty();
+                        }
+                    }
+                }
+
+                foreach (var chunkpos in WeakChunks.Keys)
+                {
+                    if (!weakRangeChunks.Contains(chunkpos))
+                    {
+                        var chunk = WeakChunks[chunkpos];
+                        if (chunk.UnloadCount++ > 20)
+                        {
+                            chunk.UnloadCount = 0;
+                            SaveChunk(chunk);
+                            WeakChunks.Remove(chunkpos, out _);
                         }
                     }
                 }
@@ -353,7 +409,7 @@ public partial class ChunkServiceBase : IDisposable, ISave
             for (int y = -range; y <= range; y++)
             {
                 var pos = coord + new Vector2I(x, y);
-                if (!Chunks.ContainsKey(pos))
+                if (!Chunks.ContainsKey(pos) && !WeakChunks.ContainsKey(pos))
                 {
                     exist = false;
                     if (!LoadChunkQueue.Contains(pos))
@@ -375,19 +431,19 @@ public partial class ChunkServiceBase : IDisposable, ISave
     /// <returns>需加载的区块坐标集合（去重）</returns>
     public HashSet<Vector2I> GetAllLoadRangeChunks()
     {
-        HashSet<Vector2I> loadqueue = new HashSet<Vector2I>();
+        _rangeChunksCache.Clear();
         if (World?.Service?.PlayerService?.Players?.Values != null)
             foreach (var player in World.Service.PlayerService.Players.Values)
             {
                 if (player.State == PlayerState.Live || player.State == PlayerState.Dead)
-                    GetLoadRangeChunks(player.ChunkCoord, loadqueue);
+                    GetLoadRangeChunks(player.ChunkCoord, _rangeChunksCache);
             }
         else
         {
             // this._tokenSource.Cancel();
         }
 
-        return loadqueue;
+        return _rangeChunksCache;
     }
 
     /// <summary>
@@ -406,6 +462,34 @@ public partial class ChunkServiceBase : IDisposable, ISave
                     coords.Add(coord);
             }
         }
+    }
+
+    /// <summary>
+    /// 获取弱加载区块范围（强半径+1，用于跨区块计算，不渲染）
+    /// </summary>
+    public HashSet<Vector2I> GetWeakLoadRangeChunks()
+    {
+        _weakRangeChunksCache.Clear();
+        if (World?.Service?.PlayerService?.Players?.Values != null)
+        {
+            int weakHorizon = LoadHorizon + 1;
+            foreach (var player in World.Service.PlayerService.Players.Values)
+            {
+                if (player.State == PlayerState.Live || player.State == PlayerState.Dead)
+                {
+                    for (int X = player.ChunkCoord.X - weakHorizon; X <= player.ChunkCoord.X + weakHorizon; X++)
+                    {
+                        for (int Y = player.ChunkCoord.Y - weakHorizon; Y <= player.ChunkCoord.Y + weakHorizon; Y++)
+                        {
+                            var coord = new Vector2I(X, Y);
+                            if (!_weakRangeChunksCache.Contains(coord))
+                                _weakRangeChunksCache.Add(coord);
+                        }
+                    }
+                }
+            }
+        }
+        return _weakRangeChunksCache;
     }
 
     /// <summary>
@@ -464,9 +548,8 @@ public partial class ChunkServiceBase : IDisposable, ISave
     /// <returns>方块数据，或 <c>null</c>（若区块未加载或坐标越界）</returns>
     public BlockData GetBlock(Vector3I globalPosition)
     {
-        // todo: 这里可以用四叉树去优化，得改区块结构
         var coord = globalPosition.MathFloor(Chunk.Size);
-        if (Chunks.TryGetValue(coord, out var chunk))
+        if (Chunks.TryGetValue(coord, out var chunk) || WeakChunks.TryGetValue(coord, out chunk))
         {
             Vector2I LocalCoord = globalPosition.Remainder(Chunk.Size);
             return chunk.GetBlock(LocalCoord.X, LocalCoord.Y, globalPosition.Z);
@@ -655,7 +738,8 @@ public partial class ChunkServiceBase : IDisposable, ISave
     /// </list>
     /// </summary>
     /// <param name="chunk">要更新的区块</param>
-    public void UpdateChunkLight(Chunk chunk)
+    /// <param name="skyLight">当前时间的天空光强度</param>
+    public void UpdateChunkLight(Chunk chunk, int skyLight)
     {
         if (LightMode == LightModeEnum.None)
         {
@@ -665,8 +749,6 @@ public partial class ChunkServiceBase : IDisposable, ISave
         var highmap = chunk.HighMap;
         if (highmap == null)
         {
-            GD.PrintErr("highmap is null!");
-            //chunk.HighMap = WorldGenerator.GetHighMap(chunk.X);
         }
 
         for (int x = 0; x < Chunk.Size; x++)
@@ -676,11 +758,11 @@ public partial class ChunkServiceBase : IDisposable, ISave
                 var gx = chunk.X * Chunk.Size + x;
                 var gy = chunk.Y * Chunk.Size + y;
                 var num = highmap[x, 1] - gy;
-                if (num > 0) chunk.GetBlock(x, y, 1).SetLight(SkyLight);
+                if (num > 0) chunk.GetBlock(x, y, 1).SetLight(skyLight);
                 if (num == 0)
                 {
-                    if (LightMode == LightModeEnum.RayCastMode) RayCastLights(new Vector3I(gx, gy, 1), LightSize);
-                    if (LightMode == LightModeEnum.DFSMode) DfsUpdateLight(new Vector3I(gx, gy, 1), LightSize);
+                    if (LightMode == LightModeEnum.RayCastMode) RayCastLights(new Vector3I(gx, gy, 1), skyLight);
+                    if (LightMode == LightModeEnum.DFSMode) DfsUpdateLight(new Vector3I(gx, gy, 1), skyLight);
                 }
             }
         }
@@ -689,6 +771,9 @@ public partial class ChunkServiceBase : IDisposable, ISave
         {
             foreach (var point in chunk.LightList)
             {
+                var foreBlock = chunk.GetBlock((int)point.X, (int)point.Y, 1);
+                if (foreBlock == null || foreBlock.BlockMeta.Cube) continue;
+
                 var light = new Vector2I(chunk.X * Chunk.Size + (int)point.X,
                     chunk.Y * Chunk.Size + (int)point.Y);
                 if (LightMode == LightModeEnum.DFSMode)
@@ -708,30 +793,31 @@ public partial class ChunkServiceBase : IDisposable, ISave
         if (World.PlayerNode == null) return;
         var player = World.PlayerNode.playerData;
         if (player == null) return;
-        var poss = new HashSet<Vector2I>();
-        GetLoadRangeChunks(player.ChunkCoord, poss);
-        int light = 0;
-        if (LightMode == LightModeEnum.None) light = 16;
-        List<Chunk> resultchunk = new List<Chunk>();
+        _lightPoss.Clear();
+        _resultChunk.Clear();
+        GetLoadRangeChunks(player.ChunkCoord, _lightPoss);
+        int timeSkyLight = World.Service.GetTimeBasedSkyLight(SkyLight);
+
+        // 第一轮：所有区块重置光照 + 收集列表
         foreach (var sts in Chunks)
         {
             var chunk = sts.Value;
-            if (poss.Contains(chunk.coord))
+            if (_lightPoss.Contains(chunk.coord))
             {
-                resultchunk.Add(sts.Value);
-                sts.Value.FillLight(light);
+                _resultChunk.Add(chunk);
+                chunk.FillLight(0);
             }
+        }
+
+        // 第二轮：应用光照（含跨区块传播，此时不会再有FillLight覆盖邻居）
+        if (LightMode != LightModeEnum.None)
+        {
+            foreach (var chunk in _resultChunk)
+                UpdateChunkLight(chunk, timeSkyLight);
         }
 
         if (LightMode != LightModeEnum.None)
         {
-            foreach (var sts in Chunks)
-            {
-                var chunk = sts.Value;
-                if (poss.Contains(chunk.coord))
-                    UpdateChunkLight(chunk);
-            }
-
             int lightsize = LightSize / 2;
             if (player.Mode == 1) lightsize = LightSize * 4;
             if (LightMode == LightModeEnum.DFSMode)
@@ -740,7 +826,13 @@ public partial class ChunkServiceBase : IDisposable, ISave
                 RayCastLights(new Vector3I(player.Coord.X, player.Coord.Y, 1), lightsize, 32);
         }
 
-        foreach (var chunk in resultchunk)
+        if (LightMode == LightModeEnum.None)
+        {
+            foreach (var chunk in _resultChunk)
+                chunk.FillLight(16);
+        }
+
+        foreach (var chunk in _resultChunk)
         {
             chunk.CheckLightUpdate();
         }
@@ -792,25 +884,28 @@ public partial class ChunkServiceBase : IDisposable, ISave
     }
 
     /// <summary>
-    /// 将当前所有已加载区块按“四连通连续区域”分组。
+    /// 将当前所有已加载区块按"四连通连续区域"分组。
     /// <para>用于并行 Tick 时减少线程竞争（同一组内区块相邻，可串行处理）。</para>
     /// </summary>
     /// <returns>区块坐标分组列表，每组为一个连续区域</returns>
     public List<List<Vector2I>> GetProximityChunkGroup()
     {
-        List<List<Vector2I>> result = new List<List<Vector2I>>();
+        if (!_chunkGroupDirty) return _cachedGroups;
+
+        _cachedGroups.Clear();
         HashSet<Vector2I> enterys = new();
-        foreach (var pos in Chunks.Keys.ToArray())
+        foreach (var pos in Chunks.Keys)
         {
             if (!enterys.Contains(pos))
             {
                 List<Vector2I> group = new List<Vector2I>();
                 GetProximityChunk(group, pos.X, pos.Y);
-                result.Add(group);
+                _cachedGroups.Add(group);
             }
         }
 
-        return result;
+        _chunkGroupDirty = false;
+        return _cachedGroups;
 
         void GetProximityChunk(List<Vector2I> group, int x, int y)
         {
@@ -825,6 +920,14 @@ public partial class ChunkServiceBase : IDisposable, ISave
                 GetProximityChunk(group, x, y - 1);
             }
         }
+    }
+
+    /// <summary>
+    /// 标记区块分组需要重新计算
+    /// </summary>
+    public void MarkChunkGroupDirty()
+    {
+        _chunkGroupDirty = true;
     }
 
     #endregion

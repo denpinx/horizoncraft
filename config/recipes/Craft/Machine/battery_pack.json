@@ -1,0 +1,11 @@
+{
+  "type": "craft",
+  "tag": "workbench",
+  "recipes": [
+    {
+      "template": ["---", "-#-", "---"],
+      "mask": {"#": "copper_ingot", "-": "iron_ingot"},
+      "result": ["battery_pack", 1]
+    }
+  ]
+}

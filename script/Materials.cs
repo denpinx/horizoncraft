@@ -56,7 +56,7 @@ namespace Horizoncraft.script
                 ItemMetas.Add(meta.Name, meta);
             }
 
-            GD.Print($"[Materials] 注册物品 {meta.Name,-16} \t#{meta.Id,-5}");
+            GameLogger.Info("Materials", $"注册物品 {meta.Name,-16} \t#{meta.Id,-5}");
             return meta;
         }
 
@@ -64,7 +64,7 @@ namespace Horizoncraft.script
         {
             meta.Id = BlockMetas.Count;
             BlockMetas.Add(meta.Name, meta);
-            GD.Print($"[Materials] 注册方块 {meta.Name,-16} \t#{meta.Id,-5}");
+            GameLogger.Info("Materials", $"注册方块 {meta.Name,-16} \t#{meta.Id,-5}");
 
             if (meta.OreConfig != null)
             {
@@ -240,7 +240,7 @@ namespace Horizoncraft.script
                         Dictionary<string, object> cmp_dict =
                             (Dictionary<string, object>)((Dictionary<string, object>)item_dict["components"])[cmp_name];
 
-                        GD.Print("[Materials] 创建组件构造Lambda:" + cmp_name);
+                        GameLogger.Debug("Materials", "创建组件构造Lambda:" + cmp_name);
                         itemMeta.Components.Add(LambdaCreater.CreateLambda<Component>(cmp_name, cmp_dict));
                     }
                 }
@@ -315,7 +315,7 @@ namespace Horizoncraft.script
                         Dictionary<string, object> cmp_dict =
                             (Dictionary<string, object>)((Dictionary<string, object>)config["components"])[cmp_name];
 
-                        GD.Print("[Materials] 创建组件构造Lambda:" + cmp_name);
+                        GameLogger.Debug("Materials", "创建组件构造Lambda:" + cmp_name);
                         components.Add(LambdaCreater.CreateLambda<Component>(cmp_name, cmp_dict));
                     }
                 }

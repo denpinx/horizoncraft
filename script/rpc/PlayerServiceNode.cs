@@ -3,6 +3,7 @@ using Horizoncraft.script;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Net;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.Services.chunk;
 using Horizoncraft.script.Services.player;
 using Horizoncraft.script.Services.world;
@@ -42,7 +43,7 @@ public partial class PlayerServiceNode : Node
     public void GetPlayer(string name, int peerid)
     {
         PlayerData playerData;
-        GD.Print($"[{nameof(PlayerServiceNode)}] 服务端收到玩家数据获取请求 @{name,16} #{peerid,8}");
+        GameLogger.Info("PlayerService",$"[{nameof(PlayerServiceNode)}] 服务端收到玩家数据获取请求 @{name,16} #{peerid,8}");
         if (World.Service is HostWorldService)
         {
             if (PlayerService.GetPlayerOrLoad(name, out playerData))
@@ -50,11 +51,11 @@ public partial class PlayerServiceNode : Node
                 playerData.PeerId = peerid;
                 var bytes = ByteTool.ToBytes(playerData);
                 RpcId(peerid, nameof(ReceivePlayer), bytes);
-                GD.Print($"[{nameof(PlayerServiceNode)}] 服务端已传回玩家数据");
+                GameLogger.Info("PlayerService",$"[{nameof(PlayerServiceNode)}] 服务端已传回玩家数据");
             }
             else
             {
-                GD.Print($"[{nameof(PlayerServiceNode)}] 服务端暂无该玩家数据");
+                GameLogger.Info("PlayerService",$"[{nameof(PlayerServiceNode)}] 服务端暂无该玩家数据");
             }
         }
     }
@@ -67,7 +68,7 @@ public partial class PlayerServiceNode : Node
     public void ReceivePlayer(byte[] data)
     {
         PlayerData playerData = ByteTool.FromBytes<PlayerData>(data);
-        GD.Print($"[{nameof(PlayerServiceNode)}] 客户端收到玩家数据 @{playerData.Name}");
+        GameLogger.Info("PlayerService",$"[{nameof(PlayerServiceNode)}] 客户端收到玩家数据 @{playerData.Name}");
         if (playerData.Name == PlayerNode.Profile.Name)
         {
             if (World.PlayerNode.playerData == null)

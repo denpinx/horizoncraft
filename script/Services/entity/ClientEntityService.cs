@@ -3,6 +3,7 @@ using Godot;
 using Horizoncraft.script;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Entity;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.NewProxy.player;
 
@@ -62,7 +63,7 @@ public class ClientEntityService : EntityServiceBase
 
     public override void UpdateEntityData(EntityDataSnapShot data, List<EntityDataSnapShot> CallBack = null)
     {
-        GD.Print("UpdateEntityData" + data.Uuid);
+        GameLogger.Debug("Entity","UpdateEntityData" + data.Uuid);
         //默认是主机玩家
         if (EntityDatas.TryGetValue(data.Uuid, out var entity))
         {

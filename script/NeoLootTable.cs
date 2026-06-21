@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Godot;
@@ -6,6 +7,7 @@ using Horizoncraft.script.Utility;
 
 namespace Horizoncraft.script;
 
+[Obsolete("未实装")]
 public class NeoLootTable()
 {
     public Dictionary<string, LootTable> LootTables = new();
@@ -28,7 +30,7 @@ public class NeoLootTable()
                 var item = Materials.ItemMetas[table_item.Name];
                 if (item == null)
                 {
-                    GD.PrintErr($"{nameof(NeoLootTable)} 没有物品 {table_item.Name}");
+                    GameLogger.Error("LootTable",$"{nameof(NeoLootTable)} 没有物品 {table_item.Name}");
                     continue;
                 }
 
@@ -49,7 +51,7 @@ public class NeoLootTable()
             }
 
             LootTables.Add(tableRecord.TableName, loot_table);
-            GD.Print($"加载战利品表：{tableRecord.TableName} {loot_table_file_path}");
+            GameLogger.Info("LootTable", $"加载战利品表：{tableRecord.TableName} {loot_table_file_path}");
         }
     }
 
@@ -74,7 +76,7 @@ public class NeoLootTable()
                 Table.LootItems.Add(lootItem);
                 var name = $"AutoGenerate::{meta.Name}";
                 LootTables.Add(name, Table);
-                GD.Print("NeoLootTable 自动生成配方:" + name);
+                GameLogger.Info("LootTable", "自动生成配方:" + name);
                 meta.LootTableName = name;
             }
         }
@@ -92,7 +94,7 @@ public class NeoLootTable()
             return loot_table;
         }
 
-        GD.PrintErr($"{nameof(NeoLootTable)} 没有战利品表 {loot_table_name}");
+        GameLogger.Error("LootTable",$"{nameof(NeoLootTable)} 没有战利品表 {loot_table_name}");
         return null;
     }
 }

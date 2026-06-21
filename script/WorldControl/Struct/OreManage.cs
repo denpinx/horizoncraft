@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Horizoncraft.script.Utility;
 
 namespace Horizoncraft.script.WorldControl.Struct;
 
@@ -10,7 +11,7 @@ public static class OreManage
 
     public static void Registry(OreConfig config)
     {
-        GD.Print($"[{nameof(OreManage)}] 注册矿脉结构: {config.Name} \t #{ores.Count}");
+        GameLogger.Info("Ore",$"[{nameof(OreManage)}] 注册矿脉结构: {config.Name} \t #{ores.Count}");
         ores.Add(config.Name, config);
     }
 

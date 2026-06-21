@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using Horizoncraft.script.Components;
+using Horizoncraft.script.Utility;
 
 namespace Horizoncraft.script.Inventory;
 
@@ -26,7 +27,7 @@ public class ItemMeta
     {
         if (ShowTexture != null) return ShowTexture;
         if (state > Itemset.Textures.Count)
-            GD.PrintErr("物品状态贴图遗漏!");
+            GameLogger.Error("Inventory","物品状态贴图遗漏!");
         else return Itemset.Textures[state];
         return null;
     }
@@ -61,7 +62,7 @@ public class ItemMeta
             var result_type = result.GetType();
             var itemcmp = Components.Find(cmp => cmp().GetType() == result_type);
             if (itemcmp != null) return false;
-            GD.Print($"方块组件 to 物品组件 {result.Drive} {result}");
+            GameLogger.Debug("Inventory", $"方块组件 to 物品组件 {result.Drive} {result}");
             Components.Add(func);
             return true;
         }

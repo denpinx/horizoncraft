@@ -25,13 +25,13 @@ public class NeoBlockStructManager
             return structBuild.DynamicBuild(x, y, z, rand, args);
         }
 
-        GD.PrintErr($"[{nameof(NeoBlockStructManager)}] 动态结构生成器 {name} 未定义)]");
+        GameLogger.Error("Struct",$"[{nameof(NeoBlockStructManager)}] 动态结构生成器 {name} 未定义)]");
         return null;
     }
 
     private void Register(StructBuild structBuild)
     {
-        GD.Print($"[{nameof(NeoBlockStructManager)}] 注册动态结构生成器: {structBuild.Name,-16} \t #{DynamicStructs.Count,-4}");
+        GameLogger.Info("Struct",$"[{nameof(NeoBlockStructManager)}] 注册动态结构生成器: {structBuild.Name,-16} \t #{DynamicStructs.Count,-4}");
         DynamicStructs.Add(structBuild.Name, structBuild);
     }
 
@@ -89,7 +89,7 @@ public class NeoBlockStructManager
                         }
                     }
 
-                    GD.Print(
+                    GameLogger.Info("Struct",
                         $"[{nameof(NeoBlockStructManager)}] 加载建筑结构: {BuildStruct.Name,-16}#{StaticBuildStructs.Count,-14}\t {BuildStruct.blockStructItems.Count,-4}b");
                     StaticBuildStructs.Add(BuildStruct.Name, BuildStruct);
                 }

@@ -1,0 +1,11 @@
+{
+  "type": "craft",
+  "tag": "workbench",
+  "recipes": [
+    {
+      "template": ["###", "-#-", "---"],
+      "mask": {"#": "glass", "-": "copper_ingot"},
+      "result": ["solar_generator", 1]
+    }
+  ]
+}

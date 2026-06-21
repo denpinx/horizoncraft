@@ -1,0 +1,11 @@
+{
+  "type": "craft",
+  "tag": "workbench",
+  "recipes": [
+    {
+      "template": ["# #", " - "],
+      "mask": {"#": "iron_ingot", "-": "iron_ingot", " ": "air"},
+      "result": ["iron_bucket", 1]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-namespace Horizoncraft.script.Services.message;
+namespace Horizoncraft.script.Services.Message;
 
 public class SingleMessageService : MessageServiceBase
 {

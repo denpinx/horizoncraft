@@ -2,6 +2,7 @@ using Godot;
 using Horizoncraft.script.Components.EntityComponents;
 using Horizoncraft.script.Events;
 using Horizoncraft.script.Expand;
+using Horizoncraft.script.Utility;
 namespace Horizoncraft.script.Components.Systems;
 /// <summary>
 /// 物品实体系统
@@ -15,7 +16,7 @@ public class ItemEntitySystem : EntitySystem
         var component = e.GetComponent<ItemEntityComponent>();
         if (component.ItemStack == null)
         {
-            GD.PrintErr("删除异常物品实体");
+            GameLogger.Error("Entity","删除异常物品实体");
             e.WorldService.EntityService.RemoveEntityData(e.UUID);
             return;
         }

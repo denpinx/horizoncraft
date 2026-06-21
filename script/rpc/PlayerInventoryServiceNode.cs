@@ -59,7 +59,7 @@ public partial class PlayerInventoryServiceNode : Node
             BlockInventory blockInventory = block?.GetComponent<InventoryComponent>()?.GetInventory();
             if (blockInventory != null)
             {
-                blockInventory.update = true;
+                blockInventory.Update = true;
                 playerData.OpeningBlockInventory = true;
                 playerData.OpenInventory = new System.Numerics.Vector3(x, y, z);
             }
@@ -90,7 +90,7 @@ public partial class PlayerInventoryServiceNode : Node
                 Inventory = playerData.Inventory
             };
             WorldService.PlayerService.Events.PickItem(ppi);
-            playerData.Inventory.update = true;
+            playerData.Inventory.Update = true;
         }
     }
 

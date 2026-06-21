@@ -100,7 +100,7 @@ public partial class InventoryComponent : TickComponent
             if (item == null)
             {
                 GetInventory().SetItem(i, additem);
-                GetInventory().update = true;
+                GetInventory().Update = true;
                 GetInventory().OnItemAdd?.Invoke(i, additem);
                 return true;
             }
@@ -113,7 +113,7 @@ public partial class InventoryComponent : TickComponent
                 {
                     item.Amount += additem.Amount;
                     additem.Amount = 0;
-                    GetInventory().update = true;
+                    GetInventory().Update = true;
                     GetInventory().OnItemAdd?.Invoke(i, additem);
                     return true;
                 }

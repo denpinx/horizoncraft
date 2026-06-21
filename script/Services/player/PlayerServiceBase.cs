@@ -10,6 +10,7 @@ using Horizoncraft.script.Events;
 using Horizoncraft.script.Expand;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.Services;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.WorldControl;
 using Horizoncraft.script.WorldControl.Tool;
 
@@ -130,7 +131,7 @@ public abstract class PlayerServiceBase : IDisposable, ISave
 
                     player.Update = true;
                     OnPlayerRespawn(player);
-                    GD.Print($"寻找复活点成功{pos.ToString()}");
+                    GameLogger.Info("Player", $"寻找复活点成功{pos}");
                 }
             }
         }
@@ -312,11 +313,10 @@ public abstract class PlayerServiceBase : IDisposable, ISave
     {
         foreach (var name in Players.Keys.ToArray())
         {
-            var player = Players[name];
-            if (PlayerNodes.ContainsKey(player.Name))
-
-                PlayerNodes[player.Name].SetData(player);
-
+            if (!Players.TryGetValue(name, out var player)) continue;
+            
+            if (PlayerNodes.TryGetValue(player.Name, out var snapshot))
+                snapshot.SetData(player);
             else if (!World.Service.ChunkService.Chunks.ContainsKey(player.ChunkCoord))
             {
                 if (player.RemoveCount++ > 40 && player.Name != PlayerNode.Profile.Name)
@@ -324,11 +324,11 @@ public abstract class PlayerServiceBase : IDisposable, ISave
                     player.RemoveCount = 0;
                     SavePlayer(player);
                     Players.TryRemove(name, out _);
-                    GD.Print($"[{nameof(PlayerServiceBase)}] 玩家被移出服务器 @{player.Name,-8} #{player.PeerId,-8}");
+                    GameLogger.Info("Player", $"玩家被移出服务器 @{player.Name,-8} #{player.PeerId,-8}");
                 }
             }
             //不给主机玩家创建对等体，且区块的视图被加载
-            else if (player.Name != PlayerNode.Profile.Name) //&& WorldService.world.HasTileMap(player.ChunkCoord))
+            else if (player.Name != PlayerNode.Profile.Name)
             {
                 PlayerSnapshot node = PlayerSnapshot_ps.Instantiate<PlayerSnapshot>();
                 PlayerNodes.Add(player.Name, node);
@@ -340,18 +340,17 @@ public abstract class PlayerServiceBase : IDisposable, ISave
         //数据不存在或则区块的视图没有加载则删除
         foreach (var name in PlayerNodes.Keys.ToArray())
         {
-            if (!Players.ContainsKey(name))
+            if (!PlayerNodes.TryGetValue(name, out var node)) continue;
+            
+            if (!Players.TryGetValue(name, out var player))
             {
-                var node = PlayerNodes[name];
                 PlayerNodes.Remove(name);
                 node.QueueFree();
             }
             else
             {
-                var player = Players[name];
                 if (!World.HasTileMap(player.ChunkCoord))
                 {
-                    var node = PlayerNodes[name];
                     PlayerNodes.Remove(name);
                     node.QueueFree();
                 }
@@ -403,7 +402,8 @@ public abstract class PlayerServiceBase : IDisposable, ISave
             for (int y = -1; y <= 1; y++)
             {
                 var around_chunk_pos = new Vector2I(coord.X + x, coord.Y + y);
-                if (!World.Service.ChunkService.Chunks.ContainsKey(around_chunk_pos))
+                if (!World.Service.ChunkService.Chunks.ContainsKey(around_chunk_pos)
+                    && !World.Service.ChunkService.WeakChunks.ContainsKey(around_chunk_pos))
                 {
                     if (Found)
                         Found = false;
@@ -432,8 +432,7 @@ public abstract class PlayerServiceBase : IDisposable, ISave
             //GD.Print($"空间无法生成{position.ToString()}");
         }
 
-        GD.Print(
-            $"[{nameof(PlayerServiceBase)}] #{World.Service.TickTimes,8}t 复活点周边区块未加载 @chunk({coord.X},{coord.Y})");
+        GameLogger.Info("Player", $"#{World.Service.TickTimes,8}t 复活点周边区块未加载 @chunk({coord.X},{coord.Y})");
         //区块未加载或没找到，下一Tick重新找，
         return false;
 

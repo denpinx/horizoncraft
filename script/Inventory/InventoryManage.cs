@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Godot;
+using Horizoncraft.script.Utility;
 
 namespace Horizoncraft.script.Inventory;
 
@@ -17,7 +18,7 @@ public static class InventoryManage
     {
         if (!Inventorys.ContainsKey(name))
         {
-            GD.PrintErr($"容器 {name} 不存在！");
+            GameLogger.Error("Inventory",$"容器 {name} 不存在！");
         }
 
         return (T)Inventorys[name];

@@ -10,10 +10,19 @@ namespace Horizoncraft.script.Components.Systems;
 /// </summary>
 public class FurnaceSystem : TickSystem
 {
-    public NeoRecipeManage NeoRecipeManage;
+    public NeoRecipeManage NeoRecipeManage
+    {
+        get
+        {
+            return csi.WorldService.NeoRecipeManage;
+        }
+    }
+
+    private ComponentSystemInitialize csi;
+
     public override void Initialize(ComponentSystemInitialize componentSystemInitialize)
     {
-        NeoRecipeManage = componentSystemInitialize.WorldService.NeoRecipeManage;
+        csi = componentSystemInitialize;
     }
 
     public override void InventoryTick(BlockTickEvent evnet, InventoryComponent component)

@@ -10,7 +10,11 @@ public static class RenderSystemManager
 {
     private static List<RenderSystem> RenderSystems = [];
 
-    //用下标索引，比字典快。
+    /// <summary>
+    /// 渲染时调用
+    /// </summary>
+    /// <param name="id">id</param>
+    /// <returns></returns>
     public static RenderSystem GetRender(int id)
     {
         if (id >= RenderSystems.Count) return null;
@@ -37,10 +41,15 @@ public static class RenderSystemManager
 
     static RenderSystemManager()
     {
+        //测试绘制
         RegisterRenderSystem(new TestRender());
+        //水流动绘制组
         RegisterRenderSystem(new WaterRender());
+        //芦苇生长绘制
         RegisterRenderSystem(new ReedRender());
+        //水缸绘制
         RegisterRenderSystem(new TankRender());
+        //管道链接绘制
         RegisterRenderSystem(new FluidPipeRender());
     }
 }

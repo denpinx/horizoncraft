@@ -5,6 +5,6 @@ namespace Horizoncraft.script.Inventory;
 
 public class ItemStateSet
 {
-    public List<string> TextureNames = new List<string>();
-    public Dictionary<int, Texture2D> Textures = new Dictionary<int, Texture2D>();
+    public List<string> TextureNames = new ();
+    public Dictionary<int, Texture2D> Textures = new ();
 }

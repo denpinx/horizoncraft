@@ -1,0 +1,11 @@
+{
+  "type": "craft",
+  "tag": "workbench",
+  "recipes": [
+    {
+      "template": ["#", "-"],
+      "mask": {"#": "workbench", "-": "logistics_pipeline"},
+      "result": ["interface_block", 1]
+    }
+  ]
+}

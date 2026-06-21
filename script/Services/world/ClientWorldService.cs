@@ -3,10 +3,11 @@ using Horizoncraft.script;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.NewProxy.player;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.Recipes;
 using Horizoncraft.script.Services.chunk;
 using Horizoncraft.script.Services.entity;
-using Horizoncraft.script.Services.message;
+using Horizoncraft.script.Services.Message;
 using Horizoncraft.script.Services.player;
 using Horizoncraft.script.WorldControl;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,19 +25,19 @@ public class ClientWorldService : WorldServiceBase
         world.Multiplayer.PeerConnected += id =>
         {
             Connected = true;
-            GD.Print($"[客户端] 连接成功 #{id}");
+            GameLogger.Info("Client",$"[客户端] 连接成功 #{id}");
         };
         world.Multiplayer.ConnectionFailed += () =>
         {
             Connected = false;
             ConnectFailed();
-            GD.PrintErr($"[客户端] 连接失败.");
+            GameLogger.Error("Client",$"[客户端] 连接失败.");
         };
         world.Multiplayer.ServerDisconnected += () =>
         {
             Connected = false;
             ConnectFailed();
-            GD.Print("[客户端] 服务器断开.");
+            GameLogger.Info("Client","[客户端] 服务器断开.");
         };
 
 
@@ -48,7 +49,7 @@ public class ClientWorldService : WorldServiceBase
         }
         else
         {
-            GD.PrintErr($"客户端连接失败 {result}");
+            GameLogger.Error("Client",$"客户端连接失败 {result}");
         }
         ServiceCollection.AddTransient<NeoComponentManager, NeoComponentManager>();
         ServiceCollection.AddTransient<NeoWorldGenerator, NeoWorldGenerator>();

@@ -1,0 +1,110 @@
+<Project Sdk="Godot.NET.Sdk/4.5.0">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MemoryPack" Version="1.21.4" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0-preview.2.26159.112" />
+    <PackageReference Include="SQLite" Version="3.13.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="Godot.SourceGenerators" Version="4.4.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="GodotSharp" Version="4.4.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="GodotSharpEditor" Version="4.4.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="script\Inventory\InventorySet.cs" />
+    <Compile Remove="script\Net\RemoteFunctionItem.cs" />
+    <Compile Remove="script\WorldControl\Service\ChunkService.cs" />
+    <Compile Remove="script\WorldControl\Service\EntityService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="config\vein\" />
+    <Folder Include="script\ComponentState\Storage\" />
+    <Folder Include="script\Interface\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bug.txt" />
+    <Content Include="config\block\buildblock\door.json" />
+    <Content Include="config\block\buildblock\function_blocks.json" />
+    <Content Include="config\block\buildblock\decorative_blocks.json" />
+    <Content Include="config\block\EraofEnergy\cables.json" />
+    <Content Include="config\block\EraofEnergy\energystore.json" />
+    <Content Include="config\block\EraofEnergy\generator.json" />
+    <Content Include="config\block\crop\carrot.json" />
+    <Content Include="config\block\functionBlock\InventoryBlock.json" />
+    <Content Include="config\block\logs\logs.json" />
+    <Content Include="config\block\Materials.json" />
+    <Content Include="config\block\oreblock\ores.json" />
+    <Content Include="config\block\Storage\storageBox.json" />
+    <Content Include="config\block_tscn\furnace_0.tscn" />
+    <Content Include="config\block_tscn\furnace_1.tscn" />
+    <Content Include="config\block_tscn\furnace_1.tscn31451182426.tmp" />
+    <Content Include="config\builds\desert_temple.json" />
+    <Content Include="config\builds\mine_mini_room.json" />
+    <Content Include="config\item\bamboo_block.json" />
+    <Content Include="config\item\block\blocks.json" />
+    <Content Include="config\item\gunpowder.json" />
+    <Content Include="config\item\Ingots.json" />
+    <Content Include="config\item\Materials.json" />
+    <Content Include="config\item\ores\ores.json" />
+    <Content Include="config\item\tool\axes.json" />
+    <Content Include="config\item\tool\bucket\iron_bucket.json" />
+    <Content Include="config\item\tool\shovels.json" />
+    <Content Include="config\item\tool\Tools.json" />
+    <Content Include="config\item\wood\logs.json" />
+    <Content Include="config\item\wood\planks.json" />
+    <Content Include="config\lang\cn\blockmetas.json" />
+    <Content Include="config\lang\cn\deathrattle.json" />
+    <Content Include="config\lang\cn\debug.json" />
+    <Content Include="config\lang\cn\gui.json" />
+    <Content Include="config\lang\cn\itemmetas.json" />
+    <Content Include="config\loot_table\carrot.json" />
+    <Content Include="config\recipes\Craft\Block\bamboo_block.json" />
+    <Content Include="config\recipes\Craft\Block\door.json" />
+    <Content Include="config\recipes\Craft\Block\furnace.json" />
+    <Content Include="config\recipes\Craft\Block\iron_storage_box.json" />
+    <Content Include="config\recipes\Craft\Block\ladder.json" />
+    <Content Include="config\recipes\Craft\Block\oak_pillar.json" />
+    <Content Include="config\recipes\Craft\Block\wooden_storage_box.json" />
+    <Content Include="config\recipes\Craft\Block\workbench.json" />
+    <Content Include="config\recipes\Craft\Item\oak_plank.json" />
+    <Content Include="config\recipes\Craft\Item\plank.json" />
+    <Content Include="config\recipes\Craft\Item\stick.json" />
+    <Content Include="config\recipes\Craft\Tool\axe\diamond_axe.json" />
+    <Content Include="config\recipes\Craft\Tool\axe\iron_axe.json" />
+    <Content Include="config\recipes\Craft\Tool\axe\stone_axe.json" />
+    <Content Include="config\recipes\Craft\Tool\axe\wood_axe.json" />
+    <Content Include="config\recipes\Craft\Tool\bukkit\bukkit.json" />
+    <Content Include="config\recipes\Craft\Tool\pickaxe\DiamondPickaxe.json" />
+    <Content Include="config\recipes\Craft\Tool\pickaxe\IronPickAxe.json" />
+    <Content Include="config\recipes\Craft\Tool\pickaxe\StonePickaxe.json" />
+    <Content Include="config\recipes\Craft\Tool\pickaxe\WoodPickAxe.json" />
+    <Content Include="config\recipes\Craft\Tool\shovel\diamond_shovel.json" />
+    <Content Include="config\recipes\Craft\Tool\shovel\iron_shovel.json" />
+    <Content Include="config\recipes\Craft\Tool\shovel\stone_shovel.json" />
+    <Content Include="config\recipes\Craft\Tool\shovel\wood_shovel.json" />
+    <Content Include="config\recipes\Process\furnace\ingots.json" />
+    <Content Include="config\recipes\Process\furnace\sand.json" />
+    <Content Include="config\recipes\Process\furnace\stone.json" />
+    <Content Include="config\schema\block.json" />
+    <Content Include="config\schema\item.json" />
+    <Content Include="config\schema\lang.json" />
+    <Content Include="config\schema\recipe.json" />
+    <Content Include="doc\文档-如何注册树.md" />
+    <Content Include="doc\文档-注册和使用语言文本.md" />
+    <Content Include="doc\文档-注册实体.md" />
+    <Content Include="doc\文档-注册容器菜单.md" />
+    <Content Include="doc\文档-注册物品.md" />
+    <Content Include="doc\文档-注册方块.md" />
+    <Content Include="doc\文档-注册生物群系.md" />
+    <Content Include="doc\文档-注册组件.md" />
+    <Content Include="doc\文档-注册配方.md" />
+  </ItemGroup>
+</Project>

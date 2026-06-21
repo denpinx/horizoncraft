@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=13 format=3 uid="uid://joabf0lpqylf"]
+[gd_resource type="Theme" format=3 uid="uid://joabf0lpqylf"]
 
 [ext_resource type="Texture2D" uid="uid://1563ysqub3lo" path="res://texture/Gui/panel2.png" id="1_ogh8t"]
 [ext_resource type="FontVariation" uid="uid://ce62qf4xrcdme" path="res://texture/ttf/font.tres" id="1_wmlrk"]

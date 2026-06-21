@@ -3,6 +3,7 @@ using System;
 using Horizoncraft.script;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.Net;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.Services.world;
 
 /// <summary>
@@ -24,7 +25,7 @@ public partial class EntityServiceNode : Node
     public void ClientReceiveEntityPack(byte[] bytes)
     {
         EntityPack pack = ByteTool.FromBytes<EntityPack>(bytes);
-        GD.Print("ClientReceiveEntityPack"+pack.Entitys.Count);
+        GameLogger.Info("EntityService","ClientReceiveEntityPack"+pack.Entitys.Count);
         WorldService.EntityService.ReceiveEntityPack(pack);
     }
 
@@ -32,7 +33,7 @@ public partial class EntityServiceNode : Node
     public void ServerReceiveEntityPack(byte[] bytes)
     {
         EntityPack pack = ByteTool.FromBytes<EntityPack>(bytes);
-        GD.Print("ServerReceiveEntityPack"+pack.Entitys.Count);
+        GameLogger.Info("EntityService","ServerReceiveEntityPack"+pack.Entitys.Count);
         WorldService.EntityService.ReceiveEntityPack(pack);
     }
 
@@ -81,7 +82,7 @@ public partial class EntityServiceNode : Node
             if (!euuidPack.Uuids.Contains(uuid))
             {
                 WorldService.EntityService.RemoveEntityData(uuid);
-                GD.Print($"remove uuid {uuid}");
+                GameLogger.Info("EntityService",$"remove uuid {uuid}");
             }
         }
     }

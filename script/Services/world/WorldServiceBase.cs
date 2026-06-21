@@ -8,13 +8,14 @@ using Horizoncraft.script;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Entity;
 using Horizoncraft.script.I18N;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.Net;
 using Horizoncraft.script.Recipes;
 using Horizoncraft.script.rpc;
 using Horizoncraft.script.Services;
 using Horizoncraft.script.Services.chunk;
 using Horizoncraft.script.Services.entity;
-using Horizoncraft.script.Services.message;
+using Horizoncraft.script.Services.Message;
 using Horizoncraft.script.Services.player;
 using Horizoncraft.script.WorldControl;
 using Horizoncraft.script.WorldControl.Tool;
@@ -39,7 +40,7 @@ public abstract class WorldServiceBase
     /// <summary>
     /// 定义多少Tick为一天
     /// </summary>
-    const int DayTicks = 20 * 60;
+    const int DayTicks = 20 * 60*20;
 
     const int AutoSaveSeconds = 15;
 
@@ -72,10 +73,6 @@ public abstract class WorldServiceBase
 
     /// <summary>实体节点行为,定义不同策略下的实体同步行为</summary>
     public EntityBehaviorBase EntityBehavior;
-    /// <summary>
-    /// 方块，物品，实体的元数据
-    /// </summary>
-    // public NeoMaterials NeoMaterials;
     /// <summary>
     /// 战利品表的配置
     /// </summary>
@@ -145,7 +142,7 @@ public abstract class WorldServiceBase
         PlayerService.SaveAll();
         _stopwatch.Stop();
 
-        GD.Print($"[{GetTime()}]保存结束。用时:{_stopwatch.Elapsed.TotalMicroseconds}μs");
+        GameLogger.Info("WorldService", $"保存结束 用时:{_stopwatch.Elapsed.TotalMicroseconds}μs");
     }
 
     /// <summary>
@@ -171,7 +168,7 @@ public abstract class WorldServiceBase
                     CreateDate = DateTime.Now.ToString(CultureInfo.InvariantCulture),
                     LoadDate = DateTime.Now.ToString(CultureInfo.InvariantCulture),
                 };
-                GD.Print($"新建WorldProfile at {World.WorldName}");
+                GameLogger.Info("WorldService", $"新建WorldProfile at {World.WorldName}");
                 conn.InsertWorldProfileByteValue("WorldProfile", Profile);
             }
         }
@@ -189,9 +186,9 @@ public abstract class WorldServiceBase
 
     public float GetTimeMinute()
     {
-        return (float)(TickTimes % ((float)DayTicks / 24));
+        return (float)(TickTimes % (DayTicks / 24)) * 60f / (DayTicks / 24);
     }
-
+    
     /// <summary>
     /// 获取当前的世界小时数
     /// </summary>
@@ -216,7 +213,7 @@ public abstract class WorldServiceBase
     }
 
     /// <summary>
-    /// 获取当前时间对应的光线明暗变化
+    /// 获取当前时间对应的光照明暗变化
     /// </summary>
     /// <returns></returns>
     public byte GetLightChange()
@@ -230,6 +227,26 @@ public abstract class WorldServiceBase
             return 0;
         else
             return (byte)(200 * ((hour - 17f) / 3f));
+    }
+
+    /// <summary>
+    /// 获取基于当前时间的天空光强度。
+    /// 白天（8-17点）返回最大值 <paramref name="maxValue"/>，夜晚（0-5点）返回0，其余时间平滑过渡。
+    /// </summary>
+    /// <param name="maxValue">白天的最大天空光值</param>
+    /// <returns>当前时间对应的天空光值</returns>
+    public int GetTimeBasedSkyLight(int maxValue)
+    {
+        float hour = GetTimeHour();
+        int min = 3;
+        if (hour >= 8f && hour < 17f)
+            return maxValue;
+        if (hour < 5f || hour >= 20f)
+            return min;
+        if (hour >= 5f && hour < 8f)
+            return (int)(min + (maxValue - min) * ((hour - 5f) / 3f));
+        // hour >= 17 && hour < 20
+        return (int)(min + (maxValue - min) * (1f - (hour - 17f) / 3f));
     }
 
     /// <summary>

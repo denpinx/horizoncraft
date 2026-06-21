@@ -50,7 +50,7 @@ public partial class HotBar : CanvasLayer
                 }
             }
 
-            PlayerNode.playerData.Inventory.update = false;
+            PlayerNode.playerData.Inventory.Update = false;
         }
     }
 }

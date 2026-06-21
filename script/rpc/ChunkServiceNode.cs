@@ -3,6 +3,7 @@ using Horizoncraft.script.Components;
 using Horizoncraft.script.Events.player;
 using Horizoncraft.script.Inventory;
 using Horizoncraft.script.Net;
+using Horizoncraft.script.Utility;
 using Horizoncraft.script.Services.chunk;
 using Horizoncraft.script.Services.entity;
 using Horizoncraft.script.Services.player;
@@ -49,7 +50,7 @@ public partial class ChunkServiceNode(
         {
             var chunk = sync.Chunks[i];
             chunk.TileMapFullUpdate = true;
-            GD.Print($"#{chunk.coord} 区块全量更新");
+            GameLogger.Info("ChunkService",$"#{chunk.coord} 区块全量更新");
 
             //同步区块
             ChunkService.Chunks[chunk.coord] = chunk;
@@ -73,7 +74,7 @@ public partial class ChunkServiceNode(
                 foreach (var vbd in update.VectorBlocks)
                     chunk.SetBlock(vbd.X, vbd.Y, vbd.Z, vbd.Block);
 
-                GD.Print($"#{chunk.coord} 区块增量更新:{update.VectorBlocks.Count}个方块");
+                GameLogger.Info("ChunkService",$"#{chunk.coord} 区块增量更新:{update.VectorBlocks.Count}个方块");
                 foreach (var entity in update.Entiydatas)
                     EntityService.AddEntityData(entity);
             }
@@ -131,7 +132,7 @@ public partial class ChunkServiceNode(
         }
         else
         {
-            GD.Print("收到数据,打开菜单");
+            GameLogger.Info("ChunkService","收到数据,打开菜单");
 
             if (World.PlayerNode.OpeningInventoryNode != null)
             {

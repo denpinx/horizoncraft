@@ -1,0 +1,16 @@
+{
+  "type": "craft",
+  "tag": "workbench",
+  "recipes": [
+    {
+      "template": ["-", "#"],
+      "mask": {"-": "coal", "#": "stick"},
+      "result": ["torch", 4]
+    },
+    {
+      "template": ["-", "#"],
+      "mask": {"-": "charcoal", "#": "stick"},
+      "result": ["torch", 4]
+    }
+  ]
+}

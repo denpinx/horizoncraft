@@ -1,0 +1,16 @@
+{
+  "type": "craft",
+  "tag": "workbench",
+  "recipes": [
+    {
+      "template": ["#-#", "-#-"],
+      "mask": {"#": "glass", "-": "iron_ingot"},
+      "result": ["logistics_pipeline", 4]
+    },
+    {
+      "template": ["##", "##"],
+      "mask": {"#": "logistics_pipeline"},
+      "result": ["big_logistics_pipeline", 1]
+    }
+  ]
+}

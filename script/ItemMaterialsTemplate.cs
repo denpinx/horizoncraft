@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Godot;
 using Horizoncraft.script.Components;
 using Horizoncraft.script.Inventory;
+using Horizoncraft.script.Utility;
 
 namespace Horizoncraft.script;
 
@@ -27,7 +28,7 @@ public class ItemMaterialsTemplate
         itemMeta.Description = Description;
         foreach (string cmp_name in Components.Keys)
         {
-            GD.Print("[ItemMaterialsTemplate] 创建组件构造Lambda:" + cmp_name);
+            GameLogger.Debug("Materials","[ItemMaterialsTemplate] 创建组件构造Lambda:" + cmp_name);
             itemMeta.Components.Add(
                 LambdaCreater.CreateLambda<Component>(cmp_name,
                     (Dictionary<string, object>)JsonCleaner.ConvertRoot(Components[cmp_name]))

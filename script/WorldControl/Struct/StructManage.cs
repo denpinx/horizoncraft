@@ -29,13 +29,13 @@ public static class BlockStructManager
             return structBuild.DynamicBuild(x, y, z, rand, args);
         }
 
-        GD.PrintErr($"[{nameof(BlockStructManager)}] 动态结构生成器 {name} 未定义)]");
+        GameLogger.Error("Struct",$"[{nameof(BlockStructManager)}] 动态结构生成器 {name} 未定义)]");
         return null;
     }
 
     private static void Register(StructBuild structBuild)
     {
-        GD.Print($"[{nameof(BlockStructManager)}] 注册动态结构生成器: {structBuild.Name,-16} \t #{DynamicStructs.Count,-4}");
+        GameLogger.Info("Struct",$"[{nameof(BlockStructManager)}] 注册动态结构生成器: {structBuild.Name,-16} \t #{DynamicStructs.Count,-4}");
         DynamicStructs.Add(structBuild.Name, structBuild);
     }
 
@@ -93,7 +93,7 @@ public static class BlockStructManager
                         }
                     }
 
-                    GD.Print(
+                    GameLogger.Info("Struct",
                         $"[{nameof(BlockStructManager)}] 加载建筑结构: {staticBuildStruct.Name,-16}#{StaticBuildStructs.Count,-14}\t {staticBuildStruct.blockStructItems.Count,-4}b");
                     StaticBuildStructs.Add(staticBuildStruct.Name, staticBuildStruct);
                 }

@@ -31,6 +31,7 @@ namespace Horizoncraft.script.Components;
 [MemoryPackUnion(18, typeof(ExpandReactiveComponent))]
 [MemoryPackUnion(19, typeof(ConnectComponent))]
 [MemoryPackUnion(20, typeof(TankComponent))]
+[MemoryPackUnion(21, typeof(ExplosiveComponent))]
 public abstract partial class Component
 {
     [MemoryPackAllowSerialize] private string _drive;
