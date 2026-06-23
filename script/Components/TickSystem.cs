@@ -33,7 +33,7 @@ namespace Horizoncraft.script.Components
                     {
                         tc.Current++;
                     }
-                }
+            }
                 else if (component is ReactiveComponent rc)
                 {
                     ReactiveTick(worldEvent as BlockTickEvent, rc);

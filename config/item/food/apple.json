@@ -1,0 +1,11 @@
+{
+    "apple": {
+        "components": {
+            "ItemEatableComponent": {
+                "Drive": "ItemEatableComponent",
+                "UseTime": 1,
+                "Hunger": 5
+            }
+        }
+    }
+}

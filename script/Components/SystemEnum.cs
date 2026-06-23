@@ -31,4 +31,5 @@ public enum SystemEnum
     FluidPipeSystem,
     CactusSystem,
     ExplosionSystem,
+    PillarSystem
 }

@@ -199,7 +199,8 @@ public class NeoComponentManager
 
             if (component.Drive == null)
             {
-                GameLogger.Error("Component", $"该组件没有 Drive。component={component.EnumId} block={blockData.BlockMeta.Name}");
+                GameLogger.Error("Component",
+                    $"该组件没有 Drive。component={component.EnumId} block={blockData.BlockMeta.Name}");
                 continue;
             }
 
@@ -234,17 +235,17 @@ public class NeoComponentManager
     //注意：有些组件会在事件触发时修改物品或方块状态，不是所有组件都能够相互兼容。
     public NeoComponentManager(WorldServiceBase worldServiceBase)
     {
-        //顶部方块覆盖组件
+        //顶部方块覆盖组件，如果顶部有方块，就替换当前方块
         Register(SystemEnum.BlockCover,
             typeof(ExpandComponent),
             new BlockCoverSystem()
         );
-        //方块扩散组件
+        //方块扩散组件，如果周围是指定方块，就随机蔓延
         Register(SystemEnum.BlockSpread,
             typeof(ExpandComponent),
             new BlockSpreadSystem()
         );
-        //底部检查组件
+        //底部检查组件，确保底部不是空气
         Register(SystemEnum.BottomCheck,
             typeof(BottomCheckComponent),
             new BottomCheckSystem()
@@ -255,11 +256,12 @@ public class NeoComponentManager
             new FluidSystem()
         );
         //物理组件,模拟沙子掉落
+        //如果左右有空气方块，且顶部有当前组件的方块，就会移动顶部的方块到左右
         Register(SystemEnum.PhysicsComponent,
             typeof(PhysicsComponent),
             new PhysicsSystem()
         );
-        //箱子容器组件
+        //箱子容器组件,可以存储物品
         Register(SystemEnum.BoxComponent,
             typeof(InventoryComponent),
             new InventorySystem()
@@ -274,12 +276,12 @@ public class NeoComponentManager
             typeof(TickComponent),
             new LogisticsInputSystem()
         );
-        //工作台组件
+        //工作台组件，可以合成物品
         Register(SystemEnum.WorkBenchComponent,
             typeof(InventoryComponent),
             new WorkBenchSystem()
         );
-        //物品耐久&工具组件
+        //工具组件，让工具具有耐久
         Register(SystemEnum.ToolSystem,
             typeof(ToolComponent),
             new ItemDurableSystem()
@@ -289,22 +291,22 @@ public class NeoComponentManager
             typeof(ItemEntityComponent),
             new ItemEntitySystem()
         );
-        //太阳能板组件
+        //太阳能板组件，白天才能工作
         Register(SystemEnum.SolarGenerator,
             typeof(EnergyUnitComponent),
             new SolarGeneratorSystem()
         );
-        //能量线缆组件
+        //能量线缆组件，可以向周围传输能量，自生也有能量缓存
         Register(SystemEnum.EnergyCable,
             typeof(EnergyUnitComponent),
             new EnergyCableSystem()
         );
-        //植作物生长组件
+        //植作物生长组件，随机tick生长
         Register(SystemEnum.CropGrowComponent,
             typeof(CropGrowComponent),
             new CropGrowthSystem()
         );
-        //可食用物品组件
+        //可食用物品组件，让物品可以被食用
         Register(
             SystemEnum.ItemEatableComponent,
             typeof(ItemEatableComponent),
@@ -316,6 +318,7 @@ public class NeoComponentManager
             new PlaceBlockBottomMatchSystem()
         );
         //门-联动更新系统，门的状态被更新时，自动一起关系，门的结构被破坏时自动消失另一部分。
+        //例：下半部分被右键打开，上面部分同步打开，关闭也是一样
         Register(SystemEnum.DoorLinkPlace,
             typeof(ItemComponent),
             new DoorLinkPlaceSystem()
@@ -326,44 +329,61 @@ public class NeoComponentManager
             new DoorLinkUpdateSystem()
         );
         //让物品能够消耗自己放置流体.
+        //可以实现水桶->放置水方块->空水桶
         Register(SystemEnum.PlaceFluidSystem,
             typeof(ItemFluidComponent),
             new PlaceFluidSystem()
         );
         //竹子生长系统
+        //随机tick生长一格，到达上限高度后停止
         Register(SystemEnum.BambooSystem,
             typeof(ReactiveComponent),
             new BambooSystem()
         );
         //竹笋生长系统
+        //随机tick后变成竹子
         Register(SystemEnum.BambooShootSystem,
             typeof(ReactiveComponent),
             new BambooShootSystem()
         );
         //芦苇生长系统
+        //随机tick生长一格，到达上限高度后停止
         Register(SystemEnum.ReedSystem,
             typeof(ReactiveComponent),
             new ReedSystem()
         );
         //水缸系统
+        //可以存储流体
         Register(SystemEnum.TankSystem,
             typeof(TankComponent),
             new IronTankSystem()
         );
         //流体管道
+        //可以传输流体
         Register(SystemEnum.FluidPipeSystem,
             typeof(ConnectComponent),
             new FluidPipeSystem()
         );
         //仙人掌生长组件
+        //随机时刻自动生长，到达上限后停止
         Register(SystemEnum.CactusSystem,
             typeof(ReactiveComponent),
             new CactusSystem()
         );
         //爆炸组件
+        //防止后N秒爆炸：并不会连锁爆炸
         Register(SystemEnum.ExplosionSystem,
             typeof(ExplosiveComponent),
             new ExplosiveSystem()
+        );
+        //柱子组件
+        //如果方块上下都没有实心方块：状态=0
+        //如果方块底部有实心方块：状态=1
+        //如果方块顶部有实心方块：状态=2
+        //如果方块上下都有实心方块：状态=3
+        Register(SystemEnum.PillarSystem,
+            typeof(ReactiveComponent),
+            new PillarSystem()
         );
 
         ComponentSystemInitialize csi = new ComponentSystemInitialize()
