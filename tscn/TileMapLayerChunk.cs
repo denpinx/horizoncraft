@@ -11,7 +11,7 @@ public partial class TileMapLayerChunk : Node2D
     [Export] TileMapLayer tileMapLayer_font;
     [Export] TileMapLayer tileMapLayer_back;
     [Export] ColorRect shadowRect;
-    [Export] DebugView debugView;
+    [Export] DebugView debugView;   
 
     [Export] RenderNode BackGroundDraw_Layer_0;
     [Export] RenderNode BackGroundDraw_Layer_1;

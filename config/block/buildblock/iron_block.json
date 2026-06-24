@@ -1,0 +1,9 @@
+{
+  "iron_block": {
+    "cube": true,
+    "rigidity": 1,
+    "tags": {
+      "type": "pickaxe"
+    }
+  }
+}

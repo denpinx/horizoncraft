@@ -15,7 +15,20 @@
     }
   },
   "oak_leaves": {
-    "rigidity": 0.2
+    "rigidity": 0.2,
+    
+    "loot": [
+      {
+        "drop-chance": 0.1,
+        "name": "apple",
+        "amount-chance": [
+          {
+            "amount": 1,
+            "chance": 1
+          }
+        ]
+      }
+    ]
   },
   "birch_log": {
     "rigidity": 1,

@@ -4,7 +4,7 @@
   "recipes": [
     {
       "template": ["###", "# #", "###"],
-      "mask": {"#": "iron_ingot", " ": "air"},
+      "mask": {"#": "iron_ingot", " ": "glass"},
       "result": ["iron_tank", 1]
     }
   ]

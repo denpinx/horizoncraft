@@ -3,8 +3,8 @@
   "tag": "workbench",
   "recipes": [
     {
-      "template": ["---", "-#-", "---"],
-      "mask": {"#": "copper_ingot", "-": "iron_ingot"},
+      "template": ["---", "###", "---"],
+      "mask": {"#": "battery", "-": "iron_ingot"},
       "result": ["battery_pack", 1]
     }
   ]

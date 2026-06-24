@@ -81,6 +81,7 @@
     "collide": false,
     "cube": false,
     "replace": true,
+    "light": true,
     "render": [
       "water_render"
     ],

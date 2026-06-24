@@ -57,6 +57,7 @@
     "fluid_pipe": "流体管道",
     "cactus": "仙人掌",
     "lava": "熔岩",
-    "tnt": "炸弹"
+    "tnt": "炸弹",
+    "iron_block": "铁块"
   }
 }

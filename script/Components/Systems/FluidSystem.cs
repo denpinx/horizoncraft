@@ -89,7 +89,7 @@ public class FluidSystem : TickSystem
             {
                 if (e.BlockData.State == 0)
                 {
-                    e.BlockData.SetMeta("air");
+                    e.SetBlock(air);
                     return;
                 }
                 else
@@ -102,7 +102,7 @@ public class FluidSystem : TickSystem
                                                                         e.GetRightBlock().State > 0))
                        )
                     {
-                        e.BlockData.SetMeta(air);
+                        e.SetBlock(air);
                         return;
                     }
 

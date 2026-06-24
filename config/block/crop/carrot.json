@@ -1,63 +1,63 @@
 {
   "carrot": {
-    "replace": true,
-    "rigidity": 0.5,
-    "collide": false,
-    "cube": false,
-    "tiletype": "atlas",
-    "components": {
-      "CropGrowComponent": {
-        "Drive": "CropGrowComponent",
-        "Max": 20,
-        "Water": false,
-        "GrowState": 8,
-        "GrowChance": 0.5,
-        "GrowCount": 16
-      },
-      "ItemEatableComponent": {
-        "Drive": "ItemEatableComponent",
-        "UseTime": 1,
-        "Hunger": 5
-      },
-      "BlockRelyOnComponent": {
-        "Drive": "BottomMatch",
-        "RelyOnBlockName": "farmland"
-      }
-    },
-    "loot": [
-      {
-        "drop-chance": 1,
-        "name": "carrot",
-        "amount-chance": [
-          {
-            "amount": 1,
-            "chance": 1
-          }
-        ]
-      },
-      {
-        "drop-chance": 1,
-        "drop-state": 7,
-        "name": "carrot",
-        "amount-chance": [
-          {
-            "amount": 2,
-            "chance": 1
-          },
-          {
-            "amount": 2,
-            "chance": 0.5
-          },
-          {
-            "amount": 2,
-            "chance": 0.5
-          },
-          {
-            "amount": 1,
-            "chance": 0.2
-          }
-        ]
-      }
-    ]
+	"replace": true,
+	"rigidity": 0.5,
+	"collide": false,
+	"cube": false,
+	"tiletype": "atlas",
+	"components": {
+	  "CropGrowComponent": {
+		"Drive": "CropGrowComponent",
+		"Max": 20,
+		"Water": false,
+		"GrowState": 8,
+		"GrowChance": 0.5,
+		"GrowCount": 16
+	  },
+	  "ItemEatableComponent": {
+		"Drive": "ItemEatableComponent",
+		"UseTime": 1,
+		"Hunger": 5
+	  },
+	  "BlockRelyOnComponent": {
+		"Drive": "BottomMatch",
+		"RelyOnBlockName": "farmland"
+	  }
+	},
+	"loot": [
+	  {
+		"drop-chance": 1,
+		"name": "carrot",
+		"amount-chance": [
+		  {
+			"amount": 1,
+			"chance": 1
+		  }
+		]
+	  },
+	  {
+		"drop-chance": 1,
+		"drop-state": 7,
+		"name": "carrot",
+		"amount-chance": [
+		  {
+			"amount": 2,
+			"chance": 1
+		  },
+		  {
+			"amount": 2,
+			"chance": 0.5
+		  },
+		  {
+			"amount": 2,
+			"chance": 0.5
+		  },
+		  {
+			"amount": 1,
+			"chance": 0.2
+		  }
+		]
+	  }
+	]
   }
 }

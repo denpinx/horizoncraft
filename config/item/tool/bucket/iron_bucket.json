@@ -13,6 +13,19 @@
       "fluid": "water",
       "on-used": "iron_bucket"
     },
-    "max": 1
+    "max": 4
+  },
+  "iron_bucket_lava": {
+    "components": {
+      "ItemFluidComponent": {
+        "Drive": "PlaceFluidSystem",
+        "FluidName": "lava"
+      }
+    },
+    "tags": {
+      "fluid": "lava",
+      "on-used": "iron_bucket"
+    },
+    "max": 4
   }
 }

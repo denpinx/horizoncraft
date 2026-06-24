@@ -208,14 +208,20 @@ public partial class Chunk
 
         if (meta.Light)
         {
-            if (!LightList.Contains(posv2))
-            {
-                LightList.Add(posv2);
-            }
+            LightList.Add(posv2);
         }
-        else if (data[x, y, z].BlockMeta.Light)
+        else
         {
-            LightList.Remove(posv2);
+            if (z == 1)
+            {
+                if (!data[x, y, 0].BlockMeta.Light)
+                    LightList.Remove(posv2);
+            }
+            else
+            {
+                if (!data[x, y, 1].BlockMeta.Light)
+                    LightList.Remove(posv2);
+            }
         }
 
 
@@ -248,14 +254,20 @@ public partial class Chunk
 
         if (blockData.BlockMeta.Light)
         {
-            if (!LightList.Contains(posv2))
-            {
-                LightList.Add(posv2);
-            }
+            LightList.Add(posv2);
         }
-        else if (data[x, y, z].BlockMeta.Light)
+        else
         {
-            LightList.Remove(posv2);
+            if (z == 1)
+            {
+                if (!data[x, y, 0].BlockMeta.Light)
+                    LightList.Remove(posv2);
+            }
+            else
+            {
+                if (!data[x, y, 1].BlockMeta.Light)
+                    LightList.Remove(posv2);
+            }
         }
 
         data[x, y, z].Components.Clear();

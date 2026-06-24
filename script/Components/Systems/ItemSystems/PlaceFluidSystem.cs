@@ -40,8 +40,10 @@ public class PlaceFluidSystem : ItemComponentSystem
                         resultPositon = newPos;
                     }
                 }
-                
-                if (resultBlock != null)
+
+                if (resultBlock != null
+                    && Materials.ItemMetas.TryGetValue("iron_bucket", out var ib)
+                    && playerUseItemEvent.Player.Inventory.TryAddItem(ib.GetItemStack()))
                 {
                     playerUseItemEvent.ChunkService.SetBlock(resultPositon, material);
                     playerUseItemEvent.UseItemStack.Amount -= 1;
@@ -49,7 +51,7 @@ public class PlaceFluidSystem : ItemComponentSystem
             }
             else
             {
-                GameLogger.Error("Fluid",$"{nameof(PlaceFluidSystem)}: 方块{itemFluidComponent.FluidName} 不存在");
+                GameLogger.Error("Fluid", $"{nameof(PlaceFluidSystem)}: 方块{itemFluidComponent.FluidName} 不存在");
             }
         }
 
