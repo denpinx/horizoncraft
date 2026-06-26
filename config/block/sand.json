@@ -1,0 +1,15 @@
+{
+  "sand": {
+    "rigidity": 0.5,
+    "components": {
+      "PhysicsComponent": {
+        "Drive": "PhysicsComponent",
+        "BlockName": "sand",
+        "Max": 2
+      }
+    },
+    "tags": {
+      "type": "shovel"
+    }
+  }
+}

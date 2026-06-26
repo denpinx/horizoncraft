@@ -1,0 +1,16 @@
+{
+  "wooden_storage_box": {
+    "rigidity": 0.5,
+    "components": {
+      "InventoryComponent": {
+        "Drive": "BoxComponent",
+        "Max": 20,
+        "Size": 36,
+        "InventoryName": "WoodStorageBoxInventory"
+      }
+    },
+    "tags": {
+      "type": "axe"
+    }
+  }
+}

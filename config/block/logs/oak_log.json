@@ -1,0 +1,17 @@
+{
+  "oak_log": {
+    "rigidity": 1,
+    "state": {
+      "normal": {
+        "texture": "oak_log"
+      },
+      "horizontal": {
+        "texture": "oak_log_horizontal"
+      }
+    },
+    "tags": {
+      "type": "axe",
+      "thesaurus": "log"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "stone": {
+    "rigidity": 1,
+    "tags": {
+      "type": "pickaxe"
+    },
+    "loot": [
+      {
+        "name": "cobblestone",
+        "drop-chance": 1,
+        "amount-chance": [
+          {
+            "amount": 1,
+            "chance": 1
+          }
+        ]
+      }
+    ]
+  }
+}

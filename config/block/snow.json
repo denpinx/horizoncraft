@@ -1,0 +1,8 @@
+{
+  "snow": {
+    "rigidity": 0.2,
+    "tags": {
+      "type": "shovel"
+    }
+  }
+}

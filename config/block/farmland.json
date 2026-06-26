@@ -1,0 +1,16 @@
+{
+  "farmland": {
+    "rigidity": 1,
+    "state": {
+      "normale": {
+        "texture": "farmland"
+      },
+      "dry": {
+        "texture": "dry_farmland"
+      }
+    },
+    "tags": {
+      "type": "shovel"
+    }
+  }
+}

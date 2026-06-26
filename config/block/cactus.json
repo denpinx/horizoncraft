@@ -1,0 +1,12 @@
+{
+  "cactus": {
+    "collide": false,
+    "cube": false,
+    "replace": true,
+    "components": {
+      "ReactiveComponent": {
+        "Drive": "CactusSystem"
+      }
+    }
+  }
+}

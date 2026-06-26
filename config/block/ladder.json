@@ -1,0 +1,11 @@
+{
+  "ladder": {
+    "rigidity": 0.5,
+    "collide": false,
+    "cube": false,
+    "tags": {
+      "enter_action": "no-fall",
+      "type": "axe"
+    }
+  }
+}

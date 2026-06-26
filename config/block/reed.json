@@ -1,0 +1,16 @@
+{
+  "reed": {
+    "rigidity": 0.1,
+    "collide": false,
+    "cube": false,
+    "components": {
+      "ReactiveComponent": {
+        "Drive": "ReedSystem"
+      }
+    },
+    "tile-visible": false,
+    "render": [
+      "reed_render"
+    ]
+  }
+}

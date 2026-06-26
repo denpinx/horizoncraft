@@ -1,0 +1,15 @@
+{
+  "copper_ore": {
+    "rigidity": 1,
+    "break-level": 1,
+    "ore": {
+      "deep": -1,
+      "size": 4,
+      "count": 8,
+      "range": 1
+    },
+    "tag": {
+      "type": "pickaxe"
+    }
+  }
+}

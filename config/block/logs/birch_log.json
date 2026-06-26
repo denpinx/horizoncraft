@@ -1,0 +1,17 @@
+{
+  "birch_log": {
+    "rigidity": 1,
+    "state": {
+      "normal": {
+        "texture": "birch_log"
+      },
+      "horizontal": {
+        "texture": "birch_log_horizontal"
+      }
+    },
+    "tags": {
+      "type": "axe",
+      "thesaurus": "log"
+    }
+  }
+}

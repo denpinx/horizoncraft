@@ -1,0 +1,26 @@
+{
+  "tnt": {
+    "rigidity": 0.5,
+    "cube": true,
+    "components": {
+      "ExplosiveComponent": {
+        "Drive": "ExplosionSystem",
+        "Power": 3,
+        "FuseTime": 80,
+        "Fuse": 0
+      }
+    },
+    "loot": [
+      {
+        "drop-chance": 1,
+        "name": "tnt",
+        "amount-chance": [
+          {
+            "amount": 1,
+            "chance": 1
+          }
+        ]
+      }
+    ]
+  }
+}

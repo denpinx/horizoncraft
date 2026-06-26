@@ -12,7 +12,6 @@
     "iron_bucket": "铁桶",
     "iron_bucket_water": "水桶",
     "iron_bucket_lava": "熔岩桶",
-    
     "diamond_pickaxe": "钻石镐",
     "diamond_shovel": "钻石铲",
     "diamond_axe": "钻石斧",
@@ -29,7 +28,7 @@
     "plank": "木板",
     "stick": "木棍",
     "gunpowder": "火药",
-    "apple":"苹果",
+    "apple": "苹果",
     "battery": "电池"
   }
 }

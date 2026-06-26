@@ -1,0 +1,7 @@
+{
+  "glass": {
+    "rigidity": 0.5,
+    "collide": true,
+    "cube": false
+  }
+}

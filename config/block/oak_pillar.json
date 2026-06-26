@@ -1,0 +1,16 @@
+{
+  "oak_pillar": {
+    "rigidity": 1,
+    "collide": false,
+    "cube": false,
+    "tiletype": "atlas",
+    "tags": {
+      "type": "axe"
+    },
+    "components": {
+      "ReactiveComponent": {
+        "Drive": "PillarSystem"
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "fluid_pipe": {
+    "collide": false,
+    "cube": false,
+    "expand-texture": [
+      "fluid_pipe/fluid_pipe_connect.png",
+      "fluid_pipe/fluid_pipe_input.png"
+    ],
+    "render": [
+      "fluid_pipe_render"
+    ],
+    "components": {
+      "ConnectComponent": {
+        "Drive": "FluidPipeSystem"
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "iron_tank": {
+    "rigidity": 1,
+    "collide": true,
+    "cube": false,
+    "components": {
+      "TankComponent": {
+        "Drive": "TankSystem"
+      }
+    },
+    "render": [
+      "tank_render"
+    ]
+  }
+}

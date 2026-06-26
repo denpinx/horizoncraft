@@ -1,0 +1,22 @@
+{
+  "water": {
+    "rigidity": 1,
+    "collide": false,
+    "cube": false,
+    "replace": true,
+    "render": [
+      "water_render"
+    ],
+    "tile-visible": false,
+    "components": {
+      "FluidComponent": {
+        "Drive": "FluidComponent",
+        "BlockName": "water",
+        "Max": 5
+      }
+    },
+    "tags": {
+      "enter_action": "no-fall"
+    }
+  }
+}

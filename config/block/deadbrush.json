@@ -1,0 +1,18 @@
+{
+  "deadbrush": {
+    "rigidity": 0.2,
+    "collide": false,
+    "cube": false,
+    "replace": true,
+    "components": {
+      "BottomCheckComponent": {
+        "Drive": "BottomCheck",
+        "DropItem": true
+      },
+      "BlockRelyOnComponent": {
+        "Drive": "BottomMatch",
+        "RelyOnBlockName": "sand"
+      }
+    }
+  }
+}

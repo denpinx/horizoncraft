@@ -1,0 +1,14 @@
+{
+  "input_block": {
+    "rigidity": 0.5,
+    "components": {
+      "TickComponent": {
+        "Drive": "LogisticsInputComponent"
+      }
+    },
+    "tags": {
+      "type": "any",
+      "link": "net"
+    }
+  }
+}

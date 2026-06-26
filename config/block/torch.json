@@ -1,0 +1,10 @@
+{
+  "torch": {
+    "rigidity": 0.1,
+    "collide": false,
+    "cube": false,
+    "light": true,
+    "replace": true,
+    "tiletype": "atlas"
+  }
+}

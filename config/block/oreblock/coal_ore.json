@@ -1,0 +1,20 @@
+{
+  "coal_ore": {
+    "rigidity": 1,
+    "ore": {
+      "deep": -1,
+      "size": 4,
+      "count": 12,
+      "range": 1
+    },
+    "tag": {
+      "type": "pickaxe"
+    },
+    "loot": [
+      {
+        "name": "coal",
+        "drop-chance": 1
+      }
+    ]
+  }
+}

@@ -24,7 +24,6 @@
     "button_inventory_clear": "清空物品栏",
     "button_recipe_next": "下一个配方",
     "button_recipe_last": "上一个配方",
-    
     "item_component_tip_eatable": "可食用,回复{0}点饥饿值"
   }
 }

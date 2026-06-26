@@ -1,0 +1,7 @@
+{
+  "bamboo_block": {
+    "rigidity": 1,
+    "collide": true,
+    "cube": true
+  }
+}

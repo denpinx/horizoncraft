@@ -1,0 +1,15 @@
+{
+  "tin_ore": {
+    "rigidity": 1,
+    "break-level": 2,
+    "ore": {
+      "deep": 1,
+      "size": 5,
+      "count": 8,
+      "range": 1
+    },
+    "tag": {
+      "type": "pickaxe"
+    }
+  }
+}

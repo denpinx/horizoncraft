@@ -1,0 +1,16 @@
+{
+  "bamboo": {
+    "rigidity": 1,
+    "tiletype": "atlas",
+    "collide": false,
+    "cube": false,
+    "tags": {
+      "type": "axe"
+    },
+    "components": {
+      "ReactiveComponent": {
+        "Drive": "BambooSystem"
+      }
+    }
+  }
+}

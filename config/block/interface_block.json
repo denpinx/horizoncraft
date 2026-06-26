@@ -1,0 +1,9 @@
+{
+  "interface_block": {
+    "rigidity": 0.5,
+    "tags": {
+      "type": "any",
+      "link": "net"
+    }
+  }
+}

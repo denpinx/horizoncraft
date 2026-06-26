@@ -1,0 +1,12 @@
+{
+  "big_logistics_pipeline": {
+    "rigidity": 0.8,
+    "collide": false,
+    "cube": false,
+    "tiletype": "terrain",
+    "tags": {
+      "type": "any",
+      "link": "net"
+    }
+  }
+}

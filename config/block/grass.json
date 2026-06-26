@@ -1,0 +1,15 @@
+{
+  "grass": {
+    "rigidity": 0.5,
+    "components": {
+      "ExpandComponent": {
+        "Drive": "BlockCover",
+        "BlockName": "dirt",
+        "Max": 20
+      }
+    },
+    "tags": {
+      "type": "shovel"
+    }
+  }
+}

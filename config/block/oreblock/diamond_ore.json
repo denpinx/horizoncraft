@@ -1,0 +1,21 @@
+{
+  "diamond_ore": {
+    "rigidity": 1,
+    "break-level": 2,
+    "ore": {
+      "deep": 16,
+      "size": 4,
+      "count": 7,
+      "range": 1
+    },
+    "tag": {
+      "type": "pickaxe"
+    },
+    "loot": [
+      {
+        "name": "diamond",
+        "drop-chance": 1
+      }
+    ]
+  }
+}

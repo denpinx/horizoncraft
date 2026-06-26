@@ -1,0 +1,12 @@
+{
+  "bamboo_shoot": {
+    "rigidity": 0.4,
+    "collide": false,
+    "cube": false,
+    "components": {
+      "ReactiveComponent": {
+        "Drive": "BambooShootSystem"
+      }
+    }
+  }
+}

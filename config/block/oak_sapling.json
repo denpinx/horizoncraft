@@ -1,0 +1,17 @@
+{
+  "oak_sapling": {
+    "rigidity": 0.2,
+    "collide": false,
+    "cube": false,
+    "components": {
+      "BottomCheckComponent": {
+        "Drive": "BottomCheck",
+        "DropItem": true
+      },
+      "BlockRelyOnComponent": {
+        "Drive": "BottomMatch",
+        "RelyOnBlockName": "grass"
+      }
+    }
+  }
+}

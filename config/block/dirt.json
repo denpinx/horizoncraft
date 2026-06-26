@@ -1,0 +1,14 @@
+{
+  "dirt": {
+    "rigidity": 0.4,
+    "components": {
+      "ExpandReactiveComponent": {
+        "Drive": "BlockSpread",
+        "BlockName": "grass"
+      }
+    },
+    "tags": {
+      "type": "shovel"
+    }
+  }
+}
